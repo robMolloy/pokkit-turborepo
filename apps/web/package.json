@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "eslint --max-warnings 0",
     "check-types": "next typegen && tsc --noEmit",
-    "tsc": "node_modules/.bin/tsc --noemit --watch"
+    "tsc": "cd ../.. && apps/web/node_modules/.bin/tsc --project apps/web/tsconfig.json --noemit --watch"
 
   },
   "dependencies": {
