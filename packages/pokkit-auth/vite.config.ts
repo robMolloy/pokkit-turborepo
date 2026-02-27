@@ -15,14 +15,16 @@ const viteConfig = (p: { mode: ConfigEnv }) => {
   });
 };
 
-const vitestConfig = defineVitestConfig({
-  test: {
-    environment: "jsdom",
-    globals: true,
-    setupFiles: "./src/setupTests.ts",
-  },
-});
+const vitestConfig = (_: { mode: ConfigEnv }) => {
+  return defineVitestConfig({
+    test: {
+      environment: "jsdom",
+      globals: true,
+      setupFiles: "./src/setupTests.ts",
+    },
+  });
+};
 
 export default (p: { mode: ConfigEnv }) => {
-  return mergeConfig(viteConfig(p), vitestConfig);
+  return mergeConfig(viteConfig(p), vitestConfig(p));
 };
