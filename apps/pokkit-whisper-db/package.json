@@ -1,0 +1,17 @@
+{
+  "name": "pokkit-whisper-db",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:init-dev": "go mod init app-db && go mod tidy",
+    "db:serve-dev": "go run . serve --http=\"0.0.0.0:8090\""
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  }
+}

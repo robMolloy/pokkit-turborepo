@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import "./style.css";
 import typescriptLogo from "/typescript.svg";
 import { Header, Counter } from "@repo/ui";
+import { logSomething } from "@repo/pokkit-auth";
 
 const App = () => (
   <div>
@@ -15,6 +16,7 @@ const App = () => (
     <div className="card">
       <Counter />
     </div>
+    <div onClick={() => logSomething("iya")}>asdadsa</div>
   </div>
 );
 
