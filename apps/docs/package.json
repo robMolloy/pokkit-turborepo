@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint --max-warnings 0",
-    "check-types": "next typegen && tsc --noEmit"
+    "check-types": "next typegen && tsc --noEmit",
+    "tsc": "cd ../.. && apps/docs/node_modules/.bin/tsc --project apps/docs/tsconfig.json --noemit --watch"
   },
   "dependencies": {
     "@repo/ui": "workspace:*",
