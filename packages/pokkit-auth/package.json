@@ -7,6 +7,7 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint \"**/*.ts\"",
+    "test": "vitest",
     "tsc": "cd ../.. && packages/pokkit-auth/node_modules/.bin/tsc --project packages/pokkit-auth/tsconfig.json --noemit --watch"
   },
   "dependencies": {
@@ -24,10 +25,10 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
-    "@vitejs/plugin-react": "^3.1.0",
+    "@vitejs/plugin-react-swc": "^4.2.3",
     "eslint": "^8.57.0",
     "jsdom": "^28.1.0",
-    "typescript": "5.5.4",
+    "typescript": "5.9.2",
     "vite": "^5.1.4",
     "vitest": "^4.0.18"
   }

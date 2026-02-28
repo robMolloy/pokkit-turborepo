@@ -4,7 +4,7 @@
 import type { ConfigEnv } from "vite";
 import { loadEnv, defineConfig as defineViteConfig, mergeConfig } from "vite";
 import { defineConfig as defineVitestConfig } from "vitest/config";
-import react from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react-swc";
 
 const viteConfig = (p: { mode: ConfigEnv }) => {
   const env = loadEnv(p.mode.command, process.cwd(), "");
