@@ -195,6 +195,12 @@ importers:
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
+      '@repo/pokkit-testing':
+        specifier: workspace:^
+        version: link:../pokkit-testing
+      '@repo/pokkit-testing2':
+        specifier: workspace:^
+        version: link:../pokkit-testing2
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
@@ -262,6 +268,73 @@ importers:
       typescript:
         specifier: 5.9.3
         version: 5.9.3
+
+  packages/pokkit-testing2:
+    dependencies:
+      fs-extra:
+        specifier: ^11.3.3
+        version: 11.3.3
+      pocketbase:
+        specifier: ^0.26.8
+        version: 0.26.8
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.3.1(react@18.3.1)
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+      zustand:
+        specifier: ^5.0.11
+        version: 5.0.11(@types/react@19.2.2)(react@18.3.1)
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/pokkit-testing':
+        specifier: workspace:^
+        version: link:../pokkit-testing
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@testing-library/jest-dom':
+        specifier: ^6.9.1
+        version: 6.9.1
+      '@testing-library/react':
+        specifier: ^16.3.2
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@testing-library/user-event':
+        specifier: ^14.6.1
+        version: 14.6.1(@testing-library/dom@10.4.1)
+      '@types/fs-extra':
+        specifier: ^11.0.4
+        version: 11.0.4
+      '@types/react':
+        specifier: ^19.0.1
+        version: 19.2.2
+      '@types/react-dom':
+        specifier: ^19.0.2
+        version: 19.2.2(@types/react@19.2.2)
+      '@vitejs/plugin-react-swc':
+        specifier: ^4.2.3
+        version: 4.2.3(@swc/helpers@0.5.19)(vite@5.4.21(@types/node@22.15.3))
+      eslint:
+        specifier: ^8.57.0
+        version: 8.57.1
+      jsdom:
+        specifier: ^28.1.0
+        version: 28.1.0
+      typescript:
+        specifier: 5.9.2
+        version: 5.9.2
+      vite:
+        specifier: ^5.1.4
+        version: 5.4.21(@types/node@22.15.3)
+      vitest:
+        specifier: ^4.0.18
+        version: 4.0.18(@types/node@22.15.3)(jsdom@28.1.0)
 
   packages/typescript-config: {}
 

@@ -1,5 +1,5 @@
 {
-  "name": "@repo/pokkit-auth",
+  "name": "@repo/pokkit-testing2",
   "version": "0.0.0",
   "exports": {
     ".": "./index.ts"
@@ -8,9 +8,10 @@
   "scripts": {
     "lint": "eslint \"**/*.ts\"",
     "test": "vitest",
-    "tsc": "cd ../.. && packages/pokkit-auth/node_modules/.bin/tsc --project packages/pokkit-auth/tsconfig.json --noemit --watch"
+    "tsc": "cd ../.. && packages/pokkit-testing2/node_modules/.bin/tsc --project packages/pokkit-testing2/tsconfig.json --noemit --watch"
   },
   "dependencies": {
+    "fs-extra": "^11.3.3",
     "pocketbase": "^0.26.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -20,11 +21,11 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/pokkit-testing": "workspace:^",
-    "@repo/pokkit-testing2": "workspace:^",
     "@repo/typescript-config": "workspace:*",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
+    "@types/fs-extra": "^11.0.4",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
     "@vitejs/plugin-react-swc": "^4.2.3",
