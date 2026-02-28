@@ -6,9 +6,13 @@
   },
   "license": "MIT",
   "scripts": {
+    "tsc": "cd ../.. && packages/pokkit-testing/node_modules/.bin/tsc --project packages/pokkit-testing/tsconfig.json --noemit --watch",
     "lint": "eslint \"**/*.ts\"",
     "test": "vitest",
-    "tsc": "cd ../.. && packages/pokkit-testing/node_modules/.bin/tsc --project packages/pokkit-testing/tsconfig.json --noemit --watch"
+    "db:init-dev": "cd pocketbase && go mod init app-db && go mod tidy",
+    "db:serve-dev": "cd pocketbase && go run . serve --http=\"0.0.0.0:8090\"",
+    "db:build": "cd pocketbase && go build && mkdir -p builds && mv app-db builds/app-db",
+    "db:build:on-change-to-dev": "cd pocketbase && npx nodemon --delay 1 --watch pocketbase/app-db/main.go --exec \"pnpm run db:build\""
   },
   "dependencies": {
     "fs-extra": "^11.3.3",

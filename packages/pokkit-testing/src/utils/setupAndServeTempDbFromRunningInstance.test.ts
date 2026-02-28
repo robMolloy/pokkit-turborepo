@@ -17,7 +17,7 @@ describe("pokkit-testing setupAndServeTempDbFromRunningInstance", () => {
   beforeAll(async () => {
     await spawnProcess?.kill("SIGTERM");
     spawnProcess = await setupAndServeTempDbFromRunningInstance({
-      runningBuildFilePath: "../../apps/pokkit-whisper-db/builds/app-db",
+      runningBuildFilePath: "./pocketbase/app-db",
       runningDbUrl: "http://0.0.0.0:8090",
       runningDbSuperuserEmail: superuserEmail,
       runningDbSuperuserPassword: superuserPassword,
