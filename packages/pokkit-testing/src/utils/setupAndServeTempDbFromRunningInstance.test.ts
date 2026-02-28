@@ -1,13 +1,8 @@
-import { exec, type ChildProcessWithoutNullStreams } from "child_process";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import PocketBase from "pocketbase";
-import {
-  clearDatabase,
-  getPortNumberFromDbUrl,
-  killPocketbaseInstance,
-  setupAndServeTempDbFromRunningInstance,
-} from "./";
+import { type ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
+import PocketBase from "pocketbase";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { clearDatabase, killPocketbaseInstance, setupAndServeTempDbFromRunningInstance } from "./";
 
 const tempDirPath = `_temp/pocket-testing-health-check`;
 const tempDbUrl = `http://0.0.0.0:8111`;
