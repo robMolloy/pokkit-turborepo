@@ -1,11 +1,16 @@
 import PocketBase, { CollectionModel } from "pocketbase";
-import { spawn, type ChildProcessWithoutNullStreams } from "child_process";
+import { exec, spawn, type ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
 
 const superusersCollectionName = "_superusers";
 
-const getPortNumberFromDbUrl = (url: string): string | undefined => {
+export const getPortNumberFromDbUrl = (url: string): string | undefined => {
   return url.split(":")[2]?.match(/^\d+/)?.[0];
+};
+
+export const killPocketbaseInstance = (dbServeUrl: string) => {
+  const portNumber = getPortNumberFromDbUrl(dbServeUrl);
+  exec(`kill -9 $(lsof -ti :"${portNumber}" 2>/dev/null | head -n 1) 2>/dev/null || true`);
 };
 
 /**
@@ -190,6 +195,7 @@ export const clearDatabase = async (p: {
     .authWithPassword(p.dbSuperuserEmail, p.dbSuperuserPassword);
 
   const collections = await superuserPb.collections.getFullList();
+
   const truncationPromises = collections
     .filter((coll) => coll.name !== superusersCollectionName)
     .map((coll) => superuserPb.collections.truncate(coll.name));
