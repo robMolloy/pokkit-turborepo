@@ -1,43 +1,38 @@
 {
   "name": "@repo/pokkit-testing",
   "version": "0.0.0",
-  "type": "module",
-  "private": true,
-  "files": [
-    "dist"
-  ],
-  "main": "./dist/es/index.js",
-  "module": "./dist/es/index.js",
-  "types": "./dist/es/index.d.ts",
   "exports": {
-    ".": {
-      "import": {
-        "types": "./dist/es/index.d.ts",
-        "default": "./dist/es/index.js"
-      },
-      "require": {
-        "types": "./dist/cjs/index.d.cts",
-        "default": "./dist/cjs/index.cjs"
-      }
-    }
+    ".": "./index.ts"
   },
+  "license": "MIT",
   "scripts": {
-    "build": "bunchee",
-    "dev": "bunchee --watch",
-    "lint": "eslint src/",
-    "check-types": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
-    "@types/fs-extra": "^11.0.4",
-    "@types/node": "^22.15.3",
-    "bunchee": "^6.4.0",
-    "eslint": "^9.39.0",
-    "typescript": "5.9.3"
+    "lint": "eslint \"**/*.ts\"",
+    "test": "vitest",
+    "tsc": "cd ../.. && packages/pokkit-testing/node_modules/.bin/tsc --project packages/pokkit-testing/tsconfig.json --noemit --watch"
   },
   "dependencies": {
     "fs-extra": "^11.3.3",
-    "pocketbase": "^0.26.8"
+    "pocketbase": "^0.26.8",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zod": "^4.3.6",
+    "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/pokkit-testing": "workspace:^",
+    "@repo/typescript-config": "workspace:*",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/fs-extra": "^11.0.4",
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react-swc": "^4.2.3",
+    "eslint": "^8.57.0",
+    "jsdom": "^28.1.0",
+    "typescript": "5.9.2",
+    "vite": "^5.1.4",
+    "vitest": "^4.0.18"
   }
 }

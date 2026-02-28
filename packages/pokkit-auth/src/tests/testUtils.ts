@@ -1,4 +1,4 @@
-import { setupAndServeTempDbFromRunningInstance } from "@repo/pokkit-testing2";
+import { setupAndServeTempDbFromRunningInstance } from "@repo/pokkit-testing";
 
 type TSetupAndServeTempDbFromRunningInstance = Parameters<
   typeof setupAndServeTempDbFromRunningInstance
