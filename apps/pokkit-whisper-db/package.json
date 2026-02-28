@@ -9,7 +9,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:init-dev": "go mod init app-db && go mod tidy",
-    "db:serve-dev": "go run . serve --http=\"0.0.0.0:8090\""
+    "db:serve-dev": "go run . serve --http=\"0.0.0.0:8090\"",
+    "db:build": "go build && mkdir -p builds && mv app-db builds/app-db",
+    "db:build:on-change-to-dev": "npx nodemon --delay 1 --watch pocketbase/app-db/main.go --exec \"npm run db:build\""
   },
   "dependencies": {
     "zod": "^4.3.6"
