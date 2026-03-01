@@ -5,6 +5,7 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
+    "tsc:web-ui": "turbo run tsc --filter=web --filter=@repo/ui",
     "tsc": "turbo run tsc",
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

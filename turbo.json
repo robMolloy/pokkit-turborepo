@@ -17,7 +17,6 @@
       "dependsOn": ["^test"]
     },
     "tsc": { 
-      "dependsOn": ["^tsc"]
     },
     "dev": {
       "cache": false,
