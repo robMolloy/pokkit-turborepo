@@ -1,7 +1,7 @@
 import PocketBase from "pocketbase";
 import { superusersCollectionName } from "../helpers/pbMetadata";
 
-export const clearDatabase = async (p: {
+export const clearDb = async (p: {
   dbUrl: string;
   dbSuperuserEmail: string;
   dbSuperuserPassword: string;

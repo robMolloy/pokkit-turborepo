@@ -1,3 +1,3 @@
-export * from "./clearDatabase";
-export * from "./setupAndServeTempDb";
-export * from "./setupAndServeTempDbFromRunningInstance";
+export * from "./clearDb";
+export * from "./setupAndServeDb";
+export * from "./setupAndServeDbFromRunningInstance";

@@ -7,12 +7,12 @@ import {
 
 import fse from "fs-extra";
 
-export const setupAndServeTempDb = async (p: {
+export const setupAndServeDb = async (p: {
   getCollectionsFn: () => Promise<CollectionModel[]>;
   /**
    * Ensure the db build file is executable
    */
-  writeDbBuildToTempDirFn: () => Promise<unknown>;
+  writeDbBuildToFilePathFn: () => Promise<unknown>;
   dbBuildFilePath: string;
   dbLogFilePath: string;
   dbUrl: string;
@@ -22,7 +22,7 @@ export const setupAndServeTempDb = async (p: {
   const collections = await p.getCollectionsFn();
 
   fse.ensureFileSync(p.dbBuildFilePath);
-  await p.writeDbBuildToTempDirFn();
+  await p.writeDbBuildToFilePathFn();
 
   const pbProcess = await serveBuildAndWriteLogs({
     dbBuildFilePath: p.dbBuildFilePath,

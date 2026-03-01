@@ -2,8 +2,8 @@ import { type ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
 import PocketBase from "pocketbase";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { clearDatabase } from "./clearDatabase";
-import { setupAndServeTempDbFromRunningInstance } from "./setupAndServeTempDbFromRunningInstance";
+import { clearDb } from "./clearDb";
+import { setupAndServeDbFromRunningInstance } from "./setupAndServeDbFromRunningInstance";
 import { superusersCollectionName } from "../helpers/pbMetadata";
 import {
   killPocketbaseInstanceByDbServeUrl,
@@ -21,19 +21,19 @@ const createPbInstance = () => new PocketBase(tempDbUrl);
 
 let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 
-describe("pokkit-testing clearDatabase", () => {
+describe("pokkit-testing clearDb()", () => {
   beforeAll(async () => {
     await spawnProcess?.kill("SIGTERM");
-    spawnProcess = await setupAndServeTempDbFromRunningInstance({
+    spawnProcess = await setupAndServeDbFromRunningInstance({
       runningBuildFilePath: "./pocketbase/app-db",
       runningDbUrl: "http://0.0.0.0:8090",
       runningDbSuperuserEmail: dbSuperuserEmail,
       runningDbSuperuserPassword: dbSuperuserPassword,
-      tempDbUrl,
-      tempDbLogFilePath,
-      tempDbBuildFilePath,
-      tempDbSuperuserEmail: dbSuperuserEmail,
-      tempDbSuperuserPassword: dbSuperuserPassword,
+      newDbUrl: tempDbUrl,
+      newDbLogFilePath: tempDbLogFilePath,
+      newDbBuildFilePath: tempDbBuildFilePath,
+      newDbSuperuserEmail: dbSuperuserEmail,
+      newDbSuperuserPassword: dbSuperuserPassword,
     });
   });
 
@@ -61,7 +61,7 @@ describe("pokkit-testing clearDatabase", () => {
     const userList1 = await superuserPb.collection("users").getFullList();
     expect(userList1.length).toBe(1);
 
-    await clearDatabase({
+    await clearDb({
       dbUrl: tempDbUrl,
       dbSuperuserEmail: dbSuperuserEmail,
       dbSuperuserPassword: dbSuperuserPassword,

@@ -8,16 +8,16 @@ import {
 import fse from "fs-extra";
 import PocketBase from "pocketbase";
 
-export const setupAndServeTempDbFromRunningInstance = async (p: {
+export const setupAndServeDbFromRunningInstance = async (p: {
   runningBuildFilePath: string;
   runningDbUrl: string;
   runningDbSuperuserEmail: string;
   runningDbSuperuserPassword: string;
-  tempDbBuildFilePath: string;
-  tempDbUrl: string;
-  tempDbLogFilePath: string;
-  tempDbSuperuserEmail: string;
-  tempDbSuperuserPassword: string;
+  newDbBuildFilePath: string;
+  newDbUrl: string;
+  newDbLogFilePath: string;
+  newDbSuperuserEmail: string;
+  newDbSuperuserPassword: string;
 }) => {
   try {
     const runningPb = new PocketBase(p.runningDbUrl);
@@ -28,24 +28,24 @@ export const setupAndServeTempDbFromRunningInstance = async (p: {
     );
   }
 
-  const tempBuildFilePath = p.tempDbBuildFilePath;
+  const tempBuildFilePath = p.newDbBuildFilePath;
 
-  const tempDbPortNumber = getPortNumberFromDbServeUrl(p.tempDbUrl);
+  const tempDbPortNumber = getPortNumberFromDbServeUrl(p.newDbUrl);
   if (!tempDbPortNumber) return;
 
   // copyBuildToTempFolder
-  fse.ensureFileSync(p.tempDbLogFilePath);
+  fse.ensureFileSync(p.newDbLogFilePath);
   fse.copyFileSync(p.runningBuildFilePath, tempBuildFilePath);
   const pbProcess = await serveBuildAndWriteLogs({
-    dbUrl: p.tempDbUrl,
+    dbUrl: p.newDbUrl,
     dbBuildFilePath: tempBuildFilePath,
-    dbLogFilePath: p.tempDbLogFilePath,
+    dbLogFilePath: p.newDbLogFilePath,
   });
 
   await upsertAdminCredentials({
     buildFilePath: tempBuildFilePath,
-    dbSuperuserEmail: p.tempDbSuperuserEmail,
-    dbSuperuserPassword: p.tempDbSuperuserPassword,
+    dbSuperuserEmail: p.newDbSuperuserEmail,
+    dbSuperuserPassword: p.newDbSuperuserPassword,
   });
 
   const collections = await getCollectionsFromRunningDbInstance({
@@ -55,9 +55,9 @@ export const setupAndServeTempDbFromRunningInstance = async (p: {
   });
 
   await applyCollectionsToDb({
-    dbUrl: p.tempDbUrl,
-    dbSuperuserEmail: p.tempDbSuperuserEmail,
-    dbSuperuserPassword: p.tempDbSuperuserPassword,
+    dbUrl: p.newDbUrl,
+    dbSuperuserEmail: p.newDbSuperuserEmail,
+    dbSuperuserPassword: p.newDbSuperuserPassword,
     collections,
   });
 
