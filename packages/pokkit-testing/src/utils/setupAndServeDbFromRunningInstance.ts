@@ -1,5 +1,5 @@
 import {
-  getPortNumberFromDbServeUrl,
+  getPortNumberFromDbUrl,
   serveBuildAndWriteLogs,
   upsertAdminCredentials,
   getCollectionsFromRunningDbInstance,
@@ -30,7 +30,7 @@ export const setupAndServeDbFromRunningInstance = async (p: {
 
   const tempBuildFilePath = p.newDbBuildFilePath;
 
-  const tempDbPortNumber = getPortNumberFromDbServeUrl(p.newDbUrl);
+  const tempDbPortNumber = getPortNumberFromDbUrl(p.newDbUrl);
   if (!tempDbPortNumber) return;
 
   // copyBuildToTempFolder

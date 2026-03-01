@@ -5,7 +5,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { clearDb } from "./clearDb";
 import {
   killPocketbaseInstanceBySpawnProcess,
-  killPocketbaseInstanceByDbServeUrl,
+  killPocketbaseInstanceByDbUrl,
 } from "../helpers/pbHelpers";
 import { setupAndServeDbFromRunningInstance } from "./setupAndServeDbFromRunningInstance";
 
@@ -38,7 +38,7 @@ describe("pokkit-testing setupAndServeTempDbFromRunningInstance", () => {
 
   afterAll(async () => {
     if (spawnProcess) await killPocketbaseInstanceBySpawnProcess(spawnProcess);
-    await killPocketbaseInstanceByDbServeUrl(tempDbUrl);
+    await killPocketbaseInstanceByDbUrl(tempDbUrl);
     spawnProcess = undefined;
     fse.removeSync(tempDirPath);
   });

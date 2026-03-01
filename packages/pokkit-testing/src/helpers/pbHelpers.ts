@@ -6,12 +6,12 @@ import { superusersCollectionName } from "./pbMetadata";
 
 const execAsync = promisify(exec);
 
-export const getPortNumberFromDbServeUrl = (dbServeUrl: string): string | undefined => {
-  return dbServeUrl.split(":")[2]?.match(/^\d+/)?.[0];
+export const getPortNumberFromDbUrl = (dbUrl: string): string | undefined => {
+  return dbUrl.split(":").slice(-1)[0]?.match(/^\d+/)?.[0];
 };
 
-export const killPocketbaseInstanceByDbServeUrl = (dbServeUrl: string) => {
-  const portNumber = getPortNumberFromDbServeUrl(dbServeUrl);
+export const killPocketbaseInstanceByDbUrl = (dbUrl: string) => {
+  const portNumber = getPortNumberFromDbUrl(dbUrl);
   return execAsync(
     `kill -9 $(lsof -ti :"${portNumber}" 2>/dev/null | head -n 1) 2>/dev/null || true`,
   );
@@ -40,7 +40,7 @@ export const serveBuildAndWriteLogs = async (p: {
   dbUrl: string;
 }): Promise<ChildProcessWithoutNullStreams> => {
   const dbServeUrl = p.dbUrl.replace("http://", "");
-  const dbPortNumber = getPortNumberFromDbServeUrl(p.dbUrl);
+  const dbPortNumber = getPortNumberFromDbUrl(p.dbUrl);
 
   if (!dbPortNumber)
     throw new Error(

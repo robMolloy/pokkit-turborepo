@@ -6,7 +6,7 @@ import { clearDb } from "./clearDb";
 import { setupAndServeDbFromRunningInstance } from "./setupAndServeDbFromRunningInstance";
 import { superusersCollectionName } from "../helpers/pbMetadata";
 import {
-  killPocketbaseInstanceByDbServeUrl,
+  killPocketbaseInstanceByDbUrl,
   killPocketbaseInstanceBySpawnProcess,
 } from "../helpers/pbHelpers";
 
@@ -39,7 +39,7 @@ describe("pokkit-testing clearDb()", () => {
 
   afterAll(async () => {
     if (spawnProcess) await killPocketbaseInstanceBySpawnProcess(spawnProcess);
-    await killPocketbaseInstanceByDbServeUrl(tempDbUrl);
+    await killPocketbaseInstanceByDbUrl(tempDbUrl);
     spawnProcess = undefined;
     fse.removeSync(tempDirPath);
   });

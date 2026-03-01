@@ -4,7 +4,7 @@ import PocketBase, { CollectionModel } from "pocketbase";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { clearDb } from "./clearDb";
 import {
-  killPocketbaseInstanceByDbServeUrl,
+  killPocketbaseInstanceByDbUrl,
   killPocketbaseInstanceBySpawnProcess,
 } from "../helpers/pbHelpers";
 import { setupAndServeDb } from "./setupAndServeDb";
@@ -22,7 +22,7 @@ let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 
 describe("pokkit-testing setupAndServeDb", () => {
   beforeAll(async () => {
-    await killPocketbaseInstanceByDbServeUrl(tempDbUrl);
+    await killPocketbaseInstanceByDbUrl(tempDbUrl);
     if (spawnProcess) await killPocketbaseInstanceBySpawnProcess(spawnProcess);
 
     spawnProcess = await setupAndServeDb({
@@ -44,7 +44,7 @@ describe("pokkit-testing setupAndServeDb", () => {
 
   afterAll(async () => {
     if (spawnProcess) await killPocketbaseInstanceBySpawnProcess(spawnProcess);
-    await killPocketbaseInstanceByDbServeUrl(tempDbUrl);
+    await killPocketbaseInstanceByDbUrl(tempDbUrl);
     spawnProcess = undefined;
 
     fse.removeSync(tempDirPath);
@@ -62,7 +62,7 @@ describe("pokkit-testing setupAndServeDb", () => {
 
   it("unsuccessful health check once terminated", async () => {
     if (spawnProcess) await killPocketbaseInstanceBySpawnProcess(spawnProcess);
-    await killPocketbaseInstanceByDbServeUrl(tempDbUrl);
+    await killPocketbaseInstanceByDbUrl(tempDbUrl);
 
     const userPb = createPbInstance();
     try {
