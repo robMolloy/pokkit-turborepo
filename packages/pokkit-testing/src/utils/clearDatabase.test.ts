@@ -1,18 +1,19 @@
 import { type ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
 import PocketBase from "pocketbase";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   killPocketbaseInstanceByDbServeUrl,
   killPocketbaseInstanceBySpawnProcess,
   setupAndServeTempDbFromRunningInstance,
 } from ".";
 import { clearDatabase } from "./clearDatabase";
+import { superusersCollectionName } from "./setupAndServeTempDbFromRunningInstance";
 
-const tempDirPath = `_temp/pocket-testing-health-check`;
+const tempDirPath = `_temp/clear-database`;
 const tempDbLogFilePath = `${tempDirPath}/pocketbase.log`;
 const tempDbBuildFilePath = `${tempDirPath}/app-db`;
-const tempDbUrl = `http://0.0.0.0:8112`;
+const tempDbUrl = `http://0.0.0.0:8113`;
 const dbSuperuserEmail = "admin@admin.com";
 const dbSuperuserPassword = "admin@admin.com";
 
@@ -20,7 +21,7 @@ const createPbInstance = () => new PocketBase(tempDbUrl);
 
 let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 
-describe("pokkit-testing setupAndServeTempDbFromRunningInstance", () => {
+describe("pokkit-testing clearDatabase", () => {
   beforeAll(async () => {
     await spawnProcess?.kill("SIGTERM");
     spawnProcess = await setupAndServeTempDbFromRunningInstance({
@@ -43,34 +44,33 @@ describe("pokkit-testing setupAndServeTempDbFromRunningInstance", () => {
     fse.removeSync(tempDirPath);
   });
 
-  beforeEach(async () => {
-    try {
-      await clearDatabase({
-        dbUrl: tempDbUrl,
-        dbSuperuserEmail: dbSuperuserEmail,
-        dbSuperuserPassword: dbSuperuserPassword,
-      });
-    } catch (error) {}
-  });
-
   it("expects true to be true", () => {
     expect(true).toBe(true);
   });
+  it("removes all users once the database is cleared", async () => {
+    const superuserPb = createPbInstance();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(dbSuperuserEmail, dbSuperuserPassword);
 
-  it("successful health check", async () => {
-    const userPb = createPbInstance();
-    const resp = await userPb.health.check();
-    expect(resp.code).toBe(200);
-  });
-  it("unsuccessful health check once terminated", async () => {
-    await spawnProcess?.kill("SIGTERM");
+    const userList0 = await superuserPb.collection("users").getFullList();
+    expect(userList0.length).toBe(0);
 
     const userPb = createPbInstance();
-    try {
-      const resp = await userPb.health.check();
-      expect(resp.code).not.toBe(200);
-    } catch (error) {
-      expect(error).toBeTruthy();
-    }
+    await userPb
+      .collection("users")
+      .create({ email: "new@user.com", password: "new@user.com", passwordConfirm: "new@user.com" });
+
+    const userList1 = await superuserPb.collection("users").getFullList();
+    expect(userList1.length).toBe(1);
+
+    await clearDatabase({
+      dbUrl: tempDbUrl,
+      dbSuperuserEmail: dbSuperuserEmail,
+      dbSuperuserPassword: dbSuperuserPassword,
+    });
+
+    const userList2 = await superuserPb.collection("users").getFullList();
+    expect(userList2.length).toBe(0);
   });
 });

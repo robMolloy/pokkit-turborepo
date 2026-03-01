@@ -2,10 +2,9 @@ import PocketBase, { CollectionModel } from "pocketbase";
 import { exec, spawn, type ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
 import { promisify } from "util";
+import { superusersCollectionName } from "./setupAndServeTempDbFromRunningInstance";
 
 const execAsync = promisify(exec);
-
-const superusersCollectionName = "_superusers";
 
 export const getPortNumberFromDbServeUrl = (dbServeUrl: string): string | undefined => {
   return dbServeUrl.split(":")[2]?.match(/^\d+/)?.[0];
@@ -102,7 +101,7 @@ const upsertAdminCredentials = async (p: {
  * @param dbSuperuserEmail - The email address of the superuser account.
  * @param dbSuperuserPassword - The password of the superuser account.
  */
-const getCollectionsFromDb = async (p: {
+const getCollectionsFromRunningDbInstance = async (p: {
   dbUrl: string;
   dbSuperuserEmail: string;
   dbSuperuserPassword: string;
@@ -221,7 +220,7 @@ export const setupAndServeTempDbFromRunningInstance = async (p: {
     dbSuperuserPassword: p.tempDbSuperuserPassword,
   });
 
-  const collections = await getCollectionsFromDb({
+  const collections = await getCollectionsFromRunningDbInstance({
     dbUrl: p.runningDbUrl,
     dbSuperuserEmail: p.runningDbSuperuserEmail,
     dbSuperuserPassword: p.runningDbSuperuserPassword,
@@ -235,30 +234,4 @@ export const setupAndServeTempDbFromRunningInstance = async (p: {
   });
 
   return pbProcess;
-};
-
-export const clearDatabase = async (p: {
-  dbUrl: string;
-  dbSuperuserEmail: string;
-  dbSuperuserPassword: string;
-}) => {
-  const superuserPb = new PocketBase(p.dbUrl);
-  await superuserPb
-    .collection(superusersCollectionName)
-    .authWithPassword(p.dbSuperuserEmail, p.dbSuperuserPassword);
-
-  const collections = await superuserPb.collections.getFullList();
-
-  const truncationPromises = collections
-    .filter((coll) => coll.name !== superusersCollectionName)
-    .map((coll) => superuserPb.collections.truncate(coll.name));
-  await Promise.all(truncationPromises);
-
-  const superuserRecords = await superuserPb.collection(superusersCollectionName).getFullList();
-  const deleteSuperuserPromises = superuserRecords
-    .filter((record) => record.email !== p.dbSuperuserEmail)
-    .map((record) => superuserPb.collection(superusersCollectionName).delete(record.id));
-  await Promise.all(deleteSuperuserPromises);
-
-  superuserPb.authStore.clear();
 };

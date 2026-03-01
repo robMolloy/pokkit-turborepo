@@ -3,11 +3,11 @@ import fse from "fs-extra";
 import PocketBase, { CollectionModel } from "pocketbase";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import {
-  clearDatabase,
   killPocketbaseInstanceByDbServeUrl,
   killPocketbaseInstanceBySpawnProcess,
   setupAndServeTempDb,
 } from ".";
+import { clearDatabase } from "./clearDatabase";
 
 const tempDirPath = `_temp/pocket-testing-health-check-2`;
 const tempDbBuildFilePath = `${tempDirPath}/app-db`;
@@ -20,38 +20,10 @@ const createPbInstance = () => new PocketBase(tempDbUrl);
 
 let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 
-// const setupAndServeTempDbWithDefaults = async (p: {
-//   dbUrl: string;
-//   dirPath: string;
-//   dbBuildFilePath: string;
-// }) => {
-//   return setupAndServeTempDb({
-//     getCollectionsFn: async () => {
-//       const collectionsString = fse.readFileSync("./pocketbase/collections.json", "utf-8");
-//       return JSON.parse(collectionsString) as CollectionModel[];
-//     },
-//     writeDbBuildToTempDirFn: async () => {
-//       fse.ensureFileSync(tempDbBuildFilePath);
-//       fse.copyFileSync(`./pocketbase/app-db`, tempDbBuildFilePath);
-//     },
-//     dbSuperuserEmail: dbSuperuserEmail,
-//     dbSuperuserPassword: dbSuperuserPassword,
-//     dbUrl: p.dbUrl,
-//     dirPath: p.dirPath,
-//     dbBuildFilePath: p.dbBuildFilePath,
-//   });
-// };
-
 describe("pokkit-testing setupAndServeTempDb", () => {
   beforeAll(async () => {
     await killPocketbaseInstanceByDbServeUrl(tempDbUrl);
     if (spawnProcess) await killPocketbaseInstanceBySpawnProcess(spawnProcess);
-
-    // spawnProcess = await setupAndServeTempDbWithDefaults({
-    //   dbUrl: tempDbUrl,
-    //   dirPath: tempDirPath,
-    //   dbBuildFilePath: tempDbBuildFilePath,
-    // });
 
     spawnProcess = await setupAndServeTempDb({
       getCollectionsFn: async () => {
