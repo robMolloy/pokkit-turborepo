@@ -8,7 +8,11 @@
   "scripts": {
     "lint": "eslint \"**/*.ts\"",
     "test": "vitest",
-    "tsc": "cd ../.. && packages/pokkit-auth/node_modules/.bin/tsc --project packages/pokkit-auth/tsconfig.json --noemit --watch"
+    "tsc": "cd ../.. && packages/pokkit-auth/node_modules/.bin/tsc --project packages/pokkit-auth/tsconfig.json --noemit --watch",
+    "db:init-dev": "cd pocketbase && go mod init app-db && go mod tidy",
+    "db:serve-dev": "cd pocketbase && go run . serve --http=\"0.0.0.0:8090\"",
+    "db:build": "cd pocketbase && go build && mkdir -p builds && mv app-db builds/app-db",
+    "db:build:on-change-to-dev": "cd pocketbase && npx nodemon --delay 1 --watch pocketbase/app-db/main.go --exec \"pnpm run db:build\""
   },
   "dependencies": {
     "pocketbase": "^0.26.8",
@@ -24,10 +28,12 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
+    "@types/fs-extra": "^11.0.4",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
     "@vitejs/plugin-react-swc": "^4.2.3",
     "eslint": "^8.57.0",
+    "fs-extra": "^11.3.3",
     "jsdom": "^28.1.0",
     "typescript": "5.9.2",
     "vite": "^5.1.4",

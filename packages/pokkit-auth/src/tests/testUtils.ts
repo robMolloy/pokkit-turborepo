@@ -1,20 +1,38 @@
-import { setupAndServeTempDbFromRunningInstance } from "@repo/pokkit-testing";
+import { setupAndServeDbFromRunningInstance, setupAndServeDb } from "@repo/pokkit-testing";
+import { CollectionModel } from "pocketbase";
 
-type TSetupAndServeTempDbFromRunningInstance = Parameters<
-  typeof setupAndServeTempDbFromRunningInstance
->[0];
+export const setupAndServeDbFromRunningInstanceWithDefaults = (p: {
+  newDbBuildFilePath: string;
+  newDbUrl: string;
+  newDbLogFilePath: string;
+}) =>
+  setupAndServeDbFromRunningInstance({
+    runningBuildFilePath: "../../apps/pokkit-whisper-db",
+    runningDbUrl: "http://0.0.0.0:8090",
+    runningDbSuperuserEmail: "admin@admin.com",
+    runningDbSuperuserPassword: "admin@admin.com",
+    newDbSuperuserPassword: "admin@admin.com",
+    newDbSuperuserEmail: "admin@admin.com",
+    newDbBuildFilePath: p.newDbBuildFilePath,
+    newDbUrl: p.newDbUrl,
+    newDbLogFilePath: p.newDbLogFilePath,
+  });
 
-export const setupAndServeTempDbFromRunningInstanceWithDefault = (
-  p: Partial<Omit<TSetupAndServeTempDbFromRunningInstance, "tempDbUrl" | "tempDirPath">> &
-    Pick<TSetupAndServeTempDbFromRunningInstance, "tempDbUrl" | "tempDirPath">,
-) =>
-  setupAndServeTempDbFromRunningInstance({
-    runningBuildFilePath: p.runningBuildFilePath ?? "../../apps/pokkit-whisper-db",
-    runningDbUrl: p.runningDbUrl ?? "http://0.0.0.0:8090",
-    runningDbSuperuserEmail: p.runningDbSuperuserEmail ?? "admin@admin.com",
-    runningDbSuperuserPassword: p.runningDbSuperuserPassword ?? "admin@admin.com",
-    tempDbUrl: p.tempDbUrl,
-    tempDirPath: p.tempDirPath,
-    tempDbSuperuserEmail: p.tempDbSuperuserEmail ?? "admin@admin.com",
-    tempDbSuperuserPassword: p.tempDbSuperuserPassword ?? "admin@admin.com",
+export const setupAndServeDbWithDefaults = (p: {
+  writeDbBuildToFilePathFn: () => Promise<unknown>;
+  dbUrl: string;
+  dbBuildFilePath: string;
+  dbLogFilePath: string;
+}) =>
+  setupAndServeDb({
+    getCollectionsFn: function (): Promise<CollectionModel[]> {
+      throw new Error("Function not implemented.");
+    },
+    dbSuperuserEmail: "admin@admin.com",
+    dbSuperuserPassword: "admin@admin.com",
+
+    writeDbBuildToFilePathFn: p.writeDbBuildToFilePathFn,
+    dbBuildFilePath: p.dbBuildFilePath,
+    dbLogFilePath: p.dbLogFilePath,
+    dbUrl: p.dbUrl,
   });
