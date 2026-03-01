@@ -2,12 +2,12 @@ import { type ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
 import PocketBase, { CollectionModel } from "pocketbase";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { clearDatabase } from "./clearDatabase";
 import {
   killPocketbaseInstanceByDbServeUrl,
   killPocketbaseInstanceBySpawnProcess,
-  setupAndServeTempDb,
-} from ".";
-import { clearDatabase } from "./clearDatabase";
+} from "../helpers/pbHelpers";
+import { setupAndServeTempDb } from "./setupAndServeTempDb";
 
 const tempDirPath = `_temp/pocket-testing-health-check-2`;
 const tempDbBuildFilePath = `${tempDirPath}/app-db`;

@@ -1,5 +1,5 @@
 import PocketBase from "pocketbase";
-import { superusersCollectionName } from "./setupAndServeTempDbFromRunningInstance";
+import { superusersCollectionName } from "../helpers/pbMetadata";
 
 export const clearDatabase = async (p: {
   dbUrl: string;

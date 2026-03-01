@@ -2,13 +2,13 @@ import { type ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
 import PocketBase from "pocketbase";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { clearDatabase } from "./clearDatabase";
+import { setupAndServeTempDbFromRunningInstance } from "./setupAndServeTempDbFromRunningInstance";
+import { superusersCollectionName } from "../helpers/pbMetadata";
 import {
   killPocketbaseInstanceByDbServeUrl,
   killPocketbaseInstanceBySpawnProcess,
-  setupAndServeTempDbFromRunningInstance,
-} from ".";
-import { clearDatabase } from "./clearDatabase";
-import { superusersCollectionName } from "./setupAndServeTempDbFromRunningInstance";
+} from "../helpers/pbHelpers";
 
 const tempDirPath = `_temp/clear-database`;
 const tempDbLogFilePath = `${tempDirPath}/pocketbase.log`;
@@ -44,9 +44,6 @@ describe("pokkit-testing clearDatabase", () => {
     fse.removeSync(tempDirPath);
   });
 
-  it("expects true to be true", () => {
-    expect(true).toBe(true);
-  });
   it("removes all users once the database is cleared", async () => {
     const superuserPb = createPbInstance();
     await superuserPb
