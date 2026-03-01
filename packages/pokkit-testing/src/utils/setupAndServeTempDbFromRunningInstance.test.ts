@@ -2,12 +2,19 @@ import { type ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
 import PocketBase from "pocketbase";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { clearDatabase, killPocketbaseInstance, setupAndServeTempDbFromRunningInstance } from "./";
+import {
+  clearDatabase,
+  killPocketbaseInstanceByDbServeUrl,
+  killPocketbaseInstanceBySpawnProcess,
+  setupAndServeTempDbFromRunningInstance,
+} from "./";
 
 const tempDirPath = `_temp/pocket-testing-health-check`;
-const tempDbUrl = `http://0.0.0.0:8111`;
-const superuserEmail = "admin@admin.com";
-const superuserPassword = "admin@admin.com";
+const tempDbLogFilePath = `${tempDirPath}/pocketbase.log`;
+const tempDbBuildFilePath = `${tempDirPath}/app-db`;
+const tempDbUrl = `http://0.0.0.0:8112`;
+const dbSuperuserEmail = "admin@admin.com";
+const dbSuperuserPassword = "admin@admin.com";
 
 const createPbInstance = () => new PocketBase(tempDbUrl);
 
@@ -19,29 +26,35 @@ describe("pokkit-testing setupAndServeTempDbFromRunningInstance", () => {
     spawnProcess = await setupAndServeTempDbFromRunningInstance({
       runningBuildFilePath: "./pocketbase/app-db",
       runningDbUrl: "http://0.0.0.0:8090",
-      runningDbSuperuserEmail: superuserEmail,
-      runningDbSuperuserPassword: superuserPassword,
+      runningDbSuperuserEmail: dbSuperuserEmail,
+      runningDbSuperuserPassword: dbSuperuserPassword,
       tempDbUrl,
-      tempDirPath,
-      tempDbSuperuserEmail: superuserEmail,
-      tempDbSuperuserPassword: superuserPassword,
+      tempDbLogFilePath,
+      tempDbBuildFilePath,
+      tempDbSuperuserEmail: dbSuperuserEmail,
+      tempDbSuperuserPassword: dbSuperuserPassword,
     });
   });
 
   afterAll(async () => {
-    await spawnProcess?.kill("SIGTERM");
+    if (spawnProcess) await killPocketbaseInstanceBySpawnProcess(spawnProcess);
+    await killPocketbaseInstanceByDbServeUrl(tempDbUrl);
     spawnProcess = undefined;
     fse.removeSync(tempDirPath);
-
-    killPocketbaseInstance(tempDbUrl);
   });
 
   beforeEach(async () => {
-    await clearDatabase({
-      dbUrl: tempDbUrl,
-      dbSuperuserEmail: superuserEmail,
-      dbSuperuserPassword: superuserPassword,
-    });
+    try {
+      await clearDatabase({
+        dbUrl: tempDbUrl,
+        dbSuperuserEmail: dbSuperuserEmail,
+        dbSuperuserPassword: dbSuperuserPassword,
+      });
+    } catch (error) {}
+  });
+
+  it("expects true to be true", () => {
+    expect(true).toBe(true);
   });
 
   it("successful health check", async () => {

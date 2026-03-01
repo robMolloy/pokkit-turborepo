@@ -1,16 +1,26 @@
 import PocketBase, { CollectionModel } from "pocketbase";
 import { exec, spawn, type ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
+import { promisify } from "util";
+
+const execAsync = promisify(exec);
 
 const superusersCollectionName = "_superusers";
 
-export const getPortNumberFromDbUrl = (url: string): string | undefined => {
-  return url.split(":")[2]?.match(/^\d+/)?.[0];
+export const getPortNumberFromDbServeUrl = (dbServeUrl: string): string | undefined => {
+  return dbServeUrl.split(":")[2]?.match(/^\d+/)?.[0];
 };
 
-export const killPocketbaseInstance = (dbServeUrl: string) => {
-  const portNumber = getPortNumberFromDbUrl(dbServeUrl);
-  exec(`kill -9 $(lsof -ti :"${portNumber}" 2>/dev/null | head -n 1) 2>/dev/null || true`);
+export const killPocketbaseInstanceByDbServeUrl = (dbServeUrl: string) => {
+  const portNumber = getPortNumberFromDbServeUrl(dbServeUrl);
+  return execAsync(
+    `kill -9 $(lsof -ti :"${portNumber}" 2>/dev/null | head -n 1) 2>/dev/null || true`,
+  );
+};
+export const killPocketbaseInstanceBySpawnProcess = (
+  spawnProcess: ChildProcessWithoutNullStreams,
+) => {
+  return spawnProcess.kill("SIGTERM");
 };
 
 /**
@@ -25,20 +35,21 @@ export const killPocketbaseInstance = (dbServeUrl: string) => {
  * @param dbUrl - Database URL in the format http://anyurl:1234 (port number after second colon).
  */
 const serveBuildAndWriteLogs = async (p: {
-  buildFilePath: string;
-  logFileDirPath: string;
+  dbBuildFilePath: string;
+  dbLogFilePath: string;
   dbUrl: string;
 }): Promise<ChildProcessWithoutNullStreams> => {
   const dbServeUrl = p.dbUrl.replace("http://", "");
-  const dbPortNumber = getPortNumberFromDbUrl(p.dbUrl);
+  const dbPortNumber = getPortNumberFromDbServeUrl(p.dbUrl);
 
   if (!dbPortNumber)
     throw new Error(
       `Invalid dbUrl: ${p.dbUrl} - requires format http://anyurl:1234 (port number after second colon)`,
     );
 
-  const logStream = fse.createWriteStream(`${p.logFileDirPath}/pocketbase.log`, { flags: "a" });
-  const pbProcess = spawn(p.buildFilePath, ["serve", `--http=${dbServeUrl}`]);
+  fse.ensureFileSync(p.dbLogFilePath);
+  const logStream = fse.createWriteStream(p.dbLogFilePath, { flags: "a" });
+  const pbProcess = spawn(p.dbBuildFilePath, ["serve", `--http=${dbServeUrl}`]);
 
   return new Promise((resolve) => {
     pbProcess.stdout.on("data", (data) => {
@@ -131,35 +142,77 @@ export type TSetupAndServeTestDbFromRunningInstance = Parameters<
   typeof setupAndServeTempDbFromRunningInstance
 >[0];
 
+export const setupAndServeTempDb = async (p: {
+  getCollectionsFn: () => Promise<CollectionModel[]>;
+  /**
+   * Ensure the db build file is executable
+   */
+  writeDbBuildToTempDirFn: () => Promise<unknown>;
+  dbBuildFilePath: string;
+  dbLogFilePath: string;
+  dbUrl: string;
+  dbSuperuserEmail: string;
+  dbSuperuserPassword: string;
+}) => {
+  const collections = await p.getCollectionsFn();
+
+  fse.ensureFileSync(p.dbBuildFilePath);
+  await p.writeDbBuildToTempDirFn();
+
+  const pbProcess = await serveBuildAndWriteLogs({
+    dbBuildFilePath: p.dbBuildFilePath,
+    dbLogFilePath: p.dbLogFilePath,
+    dbUrl: p.dbUrl,
+  });
+
+  await upsertAdminCredentials({
+    buildFilePath: p.dbBuildFilePath,
+    dbSuperuserEmail: p.dbSuperuserEmail,
+    dbSuperuserPassword: p.dbSuperuserPassword,
+  });
+
+  await applyCollectionsToDb({
+    dbUrl: p.dbUrl,
+    dbSuperuserEmail: p.dbSuperuserEmail,
+    dbSuperuserPassword: p.dbSuperuserPassword,
+    collections,
+  });
+
+  return pbProcess;
+};
+
 export const setupAndServeTempDbFromRunningInstance = async (p: {
   runningBuildFilePath: string;
   runningDbUrl: string;
   runningDbSuperuserEmail: string;
   runningDbSuperuserPassword: string;
+  tempDbBuildFilePath: string;
   tempDbUrl: string;
-  tempDirPath: string;
+  tempDbLogFilePath: string;
   tempDbSuperuserEmail: string;
   tempDbSuperuserPassword: string;
 }) => {
-  const pocketbaseBuildFileName = p.runningBuildFilePath
-    .split("/")
-    .filter((x) => !!x)
-    .slice(-1)[0]!;
-  const tempBuildFilePath = `${p.tempDirPath}/${pocketbaseBuildFileName}`;
+  try {
+    const runningPb = new PocketBase(p.runningDbUrl);
+    await runningPb.health.check();
+  } catch (error) {
+    throw new Error(
+      `No running PocketBase instance found at ${p.runningDbUrl} - the "setupAndServeTempDbFromRunningInstance()" command will fail without a running instance to copy from`,
+    );
+  }
 
-  const tempDbPortNumber = getPortNumberFromDbUrl(p.tempDbUrl);
+  const tempBuildFilePath = p.tempDbBuildFilePath;
+
+  const tempDbPortNumber = getPortNumberFromDbServeUrl(p.tempDbUrl);
   if (!tempDbPortNumber) return;
 
-  // deleteTempTestDir
-  fse.removeSync(p.tempDirPath);
-
   // copyBuildToTempFolder
-  fse.ensureDirSync(p.tempDirPath);
+  fse.ensureFileSync(p.tempDbLogFilePath);
   fse.copyFileSync(p.runningBuildFilePath, tempBuildFilePath);
   const pbProcess = await serveBuildAndWriteLogs({
     dbUrl: p.tempDbUrl,
-    buildFilePath: tempBuildFilePath,
-    logFileDirPath: p.tempDirPath,
+    dbBuildFilePath: tempBuildFilePath,
+    dbLogFilePath: p.tempDbLogFilePath,
   });
 
   await upsertAdminCredentials({
