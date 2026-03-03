@@ -89,8 +89,8 @@
     "indexes": [
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
-    "created": "2026-02-28 10:50:22.528Z",
-    "updated": "2026-02-28 10:50:22.528Z",
+    "created": "2026-01-25 00:57:26.146Z",
+    "updated": "2026-01-25 00:57:26.146Z",
     "system": true
   },
   {
@@ -196,8 +196,8 @@
     "indexes": [
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
-    "created": "2026-02-28 10:50:22.531Z",
-    "updated": "2026-02-28 10:50:22.531Z",
+    "created": "2026-01-25 00:57:26.147Z",
+    "updated": "2026-01-25 00:57:26.147Z",
     "system": true
   },
   {
@@ -305,8 +305,8 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_record_provider` ON `_externalAuths` (collectionRef, recordRef, provider)",
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
-    "created": "2026-02-28 10:50:22.533Z",
-    "updated": "2026-02-28 10:50:22.533Z",
+    "created": "2026-01-25 00:57:26.148Z",
+    "updated": "2026-01-25 00:57:26.148Z",
     "system": true
   },
   {
@@ -399,8 +399,8 @@
     "indexes": [
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
-    "created": "2026-02-28 10:50:22.538Z",
-    "updated": "2026-02-28 10:50:22.538Z",
+    "created": "2026-01-25 00:57:26.150Z",
+    "updated": "2026-01-25 00:57:26.150Z",
     "system": true
   },
   {
@@ -508,8 +508,8 @@
       "CREATE UNIQUE INDEX `idx_tokenKey_pbc_3142635823` ON `_superusers` (`tokenKey`)",
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
-    "created": "2026-02-28 10:50:22.541Z",
-    "updated": "2026-02-28 10:50:22.541Z",
+    "created": "2026-01-25 00:57:26.151Z",
+    "updated": "2026-01-25 00:57:26.151Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -580,8 +580,8 @@
   },
   {
     "id": "_pb_users_auth_",
-    "listRule": "id = @request.auth.id",
-    "viewRule": "id = @request.auth.id",
+    "listRule": "@request.auth.id = id ||\n@collection.globalUserPermissions.userId ?= @request.auth.id &&\n@collection.globalUserPermissions.role = \"admin\"",
+    "viewRule": "@request.auth.id = id ||\n@collection.globalUserPermissions.userId ?= @request.auth.id &&\n@collection.globalUserPermissions.role = \"admin\"",
     "createRule": "",
     "updateRule": "id = @request.auth.id",
     "deleteRule": "id = @request.auth.id",
@@ -717,8 +717,8 @@
       "CREATE UNIQUE INDEX `idx_tokenKey__pb_users_auth_` ON `users` (`tokenKey`)",
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
-    "created": "2026-02-28 10:50:22.545Z",
-    "updated": "2026-02-28 10:50:22.545Z",
+    "created": "2026-01-25 00:57:26.152Z",
+    "updated": "2026-01-30 23:54:33.769Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -786,5 +786,373 @@
       "subject": "Confirm your {APP_NAME} new email address",
       "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
     }
+  },
+  {
+    "id": "pbc_2680520508",
+    "listRule": "@request.auth.id != \"\" && (\n  @request.auth.id = id || \n  @collection.globalUserPermissions.id ?= @request.auth.id && @collection.globalUserPermissions.role ?= \"admin\"\n)",
+    "viewRule": "@request.auth.id != \"\" && @request.auth.id = id || @collection.globalUserPermissions.id ?= @request.auth.id && @collection.globalUserPermissions.role ?= \"admin\"",
+    "createRule": "@request.auth.id != \"\" && \n@collection.globalUserPermissions.id ?= @request.auth.id && \n@collection.globalUserPermissions.role ?= \"admin\"",
+    "updateRule": "@request.auth.id != \"\" && \n@collection.globalUserPermissions.id ?= @request.auth.id && \n@collection.globalUserPermissions.role ?= \"admin\"",
+    "deleteRule": "@request.auth.id != \"\" && \n@collection.globalUserPermissions.id ?= @request.auth.id && \n@collection.globalUserPermissions.role ?= \"admin\"",
+    "name": "globalUserPermissions",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "select1466534506",
+        "maxSelect": 1,
+        "name": "role",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "select",
+        "values": [
+          "standard",
+          "admin"
+        ]
+      },
+      {
+        "hidden": false,
+        "id": "select2063623452",
+        "maxSelect": 1,
+        "name": "status",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "select",
+        "values": [
+          "blocked",
+          "approved",
+          "pending"
+        ]
+      },
+      {
+        "cascadeDelete": true,
+        "collectionId": "_pb_users_auth_",
+        "hidden": false,
+        "id": "relation1689669068",
+        "maxSelect": 1,
+        "minSelect": 0,
+        "name": "userId",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "relation"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "created": "2026-01-25 00:57:26.161Z",
+    "updated": "2026-02-05 22:33:23.038Z",
+    "system": false
+  },
+  {
+    "id": "pbc_1053844701",
+    "listRule": "@request.auth.id != \"\"",
+    "viewRule": "@request.auth.id != \"\"",
+    "createRule": "@request.auth.id != \"\" && \n@collection.globalUserPermissions.userId ?= @request.auth.id && \n@collection.globalUserPermissions.role = \"admin\"",
+    "updateRule": "@request.auth.id != \"\" && \n@collection.organisationUserPermissions.userId ?= @request.auth.id && \n@collection.organisationUserPermissions.organisationId ?= id && \n@collection.organisationUserPermissions.role = \"admin\"",
+    "deleteRule": "@request.auth.id != \"\" && \n@collection.organisationUserPermissions.userId ?= @request.auth.id && \n@collection.organisationUserPermissions.organisationId ?= id && \n@collection.organisationUserPermissions.role = \"admin\"",
+    "name": "organisations",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text1579384326",
+        "max": 0,
+        "min": 0,
+        "name": "name",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text1843675174",
+        "max": 0,
+        "min": 0,
+        "name": "description",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "created": "2026-02-10 15:36:44.903Z",
+    "updated": "2026-02-15 00:09:39.543Z",
+    "system": false
+  },
+  {
+    "id": "pbc_230240349",
+    "listRule": "@request.auth.id != \"\" && \n@collection.organisationUserPermissions.userId ?= @request.auth.id && \n@collection.organisationUserPermissions.organisationId ?= organisationId && \n@collection.organisationUserPermissions.role = \"admin\"",
+    "viewRule": "@request.auth.id != \"\" && \n@collection.organisationUserPermissions.userId ?= @request.auth.id && \n@collection.organisationUserPermissions.organisationId ?= organisationId && \n@collection.organisationUserPermissions.role = \"admin\"",
+    "createRule": "@request.auth.id != \"\" && \n@collection.organisationUserPermissions.userId ?= @request.auth.id && \n@collection.organisationUserPermissions.organisationId ?= organisationId && \n@collection.organisationUserPermissions.role ?= \"admin\"",
+    "updateRule": "@request.auth.id != \"\" && \n@collection.organisationUserPermissions.userId ?= @request.auth.id && \n@collection.organisationUserPermissions.organisationId ?= organisationId && \n@collection.organisationUserPermissions.role ?= \"admin\"",
+    "deleteRule": "@request.auth.id != \"\" && \n@collection.organisationUserPermissions.userId ?= @request.auth.id && \n@collection.organisationUserPermissions.organisationId ?= organisationId && \n@collection.organisationUserPermissions.role ?= \"admin\"",
+    "name": "organisationUserPermissions",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "cascadeDelete": true,
+        "collectionId": "pbc_1053844701",
+        "hidden": false,
+        "id": "relation982184766",
+        "maxSelect": 1,
+        "minSelect": 0,
+        "name": "organisationId",
+        "presentable": false,
+        "required": true,
+        "system": false,
+        "type": "relation"
+      },
+      {
+        "hidden": false,
+        "id": "select1466534506",
+        "maxSelect": 1,
+        "name": "role",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "select",
+        "values": [
+          "standard",
+          "admin"
+        ]
+      },
+      {
+        "hidden": false,
+        "id": "select2063623452",
+        "maxSelect": 1,
+        "name": "status",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "select",
+        "values": [
+          "blocked",
+          "approved",
+          "pending"
+        ]
+      },
+      {
+        "cascadeDelete": true,
+        "collectionId": "_pb_users_auth_",
+        "hidden": false,
+        "id": "relation1689669068",
+        "maxSelect": 1,
+        "minSelect": 0,
+        "name": "userId",
+        "presentable": false,
+        "required": true,
+        "system": false,
+        "type": "relation"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text1330202256",
+        "max": 0,
+        "min": 0,
+        "name": "userOrgKey",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX `idx_0UWlVOdDqD` ON `organisationUserPermissions` (`userOrgKey`)"
+    ],
+    "created": "2026-02-10 15:36:44.907Z",
+    "updated": "2026-02-15 22:03:35.713Z",
+    "system": false
+  },
+  {
+    "id": "pbc_1115152794",
+    "listRule": "@request.auth.id != \"\" && \n@collection.organisationUserPermissions.userId ?= @request.auth.id && \n@collection.organisationUserPermissions.organisationId ?= organisationId && \n(@collection.organisationUserPermissions.role ?= \"admin\" || \n @collection.organisationUserPermissions.role ?= \"standard\")",
+    "viewRule": "@request.auth.id != \"\" && \n@collection.organisationUserPermissions.userId ?= @request.auth.id && \n@collection.organisationUserPermissions.organisationId ?= organisationId && \n(@collection.organisationUserPermissions.role ?= \"admin\" || \n @collection.organisationUserPermissions.role ?= \"standard\")",
+    "createRule": "@request.auth.id != \"\" && \n@collection.organisationUserPermissions.userId ?= @request.auth.id && \n@collection.organisationUserPermissions.organisationId ?= organisationId && \n@collection.organisationUserPermissions.role ?= \"admin\"",
+    "updateRule": "@request.auth.id != \"\" && \n@collection.organisationUserPermissions.userId ?= @request.auth.id && \n@collection.organisationUserPermissions.organisationId ?= organisationId && \n@collection.organisationUserPermissions.role ?= \"admin\"",
+    "deleteRule": "@request.auth.id != \"\" && \n@collection.organisationUserPermissions.userId ?= @request.auth.id && \n@collection.organisationUserPermissions.organisationId ?= organisationId && \n@collection.organisationUserPermissions.role ?= \"admin\"",
+    "name": "organisationNotes",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text2529069283",
+        "max": 0,
+        "min": 0,
+        "name": "markdown",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "cascadeDelete": false,
+        "collectionId": "pbc_1053844701",
+        "hidden": false,
+        "id": "relation1656987439",
+        "maxSelect": 1,
+        "minSelect": 0,
+        "name": "organisationId",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "relation"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "created": "2026-02-16 20:35:02.672Z",
+    "updated": "2026-02-16 22:52:45.210Z",
+    "system": false
   }
 ]

@@ -33,6 +33,7 @@
     "@types/react-dom": "^19.0.2",
     "@vitejs/plugin-react-swc": "^4.2.3",
     "eslint": "^8.57.0",
+    "eventsource": "^4.1.0",
     "fs-extra": "^11.3.3",
     "jsdom": "^28.1.0",
     "typescript": "5.9.2",
