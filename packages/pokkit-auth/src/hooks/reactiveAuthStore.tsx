@@ -7,8 +7,8 @@ import {
   TUser,
   userSchema,
   usersCollectionName,
-} from "./schemas/schemas";
-import { smartSubscribeToRecordById } from "./utils";
+} from "../schemas/schemas";
+import { smartSubscribeToRecordById } from "../utils";
 
 type TAuthStoreState = TAuthStore | null | undefined;
 
@@ -79,7 +79,7 @@ export const useReactiveAuthStore = () => {
   const initReactiveAuthStore = useInitReactiveAuthStore();
   const userStore = useUserStore();
 
-  if (!initReactiveAuthStore.data) return null;
+  if (!initReactiveAuthStore.data) return initReactiveAuthStore.data;
 
   return {
     ...initReactiveAuthStore.data,

@@ -10,7 +10,7 @@ import fse from "fs-extra";
 import PocketBase, { CollectionModel } from "pocketbase";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { useUserStore } from "./reactiveAuthStore";
-import { userSchema, usersCollectionName } from "./schemas/schemas";
+import { userSchema, usersCollectionName } from "../schemas/schemas";
 
 const tempDirPath = `_temp/generalHookFoundations-test`;
 const tempDbBuildFilePath = `${tempDirPath}/app-db`;
