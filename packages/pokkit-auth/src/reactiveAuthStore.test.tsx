@@ -237,43 +237,26 @@ describe("pokkit-testing setupAndServeDb", () => {
     unsub();
   }, 5000);
 
-  it("useUserStoreSync to update store", async () => {
+  it.only("useUserStoreSync to update store", async () => {
     const userPb = createPbInstance();
     const email = "new@user2.com";
 
     await userPb.collection("users").create({ email, password: email, passwordConfirm: email });
     const userResp = await userPb.collection("users").authWithPassword(email, email);
 
-    let result: {
-      current: {
-        userStore: ReturnType<typeof useUserStore>;
-        userStoreSync: ReturnType<typeof useUserStoreSync>;
-      };
-    };
-    await act(async () => {
-      const renderHookResp = renderHook(() => ({
+    const { result } = await act(async () =>
+      renderHook(() => ({
         userStore: useUserStore(),
         userStoreSync: useUserStoreSync({ pb: userPb, id: userResp.record.id }),
-      }));
-      const result1 = renderHookResp.result;
-      result = result1;
-    });
+      })),
+    );
 
-    await Promise.all(result!.current.userStoreSync.unsubPromises.current);
-    // Give SSE time to connect
-    // await new Promise((r) => setTimeout(r, 500));
+    await Promise.all(result.current.userStoreSync.unsubPromises.current);
 
     const createNewName = () => `updated name ${Math.floor(Math.random() * 1000)}`;
     const name = createNewName();
     userPb.collection("users").update(userResp.record.id, { name });
 
-    await waitFor(() => expect(result!.current.userStore.data?.name).toBe(name), { timeout: 5000 });
+    await waitFor(() => expect(result.current.userStore.data?.name).toBe(name), { timeout: 5000 });
   }, 5000);
-
-  // it("subscribe to user and update user store hook", async () => {
-  //   const { result: userStoreResult } = renderHook(() => useUserStore());
-
-  //   console.log(userStoreResult.current.data?.name);
-  //   expect(userStoreResult.current.data?.name).toBeTruthy();
-  // }, 5000);
 });
