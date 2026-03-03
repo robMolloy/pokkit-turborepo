@@ -7,15 +7,14 @@ import {
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { type ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
-import PocketBase, { CollectionModel, UnsubscribeFunc } from "pocketbase";
-import { useEffect, useRef } from "react";
+import PocketBase, { CollectionModel } from "pocketbase";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import {
-  useInitReactiveAuthStore,
-  useInitReactiveAuthStoreSync,
+  useReactiveAuthStore,
+  useReactiveAuthStoreSync,
   useUserStore,
+  useUserStoreSync,
 } from "./reactiveAuthStore";
-import { userSchema, usersCollectionName } from "./schemas/schemas";
 
 const tempDirPath = `_temp/reactiveAuthStore-test`;
 const tempDbBuildFilePath = `${tempDirPath}/app-db`;
@@ -27,65 +26,6 @@ const dbSuperuserPassword = "admin@admin.com";
 const createPbInstance = () => new PocketBase(tempDbUrl);
 
 let spawnProcess: ChildProcessWithoutNullStreams | undefined;
-
-const useInitUserStoreSync = (p: { pb: PocketBase; id: string | undefined }) => {
-  const userStore = useUserStore();
-  const unsubPromises = useRef<Promise<UnsubscribeFunc>[]>([]);
-
-  const abortController = useRef(new AbortController());
-
-  useEffect(() => {
-    if (p.id === undefined) return;
-
-    const userRecord = p.pb
-      .collection(usersCollectionName)
-      .getOne(p.id, { signal: abortController.current.signal });
-
-    const parseResp = userSchema.safeParse(userRecord);
-    if (parseResp.success) userStore.setData(parseResp.data);
-
-    return () => {
-      abortController.current.abort();
-    };
-  }, [p.pb, p.id]);
-
-  useEffect(() => {
-    if (p.id === undefined) return;
-    const unsubPromise = p.pb.collection(usersCollectionName).subscribe(
-      p.id,
-      (e) => {
-        const parseResp = userSchema.safeParse(e.record);
-        if (parseResp.success) userStore.setData(parseResp.data);
-      },
-      { signal: abortController.current.signal },
-    );
-
-    unsubPromises.current.push(unsubPromise);
-
-    return () => {
-      abortController.current.abort();
-      unsubPromise.then((unsub) => unsub());
-    };
-  }, [p.pb, p.id]);
-
-  return { unsubPromises, settle: () => Promise.all(unsubPromises.current) };
-};
-
-const useReactiveAuthStoreSync = (p: { pb: PocketBase }) => {
-  const initReactiveAuthStore = useInitReactiveAuthStore();
-  useInitReactiveAuthStoreSync({ pb: p.pb });
-  return useInitUserStoreSync({ pb: p.pb, id: initReactiveAuthStore.data?.record.id });
-};
-
-const useReactiveAuthStore = () => {
-  const initReactiveAuthStore = useInitReactiveAuthStore();
-  const userStore = useUserStore();
-
-  return {
-    ...initReactiveAuthStore.data,
-    record: userStore.data ? userStore.data : initReactiveAuthStore.data?.record,
-  };
-};
 
 describe("pokkit-testing setupAndServeDb", () => {
   beforeAll(async () => {
@@ -131,7 +71,7 @@ describe("pokkit-testing setupAndServeDb", () => {
     const { result } = await act(async () =>
       renderHook(() => ({
         userStore: useUserStore(),
-        userInitStoreSync: useInitUserStoreSync({ pb: userPb, id: userResp.record.id }),
+        userInitStoreSync: useUserStoreSync({ pb: userPb, id: userResp.record.id }),
       })),
     );
 
