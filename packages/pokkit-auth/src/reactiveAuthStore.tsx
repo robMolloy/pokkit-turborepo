@@ -62,16 +62,7 @@ export const useUserStoreSync = (p: { pb: PocketBase; id: string | undefined }) 
 
     return () => {
       abortController.current.abort();
-      (async () => {
-        const smartSubscribeResps = await Promise.all(smartSubscribeRespPromises.current);
-
-        const unsubFnPromises = smartSubscribeResps
-          .filter((smartSubscribeResp) => smartSubscribeResp.success)
-          .map((smartSubscribeResp) => smartSubscribeResp.data);
-
-        const unsubFns = await Promise.all(unsubFnPromises);
-        unsubFns.forEach((unsub) => unsub());
-      })();
+      unsubscribe();
     };
   }, [p.pb, p.id]);
 
@@ -87,6 +78,8 @@ export const useReactiveAuthStoreSync = (p: { pb: PocketBase }) => {
 export const useReactiveAuthStore = () => {
   const initReactiveAuthStore = useInitReactiveAuthStore();
   const userStore = useUserStore();
+
+  if (!initReactiveAuthStore.data) return null;
 
   return {
     ...initReactiveAuthStore.data,

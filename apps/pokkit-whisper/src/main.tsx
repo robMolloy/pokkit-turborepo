@@ -3,7 +3,7 @@ import PocketBase from "pocketbase";
 import { createRoot } from "react-dom/client";
 import "./style.css";
 
-const pb = new PocketBase("http://0.0.0.0:8090");
+const pb = new PocketBase("http://127.0.0.1:8090");
 
 const App = () => {
   useReactiveAuthStoreSync({ pb });
@@ -38,7 +38,14 @@ const App = () => {
       </button>
       <button
         onClick={() => {
-          if (authStore.record?.id === undefined) return;
+          pb.authStore.clear();
+        }}
+      >
+        log out
+      </button>
+      <button
+        onClick={() => {
+          if (!authStore?.record.id) return;
 
           pb.collection("users").update(authStore.record.id, {
             name: `updated name ${Math.floor(Math.random() * 1000)}`,

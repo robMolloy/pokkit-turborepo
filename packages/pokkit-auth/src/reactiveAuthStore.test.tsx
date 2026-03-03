@@ -111,7 +111,7 @@ describe("pokkit-testing setupAndServeDb", () => {
 
     await waitFor(
       () => {
-        expect(result.current.useReactiveAuthStore.record?.name).toBe(name);
+        expect(result.current.useReactiveAuthStore?.record.name).toBe(name);
       },
       { timeout: 500 },
     );
@@ -119,7 +119,7 @@ describe("pokkit-testing setupAndServeDb", () => {
     superuserPb.collection("users").update(userResp.record.id, { name: `updated${name}` });
     await waitFor(
       () => {
-        expect(result.current.useReactiveAuthStore.record?.name).toBe(`updated${name}`);
+        expect(result.current.useReactiveAuthStore?.record.name).toBe(`updated${name}`);
       },
       { timeout: 500 },
     );
