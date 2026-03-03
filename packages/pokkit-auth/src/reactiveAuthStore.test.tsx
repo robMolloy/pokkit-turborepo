@@ -1,7 +1,3 @@
-import { type ChildProcessWithoutNullStreams } from "child_process";
-import fse from "fs-extra";
-import PocketBase, { CollectionModel, UnsubscribeFunc } from "pocketbase";
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   clearDb,
   killPocketbaseInstanceByDbUrl,
@@ -9,14 +5,17 @@ import {
   setupAndServeDb,
 } from "@repo/pokkit-testing";
 import { act, renderHook, waitFor } from "@testing-library/react";
+import { type ChildProcessWithoutNullStreams } from "child_process";
+import fse from "fs-extra";
+import PocketBase, { CollectionModel, UnsubscribeFunc } from "pocketbase";
+import { useEffect, useRef } from "react";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import {
-  useReactiveAuthStoreSync,
-  useReactiveAuthStore,
-  useUserStore,
   useInitReactiveAuthStore,
+  useInitReactiveAuthStoreSync,
+  useUserStore,
 } from "./reactiveAuthStore";
-import { TUser, userSchema, usersCollectionName } from "./schemas/schemas";
-import { RefObject, useEffect, useRef } from "react";
+import { userSchema, usersCollectionName } from "./schemas/schemas";
 
 const tempDirPath = `_temp/reactiveAuthStore-test`;
 const tempDbBuildFilePath = `${tempDirPath}/app-db`;
@@ -29,31 +28,63 @@ const createPbInstance = () => new PocketBase(tempDbUrl);
 
 let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 
-const createAsyncSignal = () => {
-  let trigger!: () => void;
-  const promise = new Promise<void>((resolve) => (trigger = resolve));
-
-  return { promise, trigger };
-};
-
-const useUserStoreSync = (p: { pb: PocketBase; id: string }) => {
+const useInitUserStoreSync = (p: { pb: PocketBase; id: string | undefined }) => {
   const userStore = useUserStore();
   const unsubPromises = useRef<Promise<UnsubscribeFunc>[]>([]);
 
+  const abortController = useRef(new AbortController());
+
   useEffect(() => {
-    const unsubPromise = p.pb.collection(usersCollectionName).subscribe(p.id, (e) => {
-      const parseResp = userSchema.safeParse(e.record);
-      if (parseResp.success) userStore.setData(parseResp.data);
-    });
+    if (p.id === undefined) return;
+
+    const userRecord = p.pb
+      .collection(usersCollectionName)
+      .getOne(p.id, { signal: abortController.current.signal });
+
+    const parseResp = userSchema.safeParse(userRecord);
+    if (parseResp.success) userStore.setData(parseResp.data);
+
+    return () => {
+      abortController.current.abort();
+    };
+  }, [p.pb, p.id]);
+
+  useEffect(() => {
+    if (p.id === undefined) return;
+    const unsubPromise = p.pb.collection(usersCollectionName).subscribe(
+      p.id,
+      (e) => {
+        const parseResp = userSchema.safeParse(e.record);
+        if (parseResp.success) userStore.setData(parseResp.data);
+      },
+      { signal: abortController.current.signal },
+    );
 
     unsubPromises.current.push(unsubPromise);
 
     return () => {
+      abortController.current.abort();
       unsubPromise.then((unsub) => unsub());
     };
   }, [p.pb, p.id]);
 
   return { unsubPromises, settle: () => Promise.all(unsubPromises.current) };
+};
+
+const useReactiveAuthStoreSync = (p: { pb: PocketBase }) => {
+  const initReactiveAuthStore = useInitReactiveAuthStore();
+  useInitReactiveAuthStoreSync({ pb: p.pb });
+  return useInitUserStoreSync({ pb: p.pb, id: initReactiveAuthStore.data?.record.id });
+};
+
+const useReactiveAuthStore = () => {
+  const initReactiveAuthStore = useInitReactiveAuthStore();
+  const userStore = useUserStore();
+
+  return {
+    ...initReactiveAuthStore.data,
+    record: userStore.data ? userStore.data : initReactiveAuthStore.data?.record,
+  };
 };
 
 describe("pokkit-testing setupAndServeDb", () => {
@@ -90,153 +121,6 @@ describe("pokkit-testing setupAndServeDb", () => {
     await clearDb({ dbUrl: tempDbUrl, dbSuperuserEmail, dbSuperuserPassword });
   });
 
-  it.skip("reactive auth store updates on login", async () => {
-    const superuserPb = createPbInstance();
-    await superuserPb
-      .collection("_superusers")
-      .authWithPassword(dbSuperuserEmail, dbSuperuserPassword);
-
-    const userPb = createPbInstance();
-
-    renderHook(() => useReactiveAuthStoreSync({ pb: userPb }));
-
-    const { result: reactiveAuthStoreResult } = renderHook(() => useReactiveAuthStore());
-    const { result: initReactiveAuthStoreResult } = renderHook(() => useInitReactiveAuthStore());
-    const { result: userStoreResult } = renderHook(() => useUserStore());
-
-    expect(reactiveAuthStoreResult.current.data).toBeFalsy();
-    await userPb.collection("users").create({
-      email: "new@user.com",
-      password: "new@user.com",
-      passwordConfirm: "new@user.com",
-    });
-
-    const resp = await act(async () => {
-      return await userPb.collection("users").authWithPassword("new@user.com", "new@user.com");
-    });
-
-    expect(reactiveAuthStoreResult.current.data).toBeTruthy();
-    expect(reactiveAuthStoreResult.current.data?.record?.email).toBe("new@user.com");
-
-    await superuserPb.collection("users").update(resp.record.id, { name: "Updated Name" });
-    const userList = await superuserPb.collection("users").getFullList();
-
-    const getUser = async (p: { pb: PocketBase; id: string }) => {
-      try {
-        const userResp = await p.pb.collection(usersCollectionName).getOne(p.id);
-        return userSchema.safeParse(userResp);
-      } catch (e) {
-        const error = e as { message: string };
-        return { success: false, error } as const;
-      }
-    };
-    await getUser({ pb: userPb, id: resp.record.id });
-    await getUser({ pb: userPb, id: resp.record.id });
-    await getUser({ pb: userPb, id: resp.record.id });
-
-    expect(userStoreResult.current.data?.name).toBe("Updated Name");
-
-    expect(userList[0].name).toBe("Updated Name");
-    expect(reactiveAuthStoreResult.current.data?.record?.name).toBe("Updated Name");
-
-    await userPb.authStore.clear();
-    expect(reactiveAuthStoreResult.current.data).toBeFalsy();
-  });
-
-  it("subscribe to user test", async () => {
-    let eventCount = 0;
-    const asyncSignal = createAsyncSignal();
-
-    const userPb = createPbInstance();
-    const email = "new@user2.com";
-
-    await userPb.collection("users").create({ email, password: email, passwordConfirm: email });
-    const userResp = await userPb.collection("users").authWithPassword(email, email);
-
-    const unsub = await userPb
-      .collection(usersCollectionName)
-      .subscribe(userResp.record.id, (e) => {
-        const parseResp = userSchema.safeParse(e.record);
-        expect(parseResp.success).toBe(true);
-
-        eventCount += 1;
-        if (eventCount === 3) asyncSignal.trigger();
-      });
-
-    const createNewName = () => `updated name ${Math.floor(Math.random() * 1000)}`;
-
-    await userPb.collection("users").update(userResp.record.id, { name: createNewName() });
-    await userPb.collection("users").update(userResp.record.id, { name: createNewName() });
-    await userPb.collection("users").update(userResp.record.id, { name: createNewName() });
-
-    await asyncSignal.promise;
-
-    expect(eventCount).toBe(3);
-
-    unsub();
-  }, 5000);
-
-  it("subscribe to user and update store", async () => {
-    const asyncSignal = createAsyncSignal();
-
-    const { result: userStoreResult } = renderHook(() => useUserStore());
-
-    const userPb = createPbInstance();
-    const email = "new@user2.com";
-
-    await userPb.collection("users").create({ email, password: email, passwordConfirm: email });
-    const userResp = await userPb.collection("users").authWithPassword(email, email);
-
-    const unsub = await userPb
-      .collection(usersCollectionName)
-      .subscribe(userResp.record.id, (e) => {
-        const parseResp = userSchema.safeParse(e.record);
-        expect(parseResp.success).toBe(true);
-
-        act(() => userStoreResult.current.setData(parseResp.data));
-
-        asyncSignal.trigger();
-      });
-
-    const createNewName = () => `updated name ${Math.floor(Math.random() * 1000)}`;
-
-    const name = createNewName();
-    await userPb.collection("users").update(userResp.record.id, { name });
-
-    await asyncSignal.promise;
-
-    expect(userStoreResult.current.data?.name).toBe(name);
-
-    unsub();
-  }, 5000);
-  it("subscribe to user and update store - use waitFor instead of async signal", async () => {
-    const { result: userStoreResult } = renderHook(() => useUserStore());
-
-    const userPb = createPbInstance();
-    const email = "new@user2.com";
-
-    await userPb.collection("users").create({ email, password: email, passwordConfirm: email });
-    const userResp = await userPb.collection("users").authWithPassword(email, email);
-
-    const unsub = await userPb
-      .collection(usersCollectionName)
-      .subscribe(userResp.record.id, (e) => {
-        const parseResp = userSchema.safeParse(e.record);
-        expect(parseResp.success).toBe(true);
-
-        act(() => userStoreResult.current.setData(parseResp.data));
-      });
-
-    const createNewName = () => `updated name ${Math.floor(Math.random() * 1000)}`;
-
-    const name = createNewName();
-    await userPb.collection("users").update(userResp.record.id, { name });
-
-    await waitFor(() => expect(userStoreResult.current.data?.name).toBe(name));
-
-    unsub();
-  }, 5000);
-
   it("useUserStoreSync to update store", async () => {
     const userPb = createPbInstance();
     const email = "new@user2.com";
@@ -247,16 +131,57 @@ describe("pokkit-testing setupAndServeDb", () => {
     const { result } = await act(async () =>
       renderHook(() => ({
         userStore: useUserStore(),
-        userStoreSync: useUserStoreSync({ pb: userPb, id: userResp.record.id }),
+        userInitStoreSync: useInitUserStoreSync({ pb: userPb, id: userResp.record.id }),
       })),
     );
 
-    await Promise.all(result.current.userStoreSync.unsubPromises.current);
+    await result.current.userInitStoreSync.settle();
 
     const createNewName = () => `updated name ${Math.floor(Math.random() * 1000)}`;
     const name = createNewName();
     userPb.collection("users").update(userResp.record.id, { name });
 
     await waitFor(() => expect(result.current.userStore.data?.name).toBe(name), { timeout: 5000 });
-  }, 5000);
+  });
+
+  it("useReactiveAuthStoreSync to update store", async () => {
+    const superuserPb = createPbInstance();
+    await superuserPb
+      .collection("_superusers")
+      .authWithPassword(dbSuperuserEmail, dbSuperuserPassword);
+
+    const userPb = createPbInstance();
+    const email = "new@user2.com";
+
+    await userPb.collection("users").create({ email, password: email, passwordConfirm: email });
+    const userResp = await userPb.collection("users").authWithPassword(email, email);
+
+    const { result } = await act(async () =>
+      renderHook(() => ({
+        useReactiveAuthStore: useReactiveAuthStore(),
+        useReactiveAuthStoreSync: useReactiveAuthStoreSync({ pb: userPb }),
+      })),
+    );
+
+    await result.current.useReactiveAuthStoreSync.settle();
+
+    const createNewName = () => `updated name ${Math.floor(Math.random() * 1000)}`;
+    const name = createNewName();
+    userPb.collection("users").update(userResp.record.id, { name });
+
+    await waitFor(
+      () => {
+        expect(result.current.useReactiveAuthStore.record?.name).toBe(name);
+      },
+      { timeout: 500 },
+    );
+
+    superuserPb.collection("users").update(userResp.record.id, { name: `updated${name}` });
+    await waitFor(
+      () => {
+        expect(result.current.useReactiveAuthStore.record?.name).toBe(`updated${name}`);
+      },
+      { timeout: 500 },
+    );
+  });
 });

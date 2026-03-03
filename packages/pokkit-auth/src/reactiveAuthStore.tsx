@@ -55,7 +55,7 @@ export const useInitReactiveAuthStore = create<{
   setData: (data) => set(() => ({ data })),
 }));
 
-const useInitReactiveAuthStoreSync = (p: { pb: PocketBase }) => {
+export const useInitReactiveAuthStoreSync = (p: { pb: PocketBase }) => {
   const initReactiveAuthStore = useInitReactiveAuthStore();
   useEffect(() => {
     if (!p.pb.authStore.isValid) return initReactiveAuthStore.setData(null);
