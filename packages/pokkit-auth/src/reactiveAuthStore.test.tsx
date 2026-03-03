@@ -237,7 +237,7 @@ describe("pokkit-testing setupAndServeDb", () => {
     unsub();
   }, 5000);
 
-  it.only("useUserStoreSync to update store", async () => {
+  it("useUserStoreSync to update store", async () => {
     const userPb = createPbInstance();
     const email = "new@user2.com";
 
