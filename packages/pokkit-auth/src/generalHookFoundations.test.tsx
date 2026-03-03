@@ -7,14 +7,9 @@ import {
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { type ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
-import PocketBase, { CollectionModel, UnsubscribeFunc } from "pocketbase";
-import { useEffect, useRef } from "react";
+import PocketBase, { CollectionModel } from "pocketbase";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import {
-  useInitReactiveAuthStore,
-  useInitReactiveAuthStoreSync,
-  useUserStore,
-} from "./reactiveAuthStore";
+import { useUserStore } from "./reactiveAuthStore";
 import { userSchema, usersCollectionName } from "./schemas/schemas";
 
 const tempDirPath = `_temp/generalHookFoundations-test`;

@@ -1,4 +1,4 @@
-import PocketBase, { UnsubscribeFunc } from "pocketbase";
+import PocketBase from "pocketbase";
 import { useEffect, useRef } from "react";
 import { create } from "zustand";
 import {
@@ -8,86 +8,74 @@ import {
   userSchema,
   usersCollectionName,
 } from "./schemas/schemas";
-
-// const getUser = async (p: { pb: PocketBase; id: string }) => {
-//   try {
-//     const userResp = await p.pb.collection(usersCollectionName).getOne(p.id);
-//     return userSchema.safeParse(userResp);
-//   } catch (e) {
-//     const error = e as { message: string };
-//     return { success: false, error } as const;
-//   }
-// };
-
-// const subscribeToUser = async (p: {
-//   pb: PocketBase;
-//   id: string;
-//   onChange: (e: TUser | null) => void;
-// }) => {
-//   try {
-//     const unsubPromise = p.pb.collection(usersCollectionName).subscribe(p.id, (e) => {
-//       const parseResp = userSchema.safeParse(e.record);
-//       p.onChange(parseResp.success ? parseResp.data : null);
-//     });
-//     const userRespPromise = getUser({ pb: p.pb, id: p.id });
-
-//     // subscription must be complete to avoid any race conditions issues
-//     // avoid using promises.all to be explicit
-//     const unsub = await unsubPromise;
-//     const userResp = await userRespPromise;
-
-//     p.onChange(userResp.success ? userResp.data : null);
-
-//     return { success: true, data: unsub } as const;
-//   } catch (error) {
-//     p.onChange(null);
-//     return { success: false, error } as const;
-//   }
-// };
+import { smartSubscribeToRecordById } from "./utils";
 
 type TAuthStoreState = TAuthStore | null | undefined;
 
+const smartSubscribeToUserRecordById = (p: {
+  pb: PocketBase;
+  id: string;
+  onChange: (e: TUser | null) => void;
+}) =>
+  smartSubscribeToRecordById({
+    collectionName: usersCollectionName,
+    schema: userSchema,
+    pb: p.pb,
+    id: p.id,
+    onChange: p.onChange,
+  });
+
 export const useUserStoreSync = (p: { pb: PocketBase; id: string | undefined }) => {
   const userStore = useUserStore();
-  const unsubPromises = useRef<Promise<UnsubscribeFunc>[]>([]);
+  const smartSubscribeRespPromises = useRef<ReturnType<typeof smartSubscribeToUserRecordById>[]>(
+    [],
+  );
+
+  const settle = async () => {
+    const smartSubscribeResps = await Promise.all(smartSubscribeRespPromises.current);
+
+    const unsubFnPromises = smartSubscribeResps
+      .filter((smartSubscribeResp) => smartSubscribeResp.success)
+      .map((smartSubscribeResp) => smartSubscribeResp.data);
+
+    return Promise.all(unsubFnPromises);
+  };
+
+  const unsubscribe = async () => {
+    const unsubFns = await settle();
+    unsubFns.forEach((unsub) => unsub());
+  };
 
   const abortController = useRef(new AbortController());
 
   useEffect(() => {
-    if (p.id === undefined) return;
+    const id = p.id;
+    if (id === undefined) return;
 
-    const userRecord = p.pb
-      .collection(usersCollectionName)
-      .getOne(p.id, { signal: abortController.current.signal });
+    const resp = smartSubscribeToUserRecordById({
+      id,
+      pb: p.pb,
+      onChange: (x) => userStore.setData(x),
+    });
 
-    const parseResp = userSchema.safeParse(userRecord);
-    if (parseResp.success) userStore.setData(parseResp.data);
-
-    return () => {
-      abortController.current.abort();
-    };
-  }, [p.pb, p.id]);
-
-  useEffect(() => {
-    if (p.id === undefined) return;
-    const unsubPromise = p.pb.collection(usersCollectionName).subscribe(
-      p.id,
-      (e) => {
-        const parseResp = userSchema.safeParse(e.record);
-        if (parseResp.success) userStore.setData(parseResp.data);
-      },
-      { signal: abortController.current.signal },
-    );
-
-    unsubPromises.current.push(unsubPromise);
+    smartSubscribeRespPromises.current.push(resp);
 
     return () => {
       abortController.current.abort();
-      unsubPromise.then((unsub) => unsub());
+      (async () => {
+        const smartSubscribeResps = await Promise.all(smartSubscribeRespPromises.current);
+
+        const unsubFnPromises = smartSubscribeResps
+          .filter((smartSubscribeResp) => smartSubscribeResp.success)
+          .map((smartSubscribeResp) => smartSubscribeResp.data);
+
+        const unsubFns = await Promise.all(unsubFnPromises);
+        unsubFns.forEach((unsub) => unsub());
+      })();
     };
   }, [p.pb, p.id]);
 
-  return { unsubPromises, settle: () => Promise.all(unsubPromises.current) };
+  return { settle, unsubscribe };
 };
 
 export const useReactiveAuthStoreSync = (p: { pb: PocketBase }) => {

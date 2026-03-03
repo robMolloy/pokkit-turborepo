@@ -38,10 +38,11 @@ const App = () => {
       </button>
       <button
         onClick={() => {
-          if (authStore.data?.record.id)
-            pb.collection("users").update(authStore.data?.record.id, {
-              name: `updated name ${Math.floor(Math.random() * 1000)}`,
-            });
+          if (authStore.record?.id === undefined) return;
+
+          pb.collection("users").update(authStore.record.id, {
+            name: `updated name ${Math.floor(Math.random() * 1000)}`,
+          });
         }}
       >
         update user
