@@ -2,13 +2,18 @@
   "name": "@repo/pokkit-components",
   "version": "0.0.0",
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./styles.css": "./dist/styles.css"
   },
   "license": "MIT",
   "scripts": {
     "lint": "eslint \"**/*.ts\"",
     "test": "vitest",
-    "tsc": "cd ../.. && packages/pokkit-components/node_modules/.bin/tsc --project packages/pokkit-components/tsconfig.json --noemit --watch"
+    "tsc": "cd ../.. && packages/pokkit-components/node_modules/.bin/tsc --project packages/pokkit-components/tsconfig.json --noemit --watch",
+    "build": "tsc && npm run build:css",
+    "build:css": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --minify",
+    "build:css:watch": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --watch",
+    "dev": "tsc --watch & npm run build:css:watch"
   },
   "dependencies": {
     "pocketbase": "^0.26.8",
@@ -21,6 +26,7 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/pokkit-testing": "workspace:^",
     "@repo/typescript-config": "workspace:*",
+    "@tailwindcss/cli": "^4.2.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
@@ -32,6 +38,7 @@
     "eventsource": "^4.1.0",
     "fs-extra": "^11.3.3",
     "jsdom": "^28.1.0",
+    "tailwindcss": "^4.2.1",
     "typescript": "5.9.2",
     "vite": "^5.1.4",
     "vitest": "^4.0.18"

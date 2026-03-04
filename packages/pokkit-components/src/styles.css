@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@source "./components";
+/* tell Tailwind where to scan for classes */
+
+@theme {
+    /* your design tokens here — consumed apps inherit these */
+    --color-brand: #6366f1;
+    --color-brand-dark: #4f46e5;
+    --radius-default: 0.5rem;
+}
