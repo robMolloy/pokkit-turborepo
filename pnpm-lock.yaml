@@ -57,6 +57,9 @@ importers:
 
   apps/pokkit-whisper:
     dependencies:
+      '@repo/pokkit-components':
+        specifier: workspace:^
+        version: link:../../packages/pokkit-components
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui

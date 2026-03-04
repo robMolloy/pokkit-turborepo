@@ -1,15 +1,18 @@
 import { useReactiveAuthStore, useReactiveAuthStoreSync } from "@repo/pokkit-auth";
+import { Button } from "@repo/pokkit-components";
+import "@repo/pokkit-components/styles.css";
 import PocketBase from "pocketbase";
 import { createRoot } from "react-dom/client";
-import "./style.css";
 
 const pb = new PocketBase("http://127.0.0.1:8090");
 
 const App = () => {
   useReactiveAuthStoreSync({ pb });
   const authStore = useReactiveAuthStore();
+
   return (
     <div>
+      <Button>new</Button>
       <button
         onClick={async () => {
           const resp = await pb.health.check();
