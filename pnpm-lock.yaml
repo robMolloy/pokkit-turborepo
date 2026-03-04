@@ -325,9 +325,6 @@ importers:
 
   packages/pokkit-testing:
     dependencies:
-      fs-extra:
-        specifier: ^11.3.3
-        version: 11.3.3
       pocketbase:
         specifier: ^0.26.8
         version: 0.26.8
@@ -374,6 +371,9 @@ importers:
       eslint:
         specifier: ^8.57.0
         version: 8.57.1
+      fs-extra:
+        specifier: ^11.3.3
+        version: 11.3.3
       jsdom:
         specifier: ^28.1.0
         version: 28.1.0
