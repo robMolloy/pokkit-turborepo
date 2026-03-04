@@ -10,10 +10,7 @@
     "lint": "eslint \"**/*.ts\"",
     "test": "vitest",
     "tsc": "cd ../.. && packages/pokkit-components/node_modules/.bin/tsc --project packages/pokkit-components/tsconfig.json --noemit --watch",
-    "build": "tsc && npm run build:css",
-    "build:css": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --minify",
-    "build:css:watch": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --watch",
-    "dev": "tsc --watch & npm run build:css:watch"
+    "dev": "tailwindcss -i ./styles.css -o ./dist/styles.css --watch"
   },
   "dependencies": {
     "pocketbase": "^0.26.8",

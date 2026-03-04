@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@source "./components";
+@source "./src/components";
 /* tell Tailwind where to scan for classes */
 
 @theme {
