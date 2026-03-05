@@ -7,6 +7,7 @@
     "lint": "turbo run lint",
     "tsc:web-ui": "turbo run tsc --filter=web --filter=@repo/ui",
     "tsc": "turbo run tsc",
+    "css-build": "turbo run css-build",
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types"

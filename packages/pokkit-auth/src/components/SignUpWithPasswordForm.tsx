@@ -69,6 +69,7 @@ export const SignUpWithPasswordForm = (p: {
           name="signup-password"
           type="password"
           placeholder="Create a password"
+          className="border-red-700"
           required
         />
       </div>
@@ -82,10 +83,11 @@ export const SignUpWithPasswordForm = (p: {
           name="password-confirm"
           type="password"
           placeholder="Confirm your password"
+          className="p-16"
           required
         />
       </div>
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <Button variant="secondary" type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? "Creating account..." : "Sign Up"}
       </Button>
     </form>

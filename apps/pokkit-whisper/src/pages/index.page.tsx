@@ -2,6 +2,7 @@ import {
   LoggedInRouteProtector,
   LoggedOutRouteProtector,
   SignInWithPasswordForm,
+  SignOutButton,
   SignUpWithPasswordForm,
   useReactiveAuthStore,
 } from "@repo/pokkit-auth";
@@ -16,7 +17,10 @@ const IndexPage = () => {
       <br />
 
       <LoggedInRouteProtector>
-        <div>Signed in</div>
+        <>
+          <div>Signed in</div>
+          <SignOutButton pb={pb} />
+        </>
       </LoggedInRouteProtector>
 
       <LoggedOutRouteProtector>

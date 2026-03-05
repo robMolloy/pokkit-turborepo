@@ -17,6 +17,9 @@
     },
     "tsc": { 
     },
+    "css-build": { 
+      "persistent": true
+    },
     "dev": {
       "cache": false,
       "persistent": true

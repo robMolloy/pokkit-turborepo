@@ -10,7 +10,7 @@
     "lint": "eslint \"**/*.ts\"",
     "test": "vitest",
     "tsc": "cd ../.. && packages/pokkit-components/node_modules/.bin/tsc --project packages/pokkit-components/tsconfig.json --noemit --watch",
-    "dev": "tailwindcss -i ./styles.css -o ./dist/styles.css --watch"
+    "css-build": "tailwindcss -i ./styles.css -o ./dist/styles.css --watch"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
