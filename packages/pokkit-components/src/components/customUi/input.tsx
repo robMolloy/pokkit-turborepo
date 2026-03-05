@@ -8,18 +8,19 @@ export const Input = (p: TCnInputProps) => {
 };
 
 export const TextInput = (
-  p: Omit<TCnInputProps, "type" | "onInput"> & {
+  p: Omit<TCnInputProps, "type"> & {
     type: "text" | "password" | "email";
-    onInput?: (value: string) => void;
+    onValueChange?: (value: string) => void;
   },
 ) => {
-  const { onInput, ...rest } = p;
+  const { onValueChange, onInput, ...rest } = p;
 
   return (
     <CnInput
-      onInput={
-        onInput ? (x) => onInput((x.target as unknown as { value: string }).value) : undefined
-      }
+      onInput={(evt) => {
+        onInput?.(evt);
+        onValueChange?.((evt.target as unknown as { value: string }).value);
+      }}
       {...rest}
     />
   );

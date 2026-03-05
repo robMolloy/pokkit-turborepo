@@ -15,6 +15,7 @@
     "db:build:on-change-to-dev": "cd pocketbase && npx nodemon --delay 1 --watch pocketbase/app-db/main.go --exec \"pnpm run db:build\""
   },
   "dependencies": {
+    "@repo/pokkit-components": "workspace:^",
     "pocketbase": "^0.26.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
