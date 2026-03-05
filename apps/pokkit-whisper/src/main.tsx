@@ -15,6 +15,22 @@ const App = () => {
       <div className="flex gap-4">
         <button>html</button>
         <Button>blank</Button>
+        <Button size="default">default</Button>
+        <Button size="icon">destructive</Button>
+        <Button size="icon-lg" className="text-primary-foreground">
+          ghost
+        </Button>
+        <Button size="icon-sm" className="text-primary-foreground">
+          link
+        </Button>
+        <Button size="icon-xs">outline</Button>
+        <Button size="lg">secondary</Button>
+        <Button size="sm">secondary</Button>
+        <Button size="xs">secondary</Button>
+      </div>
+      <div className="flex gap-4">
+        <button>html</button>
+        <Button>blank</Button>
         <Button variant="default">default</Button>
         <Button variant="destructive">destructive</Button>
         <Button variant="ghost" className="text-primary-foreground">
