@@ -15,7 +15,9 @@
     "@repo/ui": "workspace:*",
     "pocketbase": "^0.26.8",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^7.9.3",
+    "vite-plugin-pages": "^0.33.3"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
