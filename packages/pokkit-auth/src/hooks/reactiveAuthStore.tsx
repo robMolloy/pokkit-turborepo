@@ -92,20 +92,18 @@ export const useInitReactiveAuthStore = create<{
 
 export const useInitReactiveAuthStoreSync = (p: { pb: PocketBase }) => {
   const initReactiveAuthStore = useInitReactiveAuthStore();
-  useEffect(() => {
+
+  const syncAuthStore = () => {
     if (!p.pb.authStore.isValid) return initReactiveAuthStore.setData(null);
 
     const resp = authStoreSchema.safeParse(p.pb.authStore);
     initReactiveAuthStore.setData(resp.success ? resp.data : null);
-  }, []);
+  };
+
+  useEffect(() => syncAuthStore(), []);
 
   useEffect(() => {
-    p.pb.authStore.onChange(() => {
-      if (!p.pb.authStore.isValid) return initReactiveAuthStore.setData(null);
-
-      const resp = authStoreSchema.safeParse(p.pb.authStore);
-      initReactiveAuthStore.setData(resp.success ? resp.data : null);
-    });
+    p.pb.authStore.onChange(() => syncAuthStore());
   }, []);
 };
 

@@ -1,20 +1,37 @@
 import {
+  LoggedInRouteProtector,
+  LoggedOutRouteProtector,
   SignInWithPasswordForm,
+  SignUpWithPasswordForm,
   useReactiveAuthStore,
-  useReactiveAuthStoreSync,
 } from "@repo/pokkit-auth";
-import PocketBase from "pocketbase";
-
-const pb = new PocketBase("http://127.0.0.1:8090");
+import { pb } from "../config/pocketbaseConfig";
 
 const IndexPage = () => {
-  useReactiveAuthStoreSync({ pb });
   const authStore = useReactiveAuthStore();
 
   return (
     <div>
       <h1>Pokkit Whisper</h1>
-      <SignInWithPasswordForm pb={pb} />
+      <br />
+
+      <LoggedInRouteProtector>
+        <div>Signed in</div>
+      </LoggedInRouteProtector>
+
+      <LoggedOutRouteProtector>
+        <>
+          <h2>Sign In</h2>
+          <SignInWithPasswordForm pb={pb} />
+
+          <br />
+
+          <h2>Sign Up</h2>
+          <SignUpWithPasswordForm pb={pb} />
+        </>
+      </LoggedOutRouteProtector>
+
+      <br />
       <pre>{JSON.stringify({ authStore }, undefined, 2)}</pre>
     </div>
   );

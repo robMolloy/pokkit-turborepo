@@ -15,7 +15,10 @@ export const userSchema = z.object({
 
 export type TUser = z.infer<typeof userSchema>;
 export type TUserSignInWithPasswordSeed = { email: string; password: string };
-export type TUserSignUpWithPasswordSeed = Pick<TUser, "email" | "name" | "emailVisibility"> & {
+export type TUserSignUpWithPasswordSeed = {
+  email: string;
+  name: string;
+  emailVisibility: boolean;
   password: string;
   passwordConfirm: string;
 };
