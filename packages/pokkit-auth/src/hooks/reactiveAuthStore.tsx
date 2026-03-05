@@ -7,7 +7,7 @@ import {
   TUser,
   userSchema,
   usersCollectionName,
-} from "../schemas/schemas";
+} from "../utils/dbUserUtils";
 import { smartSubscribeToRecordById } from "../utils";
 
 type TAuthStoreState = TAuthStore | null | undefined;

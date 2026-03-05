@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 /// <reference types="vitest" />
 
+import path from "path";
 import type { ConfigEnv } from "vite";
 import { loadEnv, defineConfig as defineViteConfig, mergeConfig } from "vite";
 import { defineConfig as defineVitestConfig } from "vitest/config";
@@ -12,6 +13,11 @@ const viteConfig = (p: { mode: ConfigEnv }) => {
   return defineViteConfig({
     base: env.VITE_APP_BASE_URL,
     plugins: [react()],
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
+    },
   });
 };
 

@@ -2,6 +2,7 @@ import path from "path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import Pages from "vite-plugin-pages";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [
@@ -10,6 +11,7 @@ export default defineConfig({
       dirs: "src/pages",
       extensions: ["page.tsx", "tsx"],
     }),
+    tsconfigPaths(),
   ],
   resolve: {
     alias: {
