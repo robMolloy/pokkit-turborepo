@@ -1,6 +1,8 @@
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 import {
   LogOutIcon,
+  LogIn,
+  UserPlus,
   Key,
   Mail,
   FileTextIcon,
@@ -50,6 +52,8 @@ import {
 const iconMap = {
   LogOutIcon,
   Key,
+  LogIn,
+  UserPlus,
   Mail,
   FileTextIcon,
   Link,

@@ -1,12 +1,8 @@
 import {
-  LoggedInRouteProtector,
-  LoggedOutRouteProtector,
-  SignInWithPasswordForm,
-  SignOutButton,
-  SignUpWithPasswordForm,
+  SignedInRouteProtector,
+  SignedOutRouteProtector,
   useReactiveAuthStore,
 } from "@repo/pokkit-auth";
-import { pb } from "../config/pocketbaseConfig";
 
 const IndexPage = () => {
   const authStore = useReactiveAuthStore();
@@ -16,24 +12,25 @@ const IndexPage = () => {
       <h1>Pokkit Whisper</h1>
       <br />
 
-      <LoggedInRouteProtector>
+      <SignedInRouteProtector>
         <>
-          <div>Signed in</div>
-          <SignOutButton pb={pb} />
+          <div>You are signed in</div>
+          <div>Enjoy the app</div>
         </>
-      </LoggedInRouteProtector>
+      </SignedInRouteProtector>
 
-      <LoggedOutRouteProtector>
+      <SignedOutRouteProtector>
         <>
-          <h2>Sign In</h2>
-          <SignInWithPasswordForm pb={pb} />
+          <div>You are signed out</div>
+          <div>Log in to enjoy the app</div>
+          {/* <SignInWithPasswordForm pb={pb} />
 
           <br />
 
           <h2>Sign Up</h2>
-          <SignUpWithPasswordForm pb={pb} />
+          <SignUpWithPasswordForm pb={pb} /> */}
         </>
-      </LoggedOutRouteProtector>
+      </SignedOutRouteProtector>
 
       <br />
       <pre>{JSON.stringify({ authStore }, undefined, 2)}</pre>

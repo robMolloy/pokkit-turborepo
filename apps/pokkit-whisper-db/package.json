@@ -11,7 +11,8 @@
     "db:serve-dev": "go run . serve --http=\"0.0.0.0:8090\"",
     "db:build": "go build",
     "db:serve-build": "./app-db serve --http=\"0.0.0.0:8090\"",
-    "db:build:on-change-to-dev": "npx nodemon --delay 1 --watch pocketbase/app-db/main.go --exec \"npm run db:build\""
+    "db:build:on-change-to-dev": "npx nodemon --delay 1 --watch pocketbase/app-db/main.go --exec \"npm run db:build\"",
+    "dev": "go run . serve --http=\"0.0.0.0:8090\""
   },
   "dependencies": {
     "zod": "^4.3.6"
