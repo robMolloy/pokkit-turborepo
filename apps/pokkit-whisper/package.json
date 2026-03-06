@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@repo/pokkit-components": "workspace:^",
+    "@repo/pokkit-shadcn": "workspace:^",
     "@repo/ui": "workspace:*",
     "@tailwindcss/vite": "^4.2.1",
     "class-variance-authority": "^0.7.1",

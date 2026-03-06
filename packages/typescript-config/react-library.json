@@ -4,6 +4,7 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "noUnusedLocals": true,
+    "downlevelIteration": true,
     "noUnusedParameters": true
   }
 }

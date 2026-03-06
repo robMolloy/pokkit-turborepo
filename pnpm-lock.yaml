@@ -112,6 +112,9 @@ importers:
       '@repo/pokkit-components':
         specifier: workspace:^
         version: link:../../packages/pokkit-components
+      '@repo/pokkit-shadcn':
+        specifier: workspace:^
+        version: link:../../packages/pokkit-shadcn
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui

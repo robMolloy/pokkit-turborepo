@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @source "./src";
-@source "../pokkit-components/dist/styles.css";
+@source "../pokkit-shadcn/dist/styles.css";
 /* tell Tailwind where to scan for classes */
 
 @theme {
