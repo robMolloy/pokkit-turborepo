@@ -14,7 +14,8 @@
     "db:serve-dev": "cd pocketbase && go run . serve --http=\"0.0.0.0:8090\"",
     "db:build": "cd pocketbase && go build && mkdir -p builds && mv app-db builds/app-db",
     "db:build:on-change-to-dev": "cd pocketbase && npx nodemon --delay 1 --watch pocketbase/app-db/main.go --exec \"pnpm run db:build\"",
-    "css-build": "tailwindcss -i ./styles.css -o ./dist/styles.css --watch"
+    "css-build": "tailwindcss -i ./styles.css -o ./dist/styles.css --watch",
+    "dev": "tailwindcss -i ./styles.css -o ./dist/styles.css --watch"
   },
   "dependencies": {
     "@repo/pokkit-components": "workspace:^",
