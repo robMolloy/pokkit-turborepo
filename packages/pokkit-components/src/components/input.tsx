@@ -1,5 +1,5 @@
 import React from "react";
-import { Input as CnInput } from "../ui/input";
+import { Input as CnInput } from "@repo/pokkit-shadcn";
 
 type TCnInputProps = React.ComponentProps<typeof CnInput>;
 

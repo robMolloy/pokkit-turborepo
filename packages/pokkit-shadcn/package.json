@@ -1,5 +1,5 @@
 {
-  "name": "@repo/pokkit-components",
+  "name": "@repo/pokkit-shadcn",
   "version": "0.0.0",
   "exports": {
     ".": "./index.ts",
@@ -9,12 +9,11 @@
   "scripts": {
     "lint": "eslint \"**/*.ts\"",
     "test": "vitest",
-    "tsc": "cd ../.. && packages/pokkit-components/node_modules/.bin/tsc --project packages/pokkit-components/tsconfig.json --noemit --watch",
+    "tsc": "cd ../.. && packages/pokkit-shadcn/node_modules/.bin/tsc --project packages/pokkit-shadcn/tsconfig.json --noemit --watch",
     "css-build": "tailwindcss -i ./styles.css -o ./dist/styles.css --watch",
     "dev": "tailwindcss -i ./styles.css -o ./dist/styles.css --watch"
   },
   "dependencies": {
-    "@repo/pokkit-shadcn": "workspace:^",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.577.0",

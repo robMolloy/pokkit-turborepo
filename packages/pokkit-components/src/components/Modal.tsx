@@ -5,7 +5,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
+} from "@repo/pokkit-shadcn";
 import { create } from "zustand";
 import type { ReactNode } from "react";
 import { Button } from "./button";

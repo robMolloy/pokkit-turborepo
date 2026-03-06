@@ -1,5 +1,4 @@
-import { cn } from "../../lib/utils";
-import { Button as CnButton } from "../ui/button";
+import { Button as CnButton, cn } from "@repo/pokkit-shadcn";
 
 type TCnButtonProps = React.ComponentProps<typeof CnButton>;
 

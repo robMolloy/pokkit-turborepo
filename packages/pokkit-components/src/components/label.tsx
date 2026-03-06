@@ -1,5 +1,5 @@
 import React from "react";
-import { Label as CnLabel } from "../ui/label";
+import { Label as CnLabel } from "@repo/pokkit-shadcn";
 
 type TCnLabelProps = React.ComponentProps<typeof CnLabel>;
 

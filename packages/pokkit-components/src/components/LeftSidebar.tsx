@@ -1,6 +1,5 @@
-import { Button } from "../ui/button";
-
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import { Button } from "@repo/pokkit-shadcn";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@repo/pokkit-shadcn";
 import { PreserveScrollAbility } from "./LayoutTemplate";
 import { Link } from "react-router-dom";
 import { CustomIcon } from "./CustomIcon";

@@ -1,6 +1,6 @@
 {
   "extends": "@repo/typescript-config/react-library.json",
-  "include": [".", "../pokkit-shadcn/index.ts"],
+  "include": [".", "../pokkit-components/index.ts"],
   "exclude": ["node_modules"],
   "compilerOptions": {
     "strictNullChecks": true,

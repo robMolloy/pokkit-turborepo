@@ -1,1 +1,1 @@
-export * from "./src/components/customUi";
+export * from "./src/components";
