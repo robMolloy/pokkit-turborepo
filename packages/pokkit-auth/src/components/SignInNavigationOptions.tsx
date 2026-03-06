@@ -6,7 +6,6 @@ export const SignInNavigationOptions = (p: {
   onSignInWithOtpButtonClick: () => void;
   onSignInWithOauth2ButtonClick: () => void;
   onSignInWithPasswordButtonClick: () => void;
-  onForgotPasswordLinkClick: () => void;
   onNavigateToSignUpLinkClick: () => void;
 }) => {
   return (
@@ -28,7 +27,7 @@ export const SignInNavigationOptions = (p: {
       )}
 
       <span className="flex justify-center items-center gap-2">
-        Already have an account?{" "}
+        Don't have an account?{" "}
         <Button
           variant="link"
           className="text-muted-foreground text-md p-0"

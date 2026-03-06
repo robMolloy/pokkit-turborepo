@@ -6,7 +6,13 @@ import "@repo/pokkit-components/styles.css";
 import "@repo/pokkit-auth/styles.css";
 import { SignOutButton, useReactiveAuthStore, useReactiveAuthStoreSync } from "@repo/pokkit-auth";
 import { pb } from "./config/pocketbaseConfig";
-import { Header, LayoutTemplate, LeftSidebar, SidebarButton } from "@repo/pokkit-components";
+import {
+  Button,
+  Header,
+  LayoutTemplate,
+  LeftSidebar,
+  SidebarButton,
+} from "@repo/pokkit-components";
 
 const Routes = () => {
   return useRoutes(routes);
@@ -19,9 +25,22 @@ const App = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const isAuthenticated = !!authDataStore?.record.id;
+
   return (
     <LayoutTemplate
-      Header={<Header Left={<div>Pokkit-Whisper</div>} Right={<SignOutButton pb={pb} />} />}
+      Header={
+        <Header
+          Left={<div>Pokkit-Whisper</div>}
+          Right={
+            isAuthenticated ? (
+              <SignOutButton pb={pb} />
+            ) : (
+              <Button onClick={() => navigate("/auth/sign-in")}>Sign In</Button>
+            )
+          }
+        />
+      }
       LeftSidebar={
         <LeftSidebar
           top={
@@ -58,7 +77,7 @@ const App = () => {
           }
           bottom={
             <>
-              {authDataStore?.record.id ? (
+              {isAuthenticated ? (
                 <SidebarButton
                   iconName="LogOut"
                   onClick={() => pb.authStore.clear()}

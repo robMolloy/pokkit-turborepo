@@ -19,16 +19,16 @@ export const SignUpNavigationOptions = (p: {
           Sign up with password
         </Button>
       )}
-      <div>
+      <span className="flex justify-center items-center gap-2">
         Already have an account?{" "}
         <Button
           variant="link"
-          className="text-muted-foreground text-sm"
+          className="text-muted-foreground text-md p-0"
           onClick={p.onNavigateToSignInLinkClick}
         >
           Sign in
         </Button>
-      </div>
+      </span>
     </div>
   );
 };
