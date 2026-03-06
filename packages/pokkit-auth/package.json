@@ -18,7 +18,7 @@
     "dev": "tailwindcss -i ./styles.css -o ./dist/styles.css --watch"
   },
   "dependencies": {
-    "@repo/pokkit-components": "workspace:^",
+    "@repo/pokkit-shadcn": "workspace:^",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.577.0",

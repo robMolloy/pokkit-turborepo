@@ -10,9 +10,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Page() {
-  const [authMethodsList, setAuthMethodsList] = useState<AuthMethodsList | null | undefined>(
-    undefined,
-  );
+  const [authMethodsList, setAuthMethodsList] = useState<AuthMethodsList | null | undefined>();
   const navigate = useNavigate();
 
   useEffect(() => {

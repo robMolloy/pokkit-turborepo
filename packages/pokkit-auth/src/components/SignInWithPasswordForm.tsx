@@ -1,4 +1,4 @@
-import { Button, Label, TextInput } from "@repo/pokkit-components";
+import { Button, Label, Input } from "@repo/pokkit-shadcn";
 import { useState } from "react";
 import PocketBase from "pocketbase";
 import { signinWithPassword } from "../utils";
@@ -30,10 +30,10 @@ export const SignInWithPasswordForm = (p: {
     >
       <div>
         <Label htmlFor="signin-with-password-email-input">Email</Label>
-        <TextInput
+        <Input
           id="signin-with-password-email-input"
           value={email}
-          onValueChange={setEmail}
+          onInput={(e) => setEmail(e.currentTarget.value)}
           name="email"
           type="email"
           placeholder="Enter your email"
@@ -42,10 +42,10 @@ export const SignInWithPasswordForm = (p: {
       </div>
       <div>
         <Label htmlFor="signin-with-password-password-input">Password</Label>
-        <TextInput
+        <Input
           id="signin-with-password-password-input"
           value={password}
-          onValueChange={setPassword}
+          onInput={(e) => setPassword(e.currentTarget.value)}
           name="password"
           type="password"
           placeholder="Enter your password"

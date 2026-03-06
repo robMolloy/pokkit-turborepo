@@ -1,4 +1,4 @@
-import { Button, Label, TextInput } from "@repo/pokkit-components";
+import { Button, Label, Input } from "@repo/pokkit-shadcn";
 import { useState } from "react";
 import PocketBase from "pocketbase";
 import { signUpWithPassword } from "../utils";
@@ -35,10 +35,10 @@ export const SignUpWithPasswordForm = (p: {
     >
       <div>
         <Label htmlFor="sign-up-with-password-name-input">Full Name</Label>
-        <TextInput
+        <Input
           id="sign-up-with-password-name-input"
           value={name}
-          onValueChange={setName}
+          onInput={(e) => setName(e.currentTarget.value)}
           disabled={isLoading}
           name="name"
           type="text"
@@ -48,10 +48,10 @@ export const SignUpWithPasswordForm = (p: {
       </div>
       <div>
         <Label htmlFor="sign-up-with-password-email-input">Email</Label>
-        <TextInput
+        <Input
           id="sign-up-with-password-email-input"
           value={email}
-          onValueChange={setEmail}
+          onInput={(e) => setEmail(e.currentTarget.value)}
           disabled={isLoading}
           name="email"
           type="email"
@@ -61,10 +61,10 @@ export const SignUpWithPasswordForm = (p: {
       </div>
       <div>
         <Label htmlFor="sign-up-with-password-password-input">Password</Label>
-        <TextInput
+        <Input
           id="sign-up-with-password-password-input"
           value={password}
-          onValueChange={setPassword}
+          onInput={(e) => setPassword(e.currentTarget.value)}
           disabled={isLoading}
           name="signup-password"
           type="password"
@@ -74,10 +74,10 @@ export const SignUpWithPasswordForm = (p: {
       </div>
       <div>
         <Label htmlFor="sign-up-with-password-password-confirm-input">Confirm Password</Label>
-        <TextInput
+        <Input
           id="sign-up-with-password-password-confirm-input"
           value={passwordConfirm}
-          onValueChange={setPasswordConfirm}
+          onInput={(e) => setPasswordConfirm(e.currentTarget.value)}
           disabled={isLoading}
           name="password-confirm"
           type="password"

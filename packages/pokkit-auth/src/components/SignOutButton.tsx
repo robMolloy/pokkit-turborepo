@@ -1,4 +1,4 @@
-import { Button } from "@repo/pokkit-components";
+import { Button } from "@repo/pokkit-shadcn";
 import PocketBase from "pocketbase";
 
 export const SignOutButton = (p: {
