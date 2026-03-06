@@ -27,6 +27,9 @@ export default function Page() {
         authMethodsList={authMethodsList}
         onSignUpWithOauth2ButtonClick={() => navigate("/auth/sign-up/oauth2")}
         onSignUpWithPasswordButtonClick={() => navigate("/auth/sign-up/password")}
+        onNavigateToSignInLinkClick={function (): void {
+          throw new Error("Function not implemented.");
+        }}
       />
     </SignedOutRouteProtector>
   );

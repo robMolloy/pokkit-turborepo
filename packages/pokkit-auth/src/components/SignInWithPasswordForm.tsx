@@ -7,6 +7,7 @@ export const SignInWithPasswordForm = (p: {
   pb: PocketBase;
   onSignInSuccess?: (messages: string[]) => void;
   onSignInError?: (messages: string[]) => void;
+  onForgotPasswordLinkClick: () => void;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -51,6 +52,14 @@ export const SignInWithPasswordForm = (p: {
           required
         />
       </div>
+
+      <Button
+        variant="link"
+        className="text-muted-foreground"
+        onClick={p.onForgotPasswordLinkClick}
+      >
+        Forgot your password?
+      </Button>
       <Button variant="secondary" type="submit" disabled={isLoading}>
         {isLoading ? "Signing in..." : "Sign In"}
       </Button>

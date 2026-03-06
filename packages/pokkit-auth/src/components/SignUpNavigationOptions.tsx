@@ -5,6 +5,7 @@ export const SignUpNavigationOptions = (p: {
   authMethodsList: AuthMethodsList;
   onSignUpWithOauth2ButtonClick: () => void;
   onSignUpWithPasswordButtonClick: () => void;
+  onNavigateToSignInLinkClick: () => void;
 }) => {
   return (
     <div className="flex flex-col gap-4">
@@ -18,6 +19,16 @@ export const SignUpNavigationOptions = (p: {
           Sign up with password
         </Button>
       )}
+      <div>
+        Already have an account?{" "}
+        <Button
+          variant="link"
+          className="text-muted-foreground text-sm"
+          onClick={p.onNavigateToSignInLinkClick}
+        >
+          Sign in
+        </Button>
+      </div>
     </div>
   );
 };
