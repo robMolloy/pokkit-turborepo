@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { pb } from "@/config/pocketbaseConfig";
 import {
   listAuthMethods,
@@ -23,11 +23,12 @@ export default function Page() {
   if (authMethodsList === null) return <div>Failed to load auth methods</div>;
   if (authMethodsList === undefined) return <div>Loading...</div>;
   return (
-    <SignedOutRouteProtector>
+    <SignedOutRouteProtector ifIsSignedIn={() => navigate("/")}>
       <Card className="w-full max-w-md mx-auto mt-16">
         <CardHeader>
-          <CardTitle>Sign in to your account</CardTitle>
-          <CardDescription>Choose your preferred sign-in method</CardDescription>
+          <div className="flex justify-center">
+            <CardTitle>Choose your sign-in method</CardTitle>
+          </div>
         </CardHeader>
         <CardContent>
           <SignInNavigationOptions

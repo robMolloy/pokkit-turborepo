@@ -23,7 +23,7 @@ export default function Page() {
   if (authMethodsList === null) return <div>Failed to load auth methods</div>;
   if (authMethodsList === undefined) return <div>Loading...</div>;
   return (
-    <SignedOutRouteProtector>
+    <SignedOutRouteProtector ifIsSignedIn={() => navigate("/")}>
       <Card className="w-full max-w-md mx-auto mt-16">
         <CardHeader>
           <CardTitle>Sign up for an account</CardTitle>

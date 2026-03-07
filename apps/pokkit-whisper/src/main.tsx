@@ -14,6 +14,7 @@ import {
   LeftSidebar,
   SidebarButton,
 } from "@repo/pokkit-components";
+import { Toaster } from "@repo/pokkit-shadcn";
 
 const Routes = () => {
   return useRoutes(routes);
@@ -29,88 +30,92 @@ const App = () => {
   const isAuthenticated = !!authDataStore?.record.id;
 
   return (
-    <LayoutTemplate
-      Header={
-        <Header
-          Left={<div>Pokkit-Whisper</div>}
-          Right={
-            isAuthenticated ? (
-              <SignOutButton pb={pb} />
-            ) : (
-              <Button onClick={() => navigate("/auth/sign-in")}>Sign In</Button>
-            )
-          }
-        />
-      }
-      LeftSidebar={
-        <LeftSidebar
-          top={
-            <>
-              <SidebarButton href="/" isHighlighted={location.pathname === "/"} iconName="Home">
-                Home
-              </SidebarButton>
-            </>
-          }
-          middle={
-            <>
-              <SidebarButton
-                href="/page1"
-                isHighlighted={location.pathname === "/page1"}
-                iconName="Home"
-              >
-                Page 1
-              </SidebarButton>
-              <SidebarButton
-                href="/page2"
-                isHighlighted={location.pathname === "/page2"}
-                iconName="Home"
-              >
-                Page 2
-              </SidebarButton>
-              <SidebarButton
-                href="/page3"
-                isHighlighted={location.pathname === "/page3"}
-                iconName="Home"
-              >
-                Page 3 hhhhhhhhhhhhhhhhhhhhhhhhhhh
-              </SidebarButton>
-            </>
-          }
-          bottom={
-            <>
-              {isAuthenticated ? (
-                <SidebarButton
-                  iconName="LogOut"
-                  onClick={() => pb.authStore.clear()}
-                  isHighlighted={false}
-                >
-                  Sign Out
-                </SidebarButton>
+    <>
+      <Toaster />
+
+      <LayoutTemplate
+        Header={
+          <Header
+            Left={<div>Pokkit-Whisper</div>}
+            Right={
+              isAuthenticated ? (
+                <SignOutButton pb={pb} />
               ) : (
-                <>
+                <Button onClick={() => navigate("/auth/sign-in")}>Sign In</Button>
+              )
+            }
+          />
+        }
+        LeftSidebar={
+          <LeftSidebar
+            top={
+              <>
+                <SidebarButton href="/" isHighlighted={location.pathname === "/"} iconName="Home">
+                  Home
+                </SidebarButton>
+              </>
+            }
+            middle={
+              <>
+                <SidebarButton
+                  href="/page1"
+                  isHighlighted={location.pathname === "/page1"}
+                  iconName="Home"
+                >
+                  Page 1
+                </SidebarButton>
+                <SidebarButton
+                  href="/page2"
+                  isHighlighted={location.pathname === "/page2"}
+                  iconName="Home"
+                >
+                  Page 2
+                </SidebarButton>
+                <SidebarButton
+                  href="/page3"
+                  isHighlighted={location.pathname === "/page3"}
+                  iconName="Home"
+                >
+                  Page 3 hhhhhhhhhhhhhhhhhhhhhhhhhhh
+                </SidebarButton>
+              </>
+            }
+            bottom={
+              <>
+                {isAuthenticated ? (
                   <SidebarButton
-                    iconName="UserPlus"
-                    onClick={() => navigate("/auth/sign-up")}
-                    isHighlighted={location.pathname.startsWith("/auth/sign-up")}
+                    iconName="LogOut"
+                    onClick={() => pb.authStore.clear()}
+                    isHighlighted={false}
                   >
-                    Sign Up
+                    Sign Out
                   </SidebarButton>
-                  <SidebarButton
-                    iconName="LogIn"
-                    onClick={() => navigate("/auth/sign-in")}
-                    isHighlighted={location.pathname.startsWith("/auth/sign-in")}
-                  >
-                    Sign In
-                  </SidebarButton>
-                </>
-              )}
-            </>
-          }
-        />
-      }
-    >
-      <Routes />
-    </LayoutTemplate>
+                ) : (
+                  <>
+                    <SidebarButton
+                      iconName="UserPlus"
+                      onClick={() => navigate("/auth/sign-up")}
+                      isHighlighted={location.pathname.startsWith("/auth/sign-up")}
+                    >
+                      Sign Up
+                    </SidebarButton>
+                    <SidebarButton
+                      iconName="LogIn"
+                      onClick={() => navigate("/auth/sign-in")}
+                      isHighlighted={location.pathname.startsWith("/auth/sign-in")}
+                    >
+                      Sign In
+                    </SidebarButton>
+                  </>
+                )}
+              </>
+            }
+          />
+        }
+      >
+        <Routes />
+      </LayoutTemplate>
+    </>
   );
 };
 
