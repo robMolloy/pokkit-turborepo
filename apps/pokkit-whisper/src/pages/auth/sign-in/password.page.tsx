@@ -1,6 +1,7 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { pb } from "@/config/pocketbaseConfig";
 import { SignedOutRouteProtector, SignInWithPasswordForm } from "@repo/pokkit-auth";
+import { Button } from "@repo/pokkit-shadcn";
 import { useNavigate } from "react-router-dom";
 const SignInWithPasswordPage: React.FC = () => {
   const navigate = useNavigate();
@@ -8,9 +9,15 @@ const SignInWithPasswordPage: React.FC = () => {
   return (
     <SignedOutRouteProtector>
       <Card className="w-full max-w-md mx-auto mt-16">
-        <CardHeader>
-          <CardTitle>Sign in</CardTitle>
-          <CardDescription>Enter your credentials to sign in</CardDescription>
+        <CardHeader className="flex justify-between items-center">
+          <CardTitle>Sign in with password</CardTitle>
+          <Button
+            variant="link"
+            className="p-0 h-0 text-muted-foreground"
+            onClick={() => navigate("/auth/sign-in")}
+          >
+            Back
+          </Button>
         </CardHeader>
         <CardContent>
           <SignInWithPasswordForm

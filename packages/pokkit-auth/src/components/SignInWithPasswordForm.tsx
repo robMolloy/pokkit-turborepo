@@ -57,7 +57,12 @@ export const SignInWithPasswordForm = (p: {
           <Button type="submit" disabled={isLoading}>
             {isLoading ? "Signing in..." : "Sign In"}
           </Button>
-          <Button variant="link" className="p-0 h-0" onClick={p.onForgotPasswordLinkClick}>
+          <Button
+            type="button"
+            variant="link"
+            className="p-0 h-0"
+            onClick={p.onForgotPasswordLinkClick}
+          >
             Forgot your password?
           </Button>
         </Field>

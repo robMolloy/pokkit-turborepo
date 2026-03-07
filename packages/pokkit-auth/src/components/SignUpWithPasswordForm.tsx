@@ -1,12 +1,12 @@
-import { Button, Label, Input } from "@repo/pokkit-shadcn";
-import { useState } from "react";
+import { Button, Field, FieldGroup, FieldLabel, Input } from "@repo/pokkit-shadcn";
 import PocketBase from "pocketbase";
+import { useState } from "react";
 import { signUpWithPassword } from "../utils";
 
 export const SignUpWithPasswordForm = (p: {
   pb: PocketBase;
-  onSignInSuccess?: (messages: string[]) => void;
-  onSignInError?: (messages: string[]) => void;
+  onSignUpSuccess?: (messages: string[]) => void;
+  onSignUpError?: (messages: string[]) => void;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -17,7 +17,6 @@ export const SignUpWithPasswordForm = (p: {
 
   return (
     <form
-      className="flex flex-col gap-4"
       onSubmit={async (e) => {
         e.preventDefault();
         if (isLoading) return;
@@ -27,67 +26,73 @@ export const SignUpWithPasswordForm = (p: {
           pb: p.pb,
           data: { email, name, emailVisibility: true, password, passwordConfirm },
         });
-        const fn = resp.success ? p.onSignInSuccess : p.onSignInError;
+        const fn = resp.success ? p.onSignUpSuccess : p.onSignUpError;
         fn?.(resp.messages);
 
         setIsLoading(false);
       }}
     >
-      <div>
-        <Label htmlFor="sign-up-with-password-name-input">Full Name</Label>
-        <Input
-          id="sign-up-with-password-name-input"
-          value={name}
-          onInput={(e) => setName(e.currentTarget.value)}
-          disabled={isLoading}
-          name="name"
-          type="text"
-          placeholder="Enter your full name"
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="sign-up-with-password-email-input">Email</Label>
-        <Input
-          id="sign-up-with-password-email-input"
-          value={email}
-          onInput={(e) => setEmail(e.currentTarget.value)}
-          disabled={isLoading}
-          name="email"
-          type="email"
-          placeholder="Enter your email"
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="sign-up-with-password-password-input">Password</Label>
-        <Input
-          id="sign-up-with-password-password-input"
-          value={password}
-          onInput={(e) => setPassword(e.currentTarget.value)}
-          disabled={isLoading}
-          name="signup-password"
-          type="password"
-          placeholder="Create a password"
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="sign-up-with-password-password-confirm-input">Confirm Password</Label>
-        <Input
-          id="sign-up-with-password-password-confirm-input"
-          value={passwordConfirm}
-          onInput={(e) => setPasswordConfirm(e.currentTarget.value)}
-          disabled={isLoading}
-          name="password-confirm"
-          type="password"
-          placeholder="Confirm your password"
-          required
-        />
-      </div>
-      <Button variant="secondary" type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? "Creating account..." : "Sign Up"}
-      </Button>
+      <FieldGroup>
+        <Field>
+          <FieldLabel htmlFor="sign-up-with-password-name-input">Full Name</FieldLabel>
+          <Input
+            id="sign-up-with-password-name-input"
+            value={name}
+            onInput={(e) => setName(e.currentTarget.value)}
+            disabled={isLoading}
+            name="name"
+            type="text"
+            placeholder="Enter your full name"
+            required
+          />
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="sign-up-with-password-email-input">Email</FieldLabel>
+          <Input
+            id="sign-up-with-password-email-input"
+            value={email}
+            onInput={(e) => setEmail(e.currentTarget.value)}
+            disabled={isLoading}
+            name="email"
+            type="email"
+            placeholder="Enter your email"
+            required
+          />
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="sign-up-with-password-password-input">Password</FieldLabel>
+          <Input
+            id="sign-up-with-password-password-input"
+            value={password}
+            onInput={(e) => setPassword(e.currentTarget.value)}
+            disabled={isLoading}
+            name="signup-password"
+            type="password"
+            placeholder="Create a password"
+            required
+          />
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="sign-up-with-password-password-confirm-input">
+            Confirm Password
+          </FieldLabel>
+          <Input
+            id="sign-up-with-password-password-confirm-input"
+            value={passwordConfirm}
+            onInput={(e) => setPasswordConfirm(e.currentTarget.value)}
+            disabled={isLoading}
+            name="password-confirm"
+            type="password"
+            placeholder="Confirm your password"
+            required
+          />
+        </Field>
+        <Field orientation="horizontal">
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? "Creating account..." : "Sign Up"}
+          </Button>
+        </Field>
+      </FieldGroup>
     </form>
   );
 };

@@ -23,7 +23,7 @@ export const SignUpNavigationOptions = (p: {
         Already have an account?{" "}
         <Button
           variant="link"
-          className="text-muted-foreground text-md p-0"
+          className="text-muted-foreground text-md p-0 h-0"
           onClick={p.onNavigateToSignInLinkClick}
         >
           Sign in

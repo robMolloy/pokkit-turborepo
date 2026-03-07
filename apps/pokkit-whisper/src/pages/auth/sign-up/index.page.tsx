@@ -26,7 +26,7 @@ export default function Page() {
     <SignedOutRouteProtector>
       <Card className="w-full max-w-md mx-auto mt-16">
         <CardHeader>
-          <CardTitle>Sign Up for an account</CardTitle>
+          <CardTitle>Sign up for an account</CardTitle>
           <CardDescription>Choose your preferred sign-up method</CardDescription>
         </CardHeader>
         <CardContent>

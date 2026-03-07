@@ -1,5 +1,6 @@
 import { cn } from "@repo/pokkit-shadcn";
 import {
+  ArrowLeft,
   LogOutIcon,
   LogIn,
   UserPlus,
@@ -50,6 +51,7 @@ import {
 } from "lucide-react";
 
 const iconMap = {
+  ArrowLeft,
   LogOutIcon,
   Key,
   LogIn,
