@@ -1,17 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { pb } from "@/config/pocketbaseConfig";
+import { createToastProps } from "@/lib/createToastProps";
 import { SignedOutRouteProtector, SignInWithOtpForm } from "@repo/pokkit-auth";
 import { Button } from "@repo/pokkit-shadcn";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-
-const createToastProps = (messages: string[]) => {
-  const [firstMessage, ...otherMessages] = messages;
-  return [
-    firstMessage,
-    { description: otherMessages?.map((msg, index) => <p key={index}>{msg}</p>) },
-  ] as const;
-};
 
 const SignInWithOtpPage: React.FC = () => {
   const navigate = useNavigate();
@@ -32,10 +25,8 @@ const SignInWithOtpPage: React.FC = () => {
         <CardContent>
           <SignInWithOtpForm
             pb={pb}
-            onSignInSuccess={() => toast.success("Signed in successfully!")}
-            onSignInError={(messages) => {
-              toast.error(...createToastProps(messages));
-            }}
+            onSignInSuccess={(messages) => toast.success(...createToastProps(messages))}
+            onSignInError={(messages) => toast.error(...createToastProps(messages))}
           />
         </CardContent>
       </Card>

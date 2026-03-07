@@ -5,3 +5,4 @@ export * from "./SignInWithPasswordForm";
 export * from "./SignOutButton";
 export * from "./SignUpNavigationOptions";
 export * from "./SignUpWithPasswordForm";
+export * from "./SignInWithPasswordResetForm";

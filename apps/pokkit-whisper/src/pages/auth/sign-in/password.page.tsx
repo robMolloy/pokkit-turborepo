@@ -1,8 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { pb } from "@/config/pocketbaseConfig";
+import { createToastProps } from "@/lib/createToastProps";
 import { SignedOutRouteProtector, SignInWithPasswordForm } from "@repo/pokkit-auth";
 import { Button } from "@repo/pokkit-shadcn";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const SignInWithPasswordPage: React.FC = () => {
   const navigate = useNavigate();
@@ -26,6 +28,8 @@ const SignInWithPasswordPage: React.FC = () => {
           <SignInWithPasswordForm
             pb={pb}
             onForgotPasswordLinkClick={() => navigate("/auth/sign-in/forgot-password")}
+            onSignInSuccess={(messages) => toast.success(...createToastProps(messages))}
+            onSignInError={(messages) => toast.error(...createToastProps(messages))}
           />
         </CardContent>
       </Card>
