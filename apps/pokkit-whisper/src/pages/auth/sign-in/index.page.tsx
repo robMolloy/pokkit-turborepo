@@ -31,7 +31,7 @@ export default function Page() {
         <CardContent>
           <SignInNavigationOptions
             authMethodsList={authMethodsList}
-            onSignInWithOtpButtonClick={() => navigate("/auth/sign-in/otp")}
+            onSignInWithOtpButtonClick={() => navigate("/auth/sign-in/one-time-passcode")}
             onSignInWithOauth2ButtonClick={() => navigate("/auth/sign-in/oauth2")}
             onSignInWithPasswordButtonClick={() => navigate("/auth/sign-in/password")}
             onNavigateToSignUpLinkClick={() => navigate("/auth/sign-up")}

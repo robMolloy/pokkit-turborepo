@@ -12,7 +12,7 @@ export const SignInNavigationOptions = (p: {
     <div className="flex flex-col gap-4">
       {p.authMethodsList.otp.enabled && (
         <Button className="w-full" onClick={p.onSignInWithOtpButtonClick}>
-          Sign in with OTP
+          Sign in with one-time passcode
         </Button>
       )}
       {p.authMethodsList.oauth2.enabled && (
