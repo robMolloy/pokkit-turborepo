@@ -3,6 +3,8 @@ import PocketBase from "pocketbase";
 import { useState } from "react";
 import { signUpWithPassword } from "../utils";
 
+const inputIdPrefix = "sign-up-with-password-form";
+
 export const SignUpWithPasswordForm = (p: {
   pb: PocketBase;
   onSignUpSuccess?: (messages: string[]) => void;
@@ -34,9 +36,9 @@ export const SignUpWithPasswordForm = (p: {
     >
       <FieldGroup>
         <Field>
-          <FieldLabel htmlFor="sign-up-with-password-name-input">Full Name</FieldLabel>
+          <FieldLabel htmlFor={`${inputIdPrefix}-name-input`}>Full Name</FieldLabel>
           <Input
-            id="sign-up-with-password-name-input"
+            id={`${inputIdPrefix}-name-input`}
             value={name}
             onInput={(e) => setName(e.currentTarget.value)}
             disabled={isLoading}
@@ -47,9 +49,9 @@ export const SignUpWithPasswordForm = (p: {
           />
         </Field>
         <Field>
-          <FieldLabel htmlFor="sign-up-with-password-email-input">Email</FieldLabel>
+          <FieldLabel htmlFor={`${inputIdPrefix}-email-input`}>Email</FieldLabel>
           <Input
-            id="sign-up-with-password-email-input"
+            id={`${inputIdPrefix}-email-input`}
             value={email}
             onInput={(e) => setEmail(e.currentTarget.value)}
             disabled={isLoading}
@@ -60,9 +62,9 @@ export const SignUpWithPasswordForm = (p: {
           />
         </Field>
         <Field>
-          <FieldLabel htmlFor="sign-up-with-password-password-input">Password</FieldLabel>
+          <FieldLabel htmlFor={`${inputIdPrefix}-password-input`}>Password</FieldLabel>
           <Input
-            id="sign-up-with-password-password-input"
+            id={`${inputIdPrefix}-password-input`}
             value={password}
             onInput={(e) => setPassword(e.currentTarget.value)}
             disabled={isLoading}
@@ -73,11 +75,11 @@ export const SignUpWithPasswordForm = (p: {
           />
         </Field>
         <Field>
-          <FieldLabel htmlFor="sign-up-with-password-password-confirm-input">
+          <FieldLabel htmlFor={`${inputIdPrefix}-password-confirm-input`}>
             Confirm Password
           </FieldLabel>
           <Input
-            id="sign-up-with-password-password-confirm-input"
+            id={`${inputIdPrefix}-password-confirm-input`}
             value={passwordConfirm}
             onInput={(e) => setPasswordConfirm(e.currentTarget.value)}
             disabled={isLoading}

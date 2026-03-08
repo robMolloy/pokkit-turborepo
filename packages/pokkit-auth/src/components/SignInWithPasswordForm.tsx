@@ -3,6 +3,8 @@ import PocketBase from "pocketbase";
 import { useState } from "react";
 import { signinWithPassword } from "../utils";
 
+const inputIdPrefix = "sign-in-with-password-form";
+
 export const SignInWithPasswordForm = (p: {
   pb: PocketBase;
   onSignInSuccess?: (messages: string[]) => void;
@@ -29,10 +31,10 @@ export const SignInWithPasswordForm = (p: {
     >
       <FieldGroup>
         <Field>
-          <FieldLabel htmlFor="signin-with-password-email-input">Email</FieldLabel>
+          <FieldLabel htmlFor={`${inputIdPrefix}-email-input`}>Email</FieldLabel>
           <Input
             autoFocus
-            id="signin-with-password-email-input"
+            id={`${inputIdPrefix}-email-input`}
             value={email}
             onInput={(e) => setEmail(e.currentTarget.value)}
             name="email"
@@ -42,9 +44,9 @@ export const SignInWithPasswordForm = (p: {
           />
         </Field>
         <Field>
-          <FieldLabel htmlFor="signin-with-password-password-input">Password</FieldLabel>
+          <FieldLabel htmlFor={`${inputIdPrefix}-password-input`}>Password</FieldLabel>
           <Input
-            id="signin-with-password-password-input"
+            id={`${inputIdPrefix}-password-input`}
             value={password}
             onInput={(e) => setPassword(e.currentTarget.value)}
             name="password"

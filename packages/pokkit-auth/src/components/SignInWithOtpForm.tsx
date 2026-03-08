@@ -14,6 +14,8 @@ import { requestOtpForSignInWithOtp, signinWithOtp } from "../utils";
 
 const DigitsOnlyRegex = /^\d*$/;
 
+const inputIdPrefix = "sign-in-with-otp";
+
 export const SignInWithOtpForm = (p: {
   pb: PocketBase;
   onRequestOtpSuccess?: (messages: string[]) => void;
@@ -53,12 +55,12 @@ export const SignInWithOtpForm = (p: {
     >
       <FieldGroup>
         <Field>
-          <FieldLabel htmlFor="sign-in-with-otp-email-input">Email</FieldLabel>
+          <FieldLabel htmlFor={`${inputIdPrefix}-email-input`}>Email</FieldLabel>
           <div className="relative">
             <Input
               autoFocus
               key={otpId} // remount input when otpId to enable autoFocus
-              id="sign-in-with-otp-email-input"
+              id={`${inputIdPrefix}-email-input`}
               value={email}
               onInput={(e) => setEmail(e.currentTarget.value)}
               disabled={isLoading || mode === "edit-otp"}
@@ -84,12 +86,12 @@ export const SignInWithOtpForm = (p: {
           </div>
         </Field>
         <Field>
-          <FieldLabel htmlFor="sign-in-with-otp-otp-input">OTP</FieldLabel>
+          <FieldLabel htmlFor={`${inputIdPrefix}-otp-input`}>OTP</FieldLabel>
           <div>
             <InputOTP
               autoFocus
               key={otpId} // remount input when otpId to enable autoFocus
-              id="sign-in-with-otp-otp-input"
+              id={`${inputIdPrefix}-otp-input`}
               disabled={isLoading || mode === "edit-email"}
               name="signin-otp"
               maxLength={8}
