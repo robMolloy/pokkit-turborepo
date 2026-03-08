@@ -5,6 +5,7 @@ import {
   SignedOutRouteProtector,
   SignUpOrSignInOAuth2Options,
 } from "@repo/pokkit-auth";
+import { Button } from "@repo/pokkit-shadcn";
 import type { AuthMethodsList } from "pocketbase";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -26,8 +27,17 @@ export default function Page() {
   return (
     <SignedOutRouteProtector ifIsSignedIn={() => navigate("/")}>
       <Card className="w-full max-w-md mx-auto mt-16">
-        <CardHeader className="relative flex justify-center">
-          <CardTitle>Choose your preferred OAuth2 provider</CardTitle>
+        <CardHeader>
+          <div className="relative flex justify-center">
+            <CardTitle>Choose your preferred OAuth2 provider</CardTitle>
+            <Button
+              variant="link"
+              className="absolute left-0 top-1/2 -translate-y-1/2 p-0 h-0 text-muted-foreground"
+              onClick={() => navigate("/auth/sign-in")}
+            >
+              &larr; Back
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <SignUpOrSignInOAuth2Options authMethodsList={authMethodsList} pb={pb} />

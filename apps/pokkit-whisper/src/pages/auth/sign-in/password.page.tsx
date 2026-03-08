@@ -12,15 +12,17 @@ const SignInWithPasswordPage: React.FC = () => {
   return (
     <SignedOutRouteProtector ifIsSignedIn={() => navigate("/")}>
       <Card className="w-full max-w-md mx-auto mt-16">
-        <CardHeader className="relative flex justify-center">
-          <CardTitle>Sign in with password</CardTitle>
-          <Button
-            variant="link"
-            className="absolute left-0 top-1/2 -translate-y-1/2 p-0 h-0 text-muted-foreground"
-            onClick={() => navigate("/auth/sign-in")}
-          >
-            &larr; Back
-          </Button>
+        <CardHeader>
+          <div className="relative flex justify-center">
+            <CardTitle>Sign in with password</CardTitle>
+            <Button
+              variant="link"
+              className="absolute left-0 top-1/2 -translate-y-1/2 p-0 h-0 text-muted-foreground"
+              onClick={() => navigate("/auth/sign-in")}
+            >
+              &larr; Back
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <SignInWithPasswordForm
