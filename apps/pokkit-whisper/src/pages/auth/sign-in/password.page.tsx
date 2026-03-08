@@ -27,9 +27,7 @@ const SignInWithPasswordPage: React.FC = () => {
         <CardContent>
           <SignInWithPasswordForm
             pb={pb}
-            onForgotPasswordLinkClick={() =>
-              navigate("/auth/sign-in/password-reset-request-and-confirm")
-            }
+            onForgotPasswordLinkClick={() => navigate("/auth/sign-in/password-reset-request")}
             onSignInSuccess={(messages) => toast.success(...createToastProps(messages))}
             onSignInError={(messages) => toast.error(...createToastProps(messages))}
           />

@@ -9,10 +9,6 @@ export const RequestPasswordResetTokenForm = (p: {
   pb: PocketBase;
   onRequestPasswordResetSuccess?: (messages: string[]) => void;
   onRequestPasswordResetError?: (messages: string[]) => void;
-  onConfirmPasswordResetSuccess?: (messages: string[]) => void;
-  onConfirmPasswordResetError?: (messages: string[]) => void;
-  onSignInSuccess?: (messages: string[]) => void;
-  onSignInError?: (messages: string[]) => void;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 

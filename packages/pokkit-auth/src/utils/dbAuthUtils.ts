@@ -18,7 +18,10 @@ export const requestVerificationEmail = async (p: { pb: PocketBase; email: strin
 
     return {
       success: true,
-      messages: ["Successfully requested verification email"] as string[],
+      messages: [
+        "Successfully requested verification email",
+        "Check your email for further instructions",
+      ] as string[],
     } as const;
   } catch (error) {
     const messagesResp = extractMessageFromPbError({ error });
@@ -41,13 +44,13 @@ export const confirmVerificationEmail = async (p: { pb: PocketBase; token: strin
 
     return {
       success: true,
-      messages: ["Successfully requested verification email"] as string[],
+      messages: ["Successfully confirmed verification email"] as string[],
     } as const;
   } catch (error) {
     const messagesResp = extractMessageFromPbError({ error });
 
     const messages = [
-      "Failed to request verification email for user",
+      "Failed to confirm verification email for user",
       ...(messagesResp ? messagesResp : []),
     ];
 
@@ -64,7 +67,10 @@ export const requestPasswordReset = async (p: { pb: PocketBase; email: string })
 
     return {
       success: true,
-      messages: ["Successfully requested passsword reset"] as string[],
+      messages: [
+        "Successfully requested passsword reset",
+        "Check your email for further instructions",
+      ] as string[],
     } as const;
   } catch (error) {
     const messagesResp = extractMessageFromPbError({ error });

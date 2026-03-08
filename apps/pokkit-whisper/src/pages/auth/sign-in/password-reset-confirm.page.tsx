@@ -42,15 +42,14 @@ export default function Page() {
         <CardContent>
           <SignInWithPasswordResetTokenForm
             pb={pb}
-            onSignInSuccess={(messages) => toast.success(...createToastProps(messages))}
-            onSignInError={(messages) => toast.error(...createToastProps(messages))}
-            onRequestPasswordResetSuccess={(messages) =>
-              toast.success(...createToastProps(messages))
-            }
-            onRequestPasswordResetError={(messages) => toast.error(...createToastProps(messages))}
             initEmailValue={email}
             initPasswordResetTokenValue={token}
-            showPasswordResetTokenInput={false}
+            onSignInSuccess={(messages) => toast.success(...createToastProps(messages))}
+            onSignInError={(messages) => toast.error(...createToastProps(messages))}
+            onConfirmPasswordResetSuccess={(messages) =>
+              toast.success(...createToastProps(messages))
+            }
+            onConfirmPasswordResetError={(messages) => toast.error(...createToastProps(messages))}
           />
         </CardContent>
       </Card>

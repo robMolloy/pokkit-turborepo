@@ -1,10 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { pb } from "@/config/pocketbaseConfig";
 import { createToastProps } from "@/lib/createToastProps";
-import {
-  SignedOutRouteProtector,
-  SignInWithPasswordResetRequestAndConfirmForm,
-} from "@repo/pokkit-auth";
+import { RequestPasswordResetTokenForm, SignedOutRouteProtector } from "@repo/pokkit-auth";
 import { Button } from "@repo/pokkit-shadcn";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -26,10 +23,8 @@ export default function ForgotPasswordPage() {
           </Button>
         </CardHeader>
         <CardContent>
-          <SignInWithPasswordResetRequestAndConfirmForm
+          <RequestPasswordResetTokenForm
             pb={pb}
-            onSignInSuccess={(messages) => toast.success(...createToastProps(messages))}
-            onSignInError={(messages) => toast.error(...createToastProps(messages))}
             onRequestPasswordResetSuccess={(messages) =>
               toast.success(...createToastProps(messages))
             }

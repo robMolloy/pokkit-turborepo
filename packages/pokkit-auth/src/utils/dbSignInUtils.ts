@@ -13,7 +13,10 @@ export const requestOtpForSignInWithOtp = async (p: { pb: PocketBase; email: str
     return {
       success: true,
       data,
-      messages: ["Successfully requested OTP"] as string[],
+      messages: [
+        "Successfully requested OTP",
+        "Check your email for further instructions",
+      ] as string[],
     } as const;
   } catch (error) {
     const messagesResp = extractMessageFromPbError({ error });
