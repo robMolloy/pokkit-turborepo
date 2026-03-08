@@ -1,42 +1,42 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { pb } from "@/config/pocketbaseConfig";
 import { createToastProps } from "@/lib/createToastProps";
-import { SignedOutRouteProtector, SignInWithPasswordForm } from "@repo/pokkit-auth";
+import {
+  SignedOutRouteProtector,
+  SignInWithPasswordResetRequestAndConfirmForm,
+} from "@repo/pokkit-auth";
 import { Button } from "@repo/pokkit-shadcn";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-const SignInWithPasswordPage: React.FC = () => {
+export default function ForgotPasswordPage() {
   const navigate = useNavigate();
 
   return (
     <SignedOutRouteProtector ifIsSignedIn={() => navigate("/")}>
       <Card className="w-full max-w-md mx-auto mt-16">
-        <CardHeader>
-          <div className="relative flex justify-center">
-            <CardTitle>Sign in with password</CardTitle>
-            <Button
-              variant="link"
-              className="absolute left-0 top-1/2 -translate-y-1/2 p-0 h-0 text-muted-foreground"
-              onClick={() => navigate("/auth/sign-in")}
-            >
-              &larr; Back
-            </Button>
-          </div>
+        <CardHeader className="flex justify-between items-center">
+          <CardTitle>Reset password and sign in</CardTitle>
+          <Button
+            variant="link"
+            className="p-0 h-0 text-muted-foreground"
+            onClick={() => navigate("/auth/sign-in")}
+          >
+            Back
+          </Button>
         </CardHeader>
         <CardContent>
-          <SignInWithPasswordForm
+          <SignInWithPasswordResetRequestAndConfirmForm
             pb={pb}
-            onForgotPasswordLinkClick={() =>
-              navigate("/auth/sign-in/password-reset-request-and-confirm")
-            }
             onSignInSuccess={(messages) => toast.success(...createToastProps(messages))}
             onSignInError={(messages) => toast.error(...createToastProps(messages))}
+            onRequestPasswordResetSuccess={(messages) =>
+              toast.success(...createToastProps(messages))
+            }
+            onRequestPasswordResetError={(messages) => toast.error(...createToastProps(messages))}
           />
         </CardContent>
       </Card>
     </SignedOutRouteProtector>
   );
-};
-
-export default SignInWithPasswordPage;
+}

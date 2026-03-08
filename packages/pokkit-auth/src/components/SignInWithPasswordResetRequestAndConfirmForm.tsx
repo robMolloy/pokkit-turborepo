@@ -10,7 +10,9 @@ import PocketBase from "pocketbase";
 import { useState } from "react";
 import { confirmPasswordReset, requestPasswordReset, signinWithPassword } from "../utils";
 
-export const SignInWithPasswordResetForm = (p: {
+const inputIdPrefix = "sign-in-with-password-reset-request-and-confirm-form";
+
+export const SignInWithPasswordResetRequestAndConfirmForm = (p: {
   pb: PocketBase;
   onRequestPasswordResetSuccess?: (messages: string[]) => void;
   onRequestPasswordResetError?: (messages: string[]) => void;
@@ -66,12 +68,12 @@ export const SignInWithPasswordResetForm = (p: {
     >
       <FieldGroup>
         <Field>
-          <FieldLabel htmlFor="sign-in-with-password-reset-email-input">Email</FieldLabel>
+          <FieldLabel htmlFor={`${inputIdPrefix}-email-input`}>Email</FieldLabel>
           <div className="relative">
             <Input
               autoFocus
               key={passwordResetToken} // remount input when otpId to enable autoFocus
-              id="sign-in-with-password-reset-email-input"
+              id={`${inputIdPrefix}-email-input`}
               value={email}
               onInput={(e) => setEmail(e.currentTarget.value)}
               disabled={isLoading || mode === "email-confirmed"}
@@ -99,14 +101,14 @@ export const SignInWithPasswordResetForm = (p: {
           </div>
         </Field>
         <Field>
-          <FieldLabel htmlFor="sign-in-with-password-reset-token-input">Reset token</FieldLabel>
+          <FieldLabel htmlFor={`${inputIdPrefix}-reset-token-input`}>Reset token</FieldLabel>
           <FieldDescription>
             Copy the reset token from your email and paste it below
           </FieldDescription>
           <Input
             autoFocus
             key={passwordResetToken} // remount input when otpId to enable autoFocus
-            id="sign-in-with-password-reset-token-input"
+            id={`${inputIdPrefix}-reset-token-input`}
             value={passwordResetToken}
             onInput={(e) => setPasswordResetToken(e.currentTarget.value)}
             disabled={isLoading || mode === "edit-email"}
@@ -117,11 +119,9 @@ export const SignInWithPasswordResetForm = (p: {
           />
         </Field>
         <Field>
-          <FieldLabel htmlFor="sign-in-with-password-password-input">New password</FieldLabel>
+          <FieldLabel htmlFor={`${inputIdPrefix}-password-input`}>New password</FieldLabel>
           <Input
-            autoFocus
-            key={passwordResetToken} // remount input when otpId to enable autoFocus
-            id="sign-in-with-password-password-input"
+            id={`${inputIdPrefix}-password-input`}
             value={password}
             onInput={(e) => setPassword(e.currentTarget.value)}
             disabled={isLoading || mode === "edit-email"}
@@ -132,13 +132,11 @@ export const SignInWithPasswordResetForm = (p: {
           />
         </Field>
         <Field>
-          <FieldLabel htmlFor="sign-in-with-password-password-confirm-input">
+          <FieldLabel htmlFor={`${inputIdPrefix}-password-confirm-input`}>
             Confirm new password
           </FieldLabel>
           <Input
-            autoFocus
-            key={passwordResetToken} // remount input when otpId to enable autoFocus
-            id="sign-in-with-password-password-confirm-input"
+            id={`${inputIdPrefix}-password-confirm-input`}
             value={passwordConfirm}
             onInput={(e) => setPasswordConfirm(e.currentTarget.value)}
             disabled={isLoading || mode === "edit-email"}

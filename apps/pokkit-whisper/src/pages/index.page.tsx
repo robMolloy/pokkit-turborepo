@@ -23,12 +23,6 @@ const IndexPage = () => {
         <>
           <div>You are signed out</div>
           <div>Log in to enjoy the app</div>
-          {/* <SignInWithPasswordForm pb={pb} />
-
-          <br />
-
-          <h2>Sign Up</h2>
-          <SignUpWithPasswordForm pb={pb} /> */}
         </>
       </SignedOutRouteProtector>
 
