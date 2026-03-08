@@ -12,15 +12,17 @@ const SignInWithOtpPage: React.FC = () => {
   return (
     <SignedOutRouteProtector ifIsSignedIn={() => navigate("/")}>
       <Card className="w-full max-w-md mx-auto mt-16">
-        <CardHeader className="flex justify-between items-center">
-          <CardTitle>Sign in with OTP</CardTitle>
-          <Button
-            variant="link"
-            className="p-0 h-0 text-muted-foreground"
-            onClick={() => navigate("/auth/sign-in")}
-          >
-            Back
-          </Button>
+        <CardHeader>
+          <div className="relative flex justify-center">
+            <CardTitle>Sign in with OTP</CardTitle>
+            <Button
+              variant="link"
+              className="absolute left-0 top-1/2 -translate-y-1/2 p-0 h-0 text-muted-foreground"
+              onClick={() => navigate("/auth/sign-in")}
+            >
+              &larr; Back
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <SignInWithOtpForm

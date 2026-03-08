@@ -26,7 +26,7 @@ export default function Page() {
     <SignedOutRouteProtector ifIsSignedIn={() => navigate("/")}>
       <Card className="w-full max-w-md mx-auto mt-16">
         <CardHeader>
-          <div className="flex justify-center">
+          <div className="relative flex justify-center">
             <CardTitle>Choose your sign-in method</CardTitle>
           </div>
         </CardHeader>

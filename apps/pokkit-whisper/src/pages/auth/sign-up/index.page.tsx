@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { pb } from "@/config/pocketbaseConfig";
 import {
   listAuthMethods,
@@ -26,12 +26,14 @@ export default function Page() {
     <SignedOutRouteProtector ifIsSignedIn={() => navigate("/")}>
       <Card className="w-full max-w-md mx-auto mt-16">
         <CardHeader>
-          <CardTitle>Sign up for an account</CardTitle>
-          <CardDescription>Choose your preferred sign-up method</CardDescription>
+          <div className="relative flex justify-center">
+            <CardTitle>Choose your preferred sign-up method</CardTitle>
+          </div>
         </CardHeader>
         <CardContent>
           <SignUpNavigationOptions
             authMethodsList={authMethodsList}
+            onSignUpWithOtpButtonClick={() => navigate("/auth/sign-up/otp")}
             onSignUpWithOauth2ButtonClick={() => navigate("/auth/sign-up/oauth2")}
             onSignUpWithPasswordButtonClick={() => navigate("/auth/sign-up/password")}
             onNavigateToSignInLinkClick={() => navigate("/auth/sign-in")}

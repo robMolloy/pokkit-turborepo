@@ -1,17 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { pb } from "@/config/pocketbaseConfig";
-import { SignedOutRouteProtector, SignUpWithPasswordForm } from "@repo/pokkit-auth";
+import { createToastProps } from "@/lib/createToastProps";
+import { SignedOutRouteProtector, SignUpWithOtpForm } from "@repo/pokkit-auth";
 import { Button } from "@repo/pokkit-shadcn";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
-const SignUpWithPasswordPage: React.FC = () => {
+const Page: React.FC = () => {
   const navigate = useNavigate();
+
   return (
     <SignedOutRouteProtector ifIsSignedIn={() => navigate("/")}>
       <Card className="w-full max-w-md mx-auto mt-16">
         <CardHeader>
           <div className="relative flex justify-center">
-            <CardTitle>Sign up with password</CardTitle>
+            <CardTitle>Sign up with OTP</CardTitle>
             <Button
               variant="link"
               className="absolute left-0 top-1/2 -translate-y-1/2 p-0 h-0 text-muted-foreground"
@@ -22,11 +25,19 @@ const SignUpWithPasswordPage: React.FC = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <SignUpWithPasswordForm pb={pb} />
+          <SignUpWithOtpForm
+            pb={pb}
+            onSignUpSuccess={(messages) => toast.success(...createToastProps(messages))}
+            onSignUpError={(messages) => toast.error(...createToastProps(messages))}
+            onRequestOtpSuccess={(messages) => toast.success(...createToastProps(messages))}
+            onRequestOtpError={(messages) => toast.error(...createToastProps(messages))}
+            onSignInSuccess={(messages) => toast.success(...createToastProps(messages))}
+            onSignInError={(messages) => toast.error(...createToastProps(messages))}
+          />
         </CardContent>
       </Card>
     </SignedOutRouteProtector>
   );
 };
 
-export default SignUpWithPasswordPage;
+export default Page;

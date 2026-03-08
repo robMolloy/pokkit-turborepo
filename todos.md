@@ -1,8 +1,11 @@
 ## BUILD POKKIT-WHISPER
 
-route protectors
+~~route protectors~~
 auth forms
-storybook for pokkit components
+
+- oauth form!!!
+- add back button - use sign in with password as referennce
+  ~~storybook for pokkit components~~
 
 ## pokkit-components
 
@@ -10,3 +13,8 @@ storybook for pokkit components
 - layout
   - sidebar
   - header nav
+
+## refactors/improvements
+
+- build packages to dist as js + types to enable aliasing within packages
+- Find a better solution to "downlevelIteration": true in tsconfig
