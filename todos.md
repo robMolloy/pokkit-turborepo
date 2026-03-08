@@ -1,18 +1,21 @@
 ## BUILD POKKIT-WHISPER
 
-~~route protectors~~
-auth forms
+- copy pokkit-whisper to pokkit-starter
+- ~~route protectors~~
+- ~~oauth form!!!~~
+- ~~add back button - use sign in with password as referennce~~
+  - ~~storybook for pokkit components~~
 
-- oauth form!!!
-- add back button - use sign in with password as referennce
-  ~~storybook for pokkit components~~
+## pokkit-auth
+
+- authMethodsList store
 
 ## pokkit-components
 
-- theme store toggle
-- layout
-  - sidebar
-  - header nav
+- theme store switcher and toggle
+- ~~layout~~
+  - ~~sidebar~~
+  - ~~header nav~~
 
 ## refactors/improvements
 
