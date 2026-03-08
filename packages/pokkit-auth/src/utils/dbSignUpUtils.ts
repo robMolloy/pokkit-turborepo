@@ -1,29 +1,9 @@
 import PocketBase from "pocketbase";
 import { extractMessageFromPbError } from "./dbErrorUtils";
 import { TUserSignUpWithPasswordSeed, userSchema, usersCollectionName } from "./dbUserUtils";
+import { signUpOrSignInWithOAuth2 } from "./dbSignInUtils";
 
-export const signupWithOAuth2Google = async (p: { pb: PocketBase }) => {
-  try {
-    const data = await p.pb.collection(usersCollectionName).authWithOAuth2({
-      provider: "google",
-    });
-
-    return {
-      success: true,
-      data,
-      messages: ["Successfully signup user with google oauth2"] as string[],
-    } as const;
-  } catch (error) {
-    const messagesResp = extractMessageFromPbError({ error });
-
-    const messages = [
-      "Failed to sign up user with google oauth2",
-      ...(messagesResp ? messagesResp : []),
-    ];
-
-    return { success: false, error, messages } as const;
-  }
-};
+export const signInWithOAuth2 = signUpOrSignInWithOAuth2;
 
 export const signUpWithPassword = async (p: {
   pb: PocketBase;

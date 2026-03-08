@@ -5,6 +5,7 @@ export * from "./SignInWithPasswordForm";
 export * from "./SignInWithPasswordResetTokenForm";
 export * from "./SignOutButton";
 export * from "./SignUpNavigationOptions";
+export * from "./SignUpOrSignInOAuth2Options";
 export * from "./SignUpWithPasswordForm";
 export * from "./SignUpWithOtpForm";
 export * from "./RequestPasswordResetTokenForm";

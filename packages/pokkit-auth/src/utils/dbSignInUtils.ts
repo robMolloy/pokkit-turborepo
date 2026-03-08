@@ -91,3 +91,27 @@ export const signinWithOAuth2Google = async (p: { pb: PocketBase }) => {
     return { success: false, error, messages } as const;
   }
 };
+
+export const signUpOrSignInWithOAuth2 = async (p: { pb: PocketBase; provider: string }) => {
+  try {
+    const data = await p.pb.collection(usersCollectionName).authWithOAuth2({
+      provider: p.provider,
+    });
+
+    return {
+      success: true,
+      data,
+      messages: [`Successfully signed in user with ${p.provider} oauth2`] as string[],
+    } as const;
+  } catch (error) {
+    const messagesResp = extractMessageFromPbError({ error });
+
+    const messages = [
+      `Failed to sign up/in user with ${p.provider} oauth2`,
+      ...(messagesResp ? messagesResp : []),
+    ];
+
+    return { success: false, error, messages } as const;
+  }
+};
+export const signInWithOAuth2 = signUpOrSignInWithOAuth2;
