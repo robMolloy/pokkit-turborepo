@@ -5,6 +5,7 @@
 - ~~oauth form!!!~~
 - ~~add back button - use sign in with password as referennce~~
   - ~~storybook for pokkit components~~
+- Clarify why verification confirmation page is less readable.
 
 ## pokkit-auth
 

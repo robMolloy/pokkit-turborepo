@@ -25,6 +25,8 @@ export default function Page() {
     })();
   }, []);
 
+  // The following JSX is relatively unclear. As verification confirmation can be performed on signed in or signed out.
+  // It may be clearer if this is split into two separate components
   return (
     <Card className="w-full max-w-md mx-auto mt-16">
       <CardHeader>
