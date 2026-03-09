@@ -20,6 +20,7 @@ import {
   SidebarButton,
 } from "@repo/pokkit-components";
 import { Toaster } from "@repo/pokkit-shadcn";
+import { envConfig } from "./config/envConfig";
 
 const Routes = () => {
   return useRoutes(routes);
@@ -42,7 +43,7 @@ const App = () => {
       <LayoutTemplate
         Header={
           <Header
-            Left={<div>Pokkit-Whisper</div>}
+            Left={<div>{envConfig.VITE_APP_DISPLAY_NAME}</div>}
             Right={
               isAuthenticated ? (
                 <SignOutButton pb={pb} />
@@ -127,7 +128,7 @@ const App = () => {
 
 createRoot(document.getElementById("app")!).render(
   <StrictMode>
-    <BrowserRouter basename={import.meta.env.VITE_APP_BASE_URL}>
+    <BrowserRouter basename={envConfig.VITE_APP_BASE_URL}>
       <App />
     </BrowserRouter>
   </StrictMode>,
