@@ -83,6 +83,31 @@ export const requestPasswordReset = async (p: { pb: PocketBase; email: string })
     return { success: false, error, messages } as const;
   }
 };
+export const requestVerificationToken = async (p: { pb: PocketBase; email: string }) => {
+  try {
+    const resp = await p.pb.collection(usersCollectionName).requestVerification(p.email);
+
+    const schema = z.literal(true);
+    schema.parse(resp);
+
+    return {
+      success: true,
+      messages: [
+        "Successfully requested verification token",
+        "Check your email for further instructions",
+      ] as string[],
+    } as const;
+  } catch (error) {
+    const messagesResp = extractMessageFromPbError({ error });
+
+    const messages = [
+      "Failed to request verification token for user",
+      ...(messagesResp ? messagesResp : []),
+    ];
+
+    return { success: false, error, messages } as const;
+  }
+};
 
 export const confirmPasswordReset = async (p: {
   pb: PocketBase;

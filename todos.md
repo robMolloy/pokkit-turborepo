@@ -9,6 +9,7 @@
 ## pokkit-auth
 
 - ~~authMethodsList store~~
+- add autoSignIn flag on any sign up forms - this should aim naming conventions
 
 ## pokkit-components
 

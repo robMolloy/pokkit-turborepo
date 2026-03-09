@@ -3,7 +3,7 @@ import { extractMessageFromPbError } from "./dbErrorUtils";
 import { TUserSignUpWithPasswordSeed, userSchema, usersCollectionName } from "./dbUserUtils";
 import { signUpOrSignInWithOAuth2 } from "./dbSignInUtils";
 
-export const signInWithOAuth2 = signUpOrSignInWithOAuth2;
+export const signUpWithOAuth2 = signUpOrSignInWithOAuth2;
 
 export const signUpWithPassword = async (p: {
   pb: PocketBase;

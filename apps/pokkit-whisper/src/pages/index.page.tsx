@@ -3,16 +3,18 @@ import {
   SignedOutRouteProtector,
   useReactiveAuthStore,
 } from "@repo/pokkit-auth";
+import { useNavigate } from "react-router-dom";
 
 const IndexPage = () => {
   const authStore = useReactiveAuthStore();
+  const navigate = useNavigate();
 
   return (
     <div>
       <h1>Pokkit Whisper</h1>
       <br />
 
-      <SignedInRouteProtector>
+      <SignedInRouteProtector ifUserIsUnverified={() => navigate("/auth/verification-request")}>
         <>
           <div>You are signed in</div>
           <div>Enjoy the app</div>

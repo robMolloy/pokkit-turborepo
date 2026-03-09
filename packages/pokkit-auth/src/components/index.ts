@@ -9,3 +9,4 @@ export * from "./SignUpOrSignInOAuth2Options";
 export * from "./SignUpWithPasswordForm";
 export * from "./SignUpWithOtpForm";
 export * from "./RequestPasswordResetTokenForm";
+export * from "./RequestVerificationTokenForm";

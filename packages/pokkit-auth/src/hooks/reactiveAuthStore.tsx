@@ -1,9 +1,9 @@
 import PocketBase, { AuthMethodsList } from "pocketbase";
-import { use, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { create } from "zustand";
-import { TUser, userSchema, usersCollectionName } from "../utils/dbUserUtils";
 import { listAuthMethods, smartSubscribeToRecordById } from "../utils";
 import { authStoreSchema, TAuthStore } from "../utils/dbAuthStoreUtils";
+import { TUser, userSchema, usersCollectionName } from "../utils/dbUserUtils";
 
 type TAuthStoreState = TAuthStore | null | undefined;
 

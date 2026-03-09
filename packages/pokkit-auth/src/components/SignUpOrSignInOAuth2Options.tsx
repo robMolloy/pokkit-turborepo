@@ -81,7 +81,7 @@ export const SignUpOrSignInOAuth2Options = (p: {
         >
           {(() => {
             const Icon = providerIconMap[x.name];
-            if (Icon) return <Icon className="mr-2" />;
+            return Icon ? <Icon className="mr-2" /> : <></>;
           })()}
           Sign up with {x.displayName}
         </Button>
