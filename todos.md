@@ -8,7 +8,7 @@
 
 ## pokkit-auth
 
-- authMethodsList store
+- ~~authMethodsList store~~
 
 ## pokkit-components
 

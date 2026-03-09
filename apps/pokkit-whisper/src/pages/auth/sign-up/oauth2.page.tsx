@@ -1,25 +1,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { pb } from "@/config/pocketbaseConfig";
 import {
-  listAuthMethods,
   SignedOutRouteProtector,
   SignUpOrSignInOAuth2Options,
+  useAuthMethodsListStore,
 } from "@repo/pokkit-auth";
 import { Button } from "@repo/pokkit-shadcn";
-import type { AuthMethodsList } from "pocketbase";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Page() {
-  const [authMethodsList, setAuthMethodsList] = useState<AuthMethodsList | null | undefined>();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    (async () => {
-      const resp = await listAuthMethods({ pb });
-      setAuthMethodsList(resp.success ? resp.data : null);
-    })();
-  }, []);
+  const authMethodsListStore = useAuthMethodsListStore();
+  const authMethodsList = authMethodsListStore.data;
 
   if (authMethodsList === null) return <div>Failed to load auth methods</div>;
   if (authMethodsList === undefined) return <div>Loading...</div>;

@@ -1,8 +1,8 @@
-import PocketBase from "pocketbase";
-import { useEffect, useRef } from "react";
+import PocketBase, { AuthMethodsList } from "pocketbase";
+import { use, useEffect, useRef } from "react";
 import { create } from "zustand";
 import { TUser, userSchema, usersCollectionName } from "../utils/dbUserUtils";
-import { smartSubscribeToRecordById } from "../utils";
+import { listAuthMethods, smartSubscribeToRecordById } from "../utils";
 import { authStoreSchema, TAuthStore } from "../utils/dbAuthStoreUtils";
 
 type TAuthStoreState = TAuthStore | null | undefined;
@@ -20,6 +20,48 @@ const smartSubscribeToUserRecordById = (p: {
     onChange: p.onChange,
   });
 
+export const useReactiveAuthStoreSync = (p: { pb: PocketBase }) => {
+  const initReactiveAuthStore = useInitReactiveAuthStore();
+  useInitReactiveAuthStoreSync({ pb: p.pb });
+  return useUserStoreSync({ pb: p.pb, id: initReactiveAuthStore.data?.record.id });
+};
+
+export const useReactiveAuthStore = () => {
+  const initReactiveAuthStore = useInitReactiveAuthStore();
+  const userStore = useUserStore();
+
+  if (!initReactiveAuthStore.data) return initReactiveAuthStore.data;
+
+  return {
+    ...initReactiveAuthStore.data,
+    record: userStore.data ? userStore.data : initReactiveAuthStore.data?.record,
+  };
+};
+
+export const useInitReactiveAuthStore = create<{
+  data: TAuthStoreState;
+  setData: (x: TAuthStoreState) => void;
+}>()((set) => ({
+  data: undefined,
+  setData: (data) => set(() => ({ data })),
+}));
+
+export const useInitReactiveAuthStoreSync = (p: { pb: PocketBase }) => {
+  const initReactiveAuthStore = useInitReactiveAuthStore();
+
+  const syncAuthStore = () => {
+    if (!p.pb.authStore.isValid) return initReactiveAuthStore.setData(null);
+
+    const resp = authStoreSchema.safeParse(p.pb.authStore);
+    initReactiveAuthStore.setData(resp.success ? resp.data : null);
+  };
+
+  useEffect(() => syncAuthStore(), []);
+
+  useEffect(() => {
+    p.pb.authStore.onChange(() => syncAuthStore());
+  }, []);
+};
 export const useUserStoreSync = (p: { pb: PocketBase; id: string | undefined }) => {
   const userStore = useUserStore();
   const smartSubscribeRespPromises = useRef<ReturnType<typeof smartSubscribeToUserRecordById>[]>(
@@ -64,53 +106,30 @@ export const useUserStoreSync = (p: { pb: PocketBase; id: string | undefined }) 
   return { settle, unsubscribe };
 };
 
-export const useReactiveAuthStoreSync = (p: { pb: PocketBase }) => {
-  const initReactiveAuthStore = useInitReactiveAuthStore();
-  useInitReactiveAuthStoreSync({ pb: p.pb });
-  return useUserStoreSync({ pb: p.pb, id: initReactiveAuthStore.data?.record.id });
-};
-
-export const useReactiveAuthStore = () => {
-  const initReactiveAuthStore = useInitReactiveAuthStore();
-  const userStore = useUserStore();
-
-  if (!initReactiveAuthStore.data) return initReactiveAuthStore.data;
-
-  return {
-    ...initReactiveAuthStore.data,
-    record: userStore.data ? userStore.data : initReactiveAuthStore.data?.record,
-  };
-};
-
-export const useInitReactiveAuthStore = create<{
-  data: TAuthStoreState;
-  setData: (x: TAuthStoreState) => void;
+type TCurrentUserState = TUser | null | undefined;
+export const useUserStore = create<{
+  data: TCurrentUserState;
+  setData: (x: TCurrentUserState) => void;
 }>()((set) => ({
   data: undefined,
   setData: (data) => set(() => ({ data })),
 }));
 
-export const useInitReactiveAuthStoreSync = (p: { pb: PocketBase }) => {
-  const initReactiveAuthStore = useInitReactiveAuthStore();
-
-  const syncAuthStore = () => {
-    if (!p.pb.authStore.isValid) return initReactiveAuthStore.setData(null);
-
-    const resp = authStoreSchema.safeParse(p.pb.authStore);
-    initReactiveAuthStore.setData(resp.success ? resp.data : null);
-  };
-
-  useEffect(() => syncAuthStore(), []);
+export const useAuthMethodsListStoreSync = (p: { pb: PocketBase }) => {
+  const authMethodsListStore = useAuthMethodsListStore();
 
   useEffect(() => {
-    p.pb.authStore.onChange(() => syncAuthStore());
+    (async () => {
+      const authMethodsListResp = await listAuthMethods({ pb: p.pb });
+      authMethodsListStore.setData(authMethodsListResp.success ? authMethodsListResp.data : null);
+    })();
   }, []);
 };
 
-type TCurrentUserState = TUser | null | undefined;
-export const useUserStore = create<{
-  data: TCurrentUserState;
-  setData: (x: TCurrentUserState) => void;
+type TAuthMethodsListState = AuthMethodsList | null | undefined;
+export const useAuthMethodsListStore = create<{
+  data: TAuthMethodsListState;
+  setData: (x: TAuthMethodsListState) => void;
 }>()((set) => ({
   data: undefined,
   setData: (data) => set(() => ({ data })),
