@@ -1,7 +1,7 @@
 import { Button, Field, FieldGroup, FieldLabel, Input } from "@repo/pokkit-shadcn";
 import PocketBase from "pocketbase";
 import { useState } from "react";
-import { signUpWithPassword } from "../utils";
+import { signinWithPassword, signUpWithPassword } from "../utils";
 
 const inputIdPrefix = "sign-up-with-password-form";
 
@@ -9,7 +9,10 @@ export const SignUpWithPasswordForm = (p: {
   pb: PocketBase;
   onSignUpSuccess?: (messages: string[]) => void;
   onSignUpError?: (messages: string[]) => void;
+  autoSignIn?: boolean;
 }) => {
+  const { autoSignIn = true } = p;
+
   const [isLoading, setIsLoading] = useState(false);
 
   const [name, setName] = useState("");
@@ -24,12 +27,18 @@ export const SignUpWithPasswordForm = (p: {
         if (isLoading) return;
         setIsLoading(true);
 
-        const resp = await signUpWithPassword({
+        const signUpResp = await signUpWithPassword({
           pb: p.pb,
           data: { email, name, emailVisibility: true, password, passwordConfirm },
         });
-        const fn = resp.success ? p.onSignUpSuccess : p.onSignUpError;
-        fn?.(resp.messages);
+        const signUpFn = signUpResp.success ? p.onSignUpSuccess : p.onSignUpError;
+        signUpFn?.(signUpResp.messages);
+
+        if (signUpResp.success && autoSignIn) {
+          const signInResp = await signinWithPassword({ pb: p.pb, data: { email, password } });
+          const signInFn = signInResp.success ? p.onSignUpSuccess : p.onSignUpError;
+          signInFn?.(signInResp.messages);
+        }
 
         setIsLoading(false);
       }}

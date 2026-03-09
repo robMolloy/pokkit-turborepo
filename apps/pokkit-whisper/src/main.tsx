@@ -45,6 +45,9 @@ const App = () => {
             Left={<div>{envConfig.VITE_APP_DISPLAY_NAME}</div>}
             Right={
               <span className="flex gap-2">
+                <Button variant="outline" onClick={() => navigate("/auth/email-change-request")}>
+                  Request Email Change Token
+                </Button>
                 <ThemeToggle />
                 {authDataStore ? (
                   <SignOutButton pb={pb} />

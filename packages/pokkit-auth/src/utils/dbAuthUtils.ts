@@ -57,6 +57,32 @@ export const confirmVerificationEmail = async (p: { pb: PocketBase; token: strin
     return { success: false, error, messages } as const;
   }
 };
+export const confirmEmailChange = async (p: {
+  pb: PocketBase;
+  token: string;
+  password: string;
+}) => {
+  try {
+    const resp = await p.pb.collection(usersCollectionName).confirmEmailChange(p.token, p.password);
+
+    const schema = z.literal(true);
+    schema.parse(resp);
+
+    return {
+      success: true,
+      messages: ["Successfully confirmed email change"] as string[],
+    } as const;
+  } catch (error) {
+    const messagesResp = extractMessageFromPbError({ error });
+
+    const messages = [
+      "Failed to confirm email change for user",
+      ...(messagesResp ? messagesResp : []),
+    ];
+
+    return { success: false, error, messages } as const;
+  }
+};
 
 export const requestPasswordReset = async (p: { pb: PocketBase; email: string }) => {
   try {
@@ -102,6 +128,31 @@ export const requestVerificationToken = async (p: { pb: PocketBase; email: strin
 
     const messages = [
       "Failed to request verification token for user",
+      ...(messagesResp ? messagesResp : []),
+    ];
+
+    return { success: false, error, messages } as const;
+  }
+};
+export const requestEmailChangeToken = async (p: { pb: PocketBase; email: string }) => {
+  try {
+    const resp = await p.pb.collection(usersCollectionName).requestEmailChange(p.email);
+
+    const schema = z.literal(true);
+    schema.parse(resp);
+
+    return {
+      success: true,
+      messages: [
+        "Successfully requested email change token",
+        "Check your email for further instructions",
+      ] as string[],
+    } as const;
+  } catch (error) {
+    const messagesResp = extractMessageFromPbError({ error });
+
+    const messages = [
+      "Failed to request email change token for user",
       ...(messagesResp ? messagesResp : []),
     ];
 

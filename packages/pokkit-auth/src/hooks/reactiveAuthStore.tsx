@@ -23,14 +23,23 @@ const smartSubscribeToUserRecordById = (p: {
 export const useReactiveAuthStoreSync = (p: { pb: PocketBase }) => {
   const initReactiveAuthStore = useInitReactiveAuthStore();
   useInitReactiveAuthStoreSync({ pb: p.pb });
-  return useUserStoreSync({ pb: p.pb, id: initReactiveAuthStore.data?.record.id });
+  const userStoreSync = useUserStoreSync({ pb: p.pb, id: initReactiveAuthStore.data?.record.id });
+
+  useEffect(() => {
+    if (userStoreSync.user === null) p.pb.authStore.clear();
+  }, [userStoreSync.user]);
+
+  return userStoreSync;
 };
 
 export const useReactiveAuthStore = () => {
   const initReactiveAuthStore = useInitReactiveAuthStore();
   const userStore = useUserStore();
 
-  if (!initReactiveAuthStore.data) return initReactiveAuthStore.data;
+  if (initReactiveAuthStore.data === undefined) return undefined;
+
+  if (initReactiveAuthStore.data === null) return null;
+  if (userStore.data === null) return null;
 
   return {
     ...initReactiveAuthStore.data,
@@ -53,6 +62,7 @@ export const useInitReactiveAuthStoreSync = (p: { pb: PocketBase }) => {
     if (!p.pb.authStore.isValid) return initReactiveAuthStore.setData(null);
 
     const resp = authStoreSchema.safeParse(p.pb.authStore);
+
     initReactiveAuthStore.setData(resp.success ? resp.data : null);
   };
 
@@ -103,7 +113,7 @@ export const useUserStoreSync = (p: { pb: PocketBase; id: string | undefined }) 
     };
   }, [p.pb, p.id]);
 
-  return { settle, unsubscribe };
+  return { settle, unsubscribe, user: userStore.data };
 };
 
 type TCurrentUserState = TUser | null | undefined;

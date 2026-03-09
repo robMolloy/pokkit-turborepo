@@ -10,11 +10,11 @@
 ## pokkit-auth
 
 - ~~authMethodsList store~~
-- add autoSignIn flag on any sign up forms - this should aim naming conventions
+- add autoSignIn flag on any sign up forms - this should improve naming conventions
 
 ## pokkit-components
 
-- theme store switcher and toggle
+- ~~theme store switcher and toggle~~
 - ~~layout~~
   - ~~sidebar~~
   - ~~header nav~~
@@ -23,3 +23,4 @@
 
 - build packages to dist as js + types to enable aliasing within packages
 - Find a better solution to "downlevelIteration": true in tsconfig
+- !!!onModelChange, write to pb_data/collections.json!!!
