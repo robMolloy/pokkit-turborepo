@@ -6,3 +6,4 @@ export * from "./label";
 export * from "./LayoutTemplate";
 export * from "./LeftSidebar";
 export * from "./Modal";
+export * from "./ThemeToggle";

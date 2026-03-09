@@ -18,6 +18,7 @@ import {
   LayoutTemplate,
   LeftSidebar,
   SidebarButton,
+  ThemeToggle,
 } from "@repo/pokkit-components";
 import { Toaster } from "@repo/pokkit-shadcn";
 import { envConfig } from "./config/envConfig";
@@ -34,8 +35,6 @@ const App = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isAuthenticated = !!authDataStore?.record.id;
-
   return (
     <>
       <Toaster />
@@ -45,11 +44,14 @@ const App = () => {
           <Header
             Left={<div>{envConfig.VITE_APP_DISPLAY_NAME}</div>}
             Right={
-              isAuthenticated ? (
-                <SignOutButton pb={pb} />
-              ) : (
-                <Button onClick={() => navigate("/auth/sign-in")}>Sign In</Button>
-              )
+              <span className="flex gap-2">
+                <ThemeToggle />
+                {authDataStore ? (
+                  <SignOutButton pb={pb} />
+                ) : (
+                  <Button onClick={() => navigate("/auth/sign-in")}>Sign In</Button>
+                )}
+              </span>
             }
           />
         }
@@ -89,7 +91,7 @@ const App = () => {
             }
             bottom={
               <>
-                {isAuthenticated ? (
+                {authDataStore ? (
                   <SidebarButton
                     iconName="LogOut"
                     onClick={() => pb.authStore.clear()}
