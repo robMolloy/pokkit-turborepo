@@ -17,6 +17,25 @@ func main() {
 		// serves static files from the provided public dir (if exists)
 		se.Router.GET("/{path...}", pbApis.Static(os.DirFS("./pb_public"), false))
 
+		pbDataDir := app.DataDir()
+		collectionsFileName := "collections.json"
+		collectionsFilePath := fmt.Sprintf("%s/%s", pbDataDir, collectionsFileName)
+
+		// readfile collectionsFilePath
+		collectionsData, err := os.ReadFile(collectionsFilePath)
+		if err != nil {
+			log.Printf("Error reading collections file: %v\n", err)
+		}
+
+		log.Println("before")
+
+		app.ImportCollectionsByMarshaledJSON(collectionsData, true)
+		log.Println("after")
+
+		log.Printf("Collections data: %s\n", string(collectionsData))
+
+		log.Printf("PocketBase data dir: %s\n", pbDataDir)
+
 		return se.Next()
 	})
 
