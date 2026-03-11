@@ -60,6 +60,9 @@ importers:
       '@repo/pokkit-components':
         specifier: workspace:*
         version: link:../../packages/pokkit-components
+      '@repo/pokkit-shadcn':
+        specifier: workspace:^
+        version: link:../../packages/pokkit-shadcn
       react:
         specifier: ^18.2.0
         version: 18.3.1

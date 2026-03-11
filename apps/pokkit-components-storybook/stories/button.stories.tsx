@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Button } from "@repo/pokkit-components";
 import "@repo/pokkit-components/styles.css";
+import "@repo/pokkit-shadcn/styles.css";
 
 const meta: Meta<typeof Button> = {
   component: Button,
