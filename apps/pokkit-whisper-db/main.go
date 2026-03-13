@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -10,6 +12,63 @@ import (
 	pbCore "github.com/pocketbase/pocketbase/core"
 )
 
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	return !errors.Is(err, os.ErrNotExist)
+}
+
+// ImportCollectionsFromCollectionsFilePath imports collections from pb_data/collections.json.
+// If successful, true is returned.
+// If this file doesn't exist, a boolean of false is returned.
+func ImportCollectionsFromCollectionsFilePath(app pbCore.App) (bool, error) {
+	collectionsFileName := "collections.json"
+	collectionsFilePath := fmt.Sprintf("%s/%s", app.DataDir(), collectionsFileName)
+
+	isExist := fileExists(collectionsFilePath)
+	if !isExist {
+		return false, nil
+	}
+
+	// File definitely exists, this will only fail with an error that should be logged
+	collectionsData, err := os.ReadFile(collectionsFilePath)
+	if err != nil {
+		return false, err
+	}
+
+	err = app.ImportCollectionsByMarshaledJSON(collectionsData, false)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+// WriteCollectionsToCollectionsFilePath writes collections to pb_data/collections.json.
+// If successful, true is returned.
+// If this file doesn't exist, a boolean of false is returned.
+func WriteCollectionsToCollectionsFilePath(app pbCore.App) (bool, error) {
+	collectionsFileName := "collections.json"
+	collectionsFilePath := fmt.Sprintf("%s/%s", app.DataDir(), collectionsFileName)
+
+	collectionsData, err := app.FindAllCollections()
+	if err != nil {
+		return false, err
+	}
+
+	data, err := json.Marshal(collectionsData)
+	if err != nil {
+		return false, err
+	}
+
+	err = os.WriteFile(collectionsFilePath, data, 0644)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+var setupComplete = false
+
 func main() {
 	app := pocketbase.New()
 
@@ -17,26 +76,62 @@ func main() {
 		// serves static files from the provided public dir (if exists)
 		se.Router.GET("/{path...}", pbApis.Static(os.DirFS("./pb_public"), false))
 
-		pbDataDir := app.DataDir()
-		collectionsFileName := "collections.json"
-		collectionsFilePath := fmt.Sprintf("%s/%s", pbDataDir, collectionsFileName)
+		resp, err := ImportCollectionsFromCollectionsFilePath(app)
+		fmt.Println(resp, err)
 
-		// readfile collectionsFilePath
-		collectionsData, err := os.ReadFile(collectionsFilePath)
-		if err != nil {
-			log.Printf("Error reading collections file: %v\n", err)
+		se.Next()
+
+		setupComplete = true
+		fmt.Println("Setup complete.")
+		return nil
+	})
+
+	app.OnSettingsReload().BindFunc(func(e *pbCore.SettingsReloadEvent) error {
+		if err := e.Next(); err != nil {
+			return err
+		}
+		fmt.Println()
+
+		return nil
+	})
+
+	app.OnCollectionAfterCreateSuccess().BindFunc(func(e *pbCore.CollectionEvent) error {
+		e.Next()
+
+		if !setupComplete {
+			return nil
 		}
 
-		log.Println("before")
+		writeResp, writeErr := WriteCollectionsToCollectionsFilePath(e.App)
+		fmt.Println(writeResp, writeErr)
 
-		app.ImportCollectionsByMarshaledJSON(collectionsData, true)
-		log.Println("after")
+		return nil
+	})
 
-		log.Printf("Collections data: %s\n", string(collectionsData))
+	app.OnCollectionAfterUpdateSuccess().BindFunc(func(e *pbCore.CollectionEvent) error {
+		e.Next()
 
-		log.Printf("PocketBase data dir: %s\n", pbDataDir)
+		if !setupComplete {
+			return nil
+		}
 
-		return se.Next()
+		writeResp, writeErr := WriteCollectionsToCollectionsFilePath(e.App)
+		fmt.Println(writeResp, writeErr)
+
+		return nil
+	})
+
+	app.OnCollectionAfterDeleteSuccess().BindFunc(func(e *pbCore.CollectionEvent) error {
+		e.Next()
+
+		if !setupComplete {
+			return nil
+		}
+
+		writeResp, writeErr := WriteCollectionsToCollectionsFilePath(e.App)
+		fmt.Println(writeResp, writeErr)
+
+		return nil
 	})
 
 	app.OnTerminate().BindFunc(func(e *pbCore.TerminateEvent) error {
