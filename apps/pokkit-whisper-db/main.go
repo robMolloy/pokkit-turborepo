@@ -67,6 +67,61 @@ func WriteCollectionsToCollectionsFilePath(app pbCore.App) (bool, error) {
 	return true, nil
 }
 
+func ImportSettingsFromSettingsFilePath(app pbCore.App) (bool, error) {
+	fileName := "settings.json"
+	filePath := fmt.Sprintf("%s/%s", app.DataDir(), fileName)
+
+	isExist := fileExists(filePath)
+	if !isExist {
+		return false, nil
+	}
+
+	// File definitely exists, this will only fail with an error that should be logged
+	settingsData, err := os.ReadFile(filePath)
+	if err != nil {
+		return false, err
+	}
+
+	settings := app.Settings()
+	unmarshalErr := json.Unmarshal(settingsData, settings)
+	if unmarshalErr != nil {
+		return false, unmarshalErr
+	}
+	app.Save(settings)
+
+	return true, nil
+}
+
+func writeDataToFileAsJson(filePath string, data any) error {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(filePath, jsonData, 0644)
+}
+
+// WriteSettingsToSettingsFilePath writes collections to pb_data/collections.json.
+// If successful, true is returned.
+// If this file doesn't exist, a boolean of false is returned.
+func WriteSettingsToSettingsFilePath(app pbCore.App) (bool, error) {
+	fileName := "settings.json"
+	filePath := fmt.Sprintf("%s/%s", app.DataDir(), fileName)
+
+	settings := app.Settings()
+
+	settingsJson, err := json.Marshal(settings)
+	if err != nil {
+		return false, err
+	}
+
+	err = os.WriteFile(filePath, settingsJson, 0644)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 var setupComplete = false
 
 func main() {
@@ -79,6 +134,9 @@ func main() {
 		resp, err := ImportCollectionsFromCollectionsFilePath(app)
 		fmt.Println(resp, err)
 
+		resp, err = ImportSettingsFromSettingsFilePath(app)
+		fmt.Println(resp, err)
+
 		se.Next()
 
 		setupComplete = true
@@ -87,11 +145,20 @@ func main() {
 	})
 
 	app.OnSettingsReload().BindFunc(func(e *pbCore.SettingsReloadEvent) error {
+		fmt.Println("OnSettingsReload")
 		if err := e.Next(); err != nil {
 			return err
 		}
-		fmt.Println()
 
+		if setupComplete {
+			fmt.Println("OnSettingsReload - writeDataToFileAsJson")
+			writeErr := writeDataToFileAsJson(app.DataDir()+"/settings.json", e.App.Settings())
+			fmt.Println(writeErr)
+		}
+
+		setupComplete = true
+
+		fmt.Println("OnSettingsReload - after")
 		return nil
 	})
 
@@ -132,12 +199,6 @@ func main() {
 		fmt.Println(writeResp, writeErr)
 
 		return nil
-	})
-
-	app.OnTerminate().BindFunc(func(e *pbCore.TerminateEvent) error {
-		log.Println("Hello, log!")
-
-		return e.Next()
 	})
 
 	app.OnRecordAfterCreateSuccess("users").BindFunc(func(e *pbCore.RecordEvent) error {
@@ -277,6 +338,18 @@ func main() {
 		organisationDocumentVersionRecord.Set("docIdVersionNumberKey", fmt.Sprintf("%s-%s", orgDocRecord.Get("id"), orgDocRecord.Get("versionNumber")))
 
 		return e.App.Save(organisationDocumentVersionRecord)
+	})
+
+	app.OnTerminate().BindFunc(func(e *pbCore.TerminateEvent) error {
+		log.Println("OnTerminate")
+
+		return e.Next()
+	})
+
+	app.OnSettingsUpdateRequest().BindFunc(func(e *pbCore.SettingsUpdateRequestEvent) error {
+		fmt.Println("OnSettingsUpdateRequest")
+
+		return e.Next()
 	})
 
 	if err := app.Start(); err != nil {
