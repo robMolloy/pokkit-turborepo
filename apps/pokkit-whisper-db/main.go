@@ -132,10 +132,10 @@ func main() {
 		se.Router.GET("/{path...}", pbApis.Static(os.DirFS("./pb_public"), false))
 
 		resp, err := ImportCollectionsFromCollectionsFilePath(app)
-		fmt.Println(resp, err)
+		fmt.Println("ImportCollectionsFromCollectionsFilePath", resp, err)
 
 		resp, err = ImportSettingsFromSettingsFilePath(app)
-		fmt.Println(resp, err)
+		fmt.Println("ImportSettingsFromSettingsFilePath", resp, err)
 
 		se.Next()
 
@@ -151,52 +151,46 @@ func main() {
 		}
 
 		if setupComplete {
-			fmt.Println("OnSettingsReload - writeDataToFileAsJson")
 			writeErr := writeDataToFileAsJson(app.DataDir()+"/settings.json", e.App.Settings())
-			fmt.Println(writeErr)
+			fmt.Println("writeDataToFileAsJson", writeErr)
 		}
-
-		setupComplete = true
 
 		fmt.Println("OnSettingsReload - after")
 		return nil
 	})
 
 	app.OnCollectionAfterCreateSuccess().BindFunc(func(e *pbCore.CollectionEvent) error {
+		fmt.Println("OnCollectionAfterCreateSuccess")
 		e.Next()
 
-		if !setupComplete {
-			return nil
+		if setupComplete {
+			writeResp, writeErr := WriteCollectionsToCollectionsFilePath(e.App)
+			fmt.Println("WriteCollectionsToCollectionsFilePath", writeResp, writeErr)
 		}
-
-		writeResp, writeErr := WriteCollectionsToCollectionsFilePath(e.App)
-		fmt.Println(writeResp, writeErr)
 
 		return nil
 	})
 
 	app.OnCollectionAfterUpdateSuccess().BindFunc(func(e *pbCore.CollectionEvent) error {
+		fmt.Println("OnCollectionAfterUpdateSuccess")
 		e.Next()
 
-		if !setupComplete {
-			return nil
+		if setupComplete {
+			writeResp, writeErr := WriteCollectionsToCollectionsFilePath(e.App)
+			fmt.Println("WriteCollectionsToCollectionsFilePath", writeResp, writeErr)
 		}
-
-		writeResp, writeErr := WriteCollectionsToCollectionsFilePath(e.App)
-		fmt.Println(writeResp, writeErr)
 
 		return nil
 	})
 
 	app.OnCollectionAfterDeleteSuccess().BindFunc(func(e *pbCore.CollectionEvent) error {
+		fmt.Println("OnCollectionAfterDeleteSuccess")
 		e.Next()
 
-		if !setupComplete {
-			return nil
+		if setupComplete {
+			writeResp, writeErr := WriteCollectionsToCollectionsFilePath(e.App)
+			fmt.Println("WriteCollectionsToCollectionsFilePath", writeResp, writeErr)
 		}
-
-		writeResp, writeErr := WriteCollectionsToCollectionsFilePath(e.App)
-		fmt.Println(writeResp, writeErr)
 
 		return nil
 	})
@@ -237,7 +231,7 @@ func main() {
 	})
 
 	app.OnRecordCreateRequest("organisations").BindFunc(func(e *pbCore.RecordRequestEvent) error {
-		log.Println("OnOrganisationRecordCreateRequest")
+		log.Println("onRecordCreateRequest - organisations")
 
 		e.Next()
 
@@ -268,6 +262,8 @@ func main() {
 	})
 
 	app.OnRecordCreate("organisationDocuments").BindFunc(func(e *pbCore.RecordEvent) error {
+		fmt.Println("OnRecordCreate - organisationDocuments")
+
 		orgDocRecord := e.Record
 
 		unsavedFiles := orgDocRecord.GetUnsavedFiles("file")
@@ -304,6 +300,8 @@ func main() {
 	})
 
 	app.OnRecordUpdate("organisationDocuments").BindFunc(func(e *pbCore.RecordEvent) error {
+		fmt.Println("OnRecordUpdate - organisationDocuments")
+
 		orgDocRecord := e.Record
 		original := e.Record.Original()
 
