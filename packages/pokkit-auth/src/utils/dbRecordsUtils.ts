@@ -32,7 +32,6 @@ export const subscribeToAllRecords = async <T extends z.ZodSchema>(p: {
     const unsub = p.pb.collection(p.collectionName).subscribe(
       "*",
       (e) => {
-        console.log(`dbRecordsUtils.ts:${/*LL*/ 35}`, e);
         const parseResp = p.itemSchema.safeParse(e.record);
 
         if (parseResp.success)
@@ -55,14 +54,15 @@ export const smartSubscribeToAllRecords = async <T extends z.ZodSchema<{ id: str
   collectionName: string;
   itemSchema: T;
   onChange: (e: z.infer<T>[]) => void;
-  signal?: AbortSignal;
 }) => {
+  const abortController = new AbortController();
+
   let allRecords: z.infer<T>[] = [];
   const getAllRecordsRespPromise = getAllRecords({
     pb: p.pb,
     collectionName: p.collectionName,
     schema: p.itemSchema,
-    signal: p.signal,
+    signal: abortController.signal,
   });
 
   const subscribeRespPromise = subscribeToAllRecords({
@@ -77,7 +77,7 @@ export const smartSubscribeToAllRecords = async <T extends z.ZodSchema<{ id: str
 
       p.onChange(allRecords);
     },
-    signal: p.signal,
+    signal: abortController.signal,
   });
 
   const getAllRecordsResp = await getAllRecordsRespPromise;
@@ -87,7 +87,10 @@ export const smartSubscribeToAllRecords = async <T extends z.ZodSchema<{ id: str
 
   const subscribeResp = await subscribeRespPromise;
 
-  const unsubscribe = () => subscribeResp.data?.then((unsub) => unsub());
+  const unsubscribe = () => {
+    abortController.abort();
+    subscribeResp.data?.then((unsub) => unsub());
+  };
 
   return { ...subscribeResp, unsubscribe };
 };

@@ -27,20 +27,16 @@ const IndexPage = () => {
   const [audioBlobs, setAudioBlobs] = useState<Blob[]>([]);
   const [recordings, setRecordings] = useState<TRecording[]>([]);
   useEffect(() => {
-    const abortController = new AbortController();
     const unsubPromise = smartSubscribeToAllRecords({
       pb,
       collectionName: recordingsCollectionName,
       itemSchema: recordingSchema,
       onChange: (x) => {
-        console.log(`index.page.tsx:${/*LL*/ 36}`, [...x]);
         setRecordings([...x]);
       },
-      signal: abortController.signal,
     });
 
     return () => {
-      abortController.abort();
       unsubPromise.then((x) => x.unsubscribe());
     };
   }, []);
