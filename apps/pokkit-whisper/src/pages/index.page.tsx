@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import z from "zod";
 
 const recordingsCollectionName = "recordings";
-const recordingSchema = z.object({ file: z.string() });
+const recordingSchema = z.object({ id: z.string(), file: z.string() });
 type TRecording = z.infer<typeof recordingSchema>;
 
 const DisplayRecording = (p: { recording: TRecording; audioBlob?: Blob }) => {
@@ -33,7 +33,8 @@ const IndexPage = () => {
       collectionName: recordingsCollectionName,
       itemSchema: recordingSchema,
       onChange: (x) => {
-        if (x) setRecordings(x);
+        console.log(`index.page.tsx:${/*LL*/ 36}`, [...x]);
+        setRecordings([...x]);
       },
       signal: abortController.signal,
     });
@@ -61,7 +62,7 @@ const IndexPage = () => {
           <br />
           <div className="flex flex-col gap-4 ">
             {recordings.map((recording, j) => (
-              <div key={j} className="flex">
+              <div key={recording.id} className="flex">
                 {j}: <DisplayRecording recording={recording} />
               </div>
             ))}

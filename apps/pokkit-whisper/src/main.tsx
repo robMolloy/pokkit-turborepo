@@ -134,7 +134,10 @@ const App = () => {
 const container = document.getElementById("app") as HTMLElement & { _reactRoot?: Root };
 const getRoot = () => {
   if (container._reactRoot) return container._reactRoot;
-  return createRoot(container);
+
+  const root = createRoot(container);
+  container._reactRoot = root;
+  return root;
 };
 getRoot().render(
   <StrictMode>

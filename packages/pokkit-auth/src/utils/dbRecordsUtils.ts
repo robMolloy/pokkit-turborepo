@@ -32,11 +32,14 @@ export const subscribeToAllRecords = async <T extends z.ZodSchema>(p: {
     const unsub = p.pb.collection(p.collectionName).subscribe(
       "*",
       (e) => {
-        console.log(`dbRecordsUtils.ts:${/*LL*/ 66}`, e.action);
+        console.log(`dbRecordsUtils.ts:${/*LL*/ 35}`, e);
         const parseResp = p.itemSchema.safeParse(e.record);
 
-        if (parseResp.success && e.action === "create")
-          p.onChange({ action: "create", record: parseResp.data });
+        if (parseResp.success)
+          p.onChange({
+            action: e.action as "create" | "update" | "delete",
+            record: parseResp.data,
+          });
       },
       { signal: p.signal },
     );
@@ -47,14 +50,14 @@ export const subscribeToAllRecords = async <T extends z.ZodSchema>(p: {
   }
 };
 
-export const smartSubscribeToAllRecords = async <T extends z.ZodSchema>(p: {
+export const smartSubscribeToAllRecords = async <T extends z.ZodSchema<{ id: string }>>(p: {
   pb: PocketBase;
   collectionName: string;
   itemSchema: T;
-  onChange: (e: z.infer<T>[] | null) => void;
+  onChange: (e: z.infer<T>[]) => void;
   signal?: AbortSignal;
 }) => {
-  const allRecords: z.infer<T>[] = [];
+  let allRecords: z.infer<T>[] = [];
   const getAllRecordsRespPromise = getAllRecords({
     pb: p.pb,
     collectionName: p.collectionName,
@@ -63,15 +66,14 @@ export const smartSubscribeToAllRecords = async <T extends z.ZodSchema>(p: {
   });
 
   const subscribeRespPromise = subscribeToAllRecords({
-    //
-    //
-    //
-    //
     pb: p.pb,
     collectionName: p.collectionName,
     itemSchema: p.itemSchema,
     onChange: (x) => {
       if (x.action === "create") allRecords.push(x.record);
+      if (x.action === "delete") allRecords = allRecords.filter((item) => item.id !== x.record.id);
+      if (x.action === "update")
+        allRecords = allRecords.map((itm) => (itm.id === x.record.id ? x.record : itm));
 
       p.onChange(allRecords);
     },
@@ -79,7 +81,7 @@ export const smartSubscribeToAllRecords = async <T extends z.ZodSchema>(p: {
   });
 
   const getAllRecordsResp = await getAllRecordsRespPromise;
-  if (getAllRecordsResp.success) allRecords.push(...getAllRecordsResp.data);
+  if (getAllRecordsResp.success) allRecords = getAllRecordsResp.data;
 
   p.onChange(allRecords);
 
