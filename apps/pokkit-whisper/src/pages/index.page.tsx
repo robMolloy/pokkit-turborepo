@@ -1,6 +1,7 @@
 import { AudioRecorder } from "@/components/audioRecorder";
-import { pb } from "@/config/pocketbaseConfig";
+import { pb, PocketBase } from "@/config/pocketbaseConfig";
 import {
+  extractMessageFromPbError,
   SignedInRouteProtector,
   SignedOutRouteProtector,
   smartSubscribeToAllRecords,
@@ -10,17 +11,62 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import z from "zod";
 
-const recordingsCollectionName = "recordings";
-const recordingSchema = z.object({
+const audioRecordingsCollectionName = "audioRecordings";
+const audioRecordingRecordSchema = z.object({
   id: z.string(),
   collectionName: z.string(),
-  file: z.string(),
+  fileName: z.string(),
   created: z.string(),
   updated: z.string(),
 });
-type TRecording = z.infer<typeof recordingSchema>;
+type TAudioRecordingRecord = z.infer<typeof audioRecordingRecordSchema>;
 
-const DisplayAndCreateRecordForAudioBlob = (p: { initId: string; audioBlob: Blob }) => {
+const createRecordHelper = async <T extends object, U extends z.ZodType>(p: {
+  pb: PocketBase;
+  collectionName: string;
+  data: T;
+  schema: U;
+  successMessagesFn: (x: z.infer<U>) => string[];
+  errorMessagesFn: (x: T) => string[];
+}) => {
+  try {
+    const resp = await p.pb.collection(p.collectionName).create(p.data);
+
+    const data = p.schema.parse(resp);
+    const messages = p.successMessagesFn(data);
+
+    return { success: true, data, messages } as const;
+  } catch (error) {
+    const messagesResp = extractMessageFromPbError({ error });
+    const messages = [...p.errorMessagesFn(p.data), ...(messagesResp ? messagesResp : [])];
+
+    return { success: false, error, messages } as const;
+  }
+};
+
+const createAudioRecordingRecord = async (p: { audioBlob: Blob }) => {
+  return createRecordHelper({
+    pb,
+    collectionName: audioRecordingsCollectionName,
+    data: { fileName: p.audioBlob },
+    schema: audioRecordingRecordSchema,
+    successMessagesFn: () => ["Successfully created audio recording record"],
+    errorMessagesFn: () => ["Failed to create audio recording record"],
+  });
+};
+
+const smartSubscribeToAllAudioRecordingRecords = async (p: {
+  onChange: (x: TAudioRecordingRecord[]) => void;
+}) => {
+  return smartSubscribeToAllRecords({
+    pb,
+    collectionName: audioRecordingsCollectionName,
+    itemSchema: audioRecordingRecordSchema,
+    onChange: p.onChange,
+  });
+};
+
+const DisplayAudioBlob = (p: { initId: string; audioBlob: Blob }) => {
   const [audioBlobFileUrl, setAudioBlobFileUrl] = useState<string | undefined>(
     p.audioBlob ? URL.createObjectURL(p.audioBlob) : undefined,
   );
@@ -42,7 +88,10 @@ const DisplayAndCreateRecordForAudioBlob = (p: { initId: string; audioBlob: Blob
   );
 };
 
-const DisplayRecording = (p: { recording: TRecording; audioBlob?: Blob }) => {
+const DisplayAudioRecordingRecord = (p: {
+  audioRecordingRecord: TAudioRecordingRecord;
+  audioBlob?: Blob;
+}) => {
   const [audioBlob, setAudioBlob] = useState<Blob | undefined>(p.audioBlob);
   const [audioBlobFileUrl, setAudioBlobFileUrl] = useState<string | undefined>(
     p.audioBlob ? URL.createObjectURL(p.audioBlob) : undefined,
@@ -62,12 +111,11 @@ const DisplayRecording = (p: { recording: TRecording; audioBlob?: Blob }) => {
 
   return (
     <div className="flex gap-6">
-      <span>{p.recording.file}</span>
+      <span>{p.audioRecordingRecord.fileName}</span>
       {!audioBlobFileUrl && (
         <button
           onClick={async () => {
-            const firstFilename = p.recording.file;
-            const url = pb.files.getURL(p.recording, firstFilename);
+            const url = pb.files.getURL(p.audioRecordingRecord, p.audioRecordingRecord.fileName);
 
             const response = await fetch(url);
             const blob = await response.blob();
@@ -89,16 +137,11 @@ const IndexPage = () => {
   const [audioBlobAndIdsList, setAudioBlobsAndIds] = useState<
     { audioBlob: Blob; tempId?: string; audioRecordId?: string }[]
   >([]);
-  const [audioRecords, setAudioRecords] = useState<TRecording[]>([]);
+  const [audioRecordingRecords, setAudioRecordingRecords] = useState<TAudioRecordingRecord[]>([]);
 
   useEffect(() => {
-    const unsubPromise = smartSubscribeToAllRecords({
-      pb,
-      collectionName: recordingsCollectionName,
-      itemSchema: recordingSchema,
-      onChange: (newRecordingRecords) => {
-        setAudioRecords(newRecordingRecords);
-      },
+    const unsubPromise = smartSubscribeToAllAudioRecordingRecords({
+      onChange: (newAudioRecordingRecords) => setAudioRecordingRecords(newAudioRecordingRecords),
     });
 
     return () => {
@@ -118,13 +161,13 @@ const IndexPage = () => {
             const tempId = crypto.randomUUID();
             setAudioBlobsAndIds((prev) => [...prev, { audioBlob, tempId: tempId }]);
 
-            const newAudioRecord = await pb.collection("recordings").create({ file: audioBlob });
-            const parsedResp = recordingSchema.safeParse(newAudioRecord);
-            if (!parsedResp.success) return;
+            const createResp = await createAudioRecordingRecord({ audioBlob });
+
+            if (!createResp.success) return;
 
             setAudioBlobsAndIds((prev) => {
               const index = prev.findIndex((item) => item.tempId === tempId);
-              if (index !== -1) prev[index] = { ...prev[index], audioRecordId: newAudioRecord.id };
+              if (index !== -1) prev[index] = { ...prev[index], audioRecordId: createResp.data.id };
               return [...prev];
             });
           }}
@@ -138,14 +181,14 @@ const IndexPage = () => {
               return (
                 <div key={j} className="flex gap-4">
                   <span>{j}:</span>
-                  <DisplayAndCreateRecordForAudioBlob
+                  <DisplayAudioBlob
                     initId={audioBlobAndIds.tempId!}
                     audioBlob={audioBlobAndIds.audioBlob}
                   />
                 </div>
               );
             })}
-          {audioRecords
+          {audioRecordingRecords
             .sort((a, b) => (a.created < b.created ? 1 : -1))
             .map((audioRecord, j) => {
               const blobItem = audioBlobAndIdsList.find((x) => x.audioRecordId === audioRecord.id);
@@ -153,7 +196,10 @@ const IndexPage = () => {
               return (
                 <div key={audioRecord.id} className="flex gap-4">
                   <span>{j}:</span>
-                  <DisplayRecording recording={audioRecord} audioBlob={blobItem?.audioBlob} />
+                  <DisplayAudioRecordingRecord
+                    audioRecordingRecord={audioRecord}
+                    audioBlob={blobItem?.audioBlob}
+                  />
                 </div>
               );
             })}

@@ -6,11 +6,47 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 
 	pocketbase "github.com/pocketbase/pocketbase"
 	pbApis "github.com/pocketbase/pocketbase/apis"
 	pbCore "github.com/pocketbase/pocketbase/core"
 )
+
+func transcribeFileFromFilePathAndSaveTranscriptionRecord(App pbCore.App, filePath string, recordID string) {
+	cmd := exec.Command(
+		"/Users/robert.molloy/Projects/current/whisper.cpp/build/bin/whisper-cli",
+		"-m", "/Users/robert.molloy/Projects/current/whisper.cpp/models/ggml-small.bin",
+		"-f", filePath,
+		"-otxt",
+		"-of", "-",
+		"-np",
+	)
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Printf("Transcription error for record %s: %v\n", recordID, err)
+		return
+	}
+
+	text := string(output)
+	log.Printf("Transcription finished for record %s: %s\n", recordID, text)
+
+	// Save transcription in PocketBase
+	audioTranscriptionsCollection, err := App.FindCollectionByNameOrId("audioTranscriptions")
+	if err != nil {
+		log.Printf("Error finding audioTranscriptions collection: %v\n", err)
+		return
+	}
+
+	audioTranscriptionRecord := pbCore.NewRecord(audioTranscriptionsCollection)
+	audioTranscriptionRecord.Set("id", recordID)
+	audioTranscriptionRecord.Set("text", text)
+
+	if err := App.Save(audioTranscriptionRecord); err != nil {
+		log.Printf("Error saving transcription for record %s: %v\n", recordID, err)
+	}
+}
 
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
@@ -191,6 +227,23 @@ func main() {
 			writeResp, writeErr := WriteCollectionsToCollectionsFilePath(e.App)
 			fmt.Println("WriteCollectionsToCollectionsFilePath", writeResp, writeErr)
 		}
+
+		return nil
+	})
+
+	app.OnRecordAfterCreateSuccess("audioRecordings").BindFunc(func(e *pbCore.RecordEvent) error {
+		log.Println("OnAudioRecordingRecordAfterCreateSuccess")
+
+		e.Next()
+
+		audioRecordingRecord := e.Record
+
+		fmt.Println(audioRecordingRecord.Get("id"))
+		fmt.Println(audioRecordingRecord.Get("fileName"))
+		fmt.Println(audioRecordingRecord.BaseFilesPath() + "/" + audioRecordingRecord.GetString("fileName"))
+
+		filePath := app.DataDir() + "/storage/" + audioRecordingRecord.BaseFilesPath() + "/" + audioRecordingRecord.GetString("fileName")
+		go transcribeFileFromFilePathAndSaveTranscriptionRecord(e.App, filePath, audioRecordingRecord.GetString("id"))
 
 		return nil
 	})
