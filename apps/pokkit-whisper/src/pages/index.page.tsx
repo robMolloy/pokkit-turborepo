@@ -4,7 +4,6 @@ import {
   SignedInRouteProtector,
   SignedOutRouteProtector,
   smartSubscribeToAllRecords,
-  useReactiveAuthStore,
 } from "@repo/pokkit-auth";
 import { CustomIcon } from "@repo/pokkit-components";
 import { useEffect, useState } from "react";
@@ -16,89 +15,89 @@ const recordingSchema = z.object({
   id: z.string(),
   collectionName: z.string(),
   file: z.string(),
+  created: z.string(),
+  updated: z.string(),
 });
 type TRecording = z.infer<typeof recordingSchema>;
 
-const DisplayAndCreateRecordForAudioBlob = (p: {
-  initId: string;
-  initAudioBlob: Blob;
-  onAudioRecordSaved: (p1: { audioRecord: TRecording }) => void;
-}) => {
+const DisplayAndCreateRecordForAudioBlob = (p: { initId: string; audioBlob: Blob }) => {
   const [audioBlobFileUrl, setAudioBlobFileUrl] = useState<string | undefined>(
-    p.initAudioBlob ? URL.createObjectURL(p.initAudioBlob) : undefined,
+    p.audioBlob ? URL.createObjectURL(p.audioBlob) : undefined,
   );
 
   useEffect(() => {
-    setAudioBlobFileUrl(URL.createObjectURL(p.initAudioBlob));
-  }, []);
+    setAudioBlobFileUrl(p.audioBlob ? URL.createObjectURL(p.audioBlob) : undefined);
 
-  useEffect(() => {
-    (async () => {
-      const resp = await pb.collection("recordings").create({ file: p.initAudioBlob });
-      const parsedResp = recordingSchema.safeParse(resp);
-      if (parsedResp.success) p.onAudioRecordSaved?.({ audioRecord: parsedResp.data });
-    })();
-  }, []);
+    return () => {
+      if (audioBlobFileUrl) URL.revokeObjectURL(audioBlobFileUrl);
+    };
+  }, [p.audioBlob]);
 
   return (
     <div className="flex gap-12">
-      {!audioBlobFileUrl && <div>Loading...</div>}
+      {p.audioBlob && !audioBlobFileUrl && <div>Loading...</div>}
 
       {audioBlobFileUrl && <audio controls src={audioBlobFileUrl} />}
     </div>
   );
 };
 
-const DisplayRecording = (p: { recording: TRecording; initAudioBlob?: Blob }) => {
-  const [audioBlobFileUrl, setAudioBlobFileUrl] = useState<string | undefined>();
+const DisplayRecording = (p: { recording: TRecording; audioBlob?: Blob }) => {
+  const [audioBlob, setAudioBlob] = useState<Blob | undefined>(p.audioBlob);
+  const [audioBlobFileUrl, setAudioBlobFileUrl] = useState<string | undefined>(
+    p.audioBlob ? URL.createObjectURL(p.audioBlob) : undefined,
+  );
+
+  useEffect(() => {
+    setAudioBlob(p.audioBlob);
+  }, [p.audioBlob]);
+
+  useEffect(() => {
+    if (audioBlob) setAudioBlobFileUrl(audioBlob ? URL.createObjectURL(audioBlob) : undefined);
+
+    return () => {
+      if (audioBlobFileUrl) URL.revokeObjectURL(audioBlobFileUrl);
+    };
+  }, [audioBlob]);
 
   return (
-    <div>
+    <div className="flex gap-6">
       <span>{p.recording.file}</span>
-      <button
-        onClick={async () => {
-          const firstFilename = p.recording.file;
-          const url = pb.files.getURL(p.recording, firstFilename);
+      {!audioBlobFileUrl && (
+        <button
+          onClick={async () => {
+            const firstFilename = p.recording.file;
+            const url = pb.files.getURL(p.recording, firstFilename);
 
-          setAudioBlobFileUrl(url);
-        }}
-      >
-        <CustomIcon iconName="Download" size="md" />
-      </button>
+            const response = await fetch(url);
+            const blob = await response.blob();
+            setAudioBlob(blob);
+          }}
+        >
+          <CustomIcon iconName="Download" size="md" />
+        </button>
+      )}
 
       {audioBlobFileUrl && <audio controls src={audioBlobFileUrl} />}
     </div>
-  );
-};
-
-const DisplayRecordingOrAudioBlob = (
-  p:
-    | React.ComponentProps<typeof DisplayRecording>
-    | React.ComponentProps<typeof DisplayAndCreateRecordForAudioBlob>,
-) => {
-  return "initId" in p ? (
-    <DisplayAndCreateRecordForAudioBlob {...p} />
-  ) : (
-    <DisplayRecording {...p} />
   );
 };
 
 const IndexPage = () => {
-  const authStore = useReactiveAuthStore();
   const navigate = useNavigate();
 
-  const [displayRecordingsProps, setDisplayRecordingsProps] = useState<
-    React.ComponentProps<typeof DisplayRecordingOrAudioBlob>[]
+  const [audioBlobAndIdsList, setAudioBlobsAndIds] = useState<
+    { audioBlob: Blob; tempId?: string; audioRecordId?: string }[]
   >([]);
+  const [audioRecords, setAudioRecords] = useState<TRecording[]>([]);
+
   useEffect(() => {
     const unsubPromise = smartSubscribeToAllRecords({
       pb,
       collectionName: recordingsCollectionName,
       itemSchema: recordingSchema,
       onChange: (newRecordingRecords) => {
-        setDisplayRecordingsProps(
-          newRecordingRecords.map((recordingRecords) => ({ recording: recordingRecords })),
-        );
+        setAudioRecords(newRecordingRecords);
       },
     });
 
@@ -113,53 +112,60 @@ const IndexPage = () => {
       <br />
 
       <SignedInRouteProtector ifUserIsUnverified={() => navigate("/auth/verification-request")}>
-        <>
-          <div>You are signed in</div>
-          <AudioRecorder
-            onRecordingComplete={(audioBlob) => {
-              // pb.collection("recordings").create({ file: audioBlob });
-              // setAudioBlobs((prev) => [audioBlob, ...prev]);
-              setDisplayRecordingsProps((prev) => [
-                ...prev,
-                {
-                  initId: crypto.randomUUID(),
-                  initAudioBlob: audioBlob,
-                  onAudioRecordSaved: (x) => {
-                    setDisplayRecordingsProps((prev) =>
-                      prev.map((item) =>
-                        // this should always be true
-                        "initId" in item && item.initId === x.audioRecord.id
-                          ? { recording: x.audioRecord, initAudioBlob: audioBlob }
-                          : item,
-                      ),
-                    );
-                  },
-                },
-              ]);
-            }}
-          />
-          <br />
-          <div className="flex flex-col gap-4 ">
-            {displayRecordingsProps.map((props, j) => (
-              <div key={j} className="flex gap-4">
-                <span>{j}:</span>
-                <DisplayRecordingOrAudioBlob {...props} />
-              </div>
-            ))}
-          </div>
-          <div>Enjoy the app</div>
-        </>
+        <div>You are signed in</div>
+        <AudioRecorder
+          onRecordingComplete={async (audioBlob) => {
+            const tempId = crypto.randomUUID();
+            setAudioBlobsAndIds((prev) => [...prev, { audioBlob, tempId: tempId }]);
+
+            const newAudioRecord = await pb.collection("recordings").create({ file: audioBlob });
+            const parsedResp = recordingSchema.safeParse(newAudioRecord);
+            if (!parsedResp.success) return;
+
+            setAudioBlobsAndIds((prev) => {
+              const index = prev.findIndex((item) => item.tempId === tempId);
+              if (index !== -1) prev[index] = { ...prev[index], audioRecordId: newAudioRecord.id };
+              return [...prev];
+            });
+          }}
+        />
+        <br />
+
+        <div className="flex flex-col gap-4">
+          {audioBlobAndIdsList
+            .filter((audioBlobAndIds) => !audioBlobAndIds.audioRecordId)
+            .map((audioBlobAndIds, j) => {
+              return (
+                <div key={j} className="flex gap-4">
+                  <span>{j}:</span>
+                  <DisplayAndCreateRecordForAudioBlob
+                    initId={audioBlobAndIds.tempId!}
+                    audioBlob={audioBlobAndIds.audioBlob}
+                  />
+                </div>
+              );
+            })}
+          {audioRecords
+            .sort((a, b) => (a.created < b.created ? 1 : -1))
+            .map((audioRecord, j) => {
+              const blobItem = audioBlobAndIdsList.find((x) => x.audioRecordId === audioRecord.id);
+
+              return (
+                <div key={audioRecord.id} className="flex gap-4">
+                  <span>{j}:</span>
+                  <DisplayRecording recording={audioRecord} audioBlob={blobItem?.audioBlob} />
+                </div>
+              );
+            })}
+        </div>
       </SignedInRouteProtector>
 
       <SignedOutRouteProtector>
-        <>
-          <div>You are signed out</div>
-          <div>Log in to enjoy the app</div>
-        </>
+        <div>You are signed out</div>
+        <div>Log in to enjoy the app</div>
       </SignedOutRouteProtector>
 
       <br />
-      <pre>{JSON.stringify({ authStore }, undefined, 2)}</pre>
     </div>
   );
 };
