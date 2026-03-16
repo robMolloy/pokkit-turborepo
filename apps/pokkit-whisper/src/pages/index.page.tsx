@@ -6,33 +6,99 @@ import {
   smartSubscribeToAllRecords,
   useReactiveAuthStore,
 } from "@repo/pokkit-auth";
+import { CustomIcon } from "@repo/pokkit-components";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import z from "zod";
 
 const recordingsCollectionName = "recordings";
-const recordingSchema = z.object({ id: z.string(), file: z.string() });
+const recordingSchema = z.object({
+  id: z.string(),
+  collectionName: z.string(),
+  file: z.string(),
+});
 type TRecording = z.infer<typeof recordingSchema>;
 
-const DisplayRecording = (p: { recording: TRecording; audioBlob?: Blob }) => {
-  useEffect(() => {}, []);
+const DisplayAndCreateRecordForAudioBlob = (p: {
+  initId: string;
+  initAudioBlob: Blob;
+  onAudioRecordSaved: (p1: { audioRecord: TRecording }) => void;
+}) => {
+  const [audioBlobFileUrl, setAudioBlobFileUrl] = useState<string | undefined>(
+    p.initAudioBlob ? URL.createObjectURL(p.initAudioBlob) : undefined,
+  );
 
-  return <div>{p.recording.file}</div>;
+  useEffect(() => {
+    setAudioBlobFileUrl(URL.createObjectURL(p.initAudioBlob));
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const resp = await pb.collection("recordings").create({ file: p.initAudioBlob });
+      const parsedResp = recordingSchema.safeParse(resp);
+      if (parsedResp.success) p.onAudioRecordSaved?.({ audioRecord: parsedResp.data });
+    })();
+  }, []);
+
+  return (
+    <div className="flex gap-12">
+      {!audioBlobFileUrl && <div>Loading...</div>}
+
+      {audioBlobFileUrl && <audio controls src={audioBlobFileUrl} />}
+    </div>
+  );
+};
+
+const DisplayRecording = (p: { recording: TRecording; initAudioBlob?: Blob }) => {
+  const [audioBlobFileUrl, setAudioBlobFileUrl] = useState<string | undefined>();
+
+  return (
+    <div>
+      <span>{p.recording.file}</span>
+      <button
+        onClick={async () => {
+          const firstFilename = p.recording.file;
+          const url = pb.files.getURL(p.recording, firstFilename);
+
+          setAudioBlobFileUrl(url);
+        }}
+      >
+        <CustomIcon iconName="Download" size="md" />
+      </button>
+
+      {audioBlobFileUrl && <audio controls src={audioBlobFileUrl} />}
+    </div>
+  );
+};
+
+const DisplayRecordingOrAudioBlob = (
+  p:
+    | React.ComponentProps<typeof DisplayRecording>
+    | React.ComponentProps<typeof DisplayAndCreateRecordForAudioBlob>,
+) => {
+  return "initId" in p ? (
+    <DisplayAndCreateRecordForAudioBlob {...p} />
+  ) : (
+    <DisplayRecording {...p} />
+  );
 };
 
 const IndexPage = () => {
   const authStore = useReactiveAuthStore();
   const navigate = useNavigate();
 
-  const [audioBlobs, setAudioBlobs] = useState<Blob[]>([]);
-  const [recordings, setRecordings] = useState<TRecording[]>([]);
+  const [displayRecordingsProps, setDisplayRecordingsProps] = useState<
+    React.ComponentProps<typeof DisplayRecordingOrAudioBlob>[]
+  >([]);
   useEffect(() => {
     const unsubPromise = smartSubscribeToAllRecords({
       pb,
       collectionName: recordingsCollectionName,
       itemSchema: recordingSchema,
-      onChange: (x) => {
-        setRecordings([...x]);
+      onChange: (newRecordingRecords) => {
+        setDisplayRecordingsProps(
+          newRecordingRecords.map((recordingRecords) => ({ recording: recordingRecords })),
+        );
       },
     });
 
@@ -51,22 +117,33 @@ const IndexPage = () => {
           <div>You are signed in</div>
           <AudioRecorder
             onRecordingComplete={(audioBlob) => {
-              pb.collection("recordings").create({ file: audioBlob });
-              setAudioBlobs((prev) => [audioBlob, ...prev]);
+              // pb.collection("recordings").create({ file: audioBlob });
+              // setAudioBlobs((prev) => [audioBlob, ...prev]);
+              setDisplayRecordingsProps((prev) => [
+                ...prev,
+                {
+                  initId: crypto.randomUUID(),
+                  initAudioBlob: audioBlob,
+                  onAudioRecordSaved: (x) => {
+                    setDisplayRecordingsProps((prev) =>
+                      prev.map((item) =>
+                        // this should always be true
+                        "initId" in item && item.initId === x.audioRecord.id
+                          ? { recording: x.audioRecord, initAudioBlob: audioBlob }
+                          : item,
+                      ),
+                    );
+                  },
+                },
+              ]);
             }}
           />
           <br />
           <div className="flex flex-col gap-4 ">
-            {recordings.map((recording, j) => (
-              <div key={recording.id} className="flex">
-                {j}: <DisplayRecording recording={recording} />
-              </div>
-            ))}
-          </div>
-          <div className="flex flex-col gap-4 ">
-            {audioBlobs.map((audioBlob, j) => (
-              <div key={j}>
-                <audio controls src={URL.createObjectURL(audioBlob)} />
+            {displayRecordingsProps.map((props, j) => (
+              <div key={j} className="flex gap-4">
+                <span>{j}:</span>
+                <DisplayRecordingOrAudioBlob {...props} />
               </div>
             ))}
           </div>
