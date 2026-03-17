@@ -5,14 +5,17 @@ const getAllRecords = async <T extends z.ZodSchema>(p: {
   pb: PocketBase;
   collectionName: string;
   schema: T;
+  onParsedItemFailedFn?: (x: unknown) => void;
   signal?: AbortSignal;
 }) => {
   try {
     const resp = await p.pb.collection(p.collectionName).getFullList({ signal: p.signal });
-    const validItems = resp
-      .map((item) => p.schema.safeParse(item))
-      .filter((item) => item.success)
-      .map((item) => item.data);
+    const validItems: z.infer<T>[] = [];
+    resp.forEach((item) => {
+      const parseResp = p.schema.safeParse(item);
+      if (parseResp.success) validItems.push(parseResp.data);
+      else p.onParsedItemFailedFn?.(item);
+    });
 
     return { success: true, data: validItems } as const;
   } catch (e) {
