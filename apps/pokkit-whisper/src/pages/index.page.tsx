@@ -49,12 +49,11 @@ const IndexPage = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Pokkit Whisper</h1>
+    <div className="p-6">
+      <h1 className="text-xl">Pokkit Whisper</h1>
       <br />
 
       <SignedInRouteProtector ifUserIsUnverified={() => navigate("/auth/verification-request")}>
-        <div>You are signed in</div>
         <AudioRecorder
           onRecordingComplete={async (audioBlob) => {
             const tempId = crypto.randomUUID();
@@ -98,7 +97,6 @@ const IndexPage = () => {
 
               return (
                 <div key={audioRecord.id} className="flex gap-4">
-                  <span>{j}:</span>
                   <DisplayAudioRecordingRecord
                     pb={pb}
                     onAudioBlobDownload={(x) => {

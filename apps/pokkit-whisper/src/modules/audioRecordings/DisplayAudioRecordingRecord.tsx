@@ -51,84 +51,95 @@ export const DisplayAudioRecordingRecord = (p: {
     <Card className="w-full">
       <CardContent className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <div className="flex justify-between gap-4 items-baseline">
-            <span className="flex items-center gap-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
               {p.transcriptionRecord && (
                 <Button
+                  size="icon"
                   variant="ghost"
+                  className="h-8 w-8"
                   onClick={() => navigator.clipboard.writeText(p.transcriptionRecord!.text)}
                 >
                   <CustomIcon iconName="Clipboard" size="sm" />
                 </Button>
               )}
+
               {p.transcriptionRecord?.text && (
                 <CustomIcon iconName="Pencil" size="sm" className="text-muted-foreground" />
               )}
+
               {p.audioBlob && (
                 <CustomIcon iconName="Volume2" size="sm" className="text-muted-foreground" />
               )}
-            </span>
-            <span></span>
+            </div>
+
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8"
+              onClick={() => setShowDetails((prev) => !prev)}
+            >
+              <CustomIcon iconName={showDetails ? "Minus" : "Plus"} size="sm" />
+            </Button>
           </div>
-          <div className="flex gap-4">
-            <span className="flex-1">
-              <div className="rounded-lg p-4 border">
-                <p
-                  className={cn("text-sm leading-relaxed w-full", {
-                    "animate-caret-blink": !p.transcriptionRecord,
-                  })}
-                >
-                  {p.transcriptionRecord ? p.transcriptionRecord?.text : "..."}
-                </p>
-              </div>
-            </span>
-            <span>
-              <Button onClick={() => setShowDetails((prev) => !prev)}>
-                <CustomIcon iconName={showDetails ? "Minus" : "Plus"} size="sm" />
-              </Button>
-            </span>
+          <div className="relative rounded border p-4">
+            <p
+              className={cn("text-sm leading-relaxed", {
+                "animate-caret-blink text-muted-foreground": !p.transcriptionRecord,
+              })}
+            >
+              {p.transcriptionRecord ? p.transcriptionRecord.text : "Transcribing..."}
+            </p>
           </div>
         </div>
 
         {showDetails && (
-          <div className="flex justify-between">
-            <span className="flex flex-col gap-2">
-              <div className="flex gap-6 text-sm">
-                <span className={cn("flex items-center gap-2 text-muted-foreground")}>
+          <div className="flex items-start justify-between">
+            <div className="flex flex-col gap-2 min-w-0">
+              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5">
                   <CustomIcon size="sm" iconName="Volume2" />
                   Audio
                 </span>
+
                 {p.transcriptionRecord && (
-                  <span className="flex gap-2 items-center text-muted-foreground">
+                  <span className="flex items-center gap-1.5">
                     <CustomIcon size="sm" iconName="Pencil" />
                     Transcribed
                   </span>
                 )}
               </div>
-              <h3 className="font-semibold text-sm leading-tight truncate">
-                {p.audioRecordingRecord.fileName}
-              </h3>
-            </span>
-            <span className="flex gap-4">
+
+              <h3 className="text-sm font-medium truncate">{p.audioRecordingRecord.fileName}</h3>
+            </div>
+
+            {/* Right */}
+            <div className="flex items-center gap-3">
               {!p.audioBlob && (
-                <button onClick={handleDownloadAudioBlob}>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="h-9 w-9"
+                  onClick={handleDownloadAudioBlob}
+                >
                   <CustomIcon
                     iconName={isDownloading ? "Loader" : "Download"}
-                    size="md"
+                    size="sm"
                     className={cn({ "animate-spin": isDownloading })}
                   />
-                </button>
+                </Button>
               )}
+
               <div className="relative">
-                <audio controls src={audioBlobFileUrl} />
+                <audio controls src={audioBlobFileUrl} className="h-9" />
                 <div
-                  className="absolute top-0 bottom-0 right-0 left-0 cursor-pointer"
+                  className="absolute inset-0 cursor-pointer"
                   onClick={() => {
                     if (!p.audioBlob) handleDownloadAudioBlob();
                   }}
                 />
               </div>
-            </span>
+            </div>
           </div>
         )}
       </CardContent>
