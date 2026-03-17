@@ -78,7 +78,7 @@ export const smartSubscribeToAllRecords = async <T extends z.ZodSchema<{ id: str
       if (x.action === "update")
         allRecords = allRecords.map((itm) => (itm.id === x.record.id ? x.record : itm));
 
-      p.onChange(allRecords);
+      p.onChange([...allRecords]);
     },
     signal: abortController.signal,
   });

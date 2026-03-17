@@ -1,5 +1,7 @@
 import { cn } from "@repo/pokkit-shadcn";
 import {
+  Badge,
+  Volume2,
   Play,
   ArrowLeft,
   LogOutIcon,
@@ -52,6 +54,8 @@ import {
 } from "lucide-react";
 
 const iconMap = {
+  Badge,
+  Volume2,
   Play,
   ArrowLeft,
   LogOutIcon,
@@ -119,9 +123,14 @@ export const CustomIcon = (p: {
   size: keyof typeof iconSizeClass;
   className?: string;
   color?: string;
+  children?: React.ReactNode;
 }) => {
   const Icon = iconMap[p.iconName];
   const sizeClass = iconSizeClass[p.size];
 
-  return <Icon color={p.color} className={cn(sizeClass, p.className)} />;
+  return (
+    <Icon color={p.color} className={cn(sizeClass, p.className)}>
+      {p.children}
+    </Icon>
+  );
 };

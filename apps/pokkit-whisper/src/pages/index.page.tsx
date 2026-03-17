@@ -101,6 +101,12 @@ const IndexPage = () => {
                   <span>{j}:</span>
                   <DisplayAudioRecordingRecord
                     pb={pb}
+                    onAudioBlobDownload={(x) => {
+                      setAudioBlobsAndIds((prev) => [
+                        ...prev,
+                        { audioBlob: x.audioBlob, audioRecordId: x.audioRecordingRecord.id },
+                      ]);
+                    }}
                     audioRecordingRecord={audioRecord}
                     audioBlob={blobItem?.audioBlob}
                     transcriptionRecord={transcriptionRecord}
@@ -117,8 +123,9 @@ const IndexPage = () => {
       </SignedOutRouteProtector>
 
       <br />
-
-      <pre>{JSON.stringify(audioTranscriptionRecords, undefined, 2)}</pre>
+      <pre>
+        {JSON.stringify({ audioTranscriptionRecords, audioRecordingRecords }, undefined, 2)}
+      </pre>
     </div>
   );
 };
