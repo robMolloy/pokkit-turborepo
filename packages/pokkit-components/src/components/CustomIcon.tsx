@@ -1,5 +1,6 @@
 import { cn } from "@repo/pokkit-shadcn";
 import {
+  Clipboard,
   Badge,
   Volume2,
   Play,
@@ -51,9 +52,11 @@ import {
   List,
   Brain,
   Loader,
+  Minus,
 } from "lucide-react";
 
 const iconMap = {
+  Clipboard,
   Badge,
   Volume2,
   Play,
@@ -105,6 +108,7 @@ const iconMap = {
   List,
   Brain,
   Loader,
+  Minus,
 };
 
 export const iconSizeClass = {
