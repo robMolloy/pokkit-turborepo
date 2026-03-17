@@ -1,5 +1,6 @@
+import { CustomIcon } from "@repo/pokkit-components";
 import { Button } from "@repo/pokkit-shadcn";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function encodeWav(buffers: Float32Array[], sampleRate: number) {
   const merged = mergeBuffers(buffers);
@@ -62,7 +63,190 @@ function writeString(view: DataView, offset: number, str: string) {
   }
 }
 
+const stationaryWaveHeights = [...Array(20)].map(() => 35);
+const createAnimatedWaveHeights = (minMaxDiff: number) =>
+  [...Array(20)].map(() => 100 - minMaxDiff + Math.random() * minMaxDiff);
+
+const WaveAnimation = (p: { isAnimating: boolean; minMaxDiff: number; interval: number }) => {
+  const [waveHeights, setWaveHeights] = useState<number[]>(stationaryWaveHeights);
+
+  useEffect(() => {
+    const interval = (() => {
+      if (p.isAnimating)
+        return setInterval(
+          () => setWaveHeights(createAnimatedWaveHeights(p.minMaxDiff)),
+          p.interval,
+        );
+    })();
+
+    return () => {
+      clearInterval(interval);
+      setWaveHeights(stationaryWaveHeights);
+    };
+  }, [p.isAnimating]);
+
+  return (
+    <div className="flex items-end gap-1 h-full">
+      {waveHeights.map((val, i) => (
+        <div
+          key={i}
+          className={`w-1 rounded-full bg-primary transition-all duration-300 ${
+            p.isAnimating ? "animate-pulse" : "opacity-30"
+          }`}
+          style={{
+            height: `${val}%`,
+            animationDelay: `${i * 0.1}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+const formatTime = (ms: number) => {
+  const s = Math.floor(ms / 1000);
+  const mins = String(Math.floor(s / 60)).padStart(2, "0");
+  const secs = String(s % 60).padStart(2, "0");
+  return `${mins}:${secs}`;
+};
+const Timer = (p: { isCounting: boolean }) => {
+  const startDate = useRef(new Date());
+  const [elapsedTimeInMs, setElapsedTimeInMs] = useState<number>(0);
+
+  useEffect(() => {
+    const interval = (() => {
+      if (!p.isCounting) return;
+
+      startDate.current = new Date();
+      return setInterval(() => {
+        setElapsedTimeInMs(new Date().getTime() - startDate.current.getTime());
+      }, 200);
+    })();
+
+    return () => {
+      if (interval) clearInterval(interval);
+      setElapsedTimeInMs(0);
+    };
+  }, [p.isCounting]);
+
+  return <div className="text-2xl font-mono tracking-widest">{formatTime(elapsedTimeInMs)}</div>;
+};
+
+// export const AudioRecorder2 = (p: { onRecordingComplete: (x: Blob) => void }) => {
+//   const [isRecording, setIsRecording] = useState(false);
+
+//   return (
+//     <div className="flex flex-col items-center gap-6">
+//       <div className="h-32">
+//         <WaveAnimation isAnimating={isRecording} minMaxDiff={50} interval={300} />
+//       </div>
+//       <Timer isCounting={isRecording} />
+//       <div className="flex gap-1 w-42">
+//         {!isRecording ? (
+//           <Button onClick={() => setIsRecording(true)} className="flex-1 gap-2">
+//             <CustomIcon iconName="Mic" size="md" />
+//             Start Recording
+//           </Button>
+//         ) : (
+//           <>
+//             <Button
+//               variant="secondary"
+//               onClick={() => {
+//                 setIsRecording(false);
+//                 p.onRecordingComplete(new Blob([]));
+//               }}
+//               className="flex flex-1 gap-2"
+//             >
+//               Send
+//               <CustomIcon iconName="Upload" size="md" />
+//             </Button>
+//             <Button variant="destructive" onClick={() => setIsRecording(false)}>
+//               <CustomIcon iconName="Trash2" size="md" />
+//             </Button>
+//           </>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
 const AudioRecorderInner = (p: { onRecordingComplete: (blob: Blob) => void }) => {
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const workletRef = useRef<AudioWorkletNode | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  const buffersRef = useRef<Float32Array[]>([]);
+  const [isRecording, setIsRecording] = useState(false);
+
+  async function startRecording() {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    streamRef.current = stream;
+
+    const audioContext = new AudioContext();
+    audioContextRef.current = audioContext;
+
+    await audioContext.audioWorklet.addModule("/audio/recorderProcessor.js");
+
+    const source = audioContext.createMediaStreamSource(stream);
+
+    const worklet = new AudioWorkletNode(audioContext, "recorder-processor");
+    workletRef.current = worklet;
+
+    buffersRef.current = [];
+
+    worklet.port.onmessage = (e) => {
+      buffersRef.current.push(new Float32Array(e.data));
+    };
+
+    source.connect(worklet);
+
+    setIsRecording(true);
+  }
+
+  function stopRecording() {
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+
+    const sampleRate = audioContextRef.current!.sampleRate;
+    const wavBlob = encodeWav(buffersRef.current, sampleRate);
+
+    p.onRecordingComplete(wavBlob);
+
+    setIsRecording(false);
+  }
+  function discardRecording() {
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+
+    setIsRecording(false);
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <div className="h-16">
+        <WaveAnimation isAnimating={isRecording} minMaxDiff={40} interval={300} />
+      </div>
+      <Timer isCounting={isRecording} />
+      <div className="flex gap-1 w-42">
+        {!isRecording ? (
+          <Button onClick={startRecording} className="flex-1 gap-2">
+            <CustomIcon iconName="Mic" size="md" />
+            Start Recording
+          </Button>
+        ) : (
+          <>
+            <Button variant="secondary" onClick={stopRecording} className="flex flex-1 gap-2">
+              Send
+              <CustomIcon iconName="Upload" size="md" />
+            </Button>
+            <Button variant="destructive" onClick={discardRecording}>
+              <CustomIcon iconName="Trash2" size="md" />
+            </Button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+const AudioRecorderInner2 = (p: { onRecordingComplete: (blob: Blob) => void }) => {
   const audioContextRef = useRef<AudioContext | null>(null);
   const workletRef = useRef<AudioWorkletNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);

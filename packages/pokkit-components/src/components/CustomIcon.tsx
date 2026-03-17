@@ -53,6 +53,8 @@ import {
   Brain,
   Loader,
   Minus,
+  Mic,
+  Square,
 } from "lucide-react";
 
 const iconMap = {
@@ -109,6 +111,8 @@ const iconMap = {
   Brain,
   Loader,
   Minus,
+  Mic,
+  Square,
 };
 
 export const iconSizeClass = {
