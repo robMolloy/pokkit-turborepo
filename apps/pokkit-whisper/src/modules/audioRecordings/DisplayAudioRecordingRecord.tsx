@@ -49,40 +49,9 @@ export const DisplayAudioRecordingRecord = (p: {
 
   return (
     <Card className="w-full">
-      <CardContent className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {p.transcriptionRecord && (
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-8 w-8"
-                  onClick={() => navigator.clipboard.writeText(p.transcriptionRecord!.text)}
-                >
-                  <CustomIcon iconName="Clipboard" size="sm" />
-                </Button>
-              )}
-
-              {p.transcriptionRecord?.text && (
-                <CustomIcon iconName="Pencil" size="sm" className="text-muted-foreground" />
-              )}
-
-              {p.audioBlob && (
-                <CustomIcon iconName="Volume2" size="sm" className="text-muted-foreground" />
-              )}
-            </div>
-
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8"
-              onClick={() => setShowDetails((prev) => !prev)}
-            >
-              <CustomIcon iconName={showDetails ? "Minus" : "Plus"} size="sm" />
-            </Button>
-          </div>
-          <div className="relative rounded border p-4">
+      <CardContent className="flex flex-col gap-8">
+        <div className="flex gap-4">
+          <div className="relative flex-1 rounded border p-4 pr-8">
             <p
               className={cn("text-sm leading-relaxed", {
                 "animate-caret-blink text-muted-foreground": !p.transcriptionRecord,
@@ -90,7 +59,36 @@ export const DisplayAudioRecordingRecord = (p: {
             >
               {p.transcriptionRecord ? p.transcriptionRecord.text : "Transcribing..."}
             </p>
+            {p.transcriptionRecord && (
+              <Button
+                size="icon"
+                variant="ghost"
+                className="absolute top-0 right-0"
+                onClick={() => navigator.clipboard.writeText(p.transcriptionRecord!.text)}
+              >
+                <CustomIcon iconName="Clipboard" size="sm" />
+              </Button>
+            )}
           </div>
+
+          <span className="flex flex-col justify-between gap-6">
+            <span className="flex flex-col gap-2">
+              {p.transcriptionRecord?.text && (
+                <CustomIcon iconName="Pencil" size="sm" className="text-muted-foreground" />
+              )}
+              {p.audioBlob && (
+                <CustomIcon iconName="Volume2" size="sm" className="text-muted-foreground" />
+              )}
+            </span>
+            <span>
+              <CustomIcon
+                onClick={() => setShowDetails((prev) => !prev)}
+                iconName={showDetails ? "Minus" : "Plus"}
+                className="cursor-pointer"
+                size="sm"
+              />
+            </span>
+          </span>
         </div>
 
         {showDetails && (
@@ -105,7 +103,7 @@ export const DisplayAudioRecordingRecord = (p: {
                 {p.transcriptionRecord && (
                   <span className="flex items-center gap-1.5">
                     <CustomIcon size="sm" iconName="Pencil" />
-                    Transcribed
+                    Transcription
                   </span>
                 )}
               </div>

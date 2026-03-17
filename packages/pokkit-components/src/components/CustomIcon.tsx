@@ -128,12 +128,13 @@ export const CustomIcon = (p: {
   className?: string;
   color?: string;
   children?: React.ReactNode;
+  onClick?: () => void;
 }) => {
   const Icon = iconMap[p.iconName];
   const sizeClass = iconSizeClass[p.size];
 
   return (
-    <Icon color={p.color} className={cn(sizeClass, p.className)}>
+    <Icon onClick={p.onClick} color={p.color} className={cn(sizeClass, p.className)}>
       {p.children}
     </Icon>
   );
