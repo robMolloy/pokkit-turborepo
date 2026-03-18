@@ -15,83 +15,6 @@ import { SignedInRouteProtector, SignedOutRouteProtector } from "@repo/pokkit-au
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-// function AudioRecorderMock() {
-//   const [isRecording, setIsRecording] = useState(false);
-//   const [duration, setDuration] = useState(0);
-
-//   useEffect(() => {
-//     let interval = 0;
-
-//     if (isRecording) {
-//       interval = setInterval(() => {
-//         setDuration((d) => d + 1);
-//       }, 200);
-//     } else {
-//       if (interval) clearInterval(interval);
-//     }
-//     return () => clearInterval(interval);
-//   }, [isRecording]);
-
-//   const formatTime = (s: number) => {
-//     const mins = String(Math.floor(s / 60)).padStart(2, "0");
-//     const secs = String(s % 60).padStart(2, "0");
-//     return `${mins}:${secs}`;
-//   };
-
-//   return (
-//     <div className="flex items-center justify-center min-h-screen bg-muted/40 p-6">
-//       <div className="w-full max-w-md rounded-2xl bg-background shadow-lg border p-6 flex flex-col gap-6">
-//         {/* Header */}
-//         <div className="flex items-center justify-between">
-//           <h2 className="text-lg font-semibold tracking-tight">Audio Recorder</h2>
-//           <span
-//             className={`text-xs font-medium px-2 py-1 rounded-full ${
-//               isRecording ? "bg-red-500/10 text-red-500" : "bg-muted text-muted-foreground"
-//             }`}
-//           >
-//             {isRecording ? "Recording" : "Idle"}
-//           </span>
-//         </div>
-
-//         {/* Wave animation */}
-//         <div className="flex items-center justify-center h-20">
-//           <WaveAnimation isAnimating={true} minMaxDiff={50} interval={250} />
-//         </div>
-
-//         {/* Timer */}
-//         <div className="text-center text-2xl font-mono tracking-widest">{formatTime(duration)}</div>
-
-//         {/* Controls */}
-//         <div className="flex items-center justify-center gap-4">
-//           {!isRecording ? (
-//             <button
-//               onClick={() => {
-//                 setDuration(0);
-//                 setIsRecording(true);
-//               }}
-//               className="flex items-center justify-center w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-md hover:scale-105 active:scale-95 transition"
-//             >
-//               <CustomIcon iconName="Mic" size="md" />
-//             </button>
-//           ) : (
-//             <button
-//               onClick={() => setIsRecording(false)}
-//               className="flex items-center justify-center w-14 h-14 rounded-full bg-red-500 text-white shadow-md hover:scale-105 active:scale-95 transition"
-//             >
-//               <CustomIcon iconName="Square" size="md" />
-//             </button>
-//           )}
-//         </div>
-
-//         {/* Footer hint */}
-//         <p className="text-center text-xs text-muted-foreground">
-//           This is a simulated recording UI
-//         </p>
-//       </div>
-//     </div>
-//   );
-// }
-
 const IndexPage = () => {
   const navigate = useNavigate();
 
@@ -129,7 +52,6 @@ const IndexPage = () => {
     <div className="p-6">
       <h1 className="text-xl">Pokkit Whisper</h1>
 
-      {/* <AudioRecorderMock /> */}
       <br />
 
       <SignedInRouteProtector ifUserIsUnverified={() => navigate("/auth/verification-request")}>
