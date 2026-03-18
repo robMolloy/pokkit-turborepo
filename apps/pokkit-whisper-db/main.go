@@ -15,8 +15,8 @@ import (
 
 func transcribeFileFromFilePathAndSaveTranscriptionRecord(App pbCore.App, filePath string, recordID string) {
 	cmd := exec.Command(
-		"/Users/robert.molloy/Projects/current/whisper.cpp/build/bin/whisper-cli",
-		"-m", "/Users/robert.molloy/Projects/current/whisper.cpp/models/ggml-small.bin",
+		"~/Projects/current/whisper.cpp/build/bin/whisper-cli",
+		"-m", "~/Projects/current/whisper.cpp/models/ggml-small.bin",
 		"-f", filePath,
 		"-otxt",
 		"-of", "-",

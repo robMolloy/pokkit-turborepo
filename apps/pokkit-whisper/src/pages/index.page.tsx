@@ -12,9 +12,7 @@ import {
   TAudioTranscriptionRecord,
 } from "@/modules/audioTranscriptions/audioTranscriptionDbUtils";
 import { SignedInRouteProtector, SignedOutRouteProtector } from "@repo/pokkit-auth";
-import { CustomIcon } from "@repo/pokkit-components";
-import { Button } from "@repo/pokkit-shadcn";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 // function AudioRecorderMock() {
@@ -170,7 +168,7 @@ const IndexPage = () => {
 
           {audioRecordingRecords
             .sort((a, b) => (a.created < b.created ? 1 : -1))
-            .map((audioRecord, j) => {
+            .map((audioRecord) => {
               const blobItem = audioBlobAndIdsList.find((x) => x.audioRecordId === audioRecord.id);
               const transcriptionRecord = audioTranscriptionRecords.find(
                 (x) => x.id === audioRecord.id,
@@ -200,11 +198,6 @@ const IndexPage = () => {
         <div>You are signed out</div>
         <div>Log in to enjoy the app</div>
       </SignedOutRouteProtector>
-
-      <br />
-      <pre>
-        {JSON.stringify({ audioTranscriptionRecords, audioRecordingRecords }, undefined, 2)}
-      </pre>
     </div>
   );
 };

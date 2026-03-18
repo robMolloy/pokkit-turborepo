@@ -246,62 +246,6 @@ const AudioRecorderInner = (p: { onRecordingComplete: (blob: Blob) => void }) =>
     </div>
   );
 };
-const AudioRecorderInner2 = (p: { onRecordingComplete: (blob: Blob) => void }) => {
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const workletRef = useRef<AudioWorkletNode | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-
-  const buffersRef = useRef<Float32Array[]>([]);
-  const [recording, setRecording] = useState(false);
-
-  async function startRecording() {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    streamRef.current = stream;
-
-    const audioContext = new AudioContext();
-    audioContextRef.current = audioContext;
-
-    await audioContext.audioWorklet.addModule("/audio/recorderProcessor.js");
-
-    const source = audioContext.createMediaStreamSource(stream);
-
-    const worklet = new AudioWorkletNode(audioContext, "recorder-processor");
-    workletRef.current = worklet;
-
-    buffersRef.current = [];
-
-    worklet.port.onmessage = (e) => {
-      buffersRef.current.push(new Float32Array(e.data));
-    };
-
-    source.connect(worklet);
-
-    setRecording(true);
-  }
-
-  function stopRecording() {
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-
-    const sampleRate = audioContextRef.current!.sampleRate;
-    const wavBlob = encodeWav(buffersRef.current, sampleRate);
-
-    p.onRecordingComplete(wavBlob);
-
-    setRecording(false);
-  }
-
-  return (
-    <div className="flex flex-col items-start gap-4">
-      {!recording ? (
-        <Button onClick={startRecording}>Start Recording</Button>
-      ) : (
-        <Button variant="destructive" onClick={stopRecording}>
-          Stop Recording
-        </Button>
-      )}
-    </div>
-  );
-};
 
 export const AudioRecorder = (p: React.ComponentProps<typeof AudioRecorderInner>) => {
   const [key, setKey] = useState(0);
