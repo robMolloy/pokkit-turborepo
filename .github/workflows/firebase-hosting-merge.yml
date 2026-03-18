@@ -28,9 +28,8 @@ jobs:
 
       # Install and build
       - run: |
-          cd apps/pokkit-whisper
           pnpm install --frozen-lockfile
-          pnpm run build
+          pnpm run build --filter=pokkit-whisper
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
