@@ -11,6 +11,7 @@
     "test": "vitest",
     "tsc": "cd ../.. && packages/pokkit-shadcn/node_modules/.bin/tsc --project packages/pokkit-shadcn/tsconfig.json --noemit --watch",
     "css-build": "tailwindcss -i ./styles.css -o ./dist/styles.css --watch",
+    "build": "tailwindcss -i ./styles.css -o ./dist/styles.css",
     "dev": "tailwindcss -i ./styles.css -o ./dist/styles.css --watch"
   },
   "dependencies": {
