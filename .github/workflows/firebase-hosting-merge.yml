@@ -28,6 +28,7 @@ jobs:
 
       # Install and build
       - run: |
+          pnpm install
           pnpm install --frozen-lockfile
           pnpm run build --filter=pokkit-whisper
 
