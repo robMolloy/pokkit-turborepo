@@ -34,8 +34,8 @@ jobs:
           ldd --version
           pnpm add -w @tailwindcss/oxide-linux-x64-gnu
           pnpm install --no-optional=false
-          pnpm run build --filter=pokkit-shadcn
-          pnpm run build --filter=pokkit-components
+          pnpm run build --filter=@repo/pokkit-shadcn
+          pnpm run build --filter=@repo/pokkit-components
           pnpm run build --filter=pokkit-whisper
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
