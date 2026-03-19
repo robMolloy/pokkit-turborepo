@@ -28,6 +28,10 @@ jobs:
 
       # Install and build
       - run: |
+          uname -m
+          uname -a
+          node -e "console.log(process.arch, process.platform)"
+          ldd --version
           pnpm add -w @tailwindcss/oxide-linux-x64-gnu
           pnpm install --no-optional=false
           pnpm run build --filter=pokkit-whisper
