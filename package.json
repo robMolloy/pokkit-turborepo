@@ -11,7 +11,8 @@
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
-    "build-whisper": "pnpm add -w @tailwindcss/oxide-linux-x64-gnu && pnpm install --no-optional=false && pnpm run build --filter=@repo/pokkit-shadcn && pnpm run build --filter=@repo/pokkit-components && pnpm run build --filter=pokkit-whisper"
+    "build-whisper": "pnpm add -w @tailwindcss/oxide-linux-x64-gnu && pnpm install --no-optional=false && pnpm run build --filter=@repo/pokkit-shadcn && pnpm run build --filter=@repo/pokkit-components && pnpm run build --filter=pokkit-whisper",
+    "build-whisper-db": "turbo run build --filter=pokkit-whisper-db"
   },
   "devDependencies": {
     "firebase-tools": "^15.11.0",
