@@ -1,0 +1,387 @@
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"html/template"
+	"log"
+	"os"
+	"os/exec"
+
+	"github.com/pocketbase/dbx"
+	pocketbase "github.com/pocketbase/pocketbase"
+	pbApis "github.com/pocketbase/pocketbase/apis"
+	pbCore "github.com/pocketbase/pocketbase/core"
+)
+
+func templatify(inputStr string, data any) (string, error) {
+	tmpl, err := template.New("test").Parse(inputStr)
+	if err != nil {
+		return "", err
+	}
+
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, data); err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
+}
+
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	return !errors.Is(err, os.ErrNotExist)
+}
+
+// ImportCollectionsFromCollectionsFilePath imports collections from pb_data/collections.json.
+// If successful, true is returned.
+// If this file doesn't exist, a boolean of false is returned.
+func ImportCollectionsFromCollectionsFilePath(app pbCore.App) (bool, error) {
+	collectionsFileName := "collections.json"
+	collectionsFilePath := fmt.Sprintf("%s/%s", app.DataDir(), collectionsFileName)
+
+	isExist := fileExists(collectionsFilePath)
+	if !isExist {
+		return false, nil
+	}
+
+	// File definitely exists, this will only fail with an error that should be logged
+	collectionsData, err := os.ReadFile(collectionsFilePath)
+	if err != nil {
+		return false, err
+	}
+
+	err = app.ImportCollectionsByMarshaledJSON(collectionsData, false)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+// WriteCollectionsToCollectionsFilePath writes collections to pb_data/collections.json.
+// If successful, true is returned.
+// If this file doesn't exist, a boolean of false is returned.
+func WriteCollectionsToCollectionsFilePath(app pbCore.App) (bool, error) {
+	collectionsFileName := "collections.json"
+	collectionsFilePath := fmt.Sprintf("%s/%s", app.DataDir(), collectionsFileName)
+
+	collectionsData, err := app.FindAllCollections()
+	if err != nil {
+		return false, err
+	}
+
+	data, err := json.Marshal(collectionsData)
+	if err != nil {
+		return false, err
+	}
+
+	err = os.WriteFile(collectionsFilePath, data, 0644)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func ImportSettingsFromSettingsFilePath(app pbCore.App) (bool, error) {
+	fileName := "settings.json"
+	filePath := fmt.Sprintf("%s/%s", app.DataDir(), fileName)
+
+	isExist := fileExists(filePath)
+	if !isExist {
+		return false, nil
+	}
+
+	// File definitely exists, this will only fail with an error that should be logged
+	settingsData, err := os.ReadFile(filePath)
+	if err != nil {
+		return false, err
+	}
+
+	settings := app.Settings()
+	unmarshalErr := json.Unmarshal(settingsData, settings)
+	if unmarshalErr != nil {
+		return false, unmarshalErr
+	}
+	app.Save(settings)
+
+	return true, nil
+}
+
+func writeDataToFileAsJson(filePath string, data any) error {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(filePath, jsonData, 0644)
+}
+
+// WriteSettingsToSettingsFilePath writes collections to pb_data/collections.json.
+// If successful, true is returned.
+// If this file doesn't exist, a boolean of false is returned.
+func WriteSettingsToSettingsFilePath(app pbCore.App) (bool, error) {
+	fileName := "settings.json"
+	filePath := fmt.Sprintf("%s/%s", app.DataDir(), fileName)
+
+	settings := app.Settings()
+
+	settingsJson, err := json.Marshal(settings)
+	if err != nil {
+		return false, err
+	}
+
+	err = os.WriteFile(filePath, settingsJson, 0644)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+var setupComplete = false
+
+func main() {
+	app := pocketbase.New()
+
+	app.OnServe().BindFunc(func(se *pbCore.ServeEvent) error {
+		// serves static files from the provided public dir (if exists)
+		se.Router.GET("/{path...}", pbApis.Static(os.DirFS("./pb_public"), false))
+
+		resp, err := ImportCollectionsFromCollectionsFilePath(app)
+		fmt.Println("ImportCollectionsFromCollectionsFilePath", resp, err)
+
+		resp, err = ImportSettingsFromSettingsFilePath(app)
+		fmt.Println("ImportSettingsFromSettingsFilePath", resp, err)
+
+		se.Next()
+
+		setupComplete = true
+		fmt.Println("Setup complete.")
+		return nil
+	})
+
+	app.OnSettingsReload().BindFunc(func(e *pbCore.SettingsReloadEvent) error {
+		fmt.Println("OnSettingsReload")
+		if err := e.Next(); err != nil {
+			return err
+		}
+
+		if setupComplete {
+			writeErr := writeDataToFileAsJson(app.DataDir()+"/settings.json", e.App.Settings())
+			fmt.Println("writeDataToFileAsJson", writeErr)
+		}
+
+		fmt.Println("OnSettingsReload - after")
+		return nil
+	})
+
+	app.OnCollectionAfterCreateSuccess().BindFunc(func(e *pbCore.CollectionEvent) error {
+		fmt.Println("OnCollectionAfterCreateSuccess")
+		e.Next()
+
+		if setupComplete {
+			writeResp, writeErr := WriteCollectionsToCollectionsFilePath(e.App)
+			fmt.Println("WriteCollectionsToCollectionsFilePath", writeResp, writeErr)
+		}
+
+		return nil
+	})
+
+	app.OnCollectionAfterUpdateSuccess().BindFunc(func(e *pbCore.CollectionEvent) error {
+		fmt.Println("OnCollectionAfterUpdateSuccess")
+		e.Next()
+
+		if setupComplete {
+			writeResp, writeErr := WriteCollectionsToCollectionsFilePath(e.App)
+			fmt.Println("WriteCollectionsToCollectionsFilePath", writeResp, writeErr)
+		}
+
+		return nil
+	})
+
+	app.OnCollectionAfterDeleteSuccess().BindFunc(func(e *pbCore.CollectionEvent) error {
+		fmt.Println("OnCollectionAfterDeleteSuccess")
+		e.Next()
+
+		if setupComplete {
+			writeResp, writeErr := WriteCollectionsToCollectionsFilePath(e.App)
+			fmt.Println("WriteCollectionsToCollectionsFilePath", writeResp, writeErr)
+		}
+
+		return nil
+	})
+
+	app.OnRecordAfterCreateSuccess("users").BindFunc(func(e *pbCore.RecordEvent) error {
+		log.Println("OnUserRecordAfterCreateSuccess")
+
+		userRecord := e.Record
+		userRecordsCount, err := e.App.CountRecords("users")
+
+		if err != nil {
+			log.Printf("Error counting user records: %v\n", err)
+			return e.Next()
+		}
+
+		if userRecordsCount != 1 {
+			return e.Next()
+		}
+
+		globalUserPermissionsCollection, err := e.App.FindCollectionByNameOrId("globalUserPermissions")
+		if err != nil {
+			log.Printf("Error finding globalUserPermissions collection: %v\n", err)
+			return e.Next()
+		}
+
+		globalUserPermissionsRecord := pbCore.NewRecord(globalUserPermissionsCollection)
+		globalUserPermissionsRecord.Set("id", userRecord.Id)
+		globalUserPermissionsRecord.Set("userId", userRecord.Id)
+		globalUserPermissionsRecord.Set("role", "admin")
+		globalUserPermissionsRecord.Set("status", "approved")
+
+		err = e.App.Save(globalUserPermissionsRecord)
+		if err != nil {
+			log.Printf("Error saving globalUserPermissions record: %v\n", err)
+		}
+
+		return e.Next()
+	})
+
+	app.OnRecordAfterCreateSuccess("deployments").BindFunc(func(e *pbCore.RecordEvent) error {
+		log.Println("OnDeplymentRecordAfterCreateSuccess")
+
+		records, err := app.FindAllRecords("deploymentCliActionOnSingleRecord", dbx.HashExp{"crudOperation": "create"})
+		if err != nil {
+			log.Printf("Error finding deploymentCliActionOnSingleRecord records: %v\n", err)
+			return e.Next()
+		}
+
+		deploymentData := map[string]any{
+			"id":         e.Record.GetString("id"),
+			"portNumber": e.Record.GetInt("portNumber"),
+			"appName":    e.Record.GetString("appName"),
+		}
+
+		for _, record := range records {
+			tmpl := record.GetString("bashTemplate")
+			resp, err := templatify(tmpl, deploymentData)
+			if err != nil {
+				log.Println(err)
+				return e.Next()
+			}
+
+			cmd := exec.Command("bash", "-c", resp)
+			cmd.Start()
+		}
+
+		return e.Next()
+	})
+
+	app.OnRecordAfterUpdateSuccess("deployments").BindFunc(func(e *pbCore.RecordEvent) error {
+		log.Println("OnDeploymentRecordAfterUpdateSuccess")
+
+		records, err := app.FindAllRecords("deploymentCliActionOnSingleRecord", dbx.HashExp{"crudOperation": "update"})
+		if err != nil {
+			log.Printf("Error finding deploymentCliActionOnSingleRecord records: %v\n", err)
+			return e.Next()
+		}
+
+		deploymentData := map[string]any{
+			"id":         e.Record.GetString("id"),
+			"portNumber": e.Record.GetInt("portNumber"),
+			"appName":    e.Record.GetString("appName"),
+		}
+
+		for _, record := range records {
+			tmpl := record.GetString("bashTemplate")
+			resp, err := templatify(tmpl, deploymentData)
+			if err != nil {
+				log.Println(err)
+				return e.Next()
+			}
+
+			cmd := exec.Command("bash", "-c", resp)
+			cmd.Start()
+		}
+
+		return e.Next()
+	})
+
+	app.OnRecordAfterDeleteSuccess("deployments").BindFunc(func(e *pbCore.RecordEvent) error {
+		log.Println("OnDeploymentRecordAfterDeleteSuccess")
+
+		records, err := app.FindAllRecords("deploymentCliActionOnSingleRecord", dbx.HashExp{"crudOperation": "delete"})
+		if err != nil {
+			log.Printf("Error finding deploymentCliActionOnSingleRecord records: %v\n", err)
+			return e.Next()
+		}
+
+		deploymentData := map[string]any{
+			"id":         e.Record.GetString("id"),
+			"portNumber": e.Record.GetInt("portNumber"),
+			"appName":    e.Record.GetString("appName"),
+		}
+
+		for _, record := range records {
+			tmpl := record.GetString("bashTemplate")
+			resp, err := templatify(tmpl, deploymentData)
+			if err != nil {
+				log.Println(err)
+				return e.Next()
+			}
+
+			cmd := exec.Command("bash", "-c", resp)
+			cmd.Start()
+		}
+
+		return e.Next()
+	})
+
+	app.OnRecordCreateRequest("organisations").BindFunc(func(e *pbCore.RecordRequestEvent) error {
+		log.Println("onRecordCreateRequest - organisations")
+
+		e.Next()
+
+		organisationRecord := e.Record
+
+		organisationUserPermissionsCollection, err := e.App.FindCollectionByNameOrId(
+			"organisationUserPermissions",
+		)
+		if err != nil {
+			log.Printf("Error finding organisationUserPermissions collection: %v\n", err)
+			return e.Next()
+		}
+
+		organisationUserPermissionsRecord := pbCore.NewRecord(organisationUserPermissionsCollection)
+
+		organisationUserPermissionsRecord.Set("userId", e.Auth.Id)
+		organisationUserPermissionsRecord.Set("organisationId", organisationRecord.Id)
+		organisationUserPermissionsRecord.Set("role", "admin")
+		organisationUserPermissionsRecord.Set("status", "approved")
+		organisationUserPermissionsRecord.Set("userOrgKey", fmt.Sprintf("%s-%s", e.Auth.Id, organisationRecord.Id))
+
+		err = e.App.Save(organisationUserPermissionsRecord)
+		if err != nil {
+			log.Printf("Error saving organisationUserPermissions record: %v\n", err)
+		}
+
+		return e.Next()
+	})
+
+	app.OnTerminate().BindFunc(func(e *pbCore.TerminateEvent) error {
+		log.Println("OnTerminate")
+
+		return e.Next()
+	})
+
+	app.OnSettingsUpdateRequest().BindFunc(func(e *pbCore.SettingsUpdateRequestEvent) error {
+		fmt.Println("OnSettingsUpdateRequest")
+
+		return e.Next()
+	})
+
+	if err := app.Start(); err != nil {
+		log.Fatal(err)
+	}
+}
