@@ -16,9 +16,11 @@ import (
 	pbCore "github.com/pocketbase/pocketbase/core"
 )
 
-var deploymentsCollectionName = "deployments"
-var changedRecordCommandTemplatesCollectionName = "changedRecordCommandTemplates"
-var allRecordsCommandTemplatesCollectionName = "allRecordsCommandTemplates"
+var usersCollectionName = "users"
+var organisationsCollectionName = "organisations"
+var instancesCollectionName = "instances"
+var changedInstanceRecordCommandTemplatesCollectionName = "changedInstanceRecordCommandTemplates"
+var allInstanceRecordsCommandTemplatesCollectionName = "allInstanceRecordsCommandTemplates"
 
 func convertDeploymentRecordToData(deploymentRecord *pbCore.Record) map[string]any {
 	return map[string]any{
@@ -237,11 +239,11 @@ func main() {
 		return nil
 	})
 
-	app.OnRecordAfterCreateSuccess("users").BindFunc(func(e *pbCore.RecordEvent) error {
+	app.OnRecordAfterCreateSuccess(usersCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		log.Println("OnUserRecordAfterCreateSuccess")
 
 		userRecord := e.Record
-		userRecordsCount, err := e.App.CountRecords("users")
+		userRecordsCount, err := e.App.CountRecords(usersCollectionName)
 
 		if err != nil {
 			log.Printf("Error counting user records: %v\n", err)
@@ -272,10 +274,10 @@ func main() {
 		return e.Next()
 	})
 
-	app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+	app.OnRecordAfterCreateSuccess(instancesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		log.Println("OnDeplymentRecordAfterCreateSuccess - changedRecord")
 
-		commandTemplateRecords, err := app.FindAllRecords(changedRecordCommandTemplatesCollectionName, dbx.HashExp{"crudOperation": "create"})
+		commandTemplateRecords, err := app.FindAllRecords(changedInstanceRecordCommandTemplatesCollectionName, dbx.HashExp{"crudOperation": "create"})
 		if err != nil {
 			log.Printf("Error finding changedRecordCommandTemplates records: %v\n", err)
 			return e.Next()
@@ -298,15 +300,15 @@ func main() {
 		return e.Next()
 	})
 
-	app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+	app.OnRecordAfterCreateSuccess(instancesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		log.Println("OnDeplymentRecordAfterCreateSuccess - all records")
 
-		commandTemplateRecords, err := app.FindAllRecords(allRecordsCommandTemplatesCollectionName, dbx.HashExp{"crudOperation": "create"})
+		commandTemplateRecords, err := app.FindAllRecords(allInstanceRecordsCommandTemplatesCollectionName, dbx.HashExp{"crudOperation": "create"})
 		if err != nil {
 			log.Printf("Error finding allRecordCommandTemplates records: %v\n", err)
 			return e.Next()
 		}
-		deploymentRecords, err := app.FindAllRecords(deploymentsCollectionName)
+		deploymentRecords, err := app.FindAllRecords(instancesCollectionName)
 		if err != nil {
 			log.Printf("Error finding deployment records: %v\n", err)
 			return e.Next()
@@ -329,10 +331,10 @@ func main() {
 		return e.Next()
 	})
 
-	app.OnRecordAfterUpdateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+	app.OnRecordAfterUpdateSuccess(instancesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		log.Println("OnDeploymentRecordAfterUpdateSuccess")
 
-		commandTemplateRecords, err := app.FindAllRecords(changedRecordCommandTemplatesCollectionName, dbx.HashExp{"crudOperation": "update"})
+		commandTemplateRecords, err := app.FindAllRecords(changedInstanceRecordCommandTemplatesCollectionName, dbx.HashExp{"crudOperation": "update"})
 		if err != nil {
 			log.Printf("Error finding changedRecordCommandTemplates records: %v\n", err)
 			return e.Next()
@@ -355,15 +357,15 @@ func main() {
 		return e.Next()
 	})
 
-	app.OnRecordAfterUpdateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+	app.OnRecordAfterUpdateSuccess(instancesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		log.Println("OnDeplymentRecordAfterUpdateSuccess - all records")
 
-		commandTemplateRecords, err := app.FindAllRecords(allRecordsCommandTemplatesCollectionName, dbx.HashExp{"crudOperation": "update"})
+		commandTemplateRecords, err := app.FindAllRecords(allInstanceRecordsCommandTemplatesCollectionName, dbx.HashExp{"crudOperation": "update"})
 		if err != nil {
 			log.Printf("Error finding allRecordCommandTemplates records: %v\n", err)
 			return e.Next()
 		}
-		deploymentRecords, err := app.FindAllRecords(deploymentsCollectionName)
+		deploymentRecords, err := app.FindAllRecords(instancesCollectionName)
 		if err != nil {
 			log.Printf("Error finding deployments records: %v\n", err)
 			return e.Next()
@@ -386,10 +388,10 @@ func main() {
 		return e.Next()
 	})
 
-	app.OnRecordAfterDeleteSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+	app.OnRecordAfterDeleteSuccess(instancesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		log.Println("OnDeploymentRecordAfterDeleteSuccess - changedRecord")
 
-		commandTemplateRecords, err := app.FindAllRecords(changedRecordCommandTemplatesCollectionName, dbx.HashExp{"crudOperation": "delete"})
+		commandTemplateRecords, err := app.FindAllRecords(changedInstanceRecordCommandTemplatesCollectionName, dbx.HashExp{"crudOperation": "delete"})
 		if err != nil {
 			log.Printf("Error finding changedRecordCommandTemplates records: %v\n", err)
 			return e.Next()
@@ -412,15 +414,15 @@ func main() {
 		return e.Next()
 	})
 
-	app.OnRecordAfterDeleteSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+	app.OnRecordAfterDeleteSuccess(instancesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		log.Println("OnDeplymentRecordAfterDeleteSuccess - all records")
 
-		commandTemplateRecords, err := app.FindAllRecords(allRecordsCommandTemplatesCollectionName, dbx.HashExp{"crudOperation": "delete"})
+		commandTemplateRecords, err := app.FindAllRecords(allInstanceRecordsCommandTemplatesCollectionName, dbx.HashExp{"crudOperation": "delete"})
 		if err != nil {
 			log.Printf("Error finding allRecordCommandTemplates records: %v\n", err)
 			return e.Next()
 		}
-		deploymentRecords, err := app.FindAllRecords(deploymentsCollectionName)
+		deploymentRecords, err := app.FindAllRecords(instancesCollectionName)
 		if err != nil {
 			log.Printf("Error finding deployments records: %v\n", err)
 			return e.Next()
@@ -443,7 +445,7 @@ func main() {
 		return e.Next()
 	})
 
-	app.OnRecordCreateRequest("organisations").BindFunc(func(e *pbCore.RecordRequestEvent) error {
+	app.OnRecordCreateRequest(organisationsCollectionName).BindFunc(func(e *pbCore.RecordRequestEvent) error {
 		log.Println("onRecordCreateRequest - organisations")
 
 		e.Next()
