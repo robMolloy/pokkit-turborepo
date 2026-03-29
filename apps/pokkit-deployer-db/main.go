@@ -99,16 +99,9 @@ func WriteCollectionsToCollectionsFile(app pbCore.App) (bool, error) {
 		return false, err
 	}
 
-	data, err := json.Marshal(collectionsData)
-	if err != nil {
-		return false, err
-	}
+	err = writeDataToFileAsJson(collectionsFilePath, collectionsData)
 
-	err = os.WriteFile(collectionsFilePath, data, 0644)
-	if err != nil {
-		return false, err
-	}
-	return true, nil
+	return err == nil, err
 }
 
 func ImportSettingsFromSettingsFile(app pbCore.App) (bool, error) {
@@ -137,7 +130,7 @@ func ImportSettingsFromSettingsFile(app pbCore.App) (bool, error) {
 }
 
 func writeDataToFileAsJson(filePath string, data any) error {
-	jsonData, err := json.Marshal(data)
+	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return err
 	}
