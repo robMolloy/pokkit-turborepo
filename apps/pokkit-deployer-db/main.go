@@ -271,27 +271,23 @@ func main() {
 	app.OnRecordAfterCreateSuccess("deployments").BindFunc(func(e *pbCore.RecordEvent) error {
 		log.Println("OnDeplymentRecordAfterCreateSuccess - changedRecord")
 
-		records, err := app.FindAllRecords("changedRecordCommandTemplates", dbx.HashExp{"crudOperation": "create"})
+		commandTemplateRecords, err := app.FindAllRecords("changedRecordCommandTemplates", dbx.HashExp{"crudOperation": "create"})
 		if err != nil {
 			log.Printf("Error finding changedRecordCommandTemplates records: %v\n", err)
 			return e.Next()
 		}
 
-		deploymentData := map[string]any{
-			"id":         e.Record.GetString("id"),
-			"portNumber": e.Record.GetInt("portNumber"),
-			"appName":    e.Record.GetString("appName"),
-		}
+		deploymentRecordsData := convertDeploymentRecordToData(e.Record)
 
-		for _, record := range records {
-			tmpl := record.GetString("bashTemplate")
-			resp, err := populateTemplate(tmpl, deploymentData)
+		for _, commandTemplateRecord := range commandTemplateRecords {
+			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
+			bashCommand, err := populateTemplate(bashTemplate, deploymentRecordsData)
 			if err != nil {
 				log.Println(err)
 				return e.Next()
 			}
 
-			cmd := exec.Command("bash", "-c", resp)
+			cmd := exec.Command("bash", "-c", bashCommand)
 			cmd.Start()
 		}
 
@@ -314,15 +310,15 @@ func main() {
 
 		deploymentRecordsData := convertDeploymentRecordsToData(deploymentRecords)
 
-		for _, record := range commandTemplateRecords {
-			bashTemplate := record.GetString("bashTemplate")
-			resp, err := populateTemplate(bashTemplate, deploymentRecordsData)
+		for _, commandTemplateRecord := range commandTemplateRecords {
+			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
+			bashCommand, err := populateTemplate(bashTemplate, deploymentRecordsData)
 			if err != nil {
 				log.Println(err)
 				return e.Next()
 			}
 
-			cmd := exec.Command("bash", "-c", resp)
+			cmd := exec.Command("bash", "-c", bashCommand)
 			cmd.Start()
 		}
 
@@ -332,27 +328,23 @@ func main() {
 	app.OnRecordAfterUpdateSuccess("deployments").BindFunc(func(e *pbCore.RecordEvent) error {
 		log.Println("OnDeploymentRecordAfterUpdateSuccess")
 
-		records, err := app.FindAllRecords("changedRecordCommandTemplates", dbx.HashExp{"crudOperation": "update"})
+		commandTemplateRecords, err := app.FindAllRecords("changedRecordCommandTemplates", dbx.HashExp{"crudOperation": "update"})
 		if err != nil {
 			log.Printf("Error finding changedRecordCommandTemplates records: %v\n", err)
 			return e.Next()
 		}
 
-		deploymentData := map[string]any{
-			"id":         e.Record.GetString("id"),
-			"portNumber": e.Record.GetInt("portNumber"),
-			"appName":    e.Record.GetString("appName"),
-		}
+		deploymentRecordsData := convertDeploymentRecordToData(e.Record)
 
-		for _, record := range records {
-			tmpl := record.GetString("bashTemplate")
-			resp, err := populateTemplate(tmpl, deploymentData)
+		for _, commandTemplateRecord := range commandTemplateRecords {
+			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
+			bashCommand, err := populateTemplate(bashTemplate, deploymentRecordsData)
 			if err != nil {
 				log.Println(err)
 				return e.Next()
 			}
 
-			cmd := exec.Command("bash", "-c", resp)
+			cmd := exec.Command("bash", "-c", bashCommand)
 			cmd.Start()
 		}
 
@@ -375,15 +367,15 @@ func main() {
 
 		deploymentRecordsData := convertDeploymentRecordsToData(deploymentRecords)
 
-		for _, record := range commandTemplateRecords {
-			tmpl := record.GetString("bashTemplate")
-			resp, err := populateTemplate(tmpl, deploymentRecordsData)
+		for _, commandTemplateRecord := range commandTemplateRecords {
+			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
+			bashCommand, err := populateTemplate(bashTemplate, deploymentRecordsData)
 			if err != nil {
 				log.Println(err)
 				return e.Next()
 			}
 
-			cmd := exec.Command("bash", "-c", resp)
+			cmd := exec.Command("bash", "-c", bashCommand)
 			cmd.Start()
 		}
 
@@ -391,29 +383,25 @@ func main() {
 	})
 
 	app.OnRecordAfterDeleteSuccess("deployments").BindFunc(func(e *pbCore.RecordEvent) error {
-		log.Println("OnDeploymentRecordAfterDeleteSuccess")
+		log.Println("OnDeploymentRecordAfterDeleteSuccess - changedRecord")
 
-		records, err := app.FindAllRecords("changedRecordCommandTemplates", dbx.HashExp{"crudOperation": "delete"})
+		commandTemplateRecords, err := app.FindAllRecords("changedRecordCommandTemplates", dbx.HashExp{"crudOperation": "delete"})
 		if err != nil {
 			log.Printf("Error finding changedRecordCommandTemplates records: %v\n", err)
 			return e.Next()
 		}
 
-		deploymentData := map[string]any{
-			"id":         e.Record.GetString("id"),
-			"portNumber": e.Record.GetInt("portNumber"),
-			"appName":    e.Record.GetString("appName"),
-		}
+		deploymentRecordsData := convertDeploymentRecordToData(e.Record)
 
-		for _, record := range records {
-			tmpl := record.GetString("bashTemplate")
-			resp, err := populateTemplate(tmpl, deploymentData)
+		for _, commandTemplateRecord := range commandTemplateRecords {
+			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
+			bashCommand, err := populateTemplate(bashTemplate, deploymentRecordsData)
 			if err != nil {
 				log.Println(err)
 				return e.Next()
 			}
 
-			cmd := exec.Command("bash", "-c", resp)
+			cmd := exec.Command("bash", "-c", bashCommand)
 			cmd.Start()
 		}
 
@@ -436,8 +424,8 @@ func main() {
 
 		deploymentRecordsData := convertDeploymentRecordsToData(deploymentRecords)
 
-		for _, record := range commandTemplateRecords {
-			bashTemplate := record.GetString("bashTemplate")
+		for _, commandTemplateRecord := range commandTemplateRecords {
+			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
 			bashCommand, err := populateTemplate(bashTemplate, deploymentRecordsData)
 			if err != nil {
 				log.Println(err)
