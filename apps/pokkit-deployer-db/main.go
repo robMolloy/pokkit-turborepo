@@ -16,6 +16,10 @@ import (
 	pbCore "github.com/pocketbase/pocketbase/core"
 )
 
+var deploymentsCollectionName = "deployments"
+var changedRecordCommandTemplatesCollectionName = "changedRecordCommandTemplates"
+var allRecordsCommandTemplatesCollectionName = "allRecordsCommandTemplates"
+
 func convertDeploymentRecordToData(deploymentRecord *pbCore.Record) map[string]any {
 	return map[string]any{
 		"id":         deploymentRecord.GetString("id"),
@@ -55,10 +59,10 @@ func fileExists(path string) bool {
 	return !errors.Is(err, os.ErrNotExist)
 }
 
-// ImportCollectionsFromCollectionsFilePath imports collections from pb_data/collections.json.
+// ImportCollectionsFromCollectionsFile imports collections from pb_data/collections.json.
 // If successful, true is returned.
 // If this file doesn't exist, a boolean of false is returned.
-func ImportCollectionsFromCollectionsFilePath(app pbCore.App) (bool, error) {
+func ImportCollectionsFromCollectionsFile(app pbCore.App) (bool, error) {
 	collectionsFileName := "collections.json"
 	collectionsFilePath := fmt.Sprintf("%s/%s", app.DataDir(), collectionsFileName)
 
@@ -81,10 +85,10 @@ func ImportCollectionsFromCollectionsFilePath(app pbCore.App) (bool, error) {
 	return true, nil
 }
 
-// WriteCollectionsToCollectionsFilePath writes collections to pb_data/collections.json.
+// WriteCollectionsToCollectionsFile writes collections to pb_data/collections.json.
 // If successful, true is returned.
 // If this file doesn't exist, a boolean of false is returned.
-func WriteCollectionsToCollectionsFilePath(app pbCore.App) (bool, error) {
+func WriteCollectionsToCollectionsFile(app pbCore.App) (bool, error) {
 	collectionsFileName := "collections.json"
 	collectionsFilePath := fmt.Sprintf("%s/%s", app.DataDir(), collectionsFileName)
 
@@ -105,7 +109,7 @@ func WriteCollectionsToCollectionsFilePath(app pbCore.App) (bool, error) {
 	return true, nil
 }
 
-func ImportSettingsFromSettingsFilePath(app pbCore.App) (bool, error) {
+func ImportSettingsFromSettingsFile(app pbCore.App) (bool, error) {
 	fileName := "settings.json"
 	filePath := fmt.Sprintf("%s/%s", app.DataDir(), fileName)
 
@@ -139,10 +143,10 @@ func writeDataToFileAsJson(filePath string, data any) error {
 	return os.WriteFile(filePath, jsonData, 0644)
 }
 
-// WriteSettingsToSettingsFilePath writes collections to pb_data/collections.json.
+// WriteSettingsToSettingsFile writes collections to pb_data/collections.json.
 // If successful, true is returned.
 // If this file doesn't exist, a boolean of false is returned.
-func WriteSettingsToSettingsFilePath(app pbCore.App) (bool, error) {
+func WriteSettingsToSettingsFile(app pbCore.App) (bool, error) {
 	fileName := "settings.json"
 	filePath := fmt.Sprintf("%s/%s", app.DataDir(), fileName)
 
@@ -169,10 +173,10 @@ func main() {
 		// serves static files from the provided public dir (if exists)
 		se.Router.GET("/{path...}", pbApis.Static(os.DirFS("./pb_public"), false))
 
-		resp, err := ImportCollectionsFromCollectionsFilePath(app)
+		resp, err := ImportCollectionsFromCollectionsFile(app)
 		fmt.Println("ImportCollectionsFromCollectionsFilePath", resp, err)
 
-		resp, err = ImportSettingsFromSettingsFilePath(app)
+		resp, err = ImportSettingsFromSettingsFile(app)
 		fmt.Println("ImportSettingsFromSettingsFilePath", resp, err)
 
 		se.Next()
@@ -202,7 +206,7 @@ func main() {
 		e.Next()
 
 		if setupComplete {
-			writeResp, writeErr := WriteCollectionsToCollectionsFilePath(e.App)
+			writeResp, writeErr := WriteCollectionsToCollectionsFile(e.App)
 			fmt.Println("WriteCollectionsToCollectionsFilePath", writeResp, writeErr)
 		}
 
@@ -214,7 +218,7 @@ func main() {
 		e.Next()
 
 		if setupComplete {
-			writeResp, writeErr := WriteCollectionsToCollectionsFilePath(e.App)
+			writeResp, writeErr := WriteCollectionsToCollectionsFile(e.App)
 			fmt.Println("WriteCollectionsToCollectionsFilePath", writeResp, writeErr)
 		}
 
@@ -226,7 +230,7 @@ func main() {
 		e.Next()
 
 		if setupComplete {
-			writeResp, writeErr := WriteCollectionsToCollectionsFilePath(e.App)
+			writeResp, writeErr := WriteCollectionsToCollectionsFile(e.App)
 			fmt.Println("WriteCollectionsToCollectionsFilePath", writeResp, writeErr)
 		}
 
@@ -268,10 +272,10 @@ func main() {
 		return e.Next()
 	})
 
-	app.OnRecordAfterCreateSuccess("deployments").BindFunc(func(e *pbCore.RecordEvent) error {
+	app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		log.Println("OnDeplymentRecordAfterCreateSuccess - changedRecord")
 
-		commandTemplateRecords, err := app.FindAllRecords("changedRecordCommandTemplates", dbx.HashExp{"crudOperation": "create"})
+		commandTemplateRecords, err := app.FindAllRecords(changedRecordCommandTemplatesCollectionName, dbx.HashExp{"crudOperation": "create"})
 		if err != nil {
 			log.Printf("Error finding changedRecordCommandTemplates records: %v\n", err)
 			return e.Next()
@@ -294,15 +298,15 @@ func main() {
 		return e.Next()
 	})
 
-	app.OnRecordAfterCreateSuccess("deployments").BindFunc(func(e *pbCore.RecordEvent) error {
+	app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		log.Println("OnDeplymentRecordAfterCreateSuccess - all records")
 
-		commandTemplateRecords, err := app.FindAllRecords("allRecordsCommandTemplates", dbx.HashExp{"crudOperation": "create"})
+		commandTemplateRecords, err := app.FindAllRecords(allRecordsCommandTemplatesCollectionName, dbx.HashExp{"crudOperation": "create"})
 		if err != nil {
 			log.Printf("Error finding allRecordCommandTemplates records: %v\n", err)
 			return e.Next()
 		}
-		deploymentRecords, err := app.FindAllRecords("deployments")
+		deploymentRecords, err := app.FindAllRecords(deploymentsCollectionName)
 		if err != nil {
 			log.Printf("Error finding deployment records: %v\n", err)
 			return e.Next()
@@ -325,10 +329,10 @@ func main() {
 		return e.Next()
 	})
 
-	app.OnRecordAfterUpdateSuccess("deployments").BindFunc(func(e *pbCore.RecordEvent) error {
+	app.OnRecordAfterUpdateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		log.Println("OnDeploymentRecordAfterUpdateSuccess")
 
-		commandTemplateRecords, err := app.FindAllRecords("changedRecordCommandTemplates", dbx.HashExp{"crudOperation": "update"})
+		commandTemplateRecords, err := app.FindAllRecords(changedRecordCommandTemplatesCollectionName, dbx.HashExp{"crudOperation": "update"})
 		if err != nil {
 			log.Printf("Error finding changedRecordCommandTemplates records: %v\n", err)
 			return e.Next()
@@ -351,15 +355,15 @@ func main() {
 		return e.Next()
 	})
 
-	app.OnRecordAfterUpdateSuccess("deployments").BindFunc(func(e *pbCore.RecordEvent) error {
+	app.OnRecordAfterUpdateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		log.Println("OnDeplymentRecordAfterUpdateSuccess - all records")
 
-		commandTemplateRecords, err := app.FindAllRecords("allRecordsCommandTemplates", dbx.HashExp{"crudOperation": "update"})
+		commandTemplateRecords, err := app.FindAllRecords(allRecordsCommandTemplatesCollectionName, dbx.HashExp{"crudOperation": "update"})
 		if err != nil {
 			log.Printf("Error finding allRecordCommandTemplates records: %v\n", err)
 			return e.Next()
 		}
-		deploymentRecords, err := app.FindAllRecords("deployments")
+		deploymentRecords, err := app.FindAllRecords(deploymentsCollectionName)
 		if err != nil {
 			log.Printf("Error finding deployments records: %v\n", err)
 			return e.Next()
@@ -382,10 +386,10 @@ func main() {
 		return e.Next()
 	})
 
-	app.OnRecordAfterDeleteSuccess("deployments").BindFunc(func(e *pbCore.RecordEvent) error {
+	app.OnRecordAfterDeleteSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		log.Println("OnDeploymentRecordAfterDeleteSuccess - changedRecord")
 
-		commandTemplateRecords, err := app.FindAllRecords("changedRecordCommandTemplates", dbx.HashExp{"crudOperation": "delete"})
+		commandTemplateRecords, err := app.FindAllRecords(changedRecordCommandTemplatesCollectionName, dbx.HashExp{"crudOperation": "delete"})
 		if err != nil {
 			log.Printf("Error finding changedRecordCommandTemplates records: %v\n", err)
 			return e.Next()
@@ -408,15 +412,15 @@ func main() {
 		return e.Next()
 	})
 
-	app.OnRecordAfterDeleteSuccess("deployments").BindFunc(func(e *pbCore.RecordEvent) error {
+	app.OnRecordAfterDeleteSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		log.Println("OnDeplymentRecordAfterDeleteSuccess - all records")
 
-		commandTemplateRecords, err := app.FindAllRecords("allRecordsCommandTemplates", dbx.HashExp{"crudOperation": "delete"})
+		commandTemplateRecords, err := app.FindAllRecords(allRecordsCommandTemplatesCollectionName, dbx.HashExp{"crudOperation": "delete"})
 		if err != nil {
 			log.Printf("Error finding allRecordCommandTemplates records: %v\n", err)
 			return e.Next()
 		}
-		deploymentRecords, err := app.FindAllRecords("deployments")
+		deploymentRecords, err := app.FindAllRecords(deploymentsCollectionName)
 		if err != nil {
 			log.Printf("Error finding deployments records: %v\n", err)
 			return e.Next()
