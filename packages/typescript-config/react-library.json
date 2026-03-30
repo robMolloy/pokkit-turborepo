@@ -2,9 +2,9 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "./base.json",
   "compilerOptions": {
+    "target": "ES2018",
     "jsx": "react-jsx",
     "noUnusedLocals": true,
-    "downlevelIteration": true,
     "noUnusedParameters": true
   }
 }
