@@ -1,3 +1,4 @@
+import { envConfig } from "@/config/envConfig";
 import { SignedInRouteProtector, SignedOutRouteProtector } from "@repo/pokkit-auth";
 import { useNavigate } from "react-router-dom";
 
@@ -6,7 +7,7 @@ const IndexPage = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-xl">Pokkit Whisper</h1>
+      <h1 className="text-xl">{envConfig.VITE_APP_DISPLAY_NAME}</h1>
 
       <br />
 

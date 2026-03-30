@@ -188,7 +188,7 @@ export const confirmPasswordReset = async (p: {
   }
 };
 
-export const logout = (p: { pb: PocketBase }) => {
+export const signOut = (p: { pb: PocketBase }) => {
   p.pb.realtime.unsubscribe();
   p.pb.authStore.clear();
   return { success: true } as const;
