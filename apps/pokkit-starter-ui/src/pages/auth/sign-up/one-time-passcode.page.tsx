@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/pokkit-shadcn";
 import { pb } from "@/config/pocketbaseConfig";
 import { createToastProps } from "@/lib/createToastProps";
 import { SignedOutRouteProtector, SignUpWithOtpForm } from "@repo/pokkit-auth";
