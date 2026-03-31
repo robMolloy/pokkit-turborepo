@@ -2,8 +2,8 @@ import { useAuthMethodsListStoreSync, useReactiveAuthStoreSync } from "@repo/pok
 import "@repo/pokkit-auth/styles.css";
 import { LayoutTemplate } from "@repo/pokkit-components";
 import "@repo/pokkit-components/styles.css";
-import { Toaster } from "@repo/pokkit-shadcn";
 import "@repo/pokkit-shadcn/styles.css";
+import { Toaster } from "@repo/pokkit-shadcn";
 import { StrictMode } from "react";
 import { createRoot, Root } from "react-dom/client";
 import { BrowserRouter, useRoutes } from "react-router-dom";
@@ -12,14 +12,20 @@ import { Header } from "./components/Header";
 import { LeftSidebar } from "./components/LeftSidebar";
 import { envConfig } from "./config/envConfig";
 import { pb } from "./config/pocketbaseConfig";
+import { useInstanceRecordsSync } from "./modules/instanceRecords/dbInstanceRecords";
 
 const Routes = () => {
   return useRoutes(routes);
 };
 
-const App = () => {
+const useAuthSync = () => {
   useReactiveAuthStoreSync({ pb });
   useAuthMethodsListStoreSync({ pb });
+};
+
+const App = () => {
+  useAuthSync();
+  useInstanceRecordsSync({ pb });
 
   return (
     <>
@@ -40,6 +46,7 @@ const getRoot = () => {
   container._reactRoot = root;
   return root;
 };
+
 getRoot().render(
   <StrictMode>
     <BrowserRouter basename={envConfig.VITE_APP_BASE_URL}>

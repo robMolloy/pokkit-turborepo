@@ -90,7 +90,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-03-13 21:22:44.235Z",
-    "updated": "2026-03-29 23:11:38.276Z",
+    "updated": "2026-03-31 11:30:08.561Z",
     "system": true
   },
   {
@@ -197,7 +197,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-03-13 21:22:44.238Z",
-    "updated": "2026-03-29 23:11:38.278Z",
+    "updated": "2026-03-31 11:30:08.565Z",
     "system": true
   },
   {
@@ -306,7 +306,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-03-13 21:22:44.239Z",
-    "updated": "2026-03-29 23:11:38.280Z",
+    "updated": "2026-03-31 11:30:08.566Z",
     "system": true
   },
   {
@@ -400,7 +400,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-03-13 21:22:44.241Z",
-    "updated": "2026-03-29 23:11:38.281Z",
+    "updated": "2026-03-31 11:30:08.568Z",
     "system": true
   },
   {
@@ -509,7 +509,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-03-13 21:22:44.243Z",
-    "updated": "2026-03-29 23:11:38.284Z",
+    "updated": "2026-03-31 11:30:08.569Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -718,7 +718,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-03-13 21:22:44.246Z",
-    "updated": "2026-03-29 23:11:38.286Z",
+    "updated": "2026-03-31 11:30:08.570Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -876,7 +876,7 @@
     ],
     "indexes": [],
     "created": "2026-03-13 21:37:13.640Z",
-    "updated": "2026-03-29 23:11:38.288Z",
+    "updated": "2026-03-31 11:30:08.572Z",
     "system": false
   },
   {
@@ -997,7 +997,7 @@
       "CREATE UNIQUE INDEX `idx_0UWlVOdDqD` ON `organisationUserPermissions` (`userOrgKey`)"
     ],
     "created": "2026-03-13 21:37:13.642Z",
-    "updated": "2026-03-29 23:11:38.289Z",
+    "updated": "2026-03-31 11:30:08.573Z",
     "system": false
   },
   {
@@ -1075,12 +1075,12 @@
     ],
     "indexes": [],
     "created": "2026-03-13 21:37:13.643Z",
-    "updated": "2026-03-29 23:11:38.291Z",
+    "updated": "2026-03-31 11:30:08.575Z",
     "system": false
   },
   {
     "id": "pbc_3352125601",
-    "listRule": null,
+    "listRule": "@request.auth.id!=\"\"",
     "viewRule": null,
     "createRule": null,
     "updateRule": null,
@@ -1167,7 +1167,7 @@
       "CREATE UNIQUE INDEX `idx_MGuOIBNgXv` ON `instances` (`portNumber`)"
     ],
     "created": "2026-03-26 13:14:00.469Z",
-    "updated": "2026-03-29 23:11:38.293Z",
+    "updated": "2026-03-31 11:41:35.911Z",
     "system": false
   },
   {
@@ -1249,7 +1249,7 @@
       "CREATE UNIQUE INDEX `idx_jmZ8IL5Ej4` ON `changedInstanceRecordCommandTemplates` (`crudOperation`)"
     ],
     "created": "2026-03-26 22:38:16.054Z",
-    "updated": "2026-03-29 23:11:38.294Z",
+    "updated": "2026-03-31 11:30:08.578Z",
     "system": false
   },
   {
@@ -1331,7 +1331,7 @@
       "CREATE UNIQUE INDEX `idx_2OQVB3k4yj` ON `allInstanceRecordsCommandTemplates` (`crudOperation`)"
     ],
     "created": "2026-03-26 23:01:46.424Z",
-    "updated": "2026-03-29 23:11:38.295Z",
+    "updated": "2026-03-31 11:30:08.579Z",
     "system": false
   },
   {
@@ -1410,7 +1410,7 @@
       "CREATE UNIQUE INDEX `idx_FOc3LWC22r` ON `userStripeDetails` (`userId`)"
     ],
     "created": "2026-03-29 22:27:19.523Z",
-    "updated": "2026-03-29 23:11:38.297Z",
+    "updated": "2026-03-31 11:30:08.580Z",
     "system": false
   },
   {
@@ -1548,7 +1548,7 @@
     ],
     "indexes": [],
     "created": "2026-03-29 22:33:09.043Z",
-    "updated": "2026-03-29 23:11:38.298Z",
+    "updated": "2026-03-31 11:30:08.582Z",
     "system": false
   },
   {
@@ -1648,7 +1648,7 @@
     ],
     "indexes": [],
     "created": "2026-03-29 22:49:17.230Z",
-    "updated": "2026-03-29 23:11:45.327Z",
+    "updated": "2026-03-31 11:30:08.583Z",
     "system": false
   }
 ]

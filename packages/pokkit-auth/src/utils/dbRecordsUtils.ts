@@ -29,6 +29,7 @@ export const subscribeToAllRecords = async <T extends z.ZodSchema>(p: {
   collectionName: string;
   itemSchema: T;
   onChange: (e: { record: z.infer<T>; action: "create" | "update" | "delete" }) => void;
+  onParsedItemFailedFn?: (x: unknown) => void;
   signal?: AbortSignal;
 }) => {
   try {
@@ -42,6 +43,7 @@ export const subscribeToAllRecords = async <T extends z.ZodSchema>(p: {
             action: e.action as "create" | "update" | "delete",
             record: parseResp.data,
           });
+        else p.onParsedItemFailedFn?.(e.record);
       },
       { signal: p.signal },
     );
@@ -57,6 +59,7 @@ export const smartSubscribeToAllRecords = async <T extends z.ZodSchema<{ id: str
   collectionName: string;
   itemSchema: T;
   onChange: (e: z.infer<T>[]) => void;
+  onParsedItemFailedFn?: (x: unknown) => void;
 }) => {
   const abortController = new AbortController();
 
@@ -66,6 +69,7 @@ export const smartSubscribeToAllRecords = async <T extends z.ZodSchema<{ id: str
     collectionName: p.collectionName,
     schema: p.itemSchema,
     signal: abortController.signal,
+    onParsedItemFailedFn: p.onParsedItemFailedFn,
   });
 
   const subscribeRespPromise = subscribeToAllRecords({
@@ -81,6 +85,7 @@ export const smartSubscribeToAllRecords = async <T extends z.ZodSchema<{ id: str
       p.onChange([...allRecords]);
     },
     signal: abortController.signal,
+    onParsedItemFailedFn: p.onParsedItemFailedFn,
   });
 
   const getAllRecordsResp = await getAllRecordsRespPromise;
