@@ -14,32 +14,66 @@ import (
 	pocketbase "github.com/pocketbase/pocketbase"
 	pbApis "github.com/pocketbase/pocketbase/apis"
 	pbCore "github.com/pocketbase/pocketbase/core"
+	"github.com/pocketbase/pocketbase/tools/types"
 )
 
 var usersCollectionName = "users"
 var organisationsCollectionName = "organisations"
+var globalUserPermissionsCollectionName = "globalUserPermissions"
 var instancesCollectionName = "instances"
 var changedInstanceRecordCommandTemplatesCollectionName = "changedInstanceRecordCommandTemplates"
 var allInstanceRecordsCommandTemplatesCollectionName = "allInstanceRecordsCommandTemplates"
+var billingLedgerCollectionName = "billingLedger"
+var userBalancesCollectionName = "userBalances"
 
-func convertDeploymentRecordToData(deploymentRecord *pbCore.Record) map[string]any {
+func convertDeploymentRecordToTemplatableData(deploymentRecord *pbCore.Record) map[string]any {
+	paidUntil := deploymentRecord.GetDateTime("paidUntil")
+	now := types.NowDateTime()
+	isExpired := paidUntil.Before(now)
+
 	return map[string]any{
 		"id":         deploymentRecord.GetString("id"),
 		"portNumber": deploymentRecord.GetInt("portNumber"),
 		"appName":    deploymentRecord.GetString("appName"),
+		"paidUntil":  paidUntil,
+		"isExpired":  isExpired,
 		"created":    deploymentRecord.GetDateTime("created"),
 		"updated":    deploymentRecord.GetDateTime("updated"),
 	}
 }
-func convertDeploymentRecordsToData(deploymentRecords []*pbCore.Record) []map[string]any {
+func convertDeploymentRecordsToTemplatableData(deploymentRecords []*pbCore.Record) []map[string]any {
 	deploymentRecordsData := []map[string]any{}
 
 	for _, deploymentRecord := range deploymentRecords {
-		deploymentRecordData := convertDeploymentRecordToData(deploymentRecord)
+		deploymentRecordData := convertDeploymentRecordToTemplatableData(deploymentRecord)
 		deploymentRecordsData = append(deploymentRecordsData, deploymentRecordData)
 	}
 
 	return deploymentRecordsData
+}
+
+type LedgerRecordData struct {
+	Id              string         `json:"id"`
+	UserId          string         `json:"userId"`
+	TokenAmount     int            `json:"tokenAmount"`
+	Reason          string         `json:"reason"`
+	PaymentIntentId string         `json:"paymentIntentId"`
+	InstanceId      string         `json:"instanceId"`
+	Created         types.DateTime `json:"created"`
+	Updated         types.DateTime `json:"updated"`
+}
+
+func convertLedgerRecordToData(deploymentRecord *pbCore.Record) LedgerRecordData {
+	return LedgerRecordData{
+		Id:              deploymentRecord.GetString("id"),
+		UserId:          deploymentRecord.GetString("userId"),
+		TokenAmount:     deploymentRecord.GetInt("tokenAmount"),
+		Reason:          deploymentRecord.GetString("reason"),
+		PaymentIntentId: deploymentRecord.GetString("paymentIntentId"),
+		InstanceId:      deploymentRecord.GetString("instanceId"),
+		Created:         deploymentRecord.GetDateTime("created"),
+		Updated:         deploymentRecord.GetDateTime("updated"),
+	}
 }
 
 func populateTemplate(inputTemplate string, data any) (string, error) {
@@ -232,6 +266,32 @@ func main() {
 		return nil
 	})
 
+	app.OnRecordAfterCreateSuccess(billingLedgerCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+		log.Println("OnBillingLedgerRecordAfterCreateSuccess")
+
+		ledgerRecord := e.Record
+
+		ledgerRecordData := convertLedgerRecordToData(ledgerRecord)
+
+		userBalanceCollection, err := app.FindCollectionByNameOrId(userBalancesCollectionName)
+		userBalanceRecord, _ := app.FindFirstRecordByData(userBalancesCollectionName, "userId", ledgerRecordData.UserId)
+		if userBalanceRecord == nil {
+			userBalanceRecord = pbCore.NewRecord(userBalanceCollection)
+			userBalanceRecord.Set("userId", ledgerRecordData.UserId)
+			userBalanceRecord.Set("balanceToken", 0)
+		}
+		currentBalanceTokens := userBalanceRecord.GetInt("balanceTokens")
+		newBalanceTokens := currentBalanceTokens + ledgerRecordData.TokenAmount
+		userBalanceRecord.Set("balanceTokens", newBalanceTokens)
+
+		err = e.App.Save(userBalanceRecord)
+		if err != nil {
+			log.Printf("Error saving userBalanceRecord: %v\n", err)
+		}
+
+		return e.Next()
+	})
+
 	app.OnRecordAfterCreateSuccess(usersCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		log.Println("OnUserRecordAfterCreateSuccess")
 
@@ -247,7 +307,7 @@ func main() {
 			return e.Next()
 		}
 
-		globalUserPermissionsCollection, err := e.App.FindCollectionByNameOrId("globalUserPermissions")
+		globalUserPermissionsCollection, err := e.App.FindCollectionByNameOrId(globalUserPermissionsCollectionName)
 		if err != nil {
 			log.Printf("Error finding globalUserPermissions collection: %v\n", err)
 			return e.Next()
@@ -276,7 +336,7 @@ func main() {
 			return e.Next()
 		}
 
-		deploymentRecordsData := convertDeploymentRecordToData(e.Record)
+		deploymentRecordsData := convertDeploymentRecordToTemplatableData(e.Record)
 
 		for _, commandTemplateRecord := range commandTemplateRecords {
 			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
@@ -307,7 +367,7 @@ func main() {
 			return e.Next()
 		}
 
-		deploymentRecordsData := convertDeploymentRecordsToData(deploymentRecords)
+		deploymentRecordsData := convertDeploymentRecordsToTemplatableData(deploymentRecords)
 
 		for _, commandTemplateRecord := range commandTemplateRecords {
 			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
@@ -333,7 +393,7 @@ func main() {
 			return e.Next()
 		}
 
-		deploymentRecordsData := convertDeploymentRecordToData(e.Record)
+		deploymentRecordsData := convertDeploymentRecordToTemplatableData(e.Record)
 
 		for _, commandTemplateRecord := range commandTemplateRecords {
 			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
@@ -364,7 +424,7 @@ func main() {
 			return e.Next()
 		}
 
-		deploymentRecordsData := convertDeploymentRecordsToData(deploymentRecords)
+		deploymentRecordsData := convertDeploymentRecordsToTemplatableData(deploymentRecords)
 
 		for _, commandTemplateRecord := range commandTemplateRecords {
 			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
@@ -390,7 +450,7 @@ func main() {
 			return e.Next()
 		}
 
-		deploymentRecordsData := convertDeploymentRecordToData(e.Record)
+		deploymentRecordsData := convertDeploymentRecordToTemplatableData(e.Record)
 
 		for _, commandTemplateRecord := range commandTemplateRecords {
 			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
@@ -421,7 +481,7 @@ func main() {
 			return e.Next()
 		}
 
-		deploymentRecordsData := convertDeploymentRecordsToData(deploymentRecords)
+		deploymentRecordsData := convertDeploymentRecordsToTemplatableData(deploymentRecords)
 
 		for _, commandTemplateRecord := range commandTemplateRecords {
 			bashTemplate := commandTemplateRecord.GetString("bashTemplate")

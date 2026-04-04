@@ -90,7 +90,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-03-13 21:22:44.235Z",
-    "updated": "2026-03-31 11:30:08.561Z",
+    "updated": "2026-04-02 09:59:06.269Z",
     "system": true
   },
   {
@@ -197,7 +197,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-03-13 21:22:44.238Z",
-    "updated": "2026-03-31 11:30:08.565Z",
+    "updated": "2026-04-02 09:59:06.271Z",
     "system": true
   },
   {
@@ -306,7 +306,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-03-13 21:22:44.239Z",
-    "updated": "2026-03-31 11:30:08.566Z",
+    "updated": "2026-04-02 09:59:06.272Z",
     "system": true
   },
   {
@@ -400,7 +400,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-03-13 21:22:44.241Z",
-    "updated": "2026-03-31 11:30:08.568Z",
+    "updated": "2026-04-02 09:59:06.274Z",
     "system": true
   },
   {
@@ -509,7 +509,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-03-13 21:22:44.243Z",
-    "updated": "2026-03-31 11:30:08.569Z",
+    "updated": "2026-04-02 09:59:06.275Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -718,7 +718,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-03-13 21:22:44.246Z",
-    "updated": "2026-03-31 11:30:08.570Z",
+    "updated": "2026-04-02 09:59:06.277Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -876,7 +876,7 @@
     ],
     "indexes": [],
     "created": "2026-03-13 21:37:13.640Z",
-    "updated": "2026-03-31 11:30:08.572Z",
+    "updated": "2026-04-02 09:59:06.279Z",
     "system": false
   },
   {
@@ -997,7 +997,7 @@
       "CREATE UNIQUE INDEX `idx_0UWlVOdDqD` ON `organisationUserPermissions` (`userOrgKey`)"
     ],
     "created": "2026-03-13 21:37:13.642Z",
-    "updated": "2026-03-31 11:30:08.573Z",
+    "updated": "2026-04-02 09:59:06.280Z",
     "system": false
   },
   {
@@ -1075,7 +1075,7 @@
     ],
     "indexes": [],
     "created": "2026-03-13 21:37:13.643Z",
-    "updated": "2026-03-31 11:30:08.575Z",
+    "updated": "2026-04-02 09:59:06.281Z",
     "system": false
   },
   {
@@ -1143,6 +1143,17 @@
       },
       {
         "hidden": false,
+        "id": "date258592446",
+        "max": "",
+        "min": "",
+        "name": "paidUntil",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "date"
+      },
+      {
+        "hidden": false,
         "id": "autodate2990389176",
         "name": "created",
         "onCreate": true,
@@ -1167,7 +1178,7 @@
       "CREATE UNIQUE INDEX `idx_MGuOIBNgXv` ON `instances` (`portNumber`)"
     ],
     "created": "2026-03-26 13:14:00.469Z",
-    "updated": "2026-03-31 11:41:35.911Z",
+    "updated": "2026-04-02 09:59:06.282Z",
     "system": false
   },
   {
@@ -1249,7 +1260,7 @@
       "CREATE UNIQUE INDEX `idx_jmZ8IL5Ej4` ON `changedInstanceRecordCommandTemplates` (`crudOperation`)"
     ],
     "created": "2026-03-26 22:38:16.054Z",
-    "updated": "2026-03-31 11:30:08.578Z",
+    "updated": "2026-04-02 09:59:06.284Z",
     "system": false
   },
   {
@@ -1331,7 +1342,7 @@
       "CREATE UNIQUE INDEX `idx_2OQVB3k4yj` ON `allInstanceRecordsCommandTemplates` (`crudOperation`)"
     ],
     "created": "2026-03-26 23:01:46.424Z",
-    "updated": "2026-03-31 11:30:08.579Z",
+    "updated": "2026-04-02 09:59:06.285Z",
     "system": false
   },
   {
@@ -1410,7 +1421,7 @@
       "CREATE UNIQUE INDEX `idx_FOc3LWC22r` ON `userStripeDetails` (`userId`)"
     ],
     "created": "2026-03-29 22:27:19.523Z",
-    "updated": "2026-03-31 11:30:08.580Z",
+    "updated": "2026-04-02 09:59:06.287Z",
     "system": false
   },
   {
@@ -1420,7 +1431,7 @@
     "createRule": null,
     "updateRule": null,
     "deleteRule": null,
-    "name": "stripeBillingPeriods",
+    "name": "billingLedger",
     "type": "base",
     "fields": [
       {
@@ -1452,32 +1463,10 @@
       },
       {
         "hidden": false,
-        "id": "date2932989418",
-        "max": "",
-        "min": "",
-        "name": "period_start",
-        "presentable": false,
-        "required": false,
-        "system": false,
-        "type": "date"
-      },
-      {
-        "hidden": false,
-        "id": "date179253131",
-        "max": "",
-        "min": "",
-        "name": "period_end",
-        "presentable": false,
-        "required": false,
-        "system": false,
-        "type": "date"
-      },
-      {
-        "hidden": false,
-        "id": "number2303153418",
+        "id": "number2699795881",
         "max": null,
         "min": null,
-        "name": "instance_count",
+        "name": "tokenAmount",
         "onlyInt": false,
         "presentable": false,
         "required": false,
@@ -1486,44 +1475,45 @@
       },
       {
         "hidden": false,
-        "id": "number2075417798",
-        "max": null,
-        "min": null,
-        "name": "total_cost_cents",
-        "onlyInt": false,
-        "presentable": false,
-        "required": false,
-        "system": false,
-        "type": "number"
-      },
-      {
-        "hidden": false,
-        "id": "select2715662852",
+        "id": "select1001949196",
         "maxSelect": 1,
-        "name": "paymentStatus",
+        "name": "reason",
         "presentable": false,
-        "required": false,
+        "required": true,
         "system": false,
         "type": "select",
         "values": [
-          "pending",
-          "invoiced",
-          "paid"
+          "stripe_payment",
+          "instance_charge",
+          "admin_adjustment"
         ]
       },
       {
         "autogeneratePattern": "",
         "hidden": false,
-        "id": "text3423455137",
+        "id": "text3346823387",
         "max": 0,
         "min": 0,
-        "name": "stripeInvoiceId",
+        "name": "paymentIntentId",
         "pattern": "",
         "presentable": false,
         "primaryKey": false,
         "required": false,
         "system": false,
         "type": "text"
+      },
+      {
+        "cascadeDelete": false,
+        "collectionId": "pbc_3352125601",
+        "hidden": false,
+        "id": "relation2304797257",
+        "maxSelect": 1,
+        "minSelect": 0,
+        "name": "instanceId",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "relation"
       },
       {
         "hidden": false,
@@ -1548,7 +1538,7 @@
     ],
     "indexes": [],
     "created": "2026-03-29 22:33:09.043Z",
-    "updated": "2026-03-31 11:30:08.582Z",
+    "updated": "2026-04-02 10:55:35.644Z",
     "system": false
   },
   {
@@ -1558,7 +1548,7 @@
     "createRule": null,
     "updateRule": null,
     "deleteRule": null,
-    "name": "stripeBillingLineItems666",
+    "name": "stripeBillingEntries",
     "type": "base",
     "fields": [
       {
@@ -1577,12 +1567,12 @@
       },
       {
         "cascadeDelete": false,
-        "collectionId": "pbc_2342125096",
+        "collectionId": "_pb_users_auth_",
         "hidden": false,
-        "id": "relation2603290680",
+        "id": "relation1689669068",
         "maxSelect": 1,
         "minSelect": 0,
-        "name": "stripeBillingPeriodId",
+        "name": "userId",
         "presentable": false,
         "required": false,
         "system": false,
@@ -1603,10 +1593,10 @@
       },
       {
         "hidden": false,
-        "id": "number1749989024",
+        "id": "number346210639",
         "max": null,
         "min": null,
-        "name": "activeDays",
+        "name": "tokenAmount",
         "onlyInt": false,
         "presentable": false,
         "required": false,
@@ -1615,15 +1605,25 @@
       },
       {
         "hidden": false,
-        "id": "number346210639",
-        "max": null,
-        "min": null,
-        "name": "costCents",
-        "onlyInt": false,
+        "id": "date3315302462",
+        "max": "",
+        "min": "",
+        "name": "periodStart",
         "presentable": false,
         "required": false,
         "system": false,
-        "type": "number"
+        "type": "date"
+      },
+      {
+        "hidden": false,
+        "id": "date2994457279",
+        "max": "",
+        "min": "",
+        "name": "periodEnd",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "date"
       },
       {
         "hidden": false,
@@ -1648,7 +1648,84 @@
     ],
     "indexes": [],
     "created": "2026-03-29 22:49:17.230Z",
-    "updated": "2026-03-31 11:30:08.583Z",
+    "updated": "2026-04-02 09:59:06.290Z",
+    "system": false
+  },
+  {
+    "id": "pbc_3272359208",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "userBalances",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "number3115862390",
+        "max": null,
+        "min": null,
+        "name": "balanceTokens",
+        "onlyInt": false,
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "number"
+      },
+      {
+        "cascadeDelete": false,
+        "collectionId": "_pb_users_auth_",
+        "hidden": false,
+        "id": "relation1689669068",
+        "maxSelect": 1,
+        "minSelect": 0,
+        "name": "userId",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "relation"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX `idx_tKzMrurend` ON `userBalances` (`userId`)"
+    ],
+    "created": "2026-03-31 22:13:47.287Z",
+    "updated": "2026-04-02 09:59:06.291Z",
     "system": false
   }
 ]
