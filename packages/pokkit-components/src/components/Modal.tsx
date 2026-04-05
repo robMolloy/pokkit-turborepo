@@ -37,19 +37,22 @@ export const Modal = () => {
   );
 };
 
-export const ModalContent = (p: {
-  title: string;
-  description: string;
-  content?: ReactNode;
-  footer?: ReactNode;
-}) => {
+export const ModalContent = (
+  p: {
+    title: string;
+    description: string;
+    footer?: ReactNode;
+  } & ({ content?: ReactNode } | { children?: ReactNode }),
+) => {
   return (
     <DialogContent>
       <DialogHeader>
         <DialogTitle>{p.title}</DialogTitle>
         <DialogDescription>{p.description}</DialogDescription>
       </DialogHeader>
-      {p.content}
+
+      {"content" in p && p.content}
+      {"children" in p && p.children}
       {p.footer && <DialogFooter>{p.footer}</DialogFooter>}
     </DialogContent>
   );

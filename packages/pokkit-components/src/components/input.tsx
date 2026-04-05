@@ -25,3 +25,25 @@ export const TextInput = (
     />
   );
 };
+export const NumberInput = (
+  p: Omit<TCnInputProps, "type"> & {
+    onValueChange?: (value: number) => void;
+  },
+) => {
+  const { onValueChange, onInput, ...rest } = p;
+
+  return (
+    <CnInput
+      type="number"
+      onInput={(evt) => {
+        onInput?.(evt);
+        if (!onValueChange) return;
+
+        const unparsedValue = (evt.target as unknown as { value: string }).value;
+        const parsedValue = parseInt(unparsedValue, 10);
+        onValueChange(parsedValue);
+      }}
+      {...rest}
+    />
+  );
+};

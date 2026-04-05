@@ -23,7 +23,7 @@ var globalUserPermissionsCollectionName = "globalUserPermissions"
 var instancesCollectionName = "instances"
 var changedInstanceRecordCommandTemplatesCollectionName = "changedInstanceRecordCommandTemplates"
 var allInstanceRecordsCommandTemplatesCollectionName = "allInstanceRecordsCommandTemplates"
-var billingLedgerCollectionName = "billingLedger"
+var userBalanceLedgerCollectionName = "userBalanceLedger"
 var userBalancesCollectionName = "userBalances"
 
 func convertDeploymentRecordToTemplatableData(deploymentRecord *pbCore.Record) map[string]any {
@@ -52,7 +52,7 @@ func convertDeploymentRecordsToTemplatableData(deploymentRecords []*pbCore.Recor
 	return deploymentRecordsData
 }
 
-type LedgerRecordData struct {
+type UserBalanceLedgerLedgerRecordData struct {
 	Id              string         `json:"id"`
 	UserId          string         `json:"userId"`
 	TokenAmount     int            `json:"tokenAmount"`
@@ -63,16 +63,16 @@ type LedgerRecordData struct {
 	Updated         types.DateTime `json:"updated"`
 }
 
-func convertLedgerRecordToData(deploymentRecord *pbCore.Record) LedgerRecordData {
-	return LedgerRecordData{
-		Id:              deploymentRecord.GetString("id"),
-		UserId:          deploymentRecord.GetString("userId"),
-		TokenAmount:     deploymentRecord.GetInt("tokenAmount"),
-		Reason:          deploymentRecord.GetString("reason"),
-		PaymentIntentId: deploymentRecord.GetString("paymentIntentId"),
-		InstanceId:      deploymentRecord.GetString("instanceId"),
-		Created:         deploymentRecord.GetDateTime("created"),
-		Updated:         deploymentRecord.GetDateTime("updated"),
+func convertUserBalanceLedgerRecordToData(userBalanceLedgerRecord *pbCore.Record) UserBalanceLedgerLedgerRecordData {
+	return UserBalanceLedgerLedgerRecordData{
+		Id:              userBalanceLedgerRecord.GetString("id"),
+		UserId:          userBalanceLedgerRecord.GetString("userId"),
+		TokenAmount:     userBalanceLedgerRecord.GetInt("tokenAmount"),
+		Reason:          userBalanceLedgerRecord.GetString("reason"),
+		PaymentIntentId: userBalanceLedgerRecord.GetString("paymentIntentId"),
+		InstanceId:      userBalanceLedgerRecord.GetString("instanceId"),
+		Created:         userBalanceLedgerRecord.GetDateTime("created"),
+		Updated:         userBalanceLedgerRecord.GetDateTime("updated"),
 	}
 }
 
@@ -266,23 +266,23 @@ func main() {
 		return nil
 	})
 
-	app.OnRecordAfterCreateSuccess(billingLedgerCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		log.Println("OnBillingLedgerRecordAfterCreateSuccess")
+	app.OnRecordAfterCreateSuccess(userBalanceLedgerCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+		log.Println("OnUserBalanceLedgerRecordAfterCreateSuccess")
 
-		ledgerRecord := e.Record
+		userBalanceLedgerRecord := e.Record
+		userBalanceLedgerRecordData := convertUserBalanceLedgerRecordToData(userBalanceLedgerRecord)
+		userId := userBalanceLedgerRecordData.UserId
 
-		ledgerRecordData := convertLedgerRecordToData(ledgerRecord)
-
-		userBalanceCollection, err := app.FindCollectionByNameOrId(userBalancesCollectionName)
-		userBalanceRecord, _ := app.FindFirstRecordByData(userBalancesCollectionName, "userId", ledgerRecordData.UserId)
+		userBalancesCollection, err := app.FindCollectionByNameOrId(userBalancesCollectionName)
+		userBalanceRecord, _ := app.FindFirstRecordByData(userBalancesCollectionName, "userId", userId)
 		if userBalanceRecord == nil {
-			userBalanceRecord = pbCore.NewRecord(userBalanceCollection)
-			userBalanceRecord.Set("userId", ledgerRecordData.UserId)
-			userBalanceRecord.Set("balanceToken", 0)
+			userBalanceRecord = pbCore.NewRecord(userBalancesCollection)
+			userBalanceRecord.Set("userId", userId)
+			userBalanceRecord.Set("tokenAmount", 0)
 		}
-		currentBalanceTokens := userBalanceRecord.GetInt("balanceTokens")
-		newBalanceTokens := currentBalanceTokens + ledgerRecordData.TokenAmount
-		userBalanceRecord.Set("balanceTokens", newBalanceTokens)
+		currentBalanceTokenAmount := userBalanceRecord.GetInt("tokenAmount")
+		newBalanceTokenAmount := currentBalanceTokenAmount + userBalanceLedgerRecordData.TokenAmount
+		userBalanceRecord.Set("tokenAmount", newBalanceTokenAmount)
 
 		err = e.App.Save(userBalanceRecord)
 		if err != nil {

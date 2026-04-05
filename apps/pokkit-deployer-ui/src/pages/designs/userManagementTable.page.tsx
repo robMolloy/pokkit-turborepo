@@ -1,5 +1,5 @@
-import { UserManagementTable } from "@/_designs/UserManagementTable";
+import { ManageUserBalancesTable } from "@/_designs/UserManagementTable";
 
 export default function Page() {
-  return <UserManagementTable />;
+  return <ManageUserBalancesTable />;
 }

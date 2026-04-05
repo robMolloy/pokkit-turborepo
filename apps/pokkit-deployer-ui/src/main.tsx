@@ -1,6 +1,6 @@
 import { useAuthMethodsListStoreSync, useReactiveAuthStoreSync } from "@repo/pokkit-auth";
 import "@repo/pokkit-auth/styles.css";
-import { LayoutTemplate } from "@repo/pokkit-components";
+import { LayoutTemplate, Modal } from "@repo/pokkit-components";
 import "@repo/pokkit-components/styles.css";
 import "@repo/pokkit-shadcn/styles.css";
 import { Toaster } from "@repo/pokkit-shadcn";
@@ -30,6 +30,7 @@ const App = () => {
   return (
     <>
       <Toaster />
+      <Modal />
 
       <LayoutTemplate Header={<Header pb={pb} />} LeftSidebar={<LeftSidebar pb={pb} />}>
         <Routes />
