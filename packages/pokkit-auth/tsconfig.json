@@ -3,9 +3,6 @@
   "include": ["."],
   "exclude": ["node_modules"],
   "compilerOptions": {
-    "strictNullChecks": true,
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "strictNullChecks": true
   }
 }

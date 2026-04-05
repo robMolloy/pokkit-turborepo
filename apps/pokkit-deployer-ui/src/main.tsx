@@ -1,9 +1,13 @@
-import { useAuthMethodsListStoreSync, useReactiveAuthStoreSync } from "@repo/pokkit-auth";
+import {
+  useAuthMethodsListStoreSync,
+  useReactiveAuthStoreSync,
+  useUserRecordsSync,
+} from "@repo/pokkit-auth";
 import "@repo/pokkit-auth/styles.css";
 import { LayoutTemplate, Modal } from "@repo/pokkit-components";
 import "@repo/pokkit-components/styles.css";
-import "@repo/pokkit-shadcn/styles.css";
 import { Toaster } from "@repo/pokkit-shadcn";
+import "@repo/pokkit-shadcn/styles.css";
 import { StrictMode } from "react";
 import { createRoot, Root } from "react-dom/client";
 import { BrowserRouter, useRoutes } from "react-router-dom";
@@ -26,6 +30,7 @@ const useAuthSync = () => {
 const App = () => {
   useAuthSync();
   useInstanceRecordsSync({ pb });
+  useUserRecordsSync({ pb });
 
   return (
     <>

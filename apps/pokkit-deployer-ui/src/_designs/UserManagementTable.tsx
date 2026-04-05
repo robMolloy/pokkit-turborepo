@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { TUser, useUserRecordsStore, useUserStore } from "@repo/pokkit-auth";
 import { ModalContent, NumberInput, useModalStore } from "@repo/pokkit-components";
 import {
   Button,
@@ -24,12 +25,6 @@ import {
 import * as React from "react";
 import z from "zod";
 
-type TUserRecord = {
-  id: string;
-  name: string;
-  email: string;
-};
-
 const userBalanceRecordSchema = z.object({
   id: z.string(),
   userId: z.string(),
@@ -50,19 +45,19 @@ const userBalanceLedgerRecordSchema = z.object({
 });
 type TUserBalanceLedgerRecord = z.infer<typeof userBalanceLedgerRecordSchema>;
 
-type TUserAccountSummary = {
-  userRecord: TUserRecord;
+type TUserBalanceDetails = {
+  userRecord: TUser;
   userBalanceRecord?: TUserBalanceRecord;
   userBalanceLedgerRecords: TUserBalanceLedgerRecord[];
 };
-type UserAccountSummaryOnUserIdLookup = { [k: string]: TUserAccountSummary };
+type TUserBalanceDetailsOnUserIdLookup = { [k: string]: TUserBalanceDetails };
 
-const buildUserAccountSummaryOnUserIdLookup = (p: {
-  userRecords: TUserRecord[];
+const buildUserBalanceDetailsOnUserIdLookup = (p: {
+  userRecords: TUser[];
   userBalanceRecords: TUserBalanceRecord[];
   userBalanceLedgerRecords: TUserBalanceLedgerRecord[];
-}): UserAccountSummaryOnUserIdLookup => {
-  const rtn: UserAccountSummaryOnUserIdLookup = {};
+}): TUserBalanceDetailsOnUserIdLookup => {
+  const rtn: TUserBalanceDetailsOnUserIdLookup = {};
   p.userRecords.forEach((userRecord) => {
     rtn[userRecord.id] = { userRecord, userBalanceRecord: undefined, userBalanceLedgerRecords: [] };
   });
@@ -76,14 +71,6 @@ const buildUserAccountSummaryOnUserIdLookup = (p: {
   });
   return rtn;
 };
-
-const mockUserRecords: TUserRecord[] = [
-  { id: "1", name: "Sarah Chen", email: "sarah.chen@example.com" },
-  { id: "2", name: "Marcus Johnson", email: "marcus.j@example.com" },
-  { id: "3", name: "Emily Rodriguez", email: "emily.r@example.com" },
-  { id: "4", name: "James Wilson", email: "james.wilson@example.com" },
-  { id: "5", name: "Aisha Patel", email: "aisha.patel@example.com" },
-];
 
 const mockUserBalanceRecords: TUserBalanceRecord[] = [
   { id: "b1", userId: "1", tokenAmount: 15420, created: "2026-04-01", updated: "2026-04-01" },
@@ -244,7 +231,7 @@ function AdjustBalanceButton({ onAdjustButtonClick }: { onAdjustButtonClick: () 
 }
 
 function UserManagementTableRow(p: {
-  userAccountSummary: TUserAccountSummary;
+  userAccountSummary: TUserBalanceDetails;
   onAdjustButtonClick: () => void;
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -288,7 +275,7 @@ function UserManagementTableRow(p: {
 }
 
 const AdjustUserBalanceForm = (p: {
-  userRecord: TUserRecord;
+  userRecord: TUser;
   userBalanceRecord?: TUserBalanceRecord;
   onConfirm: (x: Pick<TUserBalanceLedgerRecord, "tokenAmount" | "reason">) => void;
 }) => {
@@ -365,12 +352,17 @@ const AdjustUserBalanceForm = (p: {
 
 export function ManageUserBalancesTable() {
   const modalStore = useModalStore();
+  useUserStore();
+  const userRecordsStore = useUserRecordsStore();
+  const userRecords = userRecordsStore.data;
 
-  const [userRecords] = React.useState(mockUserRecords);
   const [userBalanceRecords] = React.useState(mockUserBalanceRecords);
   const [userBalanceLedgerRecords] = React.useState(mockUserBalanceLedgerRecords);
 
-  const userAccountSummaryOnUserIdLookup = buildUserAccountSummaryOnUserIdLookup({
+  if (userRecords === undefined) return <div>Loading</div>;
+  if (userRecords === null) return <div>Error</div>;
+
+  const userAccountSummaryOnUserIdLookup = buildUserBalanceDetailsOnUserIdLookup({
     userRecords,
     userBalanceRecords,
     userBalanceLedgerRecords,
