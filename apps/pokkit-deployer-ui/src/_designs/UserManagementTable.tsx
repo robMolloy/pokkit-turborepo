@@ -1,4 +1,15 @@
+import { pb } from "@/config/pocketbaseConfig";
+import { createToastProps } from "@/lib/createToastProps";
 import { cn } from "@/lib/utils";
+import {
+  createAdminAdjustmentUserBalanceLedgerRecord,
+  TUserBalanceLedgerRecord,
+  useUserBalanceLedgerRecordsStore,
+} from "@/modules/instanceRecords/dbUserBalanceLedgerRecords";
+import {
+  TUserBalanceRecord,
+  useUserBalanceRecordsStore,
+} from "@/modules/instanceRecords/dbUserBalanceRecords";
 import { TUser, useUserRecordsStore, useUserStore } from "@repo/pokkit-auth";
 import { ModalContent, NumberInput, useModalStore } from "@repo/pokkit-components";
 import {
@@ -23,27 +34,7 @@ import {
   Users,
 } from "lucide-react";
 import * as React from "react";
-import z from "zod";
-
-const userBalanceRecordSchema = z.object({
-  id: z.string(),
-  userId: z.string(),
-  tokenAmount: z.number(),
-  created: z.string(),
-  updated: z.string(),
-});
-type TUserBalanceRecord = z.infer<typeof userBalanceRecordSchema>;
-const userBalanceLedgerRecordSchema = z.object({
-  id: z.string(),
-  userId: z.string(),
-  tokenAmount: z.number(),
-  reason: z.string(),
-  paymentIntentId: z.string().nullish(),
-  instanceId: z.string().nullish(),
-  created: z.string(),
-  updated: z.string(),
-});
-type TUserBalanceLedgerRecord = z.infer<typeof userBalanceLedgerRecordSchema>;
+import { toast } from "sonner";
 
 type TUserBalanceDetails = {
   userRecord: TUser;
@@ -72,107 +63,10 @@ const buildUserBalanceDetailsOnUserIdLookup = (p: {
   return rtn;
 };
 
-const mockUserBalanceRecords: TUserBalanceRecord[] = [
-  { id: "b1", userId: "1", tokenAmount: 15420, created: "2026-04-01", updated: "2026-04-01" },
-  { id: "b2", userId: "2", tokenAmount: 8750, created: "2026-04-01", updated: "2026-04-01" },
-  { id: "b3", userId: "3", tokenAmount: 3200, created: "2026-04-01", updated: "2026-04-01" },
-  { id: "b4", userId: "4", tokenAmount: 0, created: "2026-04-01", updated: "2026-04-01" },
-  { id: "b5", userId: "5", tokenAmount: 24100, created: "2026-04-01", updated: "2026-04-01" },
-];
-
-const mockUserBalanceLedgerRecords: TUserBalanceLedgerRecord[] = [
-  {
-    id: "t1",
-    userId: "1",
-    tokenAmount: 500,
-    reason: "admin_adjustment",
-    created: "2026-04-01",
-    updated: "2026-04-01",
-  },
-  {
-    id: "t2",
-    userId: "1",
-    tokenAmount: 150,
-    reason: "admin_adjustment",
-    created: "2026-03-28",
-    updated: "2026-03-28",
-  },
-  {
-    id: "t3",
-    userId: "1",
-    tokenAmount: 1000,
-    reason: "admin_adjustment",
-    created: "2026-03-15",
-    updated: "2026-03-15",
-  },
-  {
-    id: "t4",
-    userId: "2",
-    tokenAmount: 200,
-    reason: "admin_adjustment",
-    created: "2026-04-02",
-    updated: "2026-04-02",
-  },
-  {
-    id: "t5",
-    userId: "2",
-    tokenAmount: 500,
-    reason: "admin_adjustment",
-    created: "2026-04-01",
-    updated: "2026-04-01",
-  },
-  {
-    id: "t6",
-    userId: "3",
-    tokenAmount: 3200,
-    reason: "admin_adjustment",
-    created: "2026-03-30",
-    updated: "2026-03-30",
-  },
-  {
-    id: "t7",
-    userId: "4",
-    tokenAmount: 500,
-    reason: "admin_adjustment",
-    created: "2026-02-15",
-    updated: "2026-02-15",
-  },
-  {
-    id: "t8",
-    userId: "5",
-    tokenAmount: 5000,
-    reason: "admin_adjustment",
-    created: "2026-04-03",
-    updated: "2026-04-03",
-  },
-  {
-    id: "t9",
-    userId: "5",
-    tokenAmount: 500,
-    reason: "admin_adjustment",
-    created: "2026-04-01",
-    updated: "2026-04-01",
-  },
-  {
-    id: "t10",
-    userId: "5",
-    tokenAmount: 800,
-    reason: "admin_adjustment",
-    created: "2026-03-25",
-    updated: "2026-03-25",
-  },
-  {
-    id: "t11",
-    userId: "5",
-    tokenAmount: 2000,
-    reason: "admin_adjustment",
-    created: "2026-03-20",
-    updated: "2026-03-20",
-  },
-];
-
 function formatTokens(amount: number): string {
-  return new Intl.NumberFormat("en-US").format(amount);
+  const internationalisedAmount = new Intl.NumberFormat("en-US").format(Math.abs(amount));
+
+  return `${amount >= 0 ? "+" : "-"}${internationalisedAmount}`;
 }
 
 function formatDate(dateString: string): string {
@@ -183,7 +77,7 @@ function formatDate(dateString: string): string {
   });
 }
 
-function TransactionListItem(p: { userBalanceLedgerRecord: TUserBalanceLedgerRecord }) {
+function DisplayUserBalanceLedgerRecord(p: { userBalanceLedgerRecord: TUserBalanceLedgerRecord }) {
   return (
     <div className="flex items-center justify-between rounded-md border bg-card px-3 py-2">
       <div className="flex items-center gap-3">
@@ -214,24 +108,14 @@ function TransactionListItem(p: { userBalanceLedgerRecord: TUserBalanceLedgerRec
           p.userBalanceLedgerRecord.tokenAmount >= 0 ? "text-primary" : "text-destructive",
         )}
       >
-        {p.userBalanceLedgerRecord.tokenAmount >= 0 ? "+" : "-"}
         {formatTokens(p.userBalanceLedgerRecord.tokenAmount)}
       </span>
     </div>
   );
 }
 
-function AdjustBalanceButton({ onAdjustButtonClick }: { onAdjustButtonClick: () => void }) {
-  return (
-    <Button variant="outline" size="sm" onClick={onAdjustButtonClick} className="gap-1.5">
-      <Settings2 className="size-3.5" />
-      Adjust
-    </Button>
-  );
-}
-
 function UserManagementTableRow(p: {
-  userAccountSummary: TUserBalanceDetails;
+  userBalanceDetails: TUserBalanceDetails;
   onAdjustButtonClick: () => void;
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -244,15 +128,18 @@ function UserManagementTableRow(p: {
             {isOpen ? <ChevronDown /> : <ChevronRight />}
           </Button>
         </TableCell>
-        <TableCell className="font-medium">{p.userAccountSummary.userRecord.name}</TableCell>
+        <TableCell className="font-medium">{p.userBalanceDetails.userRecord.name}</TableCell>
         <TableCell className="text-muted-foreground">
-          {p.userAccountSummary.userRecord.email}
+          {p.userBalanceDetails.userRecord.email}
         </TableCell>
         <TableCell>
-          {formatTokens(p.userAccountSummary.userBalanceRecord?.tokenAmount ?? 0)}
+          {formatTokens(p.userBalanceDetails.userBalanceRecord?.tokenAmount ?? 0)}
         </TableCell>
         <TableCell className="text-right">
-          <AdjustBalanceButton onAdjustButtonClick={() => p.onAdjustButtonClick()} />
+          <Button variant="outline" size="sm" onClick={p.onAdjustButtonClick} className="gap-1.5">
+            <Settings2 className="size-3.5" />
+            Adjust
+          </Button>
         </TableCell>
       </TableRow>
 
@@ -260,8 +147,8 @@ function UserManagementTableRow(p: {
         <TableRow>
           <TableCell colSpan={6}>
             <div className="space-y-2">
-              {p.userAccountSummary.userBalanceLedgerRecords.map((userBalanceLedgerRecord) => (
-                <TransactionListItem
+              {p.userBalanceDetails.userBalanceLedgerRecords.map((userBalanceLedgerRecord) => (
+                <DisplayUserBalanceLedgerRecord
                   key={userBalanceLedgerRecord.id}
                   userBalanceLedgerRecord={userBalanceLedgerRecord}
                 />
@@ -277,7 +164,8 @@ function UserManagementTableRow(p: {
 const AdjustUserBalanceForm = (p: {
   userRecord: TUser;
   userBalanceRecord?: TUserBalanceRecord;
-  onConfirm: (x: Pick<TUserBalanceLedgerRecord, "tokenAmount" | "reason">) => void;
+  onSuccess: (messages: string[]) => void;
+  onError: (messages: string[]) => void;
 }) => {
   const [tokenAmount, setTokenAmount] = React.useState(0);
   const [reason, setReason] = React.useState("admin_adjustment");
@@ -287,7 +175,19 @@ const AdjustUserBalanceForm = (p: {
   const resultingBalance = currentBalance + tokenAmount;
 
   return (
-    <div className="flex flex-col gap-6">
+    <form
+      onSubmit={async (e) => {
+        e.preventDefault();
+        const userId = p.userRecord.id;
+        const resp = await createAdminAdjustmentUserBalanceLedgerRecord({
+          pb,
+          data: { userId, tokenAmount },
+        });
+        const onCompleteFn = resp.success ? p.onSuccess : p.onError;
+        onCompleteFn(resp.messages);
+      }}
+      className="flex flex-col gap-6"
+    >
       <FieldGroup className="flex flex-col gap-6">
         <div className="flex gap-4">
           <div>
@@ -318,7 +218,7 @@ const AdjustUserBalanceForm = (p: {
                 >
                   {(() => {
                     if (tokenAmount === 0) return "no change";
-                    return `${tokenAmount >= 0 ? "+" : "-"}${formatTokens(Math.abs(tokenAmount))}`;
+                    return formatTokens(tokenAmount);
                   })()}
                 </div>
               </div>
@@ -342,11 +242,11 @@ const AdjustUserBalanceForm = (p: {
       </FieldGroup>
 
       <div className="flex justify-end">
-        <Button disabled={tokenAmount !== 0} onClick={() => p.onConfirm({ tokenAmount, reason })}>
+        <Button disabled={tokenAmount === 0} type="submit">
           Confirm Adjustment
         </Button>
       </div>
-    </div>
+    </form>
   );
 };
 
@@ -356,11 +256,18 @@ export function ManageUserBalancesTable() {
   const userRecordsStore = useUserRecordsStore();
   const userRecords = userRecordsStore.data;
 
-  const [userBalanceRecords] = React.useState(mockUserBalanceRecords);
-  const [userBalanceLedgerRecords] = React.useState(mockUserBalanceLedgerRecords);
+  const userBalanceRecordsStore = useUserBalanceRecordsStore();
+  const userBalanceRecords = userBalanceRecordsStore.data;
+
+  const userBalanceLedgerRecordsStore = useUserBalanceLedgerRecordsStore();
+  const userBalanceLedgerRecords = userBalanceLedgerRecordsStore.data;
 
   if (userRecords === undefined) return <div>Loading</div>;
   if (userRecords === null) return <div>Error</div>;
+  if (userBalanceRecords === undefined) return <div>Loading</div>;
+  if (userBalanceRecords === null) return <div>Error</div>;
+  if (userBalanceLedgerRecords === undefined) return <div>Loading</div>;
+  if (userBalanceLedgerRecords === null) return <div>Error</div>;
 
   const userAccountSummaryOnUserIdLookup = buildUserBalanceDetailsOnUserIdLookup({
     userRecords,
@@ -393,7 +300,7 @@ export function ManageUserBalancesTable() {
           {Object.values(userAccountSummaryOnUserIdLookup).map((userAccountSummary) => (
             <UserManagementTableRow
               key={userAccountSummary.userRecord.id}
-              userAccountSummary={userAccountSummary}
+              userBalanceDetails={userAccountSummary}
               onAdjustButtonClick={() => {
                 modalStore.setData(
                   <>
@@ -403,11 +310,15 @@ export function ManageUserBalancesTable() {
                       negative to remove`}
                     >
                       <AdjustUserBalanceForm
-                        onConfirm={(x) => {
-                          console.log(`UserManagementTable.tsx:${/*LL*/ 456}`, { x });
+                        onSuccess={(messages) => {
+                          toast.success(...createToastProps(messages));
                           modalStore.setData(null);
                         }}
+                        onError={(messages) => {
+                          toast.error(...createToastProps(messages));
+                        }}
                         userRecord={userAccountSummary.userRecord}
+                        userBalanceRecord={userAccountSummary.userBalanceRecord}
                       />
                     </ModalContent>
                   </>,

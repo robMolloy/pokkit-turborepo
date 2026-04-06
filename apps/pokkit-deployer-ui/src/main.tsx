@@ -17,6 +17,8 @@ import { LeftSidebar } from "./components/LeftSidebar";
 import { envConfig } from "./config/envConfig";
 import { pb } from "./config/pocketbaseConfig";
 import { useInstanceRecordsSync } from "./modules/instanceRecords/dbInstanceRecords";
+import { useUserBalanceLedgerRecordsSync } from "./modules/instanceRecords/dbUserBalanceLedgerRecords";
+import { useUserBalanceRecordsSync } from "./modules/instanceRecords/dbUserBalanceRecords";
 
 const Routes = () => {
   return useRoutes(routes);
@@ -29,8 +31,10 @@ const useAuthSync = () => {
 
 const App = () => {
   useAuthSync();
-  useInstanceRecordsSync({ pb });
   useUserRecordsSync({ pb });
+  useInstanceRecordsSync({ pb });
+  useUserBalanceRecordsSync({ pb });
+  useUserBalanceLedgerRecordsSync({ pb });
 
   return (
     <>

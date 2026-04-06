@@ -41,7 +41,13 @@ export const NumberInput = (
 
         const unparsedValue = (evt.target as unknown as { value: string }).value;
         const parsedValue = parseInt(unparsedValue, 10);
-        onValueChange(parsedValue);
+        const rtn = (() => {
+          if (isNaN(parsedValue)) return 0;
+          if (unparsedValue === "-") return -0;
+          return parsedValue;
+        })();
+
+        onValueChange(rtn);
       }}
       {...rest}
     />
