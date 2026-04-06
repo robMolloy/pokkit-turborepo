@@ -17,6 +17,7 @@ const IndexPage = () => {
 
       <SignedInRouteProtector ifUserIsUnverified={() => navigate("/auth/verification-request")}>
         <br />
+        signed in
       </SignedInRouteProtector>
 
       <SignedOutRouteProtector>

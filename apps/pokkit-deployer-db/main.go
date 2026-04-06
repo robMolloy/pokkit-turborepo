@@ -138,6 +138,21 @@ func WriteCollectionsToCollectionsFile(app pbCore.App) (bool, error) {
 	return err == nil, err
 }
 
+func SaveSecretsJsonAsEnvVars(app pbCore.App) error {
+	fileName := "secrets.json"
+	filePath := fmt.Sprintf("%s/%s", app.DataDir(), fileName)
+	obj, err := readJsonFromFile(filePath)
+	if err != nil {
+		return err
+	}
+
+	for key, value := range obj {
+		strValue := fmt.Sprintf("%v", value)
+		os.Setenv(key, strValue)
+	}
+
+	return nil
+}
 func ImportSettingsFromSettingsFile(app pbCore.App) (bool, error) {
 	fileName := "settings.json"
 	filePath := fmt.Sprintf("%s/%s", app.DataDir(), fileName)
@@ -161,6 +176,18 @@ func ImportSettingsFromSettingsFile(app pbCore.App) (bool, error) {
 	app.Save(settings)
 
 	return true, nil
+}
+
+func readJsonFromFile(filePath string) (map[string]any, error) {
+	jsonBytes, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	result := map[string]any{}
+
+	err = json.Unmarshal([]byte(jsonBytes), &result)
+	return result, err
 }
 
 func writeDataToFileAsJson(filePath string, data any) error {
@@ -207,6 +234,9 @@ func main() {
 
 		resp, err = ImportSettingsFromSettingsFile(app)
 		fmt.Println("ImportSettingsFromSettingsFilePath", resp, err)
+
+		err = SaveSecretsJsonAsEnvVars(app)
+		fmt.Println("SaveSecretsJsonAsEnvVars", err)
 
 		se.Next()
 
