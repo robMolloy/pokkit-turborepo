@@ -1,11 +1,13 @@
 package main
 
 import (
+	"app-db/src/routes"
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -190,6 +192,19 @@ func readJsonFromFile(filePath string) (map[string]any, error) {
 	return result, err
 }
 
+func ReadJsonFromRequestBody(requestBody io.ReadCloser) (map[string]any, error) {
+	body := requestBody
+	data, err := io.ReadAll(body)
+	if err != nil {
+		return nil, err
+	}
+	defer body.Close()
+
+	result := map[string]any{}
+	err = json.Unmarshal(data, &result)
+	return result, err
+}
+
 func writeDataToFileAsJson(filePath string, data any) error {
 	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
@@ -227,7 +242,11 @@ func main() {
 
 	app.OnServe().BindFunc(func(se *pbCore.ServeEvent) error {
 		// serves static files from the provided public dir (if exists)
-		se.Router.GET("/{path...}", pbApis.Static(os.DirFS("./pb_public"), false))
+		// se.Router.GET("/{path...}", pbApis.Static(os.DirFS("./pb_public"), false))
+
+		se.Router.GET("/hello/{name}", routes.HelloNameRouteHandler)
+		se.Router.POST("/bye", routes.ByeNameRouteHandler)
+		se.Router.POST("/stripe-create-checkout-session", routes.StripeCreateCheckoutSessionRouteHandler).Bind(pbApis.RequireAuth())
 
 		resp, err := ImportCollectionsFromCollectionsFile(app)
 		fmt.Println("ImportCollectionsFromCollectionsFilePath", resp, err)

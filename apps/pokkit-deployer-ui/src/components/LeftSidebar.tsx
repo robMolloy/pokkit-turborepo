@@ -14,6 +14,20 @@ export const LeftSidebar = (p: { pb: PocketBase }) => {
           <SidebarButton href="/" isHighlighted={location.pathname === "/"} iconName="Home">
             Home
           </SidebarButton>
+          <SidebarButton
+            href="/manage-user-balances"
+            isHighlighted={location.pathname === "/manage-user-balances"}
+            iconName="Home"
+          >
+            manage-user-balances
+          </SidebarButton>
+          <SidebarButton
+            href="/topup-user-balance"
+            isHighlighted={location.pathname === "/topup-user-balance"}
+            iconName="Home"
+          >
+            topup-user-balance
+          </SidebarButton>
         </>
       }
       middle={

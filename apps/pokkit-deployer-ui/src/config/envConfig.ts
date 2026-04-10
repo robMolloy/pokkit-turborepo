@@ -11,6 +11,10 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform((val) => val || "Unknown App"),
+  VITE_APP_STRIPE_PUBLISHABLE_KEY: z
+    .string()
+    .optional()
+    .transform((val) => val || "Unknown stripe key"),
 });
 
 export const envConfig = (() => {
