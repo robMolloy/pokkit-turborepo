@@ -71,5 +71,8 @@ export const smartSubscribeToRecordById = async <T extends z.ZodSchema>(p: {
   p.onChange(recordResp.success ? recordResp.data : null);
 
   const subscribeResp = await subscribeRespPromise;
-  return subscribeResp;
+
+  const unsubscribe = () => subscribeResp.data?.then((unsub) => unsub());
+
+  return { ...subscribeResp, unsubscribe };
 };

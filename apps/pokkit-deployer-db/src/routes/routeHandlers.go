@@ -1,17 +1,21 @@
 package routes
 
 import (
+	"app-db/src/db"
 	"app-db/src/utils"
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 	"github.com/stripe/stripe-go/v85"
 	"github.com/stripe/stripe-go/v85/checkout/session"
 	"github.com/stripe/stripe-go/v85/customer"
+	"github.com/stripe/stripe-go/v85/webhook"
 )
 
 func HelloNameRouteHandler(e *pbCore.RequestEvent) error {
@@ -79,6 +83,7 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 	}
 
 	PriceID := "price_1TJL40IGFJRyk0RhbikH1gy9"
+	Quantity := req.Quantity
 
 	// ---- Create Checkout Session ----
 	params := &stripe.CheckoutSessionParams{
@@ -87,7 +92,7 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			{
 				Price:    stripe.String(PriceID),
-				Quantity: stripe.Int64(req.Quantity),
+				Quantity: stripe.Int64(Quantity),
 			},
 		},
 
@@ -97,8 +102,10 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 		CancelURL:  stripe.String("http://localhost:5173/cancelled-stripe-checkout-session"),
 
 		Metadata: map[string]string{
-			"userId":  userId,
-			"product": req.Product,
+			"stripeCustomerId": cust.ID,
+			"userId":           userId,
+			"product":          req.Product,
+			"quantity":         strconv.FormatInt(int64(req.Quantity), 10),
 		},
 	}
 
@@ -111,4 +118,99 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 	return e.JSON(http.StatusOK, map[string]any{
 		"url": checkoutSession.URL,
 	})
+}
+
+func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
+	stripeWebhookSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
+	if stripeWebhookSecret == "" {
+		errorMessage := "STRIPE_WEBHOOK_SECRET not provided in env"
+		log.Println(errorMessage)
+		return e.InternalServerError(errorMessage, nil)
+	}
+
+	// body, _ := utils.ReadJsonFromRequestBody(e.Request.Body)
+	payload, err := io.ReadAll(e.Request.Body)
+	if err != nil {
+		errorMessage := "Could not read request body payload."
+		log.Println(errorMessage, err)
+		return e.InternalServerError(errorMessage, nil)
+	}
+
+	stripeSignatureHeader := e.Request.Header.Get("Stripe-Signature")
+	if err != nil {
+		errorMessage := "Stripe-Signature header not provided"
+		log.Println(errorMessage, err)
+		return e.BadRequestError(errorMessage, nil)
+	}
+
+	event, err := webhook.ConstructEvent(payload, stripeSignatureHeader, stripeWebhookSecret)
+	if err != nil {
+		errorMessage := "Could not construct webhook event"
+		log.Println(errorMessage, err)
+		return e.BadRequestError(errorMessage, nil)
+	}
+
+	if event.Type != "checkout.session.completed" {
+		logMessage := "not checkout.session.completed event type"
+		log.Println(logMessage, err)
+		return e.JSON(http.StatusOK, map[string]any{"url": "url"})
+	}
+
+	var paymentIntent stripe.PaymentIntent
+	err = json.Unmarshal(event.Data.Raw, &paymentIntent)
+	if err != nil {
+		errorMessage := "Could not unmarshal JSON from stripe payment intent:"
+		log.Println(errorMessage, err)
+		return e.BadRequestError(errorMessage, nil)
+	}
+	paymentIntentId := paymentIntent.ID
+	if paymentIntentId == "" {
+		errorMessage := "Payment intent id blank"
+		log.Println(errorMessage, err)
+		return e.BadRequestError(errorMessage, nil)
+	}
+
+	userBalancesCollection, err := e.App.FindCollectionByNameOrId(db.UserBalancesCollectionName)
+	userBalanceRecordByPaymentIntentId, err := e.App.FindFirstRecordByFilter(userBalancesCollection, fmt.Sprintf(`paymentIntentId="%s"`, paymentIntentId))
+
+	if userBalanceRecordByPaymentIntentId != nil {
+		errorMessage := "Payment intent id already used"
+		log.Println(errorMessage, err)
+		return e.BadRequestError(errorMessage, nil)
+	}
+
+	userId := paymentIntent.Metadata["userId"]
+	if userId == "" {
+		errorMessage := "No user id provided in metadata"
+		log.Println(errorMessage, err)
+		return e.BadRequestError(errorMessage, nil)
+	}
+
+	quantity, err := strconv.Atoi(paymentIntent.Metadata["quantity"])
+	if quantity == 0 {
+		errorMessage := "invalid quantity provided in metadata"
+		log.Println(errorMessage, err)
+		return e.BadRequestError(errorMessage, nil)
+	}
+
+	userBalanceLedgerCollection, err := e.App.FindCollectionByNameOrId(db.UserBalanceLedgerCollectionName)
+	if err != nil {
+		errorMessage := "Error finding UserBalanceLedger collection:"
+		log.Println(errorMessage, err)
+		return e.BadRequestError(errorMessage, nil)
+	}
+	userBalanceLedgerRecord := pbCore.NewRecord(userBalanceLedgerCollection)
+	userBalanceLedgerRecord.Set("userId", userId)
+	userBalanceLedgerRecord.Set("tokenAmount", quantity)
+	userBalanceLedgerRecord.Set("reason", "stripe_payment")
+	userBalanceLedgerRecord.Set("paymentIntentId", paymentIntentId)
+
+	err = e.App.Save(userBalanceLedgerRecord)
+	if err != nil {
+		errorMessage := "Error saving userBalanceLedgerRecord record:"
+		log.Println(errorMessage, err)
+		return e.BadRequestError(errorMessage, nil)
+	}
+
+	return e.JSON(http.StatusOK, map[string]any{"url": "url"})
 }

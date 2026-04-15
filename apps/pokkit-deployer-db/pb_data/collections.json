@@ -90,7 +90,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-03-13 21:22:44.235Z",
-    "updated": "2026-04-05 21:32:09.329Z",
+    "updated": "2026-04-14 22:49:24.300Z",
     "system": true
   },
   {
@@ -197,7 +197,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-03-13 21:22:44.238Z",
-    "updated": "2026-04-05 21:32:09.331Z",
+    "updated": "2026-04-14 22:49:24.302Z",
     "system": true
   },
   {
@@ -306,7 +306,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-03-13 21:22:44.239Z",
-    "updated": "2026-04-05 21:32:09.332Z",
+    "updated": "2026-04-14 22:49:24.303Z",
     "system": true
   },
   {
@@ -400,7 +400,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-03-13 21:22:44.241Z",
-    "updated": "2026-04-05 21:32:09.334Z",
+    "updated": "2026-04-14 22:49:24.304Z",
     "system": true
   },
   {
@@ -509,7 +509,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-03-13 21:22:44.243Z",
-    "updated": "2026-04-05 21:32:09.335Z",
+    "updated": "2026-04-14 22:49:24.305Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -718,7 +718,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-03-13 21:22:44.246Z",
-    "updated": "2026-04-05 21:32:09.337Z",
+    "updated": "2026-04-14 22:49:24.308Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -876,7 +876,7 @@
     ],
     "indexes": [],
     "created": "2026-03-13 21:37:13.640Z",
-    "updated": "2026-04-05 21:32:09.339Z",
+    "updated": "2026-04-14 22:49:24.310Z",
     "system": false
   },
   {
@@ -997,7 +997,7 @@
       "CREATE UNIQUE INDEX `idx_0UWlVOdDqD` ON `organisationUserPermissions` (`userOrgKey`)"
     ],
     "created": "2026-03-13 21:37:13.642Z",
-    "updated": "2026-04-05 21:32:09.340Z",
+    "updated": "2026-04-14 22:49:24.311Z",
     "system": false
   },
   {
@@ -1075,7 +1075,7 @@
     ],
     "indexes": [],
     "created": "2026-03-13 21:37:13.643Z",
-    "updated": "2026-04-05 21:32:09.342Z",
+    "updated": "2026-04-14 22:49:24.312Z",
     "system": false
   },
   {
@@ -1178,7 +1178,7 @@
       "CREATE UNIQUE INDEX `idx_MGuOIBNgXv` ON `instances` (`portNumber`)"
     ],
     "created": "2026-03-26 13:14:00.469Z",
-    "updated": "2026-04-05 21:32:09.343Z",
+    "updated": "2026-04-14 22:49:24.313Z",
     "system": false
   },
   {
@@ -1260,7 +1260,7 @@
       "CREATE UNIQUE INDEX `idx_jmZ8IL5Ej4` ON `changedInstanceRecordCommandTemplates` (`crudOperation`)"
     ],
     "created": "2026-03-26 22:38:16.054Z",
-    "updated": "2026-04-05 21:32:09.344Z",
+    "updated": "2026-04-14 22:49:24.315Z",
     "system": false
   },
   {
@@ -1342,7 +1342,7 @@
       "CREATE UNIQUE INDEX `idx_2OQVB3k4yj` ON `allInstanceRecordsCommandTemplates` (`crudOperation`)"
     ],
     "created": "2026-03-26 23:01:46.424Z",
-    "updated": "2026-04-05 21:32:09.345Z",
+    "updated": "2026-04-14 22:49:24.318Z",
     "system": false
   },
   {
@@ -1421,7 +1421,7 @@
       "CREATE UNIQUE INDEX `idx_FOc3LWC22r` ON `userStripeDetails` (`userId`)"
     ],
     "created": "2026-03-29 22:27:19.523Z",
-    "updated": "2026-04-05 21:32:09.347Z",
+    "updated": "2026-04-14 22:49:24.319Z",
     "system": false
   },
   {
@@ -1536,9 +1536,11 @@
         "type": "autodate"
       }
     ],
-    "indexes": [],
+    "indexes": [
+      "CREATE INDEX `idx_IeDxOWi9ji` ON `userBalanceLedger` (`paymentIntentId`)"
+    ],
     "created": "2026-03-29 22:33:09.043Z",
-    "updated": "2026-04-06 00:05:10.099Z",
+    "updated": "2026-04-14 23:26:43.611Z",
     "system": false
   },
   {
@@ -1648,7 +1650,7 @@
     ],
     "indexes": [],
     "created": "2026-03-29 22:49:17.230Z",
-    "updated": "2026-04-05 21:32:09.349Z",
+    "updated": "2026-04-14 22:49:24.322Z",
     "system": false
   },
   {
@@ -1725,7 +1727,7 @@
       "CREATE UNIQUE INDEX `idx_tKzMrurend` ON `userBalances` (`userId`)"
     ],
     "created": "2026-03-31 22:13:47.287Z",
-    "updated": "2026-04-05 21:32:09.350Z",
+    "updated": "2026-04-14 22:49:24.323Z",
     "system": false
   }
 ]

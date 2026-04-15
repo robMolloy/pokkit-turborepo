@@ -5,7 +5,7 @@ import z from "zod";
 import { create } from "zustand";
 
 export const userBalanceRecordsCollectionName = "userBalances";
-const userBalanceRecordSchema = z.object({
+export const userBalanceRecordSchema = z.object({
   id: z.string(),
   userId: z.string(),
   tokenAmount: z.number(),
@@ -22,18 +22,6 @@ export const useUserBalanceRecordsStore = create<{
   data: undefined,
   setData: (data) => set(() => ({ data })),
 }));
-
-export const smartSubscribeToAllUserBalanceRecords = async (p: {
-  pb: PocketBase;
-  onChange: (x: TUserBalanceRecord[]) => void;
-}) => {
-  return smartSubscribeToAllRecords({
-    pb: p.pb,
-    collectionName: userBalanceRecordsCollectionName,
-    itemSchema: userBalanceRecordSchema,
-    onChange: p.onChange,
-  });
-};
 
 export const useUserBalanceRecordsSync = (p: { pb: PocketBase }) => {
   const reactiveAuthStore = useReactiveAuthStore();

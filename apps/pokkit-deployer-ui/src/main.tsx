@@ -19,6 +19,7 @@ import { pb } from "./config/pocketbaseConfig";
 import { useInstanceRecordsSync } from "./modules/instanceRecords/dbInstanceRecords";
 import { useUserBalanceLedgerRecordsSync } from "./modules/instanceRecords/dbUserBalanceLedgerRecords";
 import { useUserBalanceRecordsSync } from "./modules/instanceRecords/dbUserBalanceRecords";
+import { useUserBalanceRecordSync } from "./modules/instanceRecords/dbUserBalanceRecord";
 
 const Routes = () => {
   return useRoutes(routes);
@@ -33,6 +34,7 @@ const App = () => {
   useAuthSync();
   useUserRecordsSync({ pb });
   useInstanceRecordsSync({ pb });
+  useUserBalanceRecordSync({ pb });
   useUserBalanceRecordsSync({ pb });
   useUserBalanceLedgerRecordsSync({ pb });
 

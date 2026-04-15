@@ -246,6 +246,7 @@ func main() {
 
 		se.Router.GET("/hello/{name}", routes.HelloNameRouteHandler)
 		se.Router.POST("/bye", routes.ByeNameRouteHandler)
+		se.Router.POST("/stripe-webhook", routes.StripeWebHookRouteHandler)
 		se.Router.POST("/stripe-create-checkout-session", routes.StripeCreateCheckoutSessionRouteHandler).Bind(pbApis.RequireAuth())
 
 		resp, err := ImportCollectionsFromCollectionsFile(app)
@@ -323,9 +324,10 @@ func main() {
 		userId := userBalanceLedgerRecordData.UserId
 
 		userBalancesCollection, err := app.FindCollectionByNameOrId(userBalancesCollectionName)
-		userBalanceRecord, _ := app.FindFirstRecordByData(userBalancesCollectionName, "userId", userId)
+		userBalanceRecord, _ := app.FindRecordById(userBalancesCollectionName, userId)
 		if userBalanceRecord == nil {
 			userBalanceRecord = pbCore.NewRecord(userBalancesCollection)
+			userBalanceRecord.Set("id", userId)
 			userBalanceRecord.Set("userId", userId)
 			userBalanceRecord.Set("tokenAmount", 0)
 		}
