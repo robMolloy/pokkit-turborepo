@@ -12,10 +12,11 @@ import (
 	"strconv"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
-	"github.com/stripe/stripe-go/v85"
-	"github.com/stripe/stripe-go/v85/checkout/session"
-	"github.com/stripe/stripe-go/v85/customer"
-	"github.com/stripe/stripe-go/v85/webhook"
+
+	stripe "github.com/stripe/stripe-go/v85"
+	stripeSession "github.com/stripe/stripe-go/v85/checkout/session"
+	stripeCustomer "github.com/stripe/stripe-go/v85/customer"
+	stripeWebhook "github.com/stripe/stripe-go/v85/webhook"
 )
 
 func HelloNameRouteHandler(e *pbCore.RequestEvent) error {
@@ -34,6 +35,54 @@ type StripeCreateCheckoutRequest struct {
 	Quantity int64  `json:"quantity"`
 }
 
+func StripeRetrieveCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
+	auth := e.Auth
+	if auth == nil {
+		return e.BadRequestError("not_logged_id", nil)
+	}
+	userId := auth.Id
+	if userId == "" {
+		return e.BadRequestError("not_logged_id", nil)
+	}
+	userEmail := auth.Email()
+	if userEmail == "" {
+		return e.BadRequestError("no_email_provided", nil)
+	}
+	stripeSecretKey := os.Getenv("STRIPE_SECRET_KEY")
+	stripe.Key = stripeSecretKey
+	if stripeSecretKey == "" {
+		errorMessage := "no stripe secret key provided"
+		log.Println(errorMessage)
+		return e.BadRequestError(errorMessage, nil)
+	}
+
+	body := e.Request.Body
+	defer body.Close()
+	data, err := io.ReadAll(body)
+	if err != nil {
+		return e.BadRequestError("invalid_request_body", err)
+	}
+
+	req := struct {
+		CheckoutSessionId string `json:"checkoutSessionId"`
+	}{}
+	err = json.Unmarshal(data, &req)
+	if err != nil {
+		return e.BadRequestError("invalid_json", err)
+	}
+
+	checkoutSession, err := stripeSession.Get(req.CheckoutSessionId, nil)
+	if err != nil {
+		errorMessage := "no checkout session id provided"
+		log.Println(errorMessage)
+		return e.BadRequestError(errorMessage, nil)
+	}
+
+	return e.JSON(http.StatusOK, map[string]any{
+		"checkoutSession": checkoutSession,
+	})
+
+}
 func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 	auth := e.Auth
 	if auth == nil {
@@ -47,9 +96,15 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 	if userEmail == "" {
 		return e.BadRequestError("no_email_provided", nil)
 	}
-	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
+	stripeSecretKey := os.Getenv("STRIPE_SECRET_KEY")
+	stripe.Key = stripeSecretKey
+	if stripeSecretKey == "" {
+		errorMessage := "no stripe secret key provided"
+		log.Println(errorMessage)
+		return e.BadRequestError(errorMessage, nil)
+	}
 
-	cust, err := customer.New(&stripe.CustomerParams{
+	cust, err := stripeCustomer.New(&stripe.CustomerParams{
 		Email: stripe.String(userEmail),
 	})
 	if err != nil {
@@ -98,8 +153,8 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 
 		Customer: stripe.String(cust.ID),
 
-		SuccessURL: stripe.String("http://localhost:5173/successful-stripe-checkout-session"),
-		CancelURL:  stripe.String("http://localhost:5173/cancelled-stripe-checkout-session"),
+		SuccessURL: stripe.String("http://localhost:5173/stripe-checkout-session/success?checkoutSessionId={CHECKOUT_SESSION_ID}"),
+		CancelURL:  stripe.String("http://localhost:5173/stripe-checkout-session/cancelled"),
 
 		Metadata: map[string]string{
 			"stripeCustomerId": cust.ID,
@@ -109,7 +164,7 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 		},
 	}
 
-	checkoutSession, err := session.New(params)
+	checkoutSession, err := stripeSession.New(params)
 	if err != nil {
 		return e.InternalServerError("stripe_session_failed", err)
 	}
@@ -143,7 +198,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		return e.BadRequestError(errorMessage, nil)
 	}
 
-	event, err := webhook.ConstructEvent(payload, stripeSignatureHeader, stripeWebhookSecret)
+	event, err := stripeWebhook.ConstructEvent(payload, stripeSignatureHeader, stripeWebhookSecret)
 	if err != nil {
 		errorMessage := "Could not construct webhook event"
 		log.Println(errorMessage, err)

@@ -1,5 +1,6 @@
 import { cn } from "@repo/pokkit-shadcn";
 import {
+  ArrowRight,
   Clipboard,
   Badge,
   Volume2,
@@ -42,6 +43,7 @@ import {
   Sun,
   Monitor,
   X,
+  XCircle,
   Check,
   CheckCircleIcon,
   Circle,
@@ -58,6 +60,7 @@ import {
 } from "lucide-react";
 
 const iconMap = {
+  ArrowRight,
   Clipboard,
   Badge,
   Volume2,
@@ -100,6 +103,7 @@ const iconMap = {
   Sun,
   Monitor,
   X,
+  XCircle,
   Check,
   CheckCircleIcon,
   Circle,

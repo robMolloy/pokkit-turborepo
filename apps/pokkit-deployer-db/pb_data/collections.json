@@ -90,7 +90,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-03-13 21:22:44.235Z",
-    "updated": "2026-04-14 22:49:24.300Z",
+    "updated": "2026-04-16 09:59:13.119Z",
     "system": true
   },
   {
@@ -197,7 +197,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-03-13 21:22:44.238Z",
-    "updated": "2026-04-14 22:49:24.302Z",
+    "updated": "2026-04-16 09:59:13.121Z",
     "system": true
   },
   {
@@ -306,7 +306,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-03-13 21:22:44.239Z",
-    "updated": "2026-04-14 22:49:24.303Z",
+    "updated": "2026-04-16 09:59:13.123Z",
     "system": true
   },
   {
@@ -400,7 +400,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-03-13 21:22:44.241Z",
-    "updated": "2026-04-14 22:49:24.304Z",
+    "updated": "2026-04-16 09:59:13.125Z",
     "system": true
   },
   {
@@ -509,7 +509,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-03-13 21:22:44.243Z",
-    "updated": "2026-04-14 22:49:24.305Z",
+    "updated": "2026-04-16 09:59:13.126Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -718,7 +718,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-03-13 21:22:44.246Z",
-    "updated": "2026-04-14 22:49:24.308Z",
+    "updated": "2026-04-16 09:59:13.128Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -876,7 +876,7 @@
     ],
     "indexes": [],
     "created": "2026-03-13 21:37:13.640Z",
-    "updated": "2026-04-14 22:49:24.310Z",
+    "updated": "2026-04-16 09:59:13.130Z",
     "system": false
   },
   {
@@ -997,7 +997,7 @@
       "CREATE UNIQUE INDEX `idx_0UWlVOdDqD` ON `organisationUserPermissions` (`userOrgKey`)"
     ],
     "created": "2026-03-13 21:37:13.642Z",
-    "updated": "2026-04-14 22:49:24.311Z",
+    "updated": "2026-04-16 09:59:13.132Z",
     "system": false
   },
   {
@@ -1075,7 +1075,7 @@
     ],
     "indexes": [],
     "created": "2026-03-13 21:37:13.643Z",
-    "updated": "2026-04-14 22:49:24.312Z",
+    "updated": "2026-04-16 09:59:13.134Z",
     "system": false
   },
   {
@@ -1178,7 +1178,7 @@
       "CREATE UNIQUE INDEX `idx_MGuOIBNgXv` ON `instances` (`portNumber`)"
     ],
     "created": "2026-03-26 13:14:00.469Z",
-    "updated": "2026-04-14 22:49:24.313Z",
+    "updated": "2026-04-16 09:59:13.135Z",
     "system": false
   },
   {
@@ -1260,7 +1260,7 @@
       "CREATE UNIQUE INDEX `idx_jmZ8IL5Ej4` ON `changedInstanceRecordCommandTemplates` (`crudOperation`)"
     ],
     "created": "2026-03-26 22:38:16.054Z",
-    "updated": "2026-04-14 22:49:24.315Z",
+    "updated": "2026-04-16 09:59:13.136Z",
     "system": false
   },
   {
@@ -1342,7 +1342,7 @@
       "CREATE UNIQUE INDEX `idx_2OQVB3k4yj` ON `allInstanceRecordsCommandTemplates` (`crudOperation`)"
     ],
     "created": "2026-03-26 23:01:46.424Z",
-    "updated": "2026-04-14 22:49:24.318Z",
+    "updated": "2026-04-16 09:59:13.139Z",
     "system": false
   },
   {
@@ -1421,7 +1421,7 @@
       "CREATE UNIQUE INDEX `idx_FOc3LWC22r` ON `userStripeDetails` (`userId`)"
     ],
     "created": "2026-03-29 22:27:19.523Z",
-    "updated": "2026-04-14 22:49:24.319Z",
+    "updated": "2026-04-16 09:59:13.141Z",
     "system": false
   },
   {
@@ -1540,7 +1540,7 @@
       "CREATE INDEX `idx_IeDxOWi9ji` ON `userBalanceLedger` (`paymentIntentId`)"
     ],
     "created": "2026-03-29 22:33:09.043Z",
-    "updated": "2026-04-14 23:26:43.611Z",
+    "updated": "2026-04-16 09:59:13.143Z",
     "system": false
   },
   {
@@ -1650,7 +1650,7 @@
     ],
     "indexes": [],
     "created": "2026-03-29 22:49:17.230Z",
-    "updated": "2026-04-14 22:49:24.322Z",
+    "updated": "2026-04-16 09:59:13.144Z",
     "system": false
   },
   {
@@ -1727,7 +1727,107 @@
       "CREATE UNIQUE INDEX `idx_tKzMrurend` ON `userBalances` (`userId`)"
     ],
     "created": "2026-03-31 22:13:47.287Z",
-    "updated": "2026-04-14 22:49:24.323Z",
+    "updated": "2026-04-16 09:59:13.146Z",
+    "system": false
+  },
+  {
+    "id": "pbc_2852184993",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "instanceSubscriptions",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "cascadeDelete": false,
+        "collectionId": "_pb_users_auth_",
+        "hidden": false,
+        "id": "relation1689669068",
+        "maxSelect": 1,
+        "minSelect": 0,
+        "name": "userId",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "relation"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text3396850601",
+        "max": 0,
+        "min": 0,
+        "name": "subscriptionId",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "number3517527325",
+        "max": null,
+        "min": null,
+        "name": "numberOfInstances",
+        "onlyInt": false,
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "number"
+      },
+      {
+        "hidden": false,
+        "id": "date2557496732",
+        "max": "",
+        "min": "",
+        "name": "paidUntilDatetime",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "date"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "created": "2026-04-16 11:13:36.080Z",
+    "updated": "2026-04-16 11:13:36.080Z",
     "system": false
   }
 ]

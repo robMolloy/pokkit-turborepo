@@ -42,10 +42,8 @@ export const confirmVerificationEmail = async (p: { pb: PocketBase; token: strin
     const schema = z.literal(true);
     schema.parse(resp);
 
-    return {
-      success: true,
-      messages: ["Successfully confirmed verification email"] as string[],
-    } as const;
+    const messages = ["Successfully confirmed verification email"];
+    return { success: true, messages } as const;
   } catch (error) {
     const messagesResp = extractMessageFromPbError({ error });
 

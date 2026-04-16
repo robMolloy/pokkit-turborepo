@@ -15,6 +15,7 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform((val) => val || "Unknown stripe key"),
+  VITE_APP_CONTACT_EMAIL_ADDRESS: z.string(),
 });
 
 export const envConfig = (() => {

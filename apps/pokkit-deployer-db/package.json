@@ -13,7 +13,7 @@
     "build": "go build",
     "db:serve-build": "./app-db serve --http=\"0.0.0.0:8090\"",
     "db:build:on-change-to-dev": "npx nodemon --delay 1 --watch pocketbase/app-db/main.go --exec \"npm run db:build\"",
-    "pre-dev": "ngrok http 8090",
+    "pre-dev": "stripe listen -l --forward-to localhost:8090/stripe-webhook",
     "dev": "go run . serve --http=\"0.0.0.0:8090\""
   },
   "dependencies": {
