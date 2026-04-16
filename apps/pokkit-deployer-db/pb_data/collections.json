@@ -1188,7 +1188,7 @@
     "createRule": null,
     "updateRule": null,
     "deleteRule": null,
-    "name": "changedInstanceRecordCommandTemplates",
+    "name": "commandTemplatesForChangedInstanceRecord",
     "type": "base",
     "fields": [
       {
@@ -1257,10 +1257,10 @@
       }
     ],
     "indexes": [
-      "CREATE UNIQUE INDEX `idx_jmZ8IL5Ej4` ON `changedInstanceRecordCommandTemplates` (`crudOperation`)"
+      "CREATE UNIQUE INDEX `idx_jmZ8IL5Ej4` ON `commandTemplatesForChangedInstanceRecord` (`crudOperation`)"
     ],
     "created": "2026-03-26 22:38:16.054Z",
-    "updated": "2026-04-16 09:59:13.136Z",
+    "updated": "2026-04-16 11:19:23.973Z",
     "system": false
   },
   {
@@ -1270,7 +1270,7 @@
     "createRule": null,
     "updateRule": null,
     "deleteRule": null,
-    "name": "allInstanceRecordsCommandTemplates",
+    "name": "commandTemplatesForAllInstanceRecords",
     "type": "base",
     "fields": [
       {
@@ -1339,10 +1339,10 @@
       }
     ],
     "indexes": [
-      "CREATE UNIQUE INDEX `idx_2OQVB3k4yj` ON `allInstanceRecordsCommandTemplates` (`crudOperation`)"
+      "CREATE UNIQUE INDEX `idx_2OQVB3k4yj` ON `commandTemplatesForAllInstanceRecords` (`crudOperation`)"
     ],
     "created": "2026-03-26 23:01:46.424Z",
-    "updated": "2026-04-16 09:59:13.139Z",
+    "updated": "2026-04-16 11:19:43.346Z",
     "system": false
   },
   {

@@ -192,7 +192,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 	}
 
 	stripeSignatureHeader := e.Request.Header.Get("Stripe-Signature")
-	if err != nil {
+	if stripeSignatureHeader == "" {
 		errorMessage := "Stripe-Signature header not provided"
 		log.Println(errorMessage, err)
 		return e.BadRequestError(errorMessage, nil)
