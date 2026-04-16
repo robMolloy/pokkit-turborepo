@@ -26,13 +26,12 @@ export default function Page() {
 
     return () => abortController.abort();
   }, []);
+
   return (
     <div>
-      <pre>{JSON.stringify({ checkoutSessionId }, undefined, 2)}</pre>
       <br />
       <br />
-      <br />
-      <div className="flex w-full justify-center mt-8">
+      <div className="flex w-full justify-center">
         {state === undefined && <div>Loading...</div>}
         {state === null && <div>Error</div>}
         {!!state && <StripeCheckoutSessionSuccessResponseCard checkoutSession={state} />}

@@ -5,8 +5,7 @@ export default function Page() {
     <div>
       <br />
       <br />
-      <br />
-      <div className="flex w-full justify-center mt-8">
+      <div className="flex w-full justify-center">
         <StripeCheckoutSessionCancelledResponseCard />
       </div>
     </div>

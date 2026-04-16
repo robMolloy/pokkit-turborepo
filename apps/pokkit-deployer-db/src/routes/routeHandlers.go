@@ -38,15 +38,21 @@ type StripeCreateCheckoutRequest struct {
 func StripeRetrieveCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 	auth := e.Auth
 	if auth == nil {
-		return e.BadRequestError("not_logged_id", nil)
+		errorMessage := "not_logged_id"
+		log.Println(errorMessage)
+		return e.BadRequestError(errorMessage, nil)
 	}
 	userId := auth.Id
 	if userId == "" {
-		return e.BadRequestError("not_logged_id", nil)
+		errorMessage := "not_logged_id"
+		log.Println(errorMessage)
+		return e.BadRequestError(errorMessage, nil)
 	}
 	userEmail := auth.Email()
 	if userEmail == "" {
-		return e.BadRequestError("no_email_provided", nil)
+		errorMessage := "no_email_provided"
+		log.Println(errorMessage)
+		return e.BadRequestError(errorMessage, nil)
 	}
 	stripeSecretKey := os.Getenv("STRIPE_SECRET_KEY")
 	stripe.Key = stripeSecretKey
@@ -60,7 +66,9 @@ func StripeRetrieveCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 	defer body.Close()
 	data, err := io.ReadAll(body)
 	if err != nil {
-		return e.BadRequestError("invalid_request_body", err)
+		errorMessage := "invalid_request_body"
+		log.Println(errorMessage, err)
+		return e.BadRequestError(errorMessage, err)
 	}
 
 	req := struct {
@@ -68,33 +76,41 @@ func StripeRetrieveCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 	}{}
 	err = json.Unmarshal(data, &req)
 	if err != nil {
-		return e.BadRequestError("invalid_json", err)
+		errorMessage := "invalid_json"
+		log.Println(errorMessage, err)
+		return e.BadRequestError(errorMessage, err)
 	}
 
 	checkoutSession, err := stripeSession.Get(req.CheckoutSessionId, nil)
 	if err != nil {
 		errorMessage := "no checkout session id provided"
-		log.Println(errorMessage)
+		log.Println(errorMessage, err)
 		return e.BadRequestError(errorMessage, nil)
 	}
 
 	return e.JSON(http.StatusOK, map[string]any{
 		"checkoutSession": checkoutSession,
 	})
-
 }
+
 func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 	auth := e.Auth
 	if auth == nil {
-		return e.BadRequestError("not_logged_id", nil)
+		errorMessage := "not_logged_id"
+		log.Println(errorMessage)
+		return e.BadRequestError(errorMessage, nil)
 	}
 	userId := auth.Id
 	if userId == "" {
-		return e.BadRequestError("not_logged_id", nil)
+		errorMessage := "not_logged_id"
+		log.Println(errorMessage)
+		return e.BadRequestError(errorMessage, nil)
 	}
 	userEmail := auth.Email()
 	if userEmail == "" {
-		return e.BadRequestError("no_email_provided", nil)
+		errorMessage := "no_email_provided"
+		log.Println(errorMessage)
+		return e.BadRequestError(errorMessage, nil)
 	}
 	stripeSecretKey := os.Getenv("STRIPE_SECRET_KEY")
 	stripe.Key = stripeSecretKey
@@ -108,15 +124,18 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 		Email: stripe.String(userEmail),
 	})
 	if err != nil {
-		fmt.Println(err)
-		return e.InternalServerError("stripe_customer_failed", err)
+		errorMessage := fmt.Sprintf("failed to create stripe customer from: %v", userEmail)
+		log.Println(errorMessage, err)
+		return e.InternalServerError(errorMessage, err)
 	}
 
 	body := e.Request.Body
 	defer body.Close()
 	data, err := io.ReadAll(body)
 	if err != nil {
-		return e.BadRequestError("invalid_request_body", err)
+		errorMessage := "invalid_request_body"
+		log.Println(errorMessage, err)
+		return e.BadRequestError(errorMessage, err)
 	}
 
 	req := struct {
@@ -125,28 +144,46 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 	}{}
 	err = json.Unmarshal(data, &req)
 	if err != nil {
-		return e.BadRequestError("invalid_json", err)
+		errorMessage := "invalid_json"
+		fmt.Println(errorMessage, err)
+		return e.BadRequestError(errorMessage, err)
 	}
 
-	if req.Quantity < 1 {
-		return e.BadRequestError("invalid_quantity", nil)
-	}
-
-	// token is the only valid product at this time
-	if req.Product != "token" {
-		return e.BadRequestError("invalid_product", nil)
-	}
-
-	PriceID := "price_1TJL40IGFJRyk0RhbikH1gy9"
 	Quantity := req.Quantity
+	if Quantity < 1 {
+		errorMessage := fmt.Sprintf("%v is an invalid quantity", req.Quantity)
+		fmt.Println(errorMessage, err)
+		return e.BadRequestError(errorMessage, err)
+	}
+
+	productDataLookup := map[string]struct {
+		PriceId     *string
+		PaymentMode *string
+	}{
+		"instance_subscription": {
+			PriceId:     stripe.String("price_1TMo82IGFJRyk0RhQn1z0oHK"),
+			PaymentMode: stripe.String(stripe.CheckoutSessionModeSubscription),
+		},
+		"token": {
+			PriceId:     stripe.String("price_1TJL40IGFJRyk0RhbikH1gy9"),
+			PaymentMode: stripe.String(stripe.CheckoutSessionModePayment),
+		},
+	}
+	// token is the only valid product at this time
+	productData, ok := productDataLookup[req.Product]
+	if !ok {
+		errorMessage := fmt.Sprintf("%v is an invalid_product", req.Product)
+		fmt.Println(errorMessage)
+		return e.BadRequestError(errorMessage, err)
+	}
 
 	// ---- Create Checkout Session ----
 	params := &stripe.CheckoutSessionParams{
-		Mode: stripe.String(stripe.CheckoutSessionModePayment),
+		Mode: productData.PaymentMode,
 
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			{
-				Price:    stripe.String(PriceID),
+				Price:    productData.PriceId,
 				Quantity: stripe.Int64(Quantity),
 			},
 		},
@@ -166,7 +203,9 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 
 	checkoutSession, err := stripeSession.New(params)
 	if err != nil {
-		return e.InternalServerError("stripe_session_failed", err)
+		errorMessage := "stripe session failed"
+		fmt.Println(errorMessage, err)
+		return e.InternalServerError(errorMessage, err)
 	}
 
 	// ---- Return checkout URL ----

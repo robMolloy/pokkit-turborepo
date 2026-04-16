@@ -1,55 +1,12 @@
 import { pb } from "@/config/pocketbaseConfig";
 import { createToastProps } from "@/lib/createToastProps";
+import { createStripeCheckoutSession } from "@/modules/stripe/stripeSdk";
 import { Button } from "@repo/pokkit-shadcn";
 import { toast } from "sonner";
-import z from "zod";
-
-const TopUpUserBalanceButton = () => {
-  return (
-    <div>
-      <Button
-        onClick={async () => {
-          const createStripeCheckoutSession = async (p1: { product: string; quantity: number }) => {
-            try {
-              const res = await pb.send("/stripe-create-checkout-session", {
-                method: "POST",
-                body: JSON.stringify(p1),
-              });
-              const schema = z.object({ url: z.string() });
-              const data = schema.parse(res);
-
-              const messages = ["Successfully set up the stripe checkout session"];
-              return { success: true, data, messages } as const;
-            } catch (e) {
-              const error = e as { message: string };
-
-              console.error({ error });
-              const messages = ["Failed to set up the stripe checkout session"];
-              if (error.message) messages.push(error.message);
-              return { success: false, messages } as const;
-            }
-          };
-
-          const sessionResp = await createStripeCheckoutSession({
-            product: "token",
-            quantity: 100,
-          });
-
-          if (!sessionResp.success) return toast.error(...createToastProps(sessionResp.messages));
-
-          window.location.href = sessionResp.data.url;
-        }}
-      >
-        Top up 100
-      </Button>
-    </div>
-  );
-};
 
 export default function Page() {
   return (
     <div>
-      {/* <BuyTokensButton /> */}
       <Button
         type="button"
         onClick={async () => {
@@ -71,7 +28,34 @@ export default function Page() {
       >
         hit bye endpoint
       </Button>
-      <TopUpUserBalanceButton />
+      <Button
+        onClick={async () => {
+          const sessionResp = await createStripeCheckoutSession({
+            product: "token",
+            quantity: 100,
+          });
+
+          if (!sessionResp.success) return toast.error(...createToastProps(sessionResp.messages));
+
+          window.location.href = sessionResp.data.url;
+        }}
+      >
+        Top up 100
+      </Button>
+      <Button
+        onClick={async () => {
+          const sessionResp = await createStripeCheckoutSession({
+            product: "instance_subscription",
+            quantity: 100,
+          });
+
+          if (!sessionResp.success) return toast.error(...createToastProps(sessionResp.messages));
+
+          window.location.href = sessionResp.data.url;
+        }}
+      >
+        create a subscription
+      </Button>
     </div>
   );
 }
