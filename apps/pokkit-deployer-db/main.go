@@ -5,7 +5,6 @@ import (
 	"app-db/src/events"
 	"app-db/src/pokkitSetup"
 	"app-db/src/routes"
-	"fmt"
 	"log"
 
 	pocketbase "github.com/pocketbase/pocketbase"
@@ -53,18 +52,6 @@ func main() {
 	app.OnRecordAfterDeleteSuccess(db.InstancesCollectionName).BindFunc(events.ExecuteBashCommandFromCommandTemplatesForAllInstanceRecordsAfterInstanceRecordDeletedEventHandler)
 
 	app.OnRecordCreateRequest(db.OrganisationsCollectionName).BindFunc(events.PromoteOrganisationCreatorToOrgAdminAfterUserCreateEventHandler)
-
-	app.OnTerminate().BindFunc(func(e *pbCore.TerminateEvent) error {
-		log.Println("OnTerminate")
-
-		return e.Next()
-	})
-
-	app.OnSettingsUpdateRequest().BindFunc(func(e *pbCore.SettingsUpdateRequestEvent) error {
-		fmt.Println("OnSettingsUpdateRequest")
-
-		return e.Next()
-	})
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)
