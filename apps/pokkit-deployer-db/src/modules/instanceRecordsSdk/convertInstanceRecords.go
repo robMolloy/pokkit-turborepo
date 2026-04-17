@@ -1,4 +1,4 @@
-package instanceRecords
+package instanceRecordsSdk
 
 import (
 	pbCore "github.com/pocketbase/pocketbase/core"

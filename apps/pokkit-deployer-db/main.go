@@ -2,7 +2,7 @@ package main
 
 import (
 	"app-db/src/db"
-	"app-db/src/modules/instanceRecords"
+	"app-db/src/modules/instanceRecordsSdk"
 	"app-db/src/modules/userBalanceLedgerRecords"
 	"app-db/src/pokkitSetup"
 	"app-db/src/routes"
@@ -23,7 +23,8 @@ func WriteSettingsToSettingsFileOnSettingsReloadEventHandler(e *pbCore.SettingsR
 		return err
 	}
 
-	if setupComplete {
+	isSetupComplete := e.App.Store().Get("isSetupComplete").(bool)
+	if isSetupComplete {
 		writeErr := utils.WriteDataToFileAsJson(e.App.DataDir()+"/settings.json", e.App.Settings())
 		if writeErr != nil {
 			e.App.Logger().Error("Error when writing to settings.json")
@@ -38,7 +39,8 @@ func WriteCollectionsToCollectionsFileAfterCollectionChangeEventHandler(e *pbCor
 	fmt.Println("OnCollectionAfterDeleteSuccess")
 	e.Next()
 
-	if setupComplete {
+	isSetupComplete := e.App.Store().Get("isSetupComplete").(bool)
+	if isSetupComplete {
 		_, writeErr := pokkitSetup.WriteCollectionsToCollectionsFile(e.App)
 		if writeErr != nil {
 			e.App.Logger().Error("Error when writing to collections.json", "writeErr", writeErr)
@@ -46,6 +48,257 @@ func WriteCollectionsToCollectionsFileAfterCollectionChangeEventHandler(e *pbCor
 	}
 
 	return nil
+}
+
+func SetupCollectionsSettingsAndEnvVarsOnServe(se *pbCore.ServeEvent) error {
+	resp, err := pokkitSetup.ImportCollectionsFromCollectionsFile(se.App)
+	fmt.Println("ImportCollectionsFromCollectionsFilePath", resp, err)
+
+	resp, err = pokkitSetup.ImportSettingsFromSettingsFile(se.App)
+	fmt.Println("ImportSettingsFromSettingsFilePath", resp, err)
+
+	err = pokkitSetup.SaveSecretsJsonAsEnvVars(se.App)
+	fmt.Println("SaveSecretsJsonAsEnvVars", err)
+
+	se.Next()
+
+	se.App.Store().Set("isSetupComplete", true)
+
+	fmt.Println("Setup complete.")
+	return nil
+}
+
+func PromoteFirstUserToApprovedAdminAfterUserCreateEventHandler(e *pbCore.RecordEvent) error {
+	log.Println("OnUserRecordAfterCreateSuccess")
+
+	userRecord := e.Record
+	userRecordsCount, err := e.App.CountRecords(db.UsersCollectionName)
+
+	if err != nil {
+		log.Printf("Error counting user records: %v\n", err)
+		return e.Next()
+	}
+
+	if userRecordsCount != 1 {
+		return e.Next()
+	}
+
+	globalUserPermissionsCollection, err := e.App.FindCollectionByNameOrId(db.GlobalUserPermissionsCollectionName)
+	if err != nil {
+		log.Printf("Error finding globalUserPermissions collection: %v\n", err)
+		return e.Next()
+	}
+
+	globalUserPermissionsRecord := pbCore.NewRecord(globalUserPermissionsCollection)
+	globalUserPermissionsRecord.Set("id", userRecord.Id)
+	globalUserPermissionsRecord.Set("userId", userRecord.Id)
+	globalUserPermissionsRecord.Set("role", "admin")
+	globalUserPermissionsRecord.Set("status", "approved")
+
+	err = e.App.Save(globalUserPermissionsRecord)
+	if err != nil {
+		log.Printf("Error saving globalUserPermissions record: %v\n", err)
+	}
+
+	return e.Next()
+}
+
+func ExecuteBashCommandFromCommandTemplatesForChangedInstanceRecordAfterInstanceRecordCreatedEventHandler(e *pbCore.RecordEvent) error {
+	log.Println("OnDeplymentRecordAfterCreateSuccess - changedRecord")
+
+	instanceRecord := e.Record
+
+	commandTemplateRecords, err := e.App.FindAllRecords(db.CommandTemplatesForChangedInstanceRecordCollectionName, dbx.HashExp{"crudOperation": "create"})
+	if err != nil {
+		log.Printf("Error finding changedRecordCommandTemplates records: %v\n", err)
+		return e.Next()
+	}
+
+	instanceRecordData := instanceRecordsSdk.ConvertInstanceRecordToData(instanceRecord)
+
+	for _, commandTemplateRecord := range commandTemplateRecords {
+		bashTemplate := commandTemplateRecord.GetString("bashTemplate")
+		bashCommand, err := utils.PopulateTemplate(bashTemplate, instanceRecordData)
+		if err != nil {
+			log.Println(err)
+			return e.Next()
+		}
+
+		cmd := exec.Command("bash", "-c", bashCommand)
+		cmd.Start()
+	}
+
+	return e.Next()
+}
+
+func ExecuteBashCommandFromCommandTemplatesForAllInstanceRecordsAfterInstanceRecordCreatedEventHandler(e *pbCore.RecordEvent) error {
+	log.Println("OnDeplymentRecordAfterCreateSuccess - all records")
+
+	commandTemplateRecords, err := e.App.FindAllRecords(db.CommandTemplatesForAllInstanceRecordsCollectionName, dbx.HashExp{"crudOperation": "create"})
+	if err != nil {
+		log.Printf("Error finding allRecordCommandTemplates records: %v\n", err)
+		return e.Next()
+	}
+	instanceRecords, err := e.App.FindAllRecords(db.InstancesCollectionName)
+	if err != nil {
+		log.Printf("Error finding deployment records: %v\n", err)
+		return e.Next()
+	}
+
+	instanceRecordsData := instanceRecordsSdk.ConvertInstanceRecordsToData(instanceRecords)
+
+	for _, commandTemplateRecord := range commandTemplateRecords {
+		bashTemplate := commandTemplateRecord.GetString("bashTemplate")
+		bashCommand, err := utils.PopulateTemplate(bashTemplate, instanceRecordsData)
+		if err != nil {
+			log.Println(err)
+			return e.Next()
+		}
+
+		cmd := exec.Command("bash", "-c", bashCommand)
+		cmd.Start()
+	}
+
+	return e.Next()
+}
+
+func ExecuteBashCommandFromCommandTemplatesForChangedInstanceRecordAfterInstanceRecordUpdatedEventHandler(e *pbCore.RecordEvent) error {
+	log.Println("OnDeploymentRecordAfterUpdateSuccess")
+
+	commandTemplateRecords, err := e.App.FindAllRecords(db.CommandTemplatesForChangedInstanceRecordCollectionName, dbx.HashExp{"crudOperation": "update"})
+	if err != nil {
+		log.Printf("Error finding changedRecordCommandTemplates records: %v\n", err)
+		return e.Next()
+	}
+
+	instanceRecordsData := instanceRecordsSdk.ConvertInstanceRecordToData(e.Record)
+
+	for _, commandTemplateRecord := range commandTemplateRecords {
+		bashTemplate := commandTemplateRecord.GetString("bashTemplate")
+		bashCommand, err := utils.PopulateTemplate(bashTemplate, instanceRecordsData)
+		if err != nil {
+			log.Println(err)
+			return e.Next()
+		}
+
+		cmd := exec.Command("bash", "-c", bashCommand)
+		cmd.Start()
+	}
+
+	return e.Next()
+}
+
+func ExecuteBashCommandFromCommandTemplatesForAllInstanceRecordsAfterInstanceRecordUpdatedEventHandler(e *pbCore.RecordEvent) error {
+	log.Println("OnDeplymentRecordAfterUpdateSuccess - all records")
+
+	commandTemplateRecords, err := e.App.FindAllRecords(db.CommandTemplatesForAllInstanceRecordsCollectionName, dbx.HashExp{"crudOperation": "update"})
+	if err != nil {
+		log.Printf("Error finding allRecordCommandTemplates records: %v\n", err)
+		return e.Next()
+	}
+	deploymentRecords, err := e.App.FindAllRecords(db.InstancesCollectionName)
+	if err != nil {
+		log.Printf("Error finding deployments records: %v\n", err)
+		return e.Next()
+	}
+
+	instanceRecordsData := instanceRecordsSdk.ConvertInstanceRecordsToData(deploymentRecords)
+
+	for _, commandTemplateRecord := range commandTemplateRecords {
+		bashTemplate := commandTemplateRecord.GetString("bashTemplate")
+		bashCommand, err := utils.PopulateTemplate(bashTemplate, instanceRecordsData)
+		if err != nil {
+			log.Println(err)
+			return e.Next()
+		}
+
+		cmd := exec.Command("bash", "-c", bashCommand)
+		cmd.Start()
+	}
+
+	return e.Next()
+}
+
+func ExecuteBashCommandFromCommandTemplatesForAllInstanceRecordsAfterInstanceRecordDeletedEventHandler(e *pbCore.RecordEvent) error {
+	commandTemplateRecords, err := e.App.FindAllRecords(db.CommandTemplatesForAllInstanceRecordsCollectionName, dbx.HashExp{"crudOperation": "delete"})
+	if err != nil {
+		return e.Next()
+	}
+	deploymentRecords, err := e.App.FindAllRecords(db.InstancesCollectionName)
+	if err != nil {
+		return e.Next()
+	}
+
+	instanceRecordsData := instanceRecordsSdk.ConvertInstanceRecordsToData(deploymentRecords)
+
+	for _, commandTemplateRecord := range commandTemplateRecords {
+		bashTemplate := commandTemplateRecord.GetString("bashTemplate")
+		bashCommand, err := utils.PopulateTemplate(bashTemplate, instanceRecordsData)
+		if err != nil {
+			log.Println(err)
+			return e.Next()
+		}
+
+		cmd := exec.Command("bash", "-c", bashCommand)
+		cmd.Start()
+	}
+
+	return e.Next()
+}
+
+func ExecuteBashCommandFromCommandTemplatesForChangedInstanceRecordAfterInstanceRecordDeletedEventHandler(e *pbCore.RecordEvent) error {
+	log.Println("OnDeploymentRecordAfterDeleteSuccess - changedRecord")
+
+	commandTemplateRecords, err := e.App.FindAllRecords(db.CommandTemplatesForChangedInstanceRecordCollectionName, dbx.HashExp{"crudOperation": "delete"})
+	if err != nil {
+		log.Printf("Error finding changedRecordCommandTemplates records: %v\n", err)
+		return e.Next()
+	}
+
+	instanceRecordData := instanceRecordsSdk.ConvertInstanceRecordToData(e.Record)
+
+	for _, commandTemplateRecord := range commandTemplateRecords {
+		bashTemplate := commandTemplateRecord.GetString("bashTemplate")
+		bashCommand, err := utils.PopulateTemplate(bashTemplate, instanceRecordData)
+		if err != nil {
+			log.Println(err)
+			return e.Next()
+		}
+
+		cmd := exec.Command("bash", "-c", bashCommand)
+		cmd.Start()
+	}
+
+	return e.Next()
+}
+
+func PromoteOrganisationCreatorToOrgAdminAfterUserCreateEventHandler(e *pbCore.RecordRequestEvent) error {
+	log.Println("onRecordCreateRequest - organisations")
+
+	e.Next()
+
+	organisationRecord := e.Record
+
+	organisationUserPermissionsCollection, err := e.App.FindCollectionByNameOrId("organisationUserPermissions")
+	if err != nil {
+		log.Printf("Error finding organisationUserPermissions collection: %v\n", err)
+		return e.Next()
+	}
+
+	organisationUserPermissionsRecord := pbCore.NewRecord(organisationUserPermissionsCollection)
+
+	organisationUserPermissionsRecord.Set("userId", e.Auth.Id)
+	organisationUserPermissionsRecord.Set("organisationId", organisationRecord.Id)
+	organisationUserPermissionsRecord.Set("role", "admin")
+	organisationUserPermissionsRecord.Set("status", "approved")
+	organisationUserPermissionsRecord.Set("userOrgKey", fmt.Sprintf("%s-%s", e.Auth.Id, organisationRecord.Id))
+
+	err = e.App.Save(organisationUserPermissionsRecord)
+	if err != nil {
+		e.App.Logger().Error("Fail to save organisation creator as organisation admin.")
+	}
+
+	return e.Next()
 }
 
 // // WriteSettingsToSettingsFile writes collections to pb_data/collections.json.
@@ -69,12 +322,14 @@ func WriteCollectionsToCollectionsFileAfterCollectionChangeEventHandler(e *pbCor
 // 	return true, nil
 // }
 
-var setupComplete = false
-
 func main() {
 	app := pocketbase.New()
+	app.Store().Set("isSetupComplete", false)
 
 	app.OnServe().BindFunc(func(se *pbCore.ServeEvent) error {
+		// serves static files from the provided public dir (if exists)
+		// se.Router.GET("/{path...}", pbApis.Static(os.DirFS("./pb_public"), false))
+
 		se.Router.GET("/hello/{name}", routes.HelloNameRouteHandler)
 		se.Router.POST("/bye", routes.ByeNameRouteHandler)
 		se.Router.POST("/stripe-webhook", routes.StripeWebHookRouteHandler)
@@ -85,25 +340,7 @@ func main() {
 		return nil
 	})
 
-	app.OnServe().BindFunc(func(se *pbCore.ServeEvent) error {
-		// serves static files from the provided public dir (if exists)
-		// se.Router.GET("/{path...}", pbApis.Static(os.DirFS("./pb_public"), false))
-
-		resp, err := pokkitSetup.ImportCollectionsFromCollectionsFile(app)
-		fmt.Println("ImportCollectionsFromCollectionsFilePath", resp, err)
-
-		resp, err = pokkitSetup.ImportSettingsFromSettingsFile(app)
-		fmt.Println("ImportSettingsFromSettingsFilePath", resp, err)
-
-		err = pokkitSetup.SaveSecretsJsonAsEnvVars(app)
-		fmt.Println("SaveSecretsJsonAsEnvVars", err)
-
-		se.Next()
-
-		setupComplete = true
-		fmt.Println("Setup complete.")
-		return nil
-	})
+	app.OnServe().BindFunc(SetupCollectionsSettingsAndEnvVarsOnServe)
 
 	app.OnSettingsReload().BindFunc(WriteSettingsToSettingsFileOnSettingsReloadEventHandler)
 
@@ -138,242 +375,18 @@ func main() {
 		return e.Next()
 	})
 
-	app.OnRecordAfterCreateSuccess(db.UsersCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		log.Println("OnUserRecordAfterCreateSuccess")
+	app.OnRecordAfterCreateSuccess(db.UsersCollectionName).BindFunc(PromoteFirstUserToApprovedAdminAfterUserCreateEventHandler)
 
-		userRecord := e.Record
-		userRecordsCount, err := e.App.CountRecords(db.UsersCollectionName)
+	app.OnRecordAfterCreateSuccess(db.InstancesCollectionName).BindFunc(ExecuteBashCommandFromCommandTemplatesForChangedInstanceRecordAfterInstanceRecordCreatedEventHandler)
+	app.OnRecordAfterCreateSuccess(db.InstancesCollectionName).BindFunc(ExecuteBashCommandFromCommandTemplatesForAllInstanceRecordsAfterInstanceRecordCreatedEventHandler)
 
-		if err != nil {
-			log.Printf("Error counting user records: %v\n", err)
-			return e.Next()
-		}
+	app.OnRecordAfterUpdateSuccess(db.InstancesCollectionName).BindFunc(ExecuteBashCommandFromCommandTemplatesForChangedInstanceRecordAfterInstanceRecordUpdatedEventHandler)
+	app.OnRecordAfterUpdateSuccess(db.InstancesCollectionName).BindFunc(ExecuteBashCommandFromCommandTemplatesForAllInstanceRecordsAfterInstanceRecordUpdatedEventHandler)
 
-		if userRecordsCount != 1 {
-			return e.Next()
-		}
+	app.OnRecordAfterDeleteSuccess(db.InstancesCollectionName).BindFunc(ExecuteBashCommandFromCommandTemplatesForChangedInstanceRecordAfterInstanceRecordDeletedEventHandler)
+	app.OnRecordAfterDeleteSuccess(db.InstancesCollectionName).BindFunc(ExecuteBashCommandFromCommandTemplatesForAllInstanceRecordsAfterInstanceRecordDeletedEventHandler)
 
-		globalUserPermissionsCollection, err := e.App.FindCollectionByNameOrId(db.GlobalUserPermissionsCollectionName)
-		if err != nil {
-			log.Printf("Error finding globalUserPermissions collection: %v\n", err)
-			return e.Next()
-		}
-
-		globalUserPermissionsRecord := pbCore.NewRecord(globalUserPermissionsCollection)
-		globalUserPermissionsRecord.Set("id", userRecord.Id)
-		globalUserPermissionsRecord.Set("userId", userRecord.Id)
-		globalUserPermissionsRecord.Set("role", "admin")
-		globalUserPermissionsRecord.Set("status", "approved")
-
-		err = e.App.Save(globalUserPermissionsRecord)
-		if err != nil {
-			log.Printf("Error saving globalUserPermissions record: %v\n", err)
-		}
-
-		return e.Next()
-	})
-
-	app.OnRecordAfterCreateSuccess(db.InstancesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		log.Println("OnDeplymentRecordAfterCreateSuccess - changedRecord")
-
-		commandTemplateRecords, err := app.FindAllRecords(db.CommandTemplatesForChangedInstanceRecordCollectionName, dbx.HashExp{"crudOperation": "create"})
-		if err != nil {
-			log.Printf("Error finding changedRecordCommandTemplates records: %v\n", err)
-			return e.Next()
-		}
-
-		instanceRecordData := instanceRecords.ConvertInstanceRecordToData(e.Record)
-
-		for _, commandTemplateRecord := range commandTemplateRecords {
-			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
-			bashCommand, err := utils.PopulateTemplate(bashTemplate, instanceRecordData)
-			if err != nil {
-				log.Println(err)
-				return e.Next()
-			}
-
-			cmd := exec.Command("bash", "-c", bashCommand)
-			cmd.Start()
-		}
-
-		return e.Next()
-	})
-
-	app.OnRecordAfterCreateSuccess(db.InstancesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		log.Println("OnDeplymentRecordAfterCreateSuccess - all records")
-
-		commandTemplateRecords, err := app.FindAllRecords(db.CommandTemplatesForAllInstanceRecordsCollectionName, dbx.HashExp{"crudOperation": "create"})
-		if err != nil {
-			log.Printf("Error finding allRecordCommandTemplates records: %v\n", err)
-			return e.Next()
-		}
-		deploymentRecords, err := app.FindAllRecords(db.InstancesCollectionName)
-		if err != nil {
-			log.Printf("Error finding deployment records: %v\n", err)
-			return e.Next()
-		}
-
-		instanceRecordsData := instanceRecords.ConvertInstanceRecordsToData(deploymentRecords)
-
-		for _, commandTemplateRecord := range commandTemplateRecords {
-			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
-			bashCommand, err := utils.PopulateTemplate(bashTemplate, instanceRecordsData)
-			if err != nil {
-				log.Println(err)
-				return e.Next()
-			}
-
-			cmd := exec.Command("bash", "-c", bashCommand)
-			cmd.Start()
-		}
-
-		return e.Next()
-	})
-
-	app.OnRecordAfterUpdateSuccess(db.InstancesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		log.Println("OnDeploymentRecordAfterUpdateSuccess")
-
-		commandTemplateRecords, err := app.FindAllRecords(db.CommandTemplatesForChangedInstanceRecordCollectionName, dbx.HashExp{"crudOperation": "update"})
-		if err != nil {
-			log.Printf("Error finding changedRecordCommandTemplates records: %v\n", err)
-			return e.Next()
-		}
-
-		deploymentRecordsData := instanceRecords.ConvertInstanceRecordToData(e.Record)
-
-		for _, commandTemplateRecord := range commandTemplateRecords {
-			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
-			bashCommand, err := utils.PopulateTemplate(bashTemplate, deploymentRecordsData)
-			if err != nil {
-				log.Println(err)
-				return e.Next()
-			}
-
-			cmd := exec.Command("bash", "-c", bashCommand)
-			cmd.Start()
-		}
-
-		return e.Next()
-	})
-
-	app.OnRecordAfterUpdateSuccess(db.InstancesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		log.Println("OnDeplymentRecordAfterUpdateSuccess - all records")
-
-		commandTemplateRecords, err := app.FindAllRecords(db.CommandTemplatesForAllInstanceRecordsCollectionName, dbx.HashExp{"crudOperation": "update"})
-		if err != nil {
-			log.Printf("Error finding allRecordCommandTemplates records: %v\n", err)
-			return e.Next()
-		}
-		deploymentRecords, err := app.FindAllRecords(db.InstancesCollectionName)
-		if err != nil {
-			log.Printf("Error finding deployments records: %v\n", err)
-			return e.Next()
-		}
-
-		instanceRecordsData := instanceRecords.ConvertInstanceRecordsToData(deploymentRecords)
-
-		for _, commandTemplateRecord := range commandTemplateRecords {
-			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
-			bashCommand, err := utils.PopulateTemplate(bashTemplate, instanceRecordsData)
-			if err != nil {
-				log.Println(err)
-				return e.Next()
-			}
-
-			cmd := exec.Command("bash", "-c", bashCommand)
-			cmd.Start()
-		}
-
-		return e.Next()
-	})
-
-	app.OnRecordAfterDeleteSuccess(db.InstancesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		log.Println("OnDeploymentRecordAfterDeleteSuccess - changedRecord")
-
-		commandTemplateRecords, err := app.FindAllRecords(db.CommandTemplatesForChangedInstanceRecordCollectionName, dbx.HashExp{"crudOperation": "delete"})
-		if err != nil {
-			log.Printf("Error finding changedRecordCommandTemplates records: %v\n", err)
-			return e.Next()
-		}
-
-		instanceRecordData := instanceRecords.ConvertInstanceRecordToData(e.Record)
-
-		for _, commandTemplateRecord := range commandTemplateRecords {
-			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
-			bashCommand, err := utils.PopulateTemplate(bashTemplate, instanceRecordData)
-			if err != nil {
-				log.Println(err)
-				return e.Next()
-			}
-
-			cmd := exec.Command("bash", "-c", bashCommand)
-			cmd.Start()
-		}
-
-		return e.Next()
-	})
-
-	app.OnRecordAfterDeleteSuccess(db.InstancesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		log.Println("OnDeplymentRecordAfterDeleteSuccess - all records")
-
-		commandTemplateRecords, err := app.FindAllRecords(db.CommandTemplatesForAllInstanceRecordsCollectionName, dbx.HashExp{"crudOperation": "delete"})
-		if err != nil {
-			log.Printf("Error finding allRecordCommandTemplates records: %v\n", err)
-			return e.Next()
-		}
-		deploymentRecords, err := app.FindAllRecords(db.InstancesCollectionName)
-		if err != nil {
-			log.Printf("Error finding deployments records: %v\n", err)
-			return e.Next()
-		}
-
-		instanceRecordsData := instanceRecords.ConvertInstanceRecordsToData(deploymentRecords)
-
-		for _, commandTemplateRecord := range commandTemplateRecords {
-			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
-			bashCommand, err := utils.PopulateTemplate(bashTemplate, instanceRecordsData)
-			if err != nil {
-				log.Println(err)
-				return e.Next()
-			}
-
-			cmd := exec.Command("bash", "-c", bashCommand)
-			cmd.Start()
-		}
-
-		return e.Next()
-	})
-
-	app.OnRecordCreateRequest(db.OrganisationsCollectionName).BindFunc(func(e *pbCore.RecordRequestEvent) error {
-		log.Println("onRecordCreateRequest - organisations")
-
-		e.Next()
-
-		organisationRecord := e.Record
-
-		organisationUserPermissionsCollection, err := e.App.FindCollectionByNameOrId(
-			"organisationUserPermissions",
-		)
-		if err != nil {
-			log.Printf("Error finding organisationUserPermissions collection: %v\n", err)
-			return e.Next()
-		}
-
-		organisationUserPermissionsRecord := pbCore.NewRecord(organisationUserPermissionsCollection)
-
-		organisationUserPermissionsRecord.Set("userId", e.Auth.Id)
-		organisationUserPermissionsRecord.Set("organisationId", organisationRecord.Id)
-		organisationUserPermissionsRecord.Set("role", "admin")
-		organisationUserPermissionsRecord.Set("status", "approved")
-		organisationUserPermissionsRecord.Set("userOrgKey", fmt.Sprintf("%s-%s", e.Auth.Id, organisationRecord.Id))
-
-		err = e.App.Save(organisationUserPermissionsRecord)
-		if err != nil {
-			log.Printf("Error saving organisationUserPermissions record: %v\n", err)
-		}
-
-		return e.Next()
-	})
+	app.OnRecordCreateRequest(db.OrganisationsCollectionName).BindFunc(PromoteOrganisationCreatorToOrgAdminAfterUserCreateEventHandler)
 
 	app.OnTerminate().BindFunc(func(e *pbCore.TerminateEvent) error {
 		log.Println("OnTerminate")
