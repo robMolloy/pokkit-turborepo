@@ -19,26 +19,26 @@ import (
 	"github.com/pocketbase/pocketbase/tools/types"
 )
 
-func convertCommandTemplateRecordToTemplatableData(commandTemplateRecord *pbCore.Record) map[string]any {
-	paidUntil := commandTemplateRecord.GetDateTime("paidUntil")
+func convertInstanceRecordToData(instanceRecord *pbCore.Record) map[string]any {
+	paidUntil := instanceRecord.GetDateTime("paidUntil")
 	now := types.NowDateTime()
 	isExpired := paidUntil.Before(now)
 
 	return map[string]any{
-		"id":         commandTemplateRecord.GetString("id"),
-		"portNumber": commandTemplateRecord.GetInt("portNumber"),
-		"appName":    commandTemplateRecord.GetString("appName"),
+		"id":         instanceRecord.GetString("id"),
+		"portNumber": instanceRecord.GetInt("portNumber"),
+		"appName":    instanceRecord.GetString("appName"),
 		"paidUntil":  paidUntil,
 		"isExpired":  isExpired,
-		"created":    commandTemplateRecord.GetDateTime("created"),
-		"updated":    commandTemplateRecord.GetDateTime("updated"),
+		"created":    instanceRecord.GetDateTime("created"),
+		"updated":    instanceRecord.GetDateTime("updated"),
 	}
 }
-func convertCommandTemplateRecordsToTemplatableData(commandTemplateRecord []*pbCore.Record) []map[string]any {
+func convertInstanceRecordsToData(instanceRecords []*pbCore.Record) []map[string]any {
 	templatableDataList := []map[string]any{}
 
-	for _, commandTemplateRecord := range commandTemplateRecord {
-		templatableData := convertCommandTemplateRecordToTemplatableData(commandTemplateRecord)
+	for _, instanceRecord := range instanceRecords {
+		templatableData := convertInstanceRecordToData(instanceRecord)
 		templatableDataList = append(templatableDataList, templatableData)
 	}
 
@@ -366,11 +366,11 @@ func main() {
 			return e.Next()
 		}
 
-		deploymentRecordsData := convertCommandTemplateRecordToTemplatableData(e.Record)
+		instanceRecordData := convertInstanceRecordToData(e.Record)
 
 		for _, commandTemplateRecord := range commandTemplateRecords {
 			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
-			bashCommand, err := utils.PopulateTemplate(bashTemplate, deploymentRecordsData)
+			bashCommand, err := utils.PopulateTemplate(bashTemplate, instanceRecordData)
 			if err != nil {
 				log.Println(err)
 				return e.Next()
@@ -397,11 +397,11 @@ func main() {
 			return e.Next()
 		}
 
-		deploymentRecordsData := convertCommandTemplateRecordsToTemplatableData(deploymentRecords)
+		instanceRecordsData := convertInstanceRecordsToData(deploymentRecords)
 
 		for _, commandTemplateRecord := range commandTemplateRecords {
 			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
-			bashCommand, err := utils.PopulateTemplate(bashTemplate, deploymentRecordsData)
+			bashCommand, err := utils.PopulateTemplate(bashTemplate, instanceRecordsData)
 			if err != nil {
 				log.Println(err)
 				return e.Next()
@@ -423,7 +423,7 @@ func main() {
 			return e.Next()
 		}
 
-		deploymentRecordsData := convertCommandTemplateRecordToTemplatableData(e.Record)
+		deploymentRecordsData := convertInstanceRecordToData(e.Record)
 
 		for _, commandTemplateRecord := range commandTemplateRecords {
 			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
@@ -454,11 +454,11 @@ func main() {
 			return e.Next()
 		}
 
-		deploymentRecordsData := convertCommandTemplateRecordsToTemplatableData(deploymentRecords)
+		instanceRecordsData := convertInstanceRecordsToData(deploymentRecords)
 
 		for _, commandTemplateRecord := range commandTemplateRecords {
 			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
-			bashCommand, err := utils.PopulateTemplate(bashTemplate, deploymentRecordsData)
+			bashCommand, err := utils.PopulateTemplate(bashTemplate, instanceRecordsData)
 			if err != nil {
 				log.Println(err)
 				return e.Next()
@@ -480,11 +480,11 @@ func main() {
 			return e.Next()
 		}
 
-		deploymentRecordsData := convertCommandTemplateRecordToTemplatableData(e.Record)
+		instanceRecordData := convertInstanceRecordToData(e.Record)
 
 		for _, commandTemplateRecord := range commandTemplateRecords {
 			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
-			bashCommand, err := utils.PopulateTemplate(bashTemplate, deploymentRecordsData)
+			bashCommand, err := utils.PopulateTemplate(bashTemplate, instanceRecordData)
 			if err != nil {
 				log.Println(err)
 				return e.Next()
@@ -511,11 +511,11 @@ func main() {
 			return e.Next()
 		}
 
-		deploymentRecordsData := convertCommandTemplateRecordsToTemplatableData(deploymentRecords)
+		instanceRecordsData := convertInstanceRecordsToData(deploymentRecords)
 
 		for _, commandTemplateRecord := range commandTemplateRecords {
 			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
-			bashCommand, err := utils.PopulateTemplate(bashTemplate, deploymentRecordsData)
+			bashCommand, err := utils.PopulateTemplate(bashTemplate, instanceRecordsData)
 			if err != nil {
 				log.Println(err)
 				return e.Next()
