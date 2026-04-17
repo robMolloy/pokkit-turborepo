@@ -92,3 +92,54 @@ func ImportCollectionsFromCollectionsFile(app pbCore.App) (bool, error) {
 
 	return true, nil
 }
+
+func WriteSettingsToSettingsFileOnSettingsReloadEventHandler(e *pbCore.SettingsReloadEvent) error {
+	fmt.Println("OnSettingsReload")
+	if err := e.Next(); err != nil {
+		return err
+	}
+
+	isSetupComplete := e.App.Store().Get("isSetupComplete").(bool)
+	if isSetupComplete {
+		writeErr := utils.WriteDataToFileAsJson(e.App.DataDir()+"/settings.json", e.App.Settings())
+		if writeErr != nil {
+			e.App.Logger().Error("Error when writing to settings.json")
+		}
+	}
+
+	fmt.Println("OnSettingsReload - after")
+	return nil
+}
+
+func WriteCollectionsToCollectionsFileAfterCollectionChangeEventHandler(e *pbCore.CollectionEvent) error {
+	fmt.Println("OnCollectionAfterDeleteSuccess")
+	e.Next()
+
+	isSetupComplete := e.App.Store().Get("isSetupComplete").(bool)
+	if isSetupComplete {
+		_, writeErr := WriteCollectionsToCollectionsFile(e.App)
+		if writeErr != nil {
+			e.App.Logger().Error("Error when writing to collections.json", "writeErr", writeErr)
+		}
+	}
+
+	return nil
+}
+
+func SetupCollectionsSettingsAndEnvVarsOnServe(se *pbCore.ServeEvent) error {
+	resp, err := ImportCollectionsFromCollectionsFile(se.App)
+	fmt.Println("ImportCollectionsFromCollectionsFilePath", resp, err)
+
+	resp, err = ImportSettingsFromSettingsFile(se.App)
+	fmt.Println("ImportSettingsFromSettingsFilePath", resp, err)
+
+	err = SaveSecretsJsonAsEnvVars(se.App)
+	fmt.Println("SaveSecretsJsonAsEnvVars", err)
+
+	se.Next()
+
+	se.App.Store().Set("isSetupComplete", true)
+
+	fmt.Println("Setup complete.")
+	return nil
+}
