@@ -2,216 +2,72 @@ package main
 
 import (
 	"app-db/src/db"
+	"app-db/src/modules/instanceRecords"
+	"app-db/src/modules/userBalanceLedgerRecords"
+	"app-db/src/pokkitSetup"
 	"app-db/src/routes"
 	"app-db/src/utils"
-	"encoding/json"
-	"errors"
 	"fmt"
-	"io"
 	"log"
-	"os"
 	"os/exec"
 
 	"github.com/pocketbase/dbx"
 	pocketbase "github.com/pocketbase/pocketbase"
 	pbApis "github.com/pocketbase/pocketbase/apis"
 	pbCore "github.com/pocketbase/pocketbase/core"
-	"github.com/pocketbase/pocketbase/tools/types"
 )
 
-func convertInstanceRecordToData(instanceRecord *pbCore.Record) map[string]any {
-	paidUntil := instanceRecord.GetDateTime("paidUntil")
-	now := types.NowDateTime()
-	isExpired := paidUntil.Before(now)
-
-	return map[string]any{
-		"id":         instanceRecord.GetString("id"),
-		"portNumber": instanceRecord.GetInt("portNumber"),
-		"appName":    instanceRecord.GetString("appName"),
-		"paidUntil":  paidUntil,
-		"isExpired":  isExpired,
-		"created":    instanceRecord.GetDateTime("created"),
-		"updated":    instanceRecord.GetDateTime("updated"),
-	}
-}
-func convertInstanceRecordsToData(instanceRecords []*pbCore.Record) []map[string]any {
-	templatableDataList := []map[string]any{}
-
-	for _, instanceRecord := range instanceRecords {
-		templatableData := convertInstanceRecordToData(instanceRecord)
-		templatableDataList = append(templatableDataList, templatableData)
-	}
-
-	return templatableDataList
-}
-
-type UserBalanceLedgerLedgerRecordData struct {
-	Id              string         `json:"id"`
-	UserId          string         `json:"userId"`
-	TokenAmount     int            `json:"tokenAmount"`
-	Reason          string         `json:"reason"`
-	PaymentIntentId string         `json:"paymentIntentId"`
-	InstanceId      string         `json:"instanceId"`
-	Created         types.DateTime `json:"created"`
-	Updated         types.DateTime `json:"updated"`
-}
-
-func convertUserBalanceLedgerRecordToData(userBalanceLedgerRecord *pbCore.Record) UserBalanceLedgerLedgerRecordData {
-	return UserBalanceLedgerLedgerRecordData{
-		Id:              userBalanceLedgerRecord.GetString("id"),
-		UserId:          userBalanceLedgerRecord.GetString("userId"),
-		TokenAmount:     userBalanceLedgerRecord.GetInt("tokenAmount"),
-		Reason:          userBalanceLedgerRecord.GetString("reason"),
-		PaymentIntentId: userBalanceLedgerRecord.GetString("paymentIntentId"),
-		InstanceId:      userBalanceLedgerRecord.GetString("instanceId"),
-		Created:         userBalanceLedgerRecord.GetDateTime("created"),
-		Updated:         userBalanceLedgerRecord.GetDateTime("updated"),
-	}
-}
-
-func fileExists(path string) bool {
-	_, err := os.Stat(path)
-	return !errors.Is(err, os.ErrNotExist)
-}
-
-// ImportCollectionsFromCollectionsFile imports collections from pb_data/collections.json.
-// If successful, true is returned.
-// If this file doesn't exist, a boolean of false is returned.
-func ImportCollectionsFromCollectionsFile(app pbCore.App) (bool, error) {
-	collectionsFileName := "collections.json"
-	collectionsFilePath := fmt.Sprintf("%s/%s", app.DataDir(), collectionsFileName)
-
-	isExist := fileExists(collectionsFilePath)
-	if !isExist {
-		return false, nil
-	}
-
-	// File definitely exists, this will only fail with an error that should be logged
-	collectionsData, err := os.ReadFile(collectionsFilePath)
-	if err != nil {
-		return false, err
-	}
-
-	err = app.ImportCollectionsByMarshaledJSON(collectionsData, false)
-	if err != nil {
-		return false, err
-	}
-
-	return true, nil
-}
-
-// WriteCollectionsToCollectionsFile writes collections to pb_data/collections.json.
-// If successful, true is returned.
-// If this file doesn't exist, a boolean of false is returned.
-func WriteCollectionsToCollectionsFile(app pbCore.App) (bool, error) {
-	collectionsFileName := "collections.json"
-	collectionsFilePath := fmt.Sprintf("%s/%s", app.DataDir(), collectionsFileName)
-
-	collectionsData, err := app.FindAllCollections()
-	if err != nil {
-		return false, err
-	}
-
-	err = writeDataToFileAsJson(collectionsFilePath, collectionsData)
-
-	return err == nil, err
-}
-
-func SaveSecretsJsonAsEnvVars(app pbCore.App) error {
-	fileName := "secrets.json"
-	filePath := fmt.Sprintf("%s/%s", app.DataDir(), fileName)
-	obj, err := readJsonFromFile(filePath)
-	if err != nil {
+func WriteSettingsToSettingsFileOnSettingsReloadEventHandler(e *pbCore.SettingsReloadEvent) error {
+	fmt.Println("OnSettingsReload")
+	if err := e.Next(); err != nil {
 		return err
 	}
 
-	for key, value := range obj {
-		strValue := fmt.Sprintf("%v", value)
-		os.Setenv(key, strValue)
+	if setupComplete {
+		writeErr := utils.WriteDataToFileAsJson(e.App.DataDir()+"/settings.json", e.App.Settings())
+		if writeErr != nil {
+			e.App.Logger().Error("Error when writing to settings.json")
+		}
+	}
+
+	fmt.Println("OnSettingsReload - after")
+	return nil
+}
+
+func WriteCollectionsToCollectionsFileAfterCollectionChangeEventHandler(e *pbCore.CollectionEvent) error {
+	fmt.Println("OnCollectionAfterDeleteSuccess")
+	e.Next()
+
+	if setupComplete {
+		_, writeErr := pokkitSetup.WriteCollectionsToCollectionsFile(e.App)
+		if writeErr != nil {
+			e.App.Logger().Error("Error when writing to collections.json", "writeErr", writeErr)
+		}
 	}
 
 	return nil
 }
 
-func ImportSettingsFromSettingsFile(app pbCore.App) (bool, error) {
-	fileName := "settings.json"
-	filePath := fmt.Sprintf("%s/%s", app.DataDir(), fileName)
+// // WriteSettingsToSettingsFile writes collections to pb_data/collections.json.
+// // If successful, true is returned.
+// // If this file doesn't exist, a boolean of false is returned.
+// func WriteSettingsToSettingsFile(app pbCore.App) (bool, error) {
+// 	fileName := "settings.json"
+// 	filePath := fmt.Sprintf("%s/%s", app.DataDir(), fileName)
 
-	isExist := fileExists(filePath)
-	if !isExist {
-		return false, nil
-	}
+// 	settings := app.Settings()
 
-	// File definitely exists, this will only fail with an error that should be logged
-	settingsData, err := os.ReadFile(filePath)
-	if err != nil {
-		return false, err
-	}
+// 	settingsJson, err := json.Marshal(settings)
+// 	if err != nil {
+// 		return false, err
+// 	}
 
-	settings := app.Settings()
-	unmarshalErr := json.Unmarshal(settingsData, settings)
-	if unmarshalErr != nil {
-		return false, unmarshalErr
-	}
-	app.Save(settings)
-
-	return true, nil
-}
-
-func readJsonFromFile(filePath string) (map[string]any, error) {
-	jsonBytes, err := os.ReadFile(filePath)
-	if err != nil {
-		return nil, err
-	}
-
-	result := map[string]any{}
-
-	err = json.Unmarshal([]byte(jsonBytes), &result)
-	return result, err
-}
-
-func ReadJsonFromRequestBody(requestBody io.ReadCloser) (map[string]any, error) {
-	body := requestBody
-	data, err := io.ReadAll(body)
-	if err != nil {
-		return nil, err
-	}
-	defer body.Close()
-
-	result := map[string]any{}
-	err = json.Unmarshal(data, &result)
-	return result, err
-}
-
-func writeDataToFileAsJson(filePath string, data any) error {
-	jsonData, err := json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		return err
-	}
-
-	return os.WriteFile(filePath, jsonData, 0644)
-}
-
-// WriteSettingsToSettingsFile writes collections to pb_data/collections.json.
-// If successful, true is returned.
-// If this file doesn't exist, a boolean of false is returned.
-func WriteSettingsToSettingsFile(app pbCore.App) (bool, error) {
-	fileName := "settings.json"
-	filePath := fmt.Sprintf("%s/%s", app.DataDir(), fileName)
-
-	settings := app.Settings()
-
-	settingsJson, err := json.Marshal(settings)
-	if err != nil {
-		return false, err
-	}
-
-	err = os.WriteFile(filePath, settingsJson, 0644)
-	if err != nil {
-		return false, err
-	}
-	return true, nil
-}
+// 	err = os.WriteFile(filePath, settingsJson, 0644)
+// 	if err != nil {
+// 		return false, err
+// 	}
+// 	return true, nil
+// }
 
 var setupComplete = false
 
@@ -219,22 +75,27 @@ func main() {
 	app := pocketbase.New()
 
 	app.OnServe().BindFunc(func(se *pbCore.ServeEvent) error {
-		// serves static files from the provided public dir (if exists)
-		// se.Router.GET("/{path...}", pbApis.Static(os.DirFS("./pb_public"), false))
-
 		se.Router.GET("/hello/{name}", routes.HelloNameRouteHandler)
 		se.Router.POST("/bye", routes.ByeNameRouteHandler)
 		se.Router.POST("/stripe-webhook", routes.StripeWebHookRouteHandler)
 		se.Router.POST("/stripe-create-checkout-session", routes.StripeCreateCheckoutSessionRouteHandler).Bind(pbApis.RequireAuth())
 		se.Router.POST("/stripe-retrieve-checkout-session", routes.StripeRetrieveCheckoutSessionRouteHandler).Bind(pbApis.RequireAuth())
+		se.Next()
 
-		resp, err := ImportCollectionsFromCollectionsFile(app)
+		return nil
+	})
+
+	app.OnServe().BindFunc(func(se *pbCore.ServeEvent) error {
+		// serves static files from the provided public dir (if exists)
+		// se.Router.GET("/{path...}", pbApis.Static(os.DirFS("./pb_public"), false))
+
+		resp, err := pokkitSetup.ImportCollectionsFromCollectionsFile(app)
 		fmt.Println("ImportCollectionsFromCollectionsFilePath", resp, err)
 
-		resp, err = ImportSettingsFromSettingsFile(app)
+		resp, err = pokkitSetup.ImportSettingsFromSettingsFile(app)
 		fmt.Println("ImportSettingsFromSettingsFilePath", resp, err)
 
-		err = SaveSecretsJsonAsEnvVars(app)
+		err = pokkitSetup.SaveSecretsJsonAsEnvVars(app)
 		fmt.Println("SaveSecretsJsonAsEnvVars", err)
 
 		se.Next()
@@ -244,62 +105,17 @@ func main() {
 		return nil
 	})
 
-	app.OnSettingsReload().BindFunc(func(e *pbCore.SettingsReloadEvent) error {
-		fmt.Println("OnSettingsReload")
-		if err := e.Next(); err != nil {
-			return err
-		}
+	app.OnSettingsReload().BindFunc(WriteSettingsToSettingsFileOnSettingsReloadEventHandler)
 
-		if setupComplete {
-			writeErr := writeDataToFileAsJson(app.DataDir()+"/settings.json", e.App.Settings())
-			fmt.Println("writeDataToFileAsJson", writeErr)
-		}
-
-		fmt.Println("OnSettingsReload - after")
-		return nil
-	})
-
-	app.OnCollectionAfterCreateSuccess().BindFunc(func(e *pbCore.CollectionEvent) error {
-		fmt.Println("OnCollectionAfterCreateSuccess")
-		e.Next()
-
-		if setupComplete {
-			writeResp, writeErr := WriteCollectionsToCollectionsFile(e.App)
-			fmt.Println("WriteCollectionsToCollectionsFilePath", writeResp, writeErr)
-		}
-
-		return nil
-	})
-
-	app.OnCollectionAfterUpdateSuccess().BindFunc(func(e *pbCore.CollectionEvent) error {
-		fmt.Println("OnCollectionAfterUpdateSuccess")
-		e.Next()
-
-		if setupComplete {
-			writeResp, writeErr := WriteCollectionsToCollectionsFile(e.App)
-			fmt.Println("WriteCollectionsToCollectionsFilePath", writeResp, writeErr)
-		}
-
-		return nil
-	})
-
-	app.OnCollectionAfterDeleteSuccess().BindFunc(func(e *pbCore.CollectionEvent) error {
-		fmt.Println("OnCollectionAfterDeleteSuccess")
-		e.Next()
-
-		if setupComplete {
-			writeResp, writeErr := WriteCollectionsToCollectionsFile(e.App)
-			fmt.Println("WriteCollectionsToCollectionsFilePath", writeResp, writeErr)
-		}
-
-		return nil
-	})
+	app.OnCollectionAfterCreateSuccess().BindFunc(WriteCollectionsToCollectionsFileAfterCollectionChangeEventHandler)
+	app.OnCollectionAfterUpdateSuccess().BindFunc(WriteCollectionsToCollectionsFileAfterCollectionChangeEventHandler)
+	app.OnCollectionAfterDeleteSuccess().BindFunc(WriteCollectionsToCollectionsFileAfterCollectionChangeEventHandler)
 
 	app.OnRecordAfterCreateSuccess(db.UserBalanceLedgerCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		log.Println("OnUserBalanceLedgerRecordAfterCreateSuccess")
 
 		userBalanceLedgerRecord := e.Record
-		userBalanceLedgerRecordData := convertUserBalanceLedgerRecordToData(userBalanceLedgerRecord)
+		userBalanceLedgerRecordData := userBalanceLedgerRecords.ConvertUserBalanceLedgerRecordToData(userBalanceLedgerRecord)
 		userId := userBalanceLedgerRecordData.UserId
 
 		userBalancesCollection, err := app.FindCollectionByNameOrId(db.UserBalancesCollectionName)
@@ -366,7 +182,7 @@ func main() {
 			return e.Next()
 		}
 
-		instanceRecordData := convertInstanceRecordToData(e.Record)
+		instanceRecordData := instanceRecords.ConvertInstanceRecordToData(e.Record)
 
 		for _, commandTemplateRecord := range commandTemplateRecords {
 			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
@@ -397,7 +213,7 @@ func main() {
 			return e.Next()
 		}
 
-		instanceRecordsData := convertInstanceRecordsToData(deploymentRecords)
+		instanceRecordsData := instanceRecords.ConvertInstanceRecordsToData(deploymentRecords)
 
 		for _, commandTemplateRecord := range commandTemplateRecords {
 			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
@@ -423,7 +239,7 @@ func main() {
 			return e.Next()
 		}
 
-		deploymentRecordsData := convertInstanceRecordToData(e.Record)
+		deploymentRecordsData := instanceRecords.ConvertInstanceRecordToData(e.Record)
 
 		for _, commandTemplateRecord := range commandTemplateRecords {
 			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
@@ -454,7 +270,7 @@ func main() {
 			return e.Next()
 		}
 
-		instanceRecordsData := convertInstanceRecordsToData(deploymentRecords)
+		instanceRecordsData := instanceRecords.ConvertInstanceRecordsToData(deploymentRecords)
 
 		for _, commandTemplateRecord := range commandTemplateRecords {
 			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
@@ -480,7 +296,7 @@ func main() {
 			return e.Next()
 		}
 
-		instanceRecordData := convertInstanceRecordToData(e.Record)
+		instanceRecordData := instanceRecords.ConvertInstanceRecordToData(e.Record)
 
 		for _, commandTemplateRecord := range commandTemplateRecords {
 			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
@@ -511,7 +327,7 @@ func main() {
 			return e.Next()
 		}
 
-		instanceRecordsData := convertInstanceRecordsToData(deploymentRecords)
+		instanceRecordsData := instanceRecords.ConvertInstanceRecordsToData(deploymentRecords)
 
 		for _, commandTemplateRecord := range commandTemplateRecords {
 			bashTemplate := commandTemplateRecord.GetString("bashTemplate")
