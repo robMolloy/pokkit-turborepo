@@ -90,7 +90,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-03-13 21:22:44.235Z",
-    "updated": "2026-04-20 19:51:23.620Z",
+    "updated": "2026-04-23 14:54:32.017Z",
     "system": true
   },
   {
@@ -197,7 +197,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-03-13 21:22:44.238Z",
-    "updated": "2026-04-20 19:51:23.622Z",
+    "updated": "2026-04-23 14:54:32.020Z",
     "system": true
   },
   {
@@ -306,7 +306,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-03-13 21:22:44.239Z",
-    "updated": "2026-04-20 19:51:23.623Z",
+    "updated": "2026-04-23 14:54:32.021Z",
     "system": true
   },
   {
@@ -400,7 +400,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-03-13 21:22:44.241Z",
-    "updated": "2026-04-20 19:51:23.625Z",
+    "updated": "2026-04-23 14:54:32.023Z",
     "system": true
   },
   {
@@ -509,7 +509,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-03-13 21:22:44.243Z",
-    "updated": "2026-04-20 19:51:23.626Z",
+    "updated": "2026-04-23 14:54:32.024Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -718,7 +718,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-03-13 21:22:44.246Z",
-    "updated": "2026-04-20 19:51:23.628Z",
+    "updated": "2026-04-23 14:54:32.026Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -876,7 +876,7 @@
     ],
     "indexes": [],
     "created": "2026-04-17 11:13:52.458Z",
-    "updated": "2026-04-20 19:51:23.630Z",
+    "updated": "2026-04-23 14:54:32.029Z",
     "system": false
   },
   {
@@ -997,7 +997,7 @@
       "CREATE UNIQUE INDEX `idx_0UWlVOdDqD` ON `organisationUserPermissions` (`userOrgKey`)"
     ],
     "created": "2026-04-17 11:13:52.459Z",
-    "updated": "2026-04-20 19:51:23.632Z",
+    "updated": "2026-04-23 14:54:32.030Z",
     "system": false
   },
   {
@@ -1075,7 +1075,7 @@
     ],
     "indexes": [],
     "created": "2026-04-17 11:13:52.460Z",
-    "updated": "2026-04-20 19:51:23.635Z",
+    "updated": "2026-04-23 14:54:32.032Z",
     "system": false
   },
   {
@@ -1178,7 +1178,7 @@
       "CREATE UNIQUE INDEX `idx_MGuOIBNgXv` ON `instances` (`portNumber`)"
     ],
     "created": "2026-04-17 11:13:52.461Z",
-    "updated": "2026-04-20 19:51:23.636Z",
+    "updated": "2026-04-23 14:54:32.033Z",
     "system": false
   },
   {
@@ -1260,7 +1260,7 @@
       "CREATE UNIQUE INDEX `idx_jmZ8IL5Ej4` ON `commandTemplatesForChangedInstanceRecord` (`crudOperation`)"
     ],
     "created": "2026-04-17 11:13:52.462Z",
-    "updated": "2026-04-20 19:51:23.637Z",
+    "updated": "2026-04-23 14:54:32.034Z",
     "system": false
   },
   {
@@ -1342,7 +1342,7 @@
       "CREATE UNIQUE INDEX `idx_2OQVB3k4yj` ON `commandTemplatesForAllInstanceRecords` (`crudOperation`)"
     ],
     "created": "2026-04-17 11:13:52.464Z",
-    "updated": "2026-04-20 19:51:23.639Z",
+    "updated": "2026-04-23 14:54:32.036Z",
     "system": false
   },
   {
@@ -1421,7 +1421,7 @@
       "CREATE UNIQUE INDEX `idx_FOc3LWC22r` ON `userStripeDetails` (`userId`)"
     ],
     "created": "2026-04-17 11:13:52.465Z",
-    "updated": "2026-04-20 19:51:23.640Z",
+    "updated": "2026-04-23 14:54:32.038Z",
     "system": false
   },
   {
@@ -1540,7 +1540,7 @@
       "CREATE INDEX `idx_IeDxOWi9ji` ON `userBalanceLedger` (`paymentIntentId`)"
     ],
     "created": "2026-04-17 11:13:52.467Z",
-    "updated": "2026-04-20 19:51:23.641Z",
+    "updated": "2026-04-23 14:54:32.039Z",
     "system": false
   },
   {
@@ -1650,7 +1650,7 @@
     ],
     "indexes": [],
     "created": "2026-04-17 11:13:52.468Z",
-    "updated": "2026-04-20 19:51:23.643Z",
+    "updated": "2026-04-23 14:54:32.040Z",
     "system": false
   },
   {
@@ -1727,7 +1727,7 @@
       "CREATE UNIQUE INDEX `idx_tKzMrurend` ON `userBalances` (`userId`)"
     ],
     "created": "2026-04-17 11:13:52.470Z",
-    "updated": "2026-04-20 19:51:23.645Z",
+    "updated": "2026-04-23 14:54:32.042Z",
     "system": false
   },
   {
@@ -1827,7 +1827,7 @@
     ],
     "indexes": [],
     "created": "2026-04-17 11:13:52.471Z",
-    "updated": "2026-04-20 19:51:23.646Z",
+    "updated": "2026-04-23 14:54:32.043Z",
     "system": false
   },
   {
@@ -1863,7 +1863,7 @@
         "minSelect": 0,
         "name": "userId",
         "presentable": false,
-        "required": true,
+        "required": false,
         "system": false,
         "type": "relation"
       },
@@ -1874,6 +1874,20 @@
         "max": 0,
         "min": 0,
         "name": "paymentIntentId",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text1767278655",
+        "max": 0,
+        "min": 0,
+        "name": "currency",
         "pattern": "",
         "presentable": false,
         "primaryKey": false,
@@ -1974,7 +1988,7 @@
       "CREATE INDEX `idx_Bzj0h4o9vr` ON `stripeBalanceLedger` (`paymentIntentId`)"
     ],
     "created": "2026-04-23 10:02:37.517Z",
-    "updated": "2026-04-23 10:02:37.517Z",
+    "updated": "2026-04-23 14:55:50.695Z",
     "system": false
   }
 ]

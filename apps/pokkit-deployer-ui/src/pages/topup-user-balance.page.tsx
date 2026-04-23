@@ -31,7 +31,7 @@ export default function Page() {
       <Button
         onClick={async () => {
           const sessionResp = await createStripeCheckoutSession({
-            product: "token",
+            productName: "token",
             quantity: 100,
           });
 
@@ -45,7 +45,7 @@ export default function Page() {
       <Button
         onClick={async () => {
           const sessionResp = await createStripeCheckoutSession({
-            product: "instance_subscription",
+            productName: "instance_subscription",
             quantity: 100,
           });
 

@@ -41,7 +41,10 @@ export const stripeRetrieveCheckoutSession = async (p: {
   }
 };
 
-export const createStripeCheckoutSession = async (p1: { product: string; quantity: number }) => {
+export const createStripeCheckoutSession = async (p1: {
+  productName: string;
+  quantity: number;
+}) => {
   try {
     const res = await pb.send("/stripe-create-checkout-session", {
       method: "POST",
