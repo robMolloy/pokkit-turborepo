@@ -228,7 +228,6 @@ func createBalanceLedgerRecordFromStripePayload(e *pbCore.RequestEvent, payload 
 }
 
 func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
-
 	stripeWebhookSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
 	if stripeWebhookSecret == "" {
 		return e.InternalServerError("STRIPE_WEBHOOK_SECRET not provided in env", nil)
@@ -239,28 +238,18 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 	}
 	payload, err := io.ReadAll(e.Request.Body)
 	if err != nil {
-		return e.InternalServerError("Could not read request body payload.", nil)
+		return e.InternalServerError("Could not read request body payload.", err)
 	}
 	event, err := stripeWebhook.ConstructEvent(payload, stripeSignatureHeader, stripeWebhookSecret)
 	if err != nil {
-		return e.BadRequestError("Could not construct webhook event", nil)
+		return e.BadRequestError("Could not construct webhook event", err)
 	}
-	eventType := event.Type
-	e.App.Logger().Error("eventType", "eventType", event)
 
 	var paymentIntent stripe.PaymentIntent
 	err = json.Unmarshal(event.Data.Raw, &paymentIntent)
 	if err != nil {
-		return e.BadRequestError("Could not unmarshal JSON from stripe payment intent:", nil)
+		return e.BadRequestError("Could not unmarshal JSON from stripe payment intent:", err)
 	}
-
-	// eventType := event.Type
-	currency := paymentIntent.Currency
-	paymentIntentId := paymentIntent.ID
-	userId := paymentIntent.Metadata["userId"]
-	productName := paymentIntent.Metadata["productName"]
-	productId := paymentIntent.Metadata["productId"]
-	stripeCustomerId := paymentIntent.Metadata["stripeCustomerId"]
 
 	quantity, err := strconv.Atoi(paymentIntent.Metadata["quantity"])
 	if err != nil {
@@ -268,19 +257,19 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 	}
 
 	stripeBalanceLedgeRecordStruct := TStripeBalanceLedgerStruct{
-		UserId:           userId,
 		Quantity:         quantity,
-		PaymentIntentId:  paymentIntentId,
-		Currency:         string(currency),
-		ProductName:      productName,
-		ProductId:        productId,
-		StripeCustomerId: stripeCustomerId,
-		EventType:        string(eventType),
+		EventType:        string(event.Type),
+		Currency:         string(paymentIntent.Currency),
+		PaymentIntentId:  paymentIntent.ID,
+		UserId:           paymentIntent.Metadata["userId"],
+		ProductName:      paymentIntent.Metadata["productName"],
+		ProductId:        paymentIntent.Metadata["productId"],
+		StripeCustomerId: paymentIntent.Metadata["stripeCustomerId"],
 	}
 
 	stripeBalanceLedgerCollection, err := e.App.FindCollectionByNameOrId(db.StripeBalanceLedgerCollectionName)
 	if err != nil {
-		return e.BadRequestError("Error finding UserBalanceLedger collection:", err)
+		return e.BadRequestError("Error finding StripeBalanceLedger collection:", err)
 	}
 
 	stripeBalanceLedgerRecord := pbCore.NewRecord(stripeBalanceLedgerCollection)
@@ -289,8 +278,6 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 	if err != nil {
 		return e.BadRequestError("Unable to save stripeBalanceLedgerRecord", err)
 	}
-
-	e.App.Logger().Error("huh", "stripeBalanceLedgeRecord", stripeBalanceLedgeRecordStruct)
 
 	return e.JSON(http.StatusOK, map[string]any{"url": "url"})
 }
