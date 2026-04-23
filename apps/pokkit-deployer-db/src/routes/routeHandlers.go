@@ -180,6 +180,28 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 	})
 }
 
+func createBalanceLedgerRecordFromStripePayload(e *pbCore.RequestEvent, payload struct {
+	UserId          string
+	Quantity        int
+	PaymentIntentId string
+}) error {
+	userBalanceLedgerCollection, err := e.App.FindCollectionByNameOrId(db.UserBalanceLedgerCollectionName)
+	if err != nil {
+		return e.BadRequestError("Error finding UserBalanceLedger collection:", nil)
+	}
+	userBalanceLedgerRecord := pbCore.NewRecord(userBalanceLedgerCollection)
+	userBalanceLedgerRecord.Set("userId", payload.UserId)
+	userBalanceLedgerRecord.Set("tokenAmount", payload.Quantity)
+	userBalanceLedgerRecord.Set("reason", "stripe_payment")
+	userBalanceLedgerRecord.Set("paymentIntentId", payload.PaymentIntentId)
+
+	err = e.App.Save(userBalanceLedgerRecord)
+	if err != nil {
+		return e.BadRequestError("Error saving userBalanceLedgerRecord record:", nil)
+	}
+	return nil
+}
+
 func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 	stripeWebhookSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
 	if stripeWebhookSecret == "" {
@@ -210,6 +232,8 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 	if err != nil {
 		return e.BadRequestError("Could not unmarshal JSON from stripe payment intent:", nil)
 	}
+	e.App.Logger().Error("y", "y", paymentIntent)
+	e.App.Logger().Error("y2", "y2", payload)
 	paymentIntentId := paymentIntent.ID
 	if paymentIntentId == "" {
 		return e.BadRequestError("Payment intent id blank", nil)
@@ -232,19 +256,38 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		return e.BadRequestError("invalid quantity provided in metadata", nil)
 	}
 
-	userBalanceLedgerCollection, err := e.App.FindCollectionByNameOrId(db.UserBalanceLedgerCollectionName)
-	if err != nil {
-		return e.BadRequestError("Error finding UserBalanceLedger collection:", nil)
-	}
-	userBalanceLedgerRecord := pbCore.NewRecord(userBalanceLedgerCollection)
-	userBalanceLedgerRecord.Set("userId", userId)
-	userBalanceLedgerRecord.Set("tokenAmount", quantity)
-	userBalanceLedgerRecord.Set("reason", "stripe_payment")
-	userBalanceLedgerRecord.Set("paymentIntentId", paymentIntentId)
+	fmt.Println("asd")
+	fmt.Println("asd")
+	fmt.Println("asd")
+	fmt.Println("asd")
+	fmt.Println("asd")
+	fmt.Println("asd")
+	fmt.Println("asd")
+	fmt.Println("asd")
+	fmt.Println("asd")
+	fmt.Println("asd")
 
-	err = e.App.Save(userBalanceLedgerRecord)
-	if err != nil {
-		return e.BadRequestError("Error saving userBalanceLedgerRecord record:", nil)
+	e.App.Logger().Error("huh", "data", struct {
+		UserId          string
+		Quantity        int
+		PaymentIntentId string
+		Product         string
+	}{
+		UserId:          userId,
+		Quantity:        quantity,
+		PaymentIntentId: paymentIntentId,
+	})
+
+	if true {
+		createBalanceLedgerRecordFromStripePayload(e, struct {
+			UserId          string
+			Quantity        int
+			PaymentIntentId string
+		}{
+			UserId:          userId,
+			Quantity:        quantity,
+			PaymentIntentId: paymentIntentId,
+		})
 	}
 
 	return e.JSON(http.StatusOK, map[string]any{"url": "url"})
