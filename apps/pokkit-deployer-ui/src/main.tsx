@@ -17,7 +17,7 @@ import { LeftSidebar } from "./components/LeftSidebar";
 import { envConfig } from "./config/envConfig";
 import { pb } from "./config/pocketbaseConfig";
 import { useInstanceRecordsSync } from "./modules/instanceRecords/dbInstanceRecords";
-import { useUserBalanceLedgerRecordsSync } from "./modules/instanceRecords/dbUserBalanceLedgerRecords";
+import { useStripeLedgerRecordsSync } from "./modules/instanceRecords/dbStripeLedgerRecords";
 import { useUserBalanceRecordsSync } from "./modules/instanceRecords/dbUserBalanceRecords";
 import { useUserBalanceRecordSync } from "./modules/instanceRecords/dbUserBalanceRecord";
 
@@ -36,7 +36,7 @@ const App = () => {
   useInstanceRecordsSync({ pb });
   useUserBalanceRecordSync({ pb });
   useUserBalanceRecordsSync({ pb });
-  useUserBalanceLedgerRecordsSync({ pb });
+  useStripeLedgerRecordsSync({ pb });
 
   return (
     <>

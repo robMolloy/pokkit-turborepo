@@ -1524,12 +1524,12 @@
   },
   {
     "id": "pbc_3068566530",
-    "listRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = id || @collection.authGlobalUserPermissions.id ?= @request.auth.id \u0026\u0026 @collection.authGlobalUserPermissions.role ?= \"admin\")",
-    "viewRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = id || @collection.authGlobalUserPermissions.id ?= @request.auth.id \u0026\u0026 @collection.authGlobalUserPermissions.role ?= \"admin\")",
+    "listRule": "@request.auth.id != \"\" \u0026\u0026 @request.auth.id = userId ",
+    "viewRule": "@request.auth.id != \"\" \u0026\u0026 @request.auth.id = userId",
     "createRule": null,
     "updateRule": null,
     "deleteRule": null,
-    "name": "stripeBalanceLedger",
+    "name": "stripeLedger",
     "type": "base",
     "fields": [
       {
@@ -1712,10 +1712,10 @@
       }
     ],
     "indexes": [
-      "CREATE INDEX `idx_Bzj0h4o9vr` ON `stripeBalanceLedger` (`paymentIntentId`)"
+      "CREATE INDEX `idx_Bzj0h4o9vr` ON `stripeLedger` (`paymentIntentId`)"
     ],
     "created": "2026-04-23 10:02:37.517Z",
-    "updated": "2026-04-24 16:00:26.297Z",
+    "updated": "2026-04-24 23:34:46.435Z",
     "system": false
   }
 ]

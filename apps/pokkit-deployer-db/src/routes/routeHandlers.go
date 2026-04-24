@@ -2,7 +2,7 @@ package routes
 
 import (
 	"app-db/src/db"
-	"app-db/src/modules/stripeBalanceLedgerRecordsSdk"
+	"app-db/src/modules/stripeLedgerRecordsSdk"
 	"app-db/src/utils"
 	"encoding/json"
 	"fmt"
@@ -183,9 +183,9 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		return e.BadRequestError("Could not construct webhook event", err)
 	}
 
-	var stripeBalanceLedgeRecordStruct stripeBalanceLedgerRecordsSdk.TStripeBalanceLedgerStruct
-
-	if event.Type == "payment_intent.succeeded" {
+	var logAllStripeEvents = true
+	var stripeLedgeRecordStruct stripeLedgerRecordsSdk.TStripeLedgerStruct
+	if event.Type == "payment_intent.succeeded" || logAllStripeEvents {
 		var paymentIntent stripe.PaymentIntent
 		err = json.Unmarshal(event.Data.Raw, &paymentIntent)
 		if err != nil {
@@ -197,7 +197,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 			quantity = 0
 		}
 
-		stripeBalanceLedgeRecordStruct = stripeBalanceLedgerRecordsSdk.TStripeBalanceLedgerStruct{
+		stripeLedgeRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
 			Quantity:        quantity,
 			EventType:       string(event.Type),
 			Currency:        string(paymentIntent.Currency),
@@ -229,7 +229,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 			subscriptionId = checkoutSession.Subscription.ID
 		}
 
-		stripeBalanceLedgeRecordStruct = stripeBalanceLedgerRecordsSdk.TStripeBalanceLedgerStruct{
+		stripeLedgeRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
 			Quantity:         quantity,
 			EventType:        string(event.Type),
 			Currency:         string(checkoutSession.Currency),
@@ -243,20 +243,20 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		}
 	}
 
-	if stripeBalanceLedgeRecordStruct.EventType == "" { // proxy for irrelevant eventTypes
+	if stripeLedgeRecordStruct.EventType == "" && !logAllStripeEvents {
 		return e.JSON(http.StatusOK, map[string]any{"url": "url"})
 	}
 
-	stripeBalanceLedgerCollection, err := e.App.FindCollectionByNameOrId(db.StripeBalanceLedgerCollectionName)
+	stripeLedgerCollection, err := e.App.FindCollectionByNameOrId(db.StripeLedgerCollectionName)
 	if err != nil {
-		return e.BadRequestError("Error finding StripeBalanceLedger collection:", err)
+		return e.BadRequestError("Error finding StripeLedger collection:", err)
 	}
 
-	stripeBalanceLedgerRecord := pbCore.NewRecord(stripeBalanceLedgerCollection)
-	stripeBalanceLedgerRecordsSdk.PopulateStripeBalanceLedgerRecord(stripeBalanceLedgerRecord, stripeBalanceLedgeRecordStruct)
-	err = e.App.Save(stripeBalanceLedgerRecord)
+	stripeLedgerRecord := pbCore.NewRecord(stripeLedgerCollection)
+	stripeLedgerRecordsSdk.PopulateStripeLedgerRecord(stripeLedgerRecord, stripeLedgeRecordStruct)
+	err = e.App.Save(stripeLedgerRecord)
 	if err != nil {
-		return e.BadRequestError("Unable to save stripeBalanceLedgerRecord", err)
+		return e.BadRequestError("Unable to save stripeLedgerRecord", err)
 	}
 
 	return e.JSON(http.StatusOK, map[string]any{"url": "url"})

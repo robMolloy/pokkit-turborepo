@@ -1,11 +1,9 @@
-import { pb } from "@/config/pocketbaseConfig";
 import { createToastProps } from "@/lib/createToastProps";
 import { cn } from "@/lib/utils";
 import {
-  createAdminAdjustmentUserBalanceLedgerRecord,
-  TUserBalanceLedgerRecord,
-  useUserBalanceLedgerRecordsStore,
-} from "@/modules/instanceRecords/dbUserBalanceLedgerRecords";
+  TStripeLedgerRecord,
+  useStripeLedgerRecordsStore,
+} from "@/modules/instanceRecords/dbStripeLedgerRecords";
 import {
   TUserBalanceRecord,
   useUserBalanceRecordsStore,
@@ -39,14 +37,14 @@ import { toast } from "sonner";
 type TUserBalanceDetails = {
   userRecord: TUser;
   userBalanceRecord?: TUserBalanceRecord;
-  userBalanceLedgerRecords: TUserBalanceLedgerRecord[];
+  userBalanceLedgerRecords: TStripeLedgerRecord[];
 };
 type TUserBalanceDetailsOnUserIdLookup = { [k: string]: TUserBalanceDetails };
 
 const buildUserBalanceDetailsOnUserIdLookup = (p: {
   userRecords: TUser[];
   userBalanceRecords: TUserBalanceRecord[];
-  userBalanceLedgerRecords: TUserBalanceLedgerRecord[];
+  userBalanceLedgerRecords: TStripeLedgerRecord[];
 }): TUserBalanceDetailsOnUserIdLookup => {
   const rtn: TUserBalanceDetailsOnUserIdLookup = {};
   p.userRecords.forEach((userRecord) => {
@@ -77,26 +75,29 @@ function formatDate(dateString: string): string {
   });
 }
 
-function DisplayUserBalanceLedgerRecord(p: { userBalanceLedgerRecord: TUserBalanceLedgerRecord }) {
+function DisplayUserBalanceLedgerRecord(p: { userBalanceLedgerRecord: TStripeLedgerRecord }) {
   return (
     <div className="flex items-center justify-between rounded-md border bg-card px-3 py-2">
       <div className="flex items-center gap-3">
         <div
           className={cn(
             "flex size-7 items-center justify-center rounded-full",
-            p.userBalanceLedgerRecord.tokenAmount >= 0
+            p.userBalanceLedgerRecord.quantity >= 0
               ? "bg-primary/10"
               : "bg-destructive/10 text-destructive",
           )}
         >
-          {p.userBalanceLedgerRecord.tokenAmount >= 0 ? (
+          {p.userBalanceLedgerRecord.quantity >= 0 ? (
             <ArrowDownLeft className="size-3.5" />
           ) : (
             <ArrowUpRight className="size-3.5" />
           )}
         </div>
         <div>
-          <p className="text-sm font-medium">{p.userBalanceLedgerRecord.reason}</p>
+          <p className="text-sm font-medium">
+            {formatTokens(p.userBalanceLedgerRecord.quantity)}{" "}
+            {p.userBalanceLedgerRecord.productName}(s)
+          </p>
           <p className="text-xs text-muted-foreground">
             {formatDate(p.userBalanceLedgerRecord.created)}
           </p>
@@ -105,10 +106,10 @@ function DisplayUserBalanceLedgerRecord(p: { userBalanceLedgerRecord: TUserBalan
       <span
         className={cn(
           "font-mono text-sm font-medium",
-          p.userBalanceLedgerRecord.tokenAmount >= 0 ? "text-primary" : "text-destructive",
+          p.userBalanceLedgerRecord.quantity >= 0 ? "text-primary" : "text-destructive",
         )}
       >
-        {formatTokens(p.userBalanceLedgerRecord.tokenAmount)}
+        {formatTokens(p.userBalanceLedgerRecord.quantity)}
       </span>
     </div>
   );
@@ -178,13 +179,13 @@ const AdjustUserBalanceForm = (p: {
     <form
       onSubmit={async (e) => {
         e.preventDefault();
-        const userId = p.userRecord.id;
-        const resp = await createAdminAdjustmentUserBalanceLedgerRecord({
-          pb,
-          data: { userId, tokenAmount },
-        });
-        const onCompleteFn = resp.success ? p.onSuccess : p.onError;
-        onCompleteFn(resp.messages);
+        // const userId = p.userRecord.id;
+        // const resp = await createAdminAdjustmentUserBalanceLedgerRecord({
+        //   pb,
+        //   data: { userId, tokenAmount },
+        // });
+        // const onCompleteFn = resp.success ? p.onSuccess : p.onError;
+        // onCompleteFn(resp.messages);
       }}
       className="flex flex-col gap-6"
     >
@@ -259,7 +260,7 @@ export function ManageUserBalancesTable() {
   const userBalanceRecordsStore = useUserBalanceRecordsStore();
   const userBalanceRecords = userBalanceRecordsStore.data;
 
-  const userBalanceLedgerRecordsStore = useUserBalanceLedgerRecordsStore();
+  const userBalanceLedgerRecordsStore = useStripeLedgerRecordsStore();
   const userBalanceLedgerRecords = userBalanceLedgerRecordsStore.data;
 
   if (userRecords === undefined) return <div>Loading</div>;

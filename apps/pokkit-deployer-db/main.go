@@ -51,7 +51,7 @@ func main() {
 	app.OnCollectionAfterUpdateSuccess().BindFunc(pokkitSetup.WriteCollectionsToCollectionsFileAfterCollectionChangeEventHandler)
 	app.OnCollectionAfterDeleteSuccess().BindFunc(pokkitSetup.WriteCollectionsToCollectionsFileAfterCollectionChangeEventHandler)
 
-	app.OnRecordAfterCreateSuccess(db.StripeBalanceLedgerCollectionName).BindFunc(events.UpdateBalanceAfterStripeBalanceLedgerCreatedEventHandler)
+	app.OnRecordAfterCreateSuccess(db.StripeLedgerCollectionName).BindFunc(events.UpdateProductsAfterStripeLedgerCreatedEventHandler)
 
 	app.OnRecordAfterCreateSuccess(db.UsersCollectionName).BindFunc(events.PromoteFirstUserToApprovedAdminAfterUserCreateEventHandler)
 

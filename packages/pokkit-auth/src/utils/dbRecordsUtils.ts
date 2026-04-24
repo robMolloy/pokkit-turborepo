@@ -14,7 +14,7 @@ const getAllRecords = async <T extends z.ZodSchema>(p: {
     resp.forEach((item) => {
       const parseResp = p.schema.safeParse(item);
       if (parseResp.success) validItems.push(parseResp.data);
-      else p.onParsedItemFailedFn?.(item);
+      else p.onParsedItemFailedFn?.({ item, parseResp });
     });
 
     return { success: true, data: validItems } as const;
@@ -43,7 +43,7 @@ export const subscribeToAllRecords = async <T extends z.ZodSchema>(p: {
             action: e.action as "create" | "update" | "delete",
             record: parseResp.data,
           });
-        else p.onParsedItemFailedFn?.(e.record);
+        else p.onParsedItemFailedFn?.({ item: e.record, parseResp });
       },
       { signal: p.signal },
     );

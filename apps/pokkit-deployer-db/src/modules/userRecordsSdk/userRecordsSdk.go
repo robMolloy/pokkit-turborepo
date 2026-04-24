@@ -18,16 +18,16 @@ type TUserRecordStruct struct {
 	Updated         pbTypes.DateTime `json:"updated"`
 }
 
-func ConvertUserRecordToStruct(userBalanceLedgerRecord *pbCore.Record) TUserRecordStruct {
+func ConvertUserRecordToStruct(record *pbCore.Record) TUserRecordStruct {
 	return TUserRecordStruct{
-		Id:              userBalanceLedgerRecord.GetString("id"),
-		Email:           userBalanceLedgerRecord.GetString("email"),
-		EmailVisibility: userBalanceLedgerRecord.GetBool("emailVisibility"),
-		Verified:        userBalanceLedgerRecord.GetBool("verified"),
-		Name:            userBalanceLedgerRecord.GetInt("name"),
-		Avatar:          userBalanceLedgerRecord.GetString("avatar"),
-		Created:         userBalanceLedgerRecord.GetDateTime("created"),
-		Updated:         userBalanceLedgerRecord.GetDateTime("updated"),
+		Id:              record.GetString("id"),
+		Email:           record.GetString("email"),
+		EmailVisibility: record.GetBool("emailVisibility"),
+		Verified:        record.GetBool("verified"),
+		Name:            record.GetInt("name"),
+		Avatar:          record.GetString("avatar"),
+		Created:         record.GetDateTime("created"),
+		Updated:         record.GetDateTime("updated"),
 	}
 }
 

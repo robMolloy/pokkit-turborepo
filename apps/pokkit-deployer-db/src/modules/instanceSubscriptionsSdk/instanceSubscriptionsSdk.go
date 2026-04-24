@@ -2,7 +2,7 @@ package instanceSubscriptionsSdk
 
 import (
 	"app-db/src/db"
-	"app-db/src/modules/stripeBalanceLedgerRecordsSdk"
+	"app-db/src/modules/stripeLedgerRecordsSdk"
 	"app-db/src/modules/stripeSdk"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
@@ -31,8 +31,8 @@ func ConvertInstanceSubscriptionRecordToStruct(record *pbCore.Record) TInstanceS
 	}
 }
 
-func FindInstancesSubscriptionRecordAndUpdateFromStripeBalanceLedgerStruct(app pbCore.App, stripeBalanceLedgerStruct stripeBalanceLedgerRecordsSdk.TStripeBalanceLedgerStruct) error {
-	subscription, err := stripeSdk.RetrieveStripeSubscription(stripeBalanceLedgerStruct.SubscriptionId)
+func FindInstancesSubscriptionRecordAndUpdateFromStripeLedgerStruct(app pbCore.App, stripeLedgerStruct stripeLedgerRecordsSdk.TStripeLedgerStruct) error {
+	subscription, err := stripeSdk.RetrieveStripeSubscription(stripeLedgerStruct.SubscriptionId)
 	app.Logger().Error("subscription", "subscription", subscription)
 	if err != nil {
 		return err
@@ -41,19 +41,16 @@ func FindInstancesSubscriptionRecordAndUpdateFromStripeBalanceLedgerStruct(app p
 	currentPeriodEnd, err := stripeSdk.GetCurrentPeriodEndFromStripeSubscription(subscription)
 
 	instancesSubscriptionsCollection, err := app.FindCollectionByNameOrId(db.InstancesSubscriptionsCollectionName)
-	instancesSubscriptionsRecord, _ := app.FindRecordById(db.InstancesSubscriptionsCollectionName, stripeBalanceLedgerStruct.UserId)
+	instancesSubscriptionsRecord, _ := app.FindRecordById(db.InstancesSubscriptionsCollectionName, stripeLedgerStruct.UserId)
 
-	app.Logger().Error("stripeBalanceLedgerStruct", "stripeBalanceLedgerStruct", stripeBalanceLedgerStruct)
 	if instancesSubscriptionsRecord == nil {
 		instancesSubscriptionsRecord = pbCore.NewRecord(instancesSubscriptionsCollection)
-		instancesSubscriptionsRecord.Set("id", stripeBalanceLedgerStruct.UserId)
-		instancesSubscriptionsRecord.Set("userId", stripeBalanceLedgerStruct.UserId)
+		instancesSubscriptionsRecord.Set("id", stripeLedgerStruct.UserId)
+		instancesSubscriptionsRecord.Set("userId", stripeLedgerStruct.UserId)
 	}
 
-	instancesSubscriptionsRecord.Set("numberOfInstances", stripeBalanceLedgerStruct.Quantity)
+	instancesSubscriptionsRecord.Set("numberOfInstances", stripeLedgerStruct.Quantity)
 
-	// currentPaidUntilDateTime := instancesSubscriptionsRecord.GetDateTime("paidUntilDateTime")
-	// newPaidUntilDateTime := currentPaidUntilDateTime.AddDate(0, 1, 0)
 	instancesSubscriptionsRecord.Set("paidUntilDateTime", currentPeriodEnd)
 	instancesSubscriptionsRecord.Set("subscriptionId", subscription.ID)
 

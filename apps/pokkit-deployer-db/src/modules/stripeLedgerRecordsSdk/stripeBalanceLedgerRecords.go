@@ -1,11 +1,11 @@
-package stripeBalanceLedgerRecordsSdk
+package stripeLedgerRecordsSdk
 
 import (
 	pbCore "github.com/pocketbase/pocketbase/core"
 	pbTypes "github.com/pocketbase/pocketbase/tools/types"
 )
 
-type TStripeBalanceLedgerStruct struct {
+type TStripeLedgerStruct struct {
 	Id               string           `json:"id"`
 	UserId           string           `json:"userId"`
 	Quantity         int              `json:"quantity"`
@@ -21,7 +21,7 @@ type TStripeBalanceLedgerStruct struct {
 	Updated          pbTypes.DateTime `json:"updated"`
 }
 
-func PopulateStripeBalanceLedgerRecord(record *pbCore.Record, data TStripeBalanceLedgerStruct) *pbCore.Record {
+func PopulateStripeLedgerRecord(record *pbCore.Record, data TStripeLedgerStruct) *pbCore.Record {
 	record.Set("id", data.Id)
 	record.Set("userId", data.UserId)
 	record.Set("quantity", data.Quantity)
@@ -39,20 +39,20 @@ func PopulateStripeBalanceLedgerRecord(record *pbCore.Record, data TStripeBalanc
 	return record
 }
 
-func ConvertStripeBalanceLedgerRecordToStruct(stripeBalanceLedgerRecord *pbCore.Record) TStripeBalanceLedgerStruct {
-	return TStripeBalanceLedgerStruct{
-		Id:               stripeBalanceLedgerRecord.GetString("id"),
-		UserId:           stripeBalanceLedgerRecord.GetString("userId"),
-		Quantity:         stripeBalanceLedgerRecord.GetInt("quantity"),
-		PaymentIntentId:  stripeBalanceLedgerRecord.GetString("paymentIntentId"),
-		SubscriptionId:   stripeBalanceLedgerRecord.GetString("subscriptionId"),
-		Currency:         stripeBalanceLedgerRecord.GetString("currency"),
-		ProductName:      stripeBalanceLedgerRecord.GetString("productName"),
-		ProductId:        stripeBalanceLedgerRecord.GetString("productId"),
-		StripeCustomerId: stripeBalanceLedgerRecord.GetString("stripeCustomerId"),
-		EventType:        stripeBalanceLedgerRecord.GetString("eventType"),
-		RawData:          stripeBalanceLedgerRecord.GetString("rawData"),
-		Created:          stripeBalanceLedgerRecord.GetDateTime("created"),
-		Updated:          stripeBalanceLedgerRecord.GetDateTime("updated"),
+func ConvertStripeLedgerRecordToStruct(record *pbCore.Record) TStripeLedgerStruct {
+	return TStripeLedgerStruct{
+		Id:               record.GetString("id"),
+		UserId:           record.GetString("userId"),
+		Quantity:         record.GetInt("quantity"),
+		PaymentIntentId:  record.GetString("paymentIntentId"),
+		SubscriptionId:   record.GetString("subscriptionId"),
+		Currency:         record.GetString("currency"),
+		ProductName:      record.GetString("productName"),
+		ProductId:        record.GetString("productId"),
+		StripeCustomerId: record.GetString("stripeCustomerId"),
+		EventType:        record.GetString("eventType"),
+		RawData:          record.GetString("rawData"),
+		Created:          record.GetDateTime("created"),
+		Updated:          record.GetDateTime("updated"),
 	}
 }
