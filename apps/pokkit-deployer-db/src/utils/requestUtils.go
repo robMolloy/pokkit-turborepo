@@ -17,3 +17,16 @@ func ReadJsonFromRequestBody(requestBody io.ReadCloser) (map[string]any, error) 
 	err = json.Unmarshal(data, &result)
 	return result, err
 }
+
+func ReadRequestBodyJsonIntoResult[T any](requestBody io.ReadCloser) (T, error) {
+	var result T
+	defer requestBody.Close()
+
+	data, err := io.ReadAll(requestBody)
+	if err != nil {
+		return result, err
+	}
+
+	err = json.Unmarshal(data, &result)
+	return result, err
+}

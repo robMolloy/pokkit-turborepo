@@ -6,10 +6,13 @@ import (
 	"app-db/src/pokkitSetup"
 	"app-db/src/routes"
 	"log"
+	"os"
 
 	pocketbase "github.com/pocketbase/pocketbase"
 	pbApis "github.com/pocketbase/pocketbase/apis"
 	pbCore "github.com/pocketbase/pocketbase/core"
+
+	stripe "github.com/stripe/stripe-go/v85"
 )
 
 func main() {
@@ -31,6 +34,16 @@ func main() {
 	})
 
 	app.OnServe().BindFunc(pokkitSetup.SetupCollectionsSettingsAndEnvVarsOnServe)
+	app.OnServe().BindFunc(func(e *pbCore.ServeEvent) error {
+		stripeSecretKey := os.Getenv("STRIPE_SECRET_KEY")
+		if stripeSecretKey == "" {
+			e.App.Logger().Error("stripeSecretKey cannot be blank")
+			return e.Next()
+		}
+		stripe.Key = stripeSecretKey
+
+		return e.Next()
+	})
 
 	app.OnSettingsReload().BindFunc(pokkitSetup.WriteSettingsToSettingsFileOnSettingsReloadEventHandler)
 

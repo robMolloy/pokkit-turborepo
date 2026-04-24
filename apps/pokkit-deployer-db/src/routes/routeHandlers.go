@@ -2,6 +2,7 @@ package routes
 
 import (
 	"app-db/src/db"
+	"app-db/src/modules/stripeBalanceLedgerRecordsSdk"
 	"app-db/src/utils"
 	"encoding/json"
 	"fmt"
@@ -17,30 +18,6 @@ import (
 	stripeCustomer "github.com/stripe/stripe-go/v85/customer"
 	stripeWebhook "github.com/stripe/stripe-go/v85/webhook"
 )
-
-type TStripeBalanceLedgerStruct struct {
-	UserId           string `json:"userId"`
-	Quantity         int    `json:"quantity"`
-	PaymentIntentId  string `json:"paymentIntentId"`
-	Currency         string `json:"currency"`
-	ProductName      string `json:"productName"`
-	ProductId        string `json:"productId"`
-	StripeCustomerId string `json:"stripeCustomerId"`
-	EventType        string `json:"eventType"`
-}
-
-func PopulateStripeBalanceLedgerRecord(record *pbCore.Record, data TStripeBalanceLedgerStruct) *pbCore.Record {
-	record.Set("userId", data.UserId)
-	record.Set("quantity", data.Quantity)
-	record.Set("paymentIntentId", data.PaymentIntentId)
-	record.Set("currency", data.Currency)
-	record.Set("productName", data.ProductName)
-	record.Set("productId", data.ProductId)
-	record.Set("stripeCustomerId", data.StripeCustomerId)
-	record.Set("eventType", data.EventType)
-
-	return record
-}
 
 var ProductDataLookup = map[string]struct {
 	PriceId     *string
@@ -85,11 +62,6 @@ func StripeRetrieveCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 	if userEmail == "" {
 		return e.BadRequestError("no_email_provided", nil)
 	}
-	stripeSecretKey := os.Getenv("STRIPE_SECRET_KEY")
-	stripe.Key = stripeSecretKey
-	if stripeSecretKey == "" {
-		return e.BadRequestError("no stripe secret key provided", nil)
-	}
 
 	body := e.Request.Body
 	defer body.Close()
@@ -129,11 +101,6 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 	if userEmail == "" {
 		return e.BadRequestError("no_email_provided", nil)
 	}
-	stripeSecretKey := os.Getenv("STRIPE_SECRET_KEY")
-	stripe.Key = stripeSecretKey
-	if stripeSecretKey == "" {
-		return e.BadRequestError("no stripe secret key provided", nil)
-	}
 
 	cust, err := stripeCustomer.New(&stripe.CustomerParams{
 		Email: stripe.String(userEmail),
@@ -142,20 +109,13 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 		return e.InternalServerError(fmt.Sprintf("failed to create stripe customer from: %v", userEmail), err)
 	}
 
-	body := e.Request.Body
-	defer body.Close()
-	data, err := io.ReadAll(body)
-	if err != nil {
-		return e.BadRequestError("invalid_request_body", err)
-	}
-
-	req := struct {
+	req, err := utils.ReadRequestBodyJsonIntoResult[struct {
 		ProductName string `json:"productName"`
 		Quantity    int64  `json:"quantity"`
-	}{}
-	err = json.Unmarshal(data, &req)
+	}](e.Request.Body)
+
 	if err != nil {
-		return e.BadRequestError("invalid_json", err)
+		return e.BadRequestError("error ReadingRequestBodyJsonIntoResult", err)
 	}
 
 	Quantity := req.Quantity
@@ -245,26 +205,68 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		return e.BadRequestError("Could not construct webhook event", err)
 	}
 
-	var paymentIntent stripe.PaymentIntent
-	err = json.Unmarshal(event.Data.Raw, &paymentIntent)
-	if err != nil {
-		return e.BadRequestError("Could not unmarshal JSON from stripe payment intent:", err)
+	var stripeBalanceLedgeRecordStruct stripeBalanceLedgerRecordsSdk.TStripeBalanceLedgerStruct
+
+	if event.Type == "payment_intent.succeeded" {
+		var paymentIntent stripe.PaymentIntent
+		err = json.Unmarshal(event.Data.Raw, &paymentIntent)
+		if err != nil {
+			return e.BadRequestError("Could not unmarshal JSON from stripe payment intent:", err)
+		}
+
+		quantity, err := strconv.Atoi(paymentIntent.Metadata["quantity"])
+		if err != nil {
+			quantity = 0
+		}
+
+		stripeBalanceLedgeRecordStruct = stripeBalanceLedgerRecordsSdk.TStripeBalanceLedgerStruct{
+			Quantity:        quantity,
+			EventType:       string(event.Type),
+			Currency:        string(paymentIntent.Currency),
+			PaymentIntentId: paymentIntent.ID,
+			SubscriptionId:  "",
+			// SubscriptionExpiresAtDateTime:   "",
+			UserId:           paymentIntent.Metadata["userId"],
+			ProductName:      paymentIntent.Metadata["productName"],
+			ProductId:        paymentIntent.Metadata["productId"],
+			StripeCustomerId: paymentIntent.Metadata["stripeCustomerId"],
+			RawData:          paymentIntent,
+		}
 	}
 
-	quantity, err := strconv.Atoi(paymentIntent.Metadata["quantity"])
-	if err != nil {
-		quantity = 0
+	if event.Type == "checkout.session.completed" {
+		var checkoutSession stripe.CheckoutSession
+		err = json.Unmarshal(event.Data.Raw, &checkoutSession)
+		if err != nil {
+			return e.BadRequestError("Could not unmarshal JSON from checkout session:", err)
+		}
+
+		quantity, err := strconv.Atoi(checkoutSession.Metadata["quantity"])
+		if err != nil {
+			quantity = 0
+		}
+
+		var subscriptionId string
+		if checkoutSession.Subscription != nil {
+			subscriptionId = checkoutSession.Subscription.ID
+		}
+
+		stripeBalanceLedgeRecordStruct = stripeBalanceLedgerRecordsSdk.TStripeBalanceLedgerStruct{
+			Quantity:         quantity,
+			EventType:        string(event.Type),
+			Currency:         string(checkoutSession.Currency),
+			PaymentIntentId:  checkoutSession.ID,
+			SubscriptionId:   subscriptionId,
+			UserId:           checkoutSession.Metadata["userId"],
+			ProductName:      checkoutSession.Metadata["productName"],
+			ProductId:        checkoutSession.Metadata["productId"],
+			StripeCustomerId: checkoutSession.Metadata["stripeCustomerId"],
+			RawData:          checkoutSession,
+		}
 	}
 
-	stripeBalanceLedgeRecordStruct := TStripeBalanceLedgerStruct{
-		Quantity:         quantity,
-		EventType:        string(event.Type),
-		Currency:         string(paymentIntent.Currency),
-		PaymentIntentId:  paymentIntent.ID,
-		UserId:           paymentIntent.Metadata["userId"],
-		ProductName:      paymentIntent.Metadata["productName"],
-		ProductId:        paymentIntent.Metadata["productId"],
-		StripeCustomerId: paymentIntent.Metadata["stripeCustomerId"],
+	if stripeBalanceLedgeRecordStruct.EventType == "" { // proxy for irrelevant eventTypes
+		return e.JSON(http.StatusOK, map[string]any{"url": "url"})
 	}
 
 	stripeBalanceLedgerCollection, err := e.App.FindCollectionByNameOrId(db.StripeBalanceLedgerCollectionName)
@@ -273,7 +275,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 	}
 
 	stripeBalanceLedgerRecord := pbCore.NewRecord(stripeBalanceLedgerCollection)
-	PopulateStripeBalanceLedgerRecord(stripeBalanceLedgerRecord, stripeBalanceLedgeRecordStruct)
+	stripeBalanceLedgerRecordsSdk.PopulateStripeBalanceLedgerRecord(stripeBalanceLedgerRecord, stripeBalanceLedgeRecordStruct)
 	err = e.App.Save(stripeBalanceLedgerRecord)
 	if err != nil {
 		return e.BadRequestError("Unable to save stripeBalanceLedgerRecord", err)

@@ -3,7 +3,8 @@ package events
 import (
 	"app-db/src/db"
 	"app-db/src/modules/instanceRecordsSdk"
-	"app-db/src/modules/stripeBalanceLedgeRecordsSdk"
+	"app-db/src/modules/instanceSubscriptionsSdk"
+	"app-db/src/modules/stripeBalanceLedgerRecordsSdk"
 	"app-db/src/modules/userBalanceRecordsSdk"
 	"app-db/src/modules/userRecordsSdk"
 	"app-db/src/pokkitSetup"
@@ -300,36 +301,10 @@ func PromoteOrganisationCreatorToOrgAdminAfterUserCreateEventHandler(e *pbCore.R
 	return e.Next()
 }
 
-// func UpdateBalanceAfterUserBalanceLedgerCreatedEventHandler(e *pbCore.RecordEvent) error {
-// 	log.Println("OnUserBalanceLedgerRecordAfterCreateSuccess")
-
-// 	userBalanceLedgerRecord := e.Record
-// 	userBalanceLedgerRecordData := userBalanceLedgerRecords.ConvertUserBalanceLedgerRecordToData(userBalanceLedgerRecord)
-// 	userId := userBalanceLedgerRecordData.UserId
-
-// 	userBalancesCollection, err := e.App.FindCollectionByNameOrId(db.UserBalancesCollectionName)
-// 	userBalanceRecord, _ := e.App.FindRecordById(db.UserBalancesCollectionName, userId)
-// 	if userBalanceRecord == nil {
-// 		userBalanceRecord = pbCore.NewRecord(userBalancesCollection)
-// 		userBalanceRecord.Set("id", userId)
-// 		userBalanceRecord.Set("userId", userId)
-// 		userBalanceRecord.Set("tokenAmount", 0)
-// 	}
-// 	currentBalanceTokenAmount := userBalanceRecord.GetInt("tokenAmount")
-// 	newBalanceTokenAmount := currentBalanceTokenAmount + userBalanceLedgerRecordData.TokenAmount
-// 	userBalanceRecord.Set("tokenAmount", newBalanceTokenAmount)
-
-// 	err = e.App.Save(userBalanceRecord)
-// 	if err != nil {
-// 		log.Printf("Error saving userBalanceRecord: %v\n", err)
-// 	}
-
-//		return e.Next()
-//	}
 func UpdateBalanceAfterStripeBalanceLedgerCreatedEventHandler(e *pbCore.RecordEvent) error {
 	log.Println("OnStripeBalanceLedgerRecordAfterCreateSuccess")
 	stripeBalanceLedgerRecord := e.Record
-	stripeBalanceLedgerRecordStruct := stripeBalanceLedgeRecordsSdk.ConvertStripeBalanceLedgerRecordToStruct(stripeBalanceLedgerRecord)
+	stripeBalanceLedgerRecordStruct := stripeBalanceLedgerRecordsSdk.ConvertStripeBalanceLedgerRecordToStruct(stripeBalanceLedgerRecord)
 	if stripeBalanceLedgerRecordStruct.EventType != "checkout.session.completed" {
 		e.App.Logger().Info("event type must be checkout.session.completed to be used")
 		return e.Next()
@@ -352,6 +327,11 @@ func UpdateBalanceAfterStripeBalanceLedgerCreatedEventHandler(e *pbCore.RecordEv
 
 	if stripeBalanceLedgerRecordStruct.ProductName == "instance_subscription" {
 
+		err = instanceSubscriptionsSdk.FindInstancesSubscriptionRecordAndUpdateFromStripeBalanceLedgerStruct(e.App, stripeBalanceLedgerRecordStruct)
+		if err != nil {
+			e.App.Logger().Error("Error Incrementing number of instances on userBalanceRecord", "err", err)
+			return err
+		}
 	}
 
 	if stripeBalanceLedgerRecordStruct.ProductName == "token" {
@@ -360,7 +340,6 @@ func UpdateBalanceAfterStripeBalanceLedgerCreatedEventHandler(e *pbCore.RecordEv
 			e.App.Logger().Error("Error Incrementing TokenAmount on userBalanceRecord", "err", err)
 			return err
 		}
-
 	}
 
 	return e.Next()
