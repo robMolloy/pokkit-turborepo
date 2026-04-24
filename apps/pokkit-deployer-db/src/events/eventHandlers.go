@@ -3,7 +3,9 @@ package events
 import (
 	"app-db/src/db"
 	"app-db/src/modules/instanceRecordsSdk"
-	"app-db/src/modules/userBalanceLedgerRecords"
+	"app-db/src/modules/stripeBalanceLedgeRecordsSdk"
+	"app-db/src/modules/userBalanceRecordsSdk"
+	"app-db/src/modules/userRecordsSdk"
 	"app-db/src/pokkitSetup"
 	"app-db/src/utils"
 	"fmt"
@@ -298,28 +300,67 @@ func PromoteOrganisationCreatorToOrgAdminAfterUserCreateEventHandler(e *pbCore.R
 	return e.Next()
 }
 
-func UpdateBalanceAfterUserBalanceLedgerCreatedEventHandler(e *pbCore.RecordEvent) error {
-	log.Println("OnUserBalanceLedgerRecordAfterCreateSuccess")
+// func UpdateBalanceAfterUserBalanceLedgerCreatedEventHandler(e *pbCore.RecordEvent) error {
+// 	log.Println("OnUserBalanceLedgerRecordAfterCreateSuccess")
 
-	userBalanceLedgerRecord := e.Record
-	userBalanceLedgerRecordData := userBalanceLedgerRecords.ConvertUserBalanceLedgerRecordToData(userBalanceLedgerRecord)
-	userId := userBalanceLedgerRecordData.UserId
+// 	userBalanceLedgerRecord := e.Record
+// 	userBalanceLedgerRecordData := userBalanceLedgerRecords.ConvertUserBalanceLedgerRecordToData(userBalanceLedgerRecord)
+// 	userId := userBalanceLedgerRecordData.UserId
 
-	userBalancesCollection, err := e.App.FindCollectionByNameOrId(db.UserBalancesCollectionName)
-	userBalanceRecord, _ := e.App.FindRecordById(db.UserBalancesCollectionName, userId)
-	if userBalanceRecord == nil {
-		userBalanceRecord = pbCore.NewRecord(userBalancesCollection)
-		userBalanceRecord.Set("id", userId)
-		userBalanceRecord.Set("userId", userId)
-		userBalanceRecord.Set("tokenAmount", 0)
+// 	userBalancesCollection, err := e.App.FindCollectionByNameOrId(db.UserBalancesCollectionName)
+// 	userBalanceRecord, _ := e.App.FindRecordById(db.UserBalancesCollectionName, userId)
+// 	if userBalanceRecord == nil {
+// 		userBalanceRecord = pbCore.NewRecord(userBalancesCollection)
+// 		userBalanceRecord.Set("id", userId)
+// 		userBalanceRecord.Set("userId", userId)
+// 		userBalanceRecord.Set("tokenAmount", 0)
+// 	}
+// 	currentBalanceTokenAmount := userBalanceRecord.GetInt("tokenAmount")
+// 	newBalanceTokenAmount := currentBalanceTokenAmount + userBalanceLedgerRecordData.TokenAmount
+// 	userBalanceRecord.Set("tokenAmount", newBalanceTokenAmount)
+
+// 	err = e.App.Save(userBalanceRecord)
+// 	if err != nil {
+// 		log.Printf("Error saving userBalanceRecord: %v\n", err)
+// 	}
+
+//		return e.Next()
+//	}
+func UpdateBalanceAfterStripeBalanceLedgerCreatedEventHandler(e *pbCore.RecordEvent) error {
+	log.Println("OnStripeBalanceLedgerRecordAfterCreateSuccess")
+	stripeBalanceLedgerRecord := e.Record
+	stripeBalanceLedgerRecordStruct := stripeBalanceLedgeRecordsSdk.ConvertStripeBalanceLedgerRecordToStruct(stripeBalanceLedgerRecord)
+	if stripeBalanceLedgerRecordStruct.EventType != "checkout.session.completed" {
+		e.App.Logger().Info("event type must be checkout.session.completed to be used")
+		return e.Next()
 	}
-	currentBalanceTokenAmount := userBalanceRecord.GetInt("tokenAmount")
-	newBalanceTokenAmount := currentBalanceTokenAmount + userBalanceLedgerRecordData.TokenAmount
-	userBalanceRecord.Set("tokenAmount", newBalanceTokenAmount)
+	if stripeBalanceLedgerRecordStruct.Quantity <= 0 {
+		e.App.Logger().Error("stripeBalanceLedgerRecordStruct.Quantity cannot be <= 0", "stripeBalanceLedgerRecordStruct", stripeBalanceLedgerRecordStruct)
+		return e.Next()
+	}
+	if stripeBalanceLedgerRecordStruct.Currency != "usd" {
+		e.App.Logger().Error("currency must be usd")
+		return e.Next()
+	}
 
-	err = e.App.Save(userBalanceRecord)
-	if err != nil {
-		log.Printf("Error saving userBalanceRecord: %v\n", err)
+	userId := stripeBalanceLedgerRecordStruct.UserId
+	user, err := userRecordsSdk.FindUserRecordStructById(e.App, userId)
+	if user == nil || err != nil {
+		e.App.Logger().Error("no user found")
+		return e.Next()
+	}
+
+	if stripeBalanceLedgerRecordStruct.ProductName == "instance_subscription" {
+
+	}
+
+	if stripeBalanceLedgerRecordStruct.ProductName == "token" {
+		err = userBalanceRecordsSdk.FindUserBalanceRecordAndIncrementTokenAmount(e.App, userId, stripeBalanceLedgerRecordStruct.Quantity)
+		if err != nil {
+			e.App.Logger().Error("Error Incrementing TokenAmount on userBalanceRecord", "err", err)
+			return err
+		}
+
 	}
 
 	return e.Next()
