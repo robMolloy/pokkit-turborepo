@@ -165,28 +165,6 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 	})
 }
 
-func createBalanceLedgerRecordFromStripePayload(e *pbCore.RequestEvent, payload struct {
-	UserId          string
-	Quantity        int
-	PaymentIntentId string
-}) error {
-	userBalanceLedgerCollection, err := e.App.FindCollectionByNameOrId(db.UserBalanceLedgerCollectionName)
-	if err != nil {
-		return e.BadRequestError("Error finding UserBalanceLedger collection:", nil)
-	}
-	userBalanceLedgerRecord := pbCore.NewRecord(userBalanceLedgerCollection)
-	userBalanceLedgerRecord.Set("userId", payload.UserId)
-	userBalanceLedgerRecord.Set("tokenAmount", payload.Quantity)
-	userBalanceLedgerRecord.Set("reason", "stripe_payment")
-	userBalanceLedgerRecord.Set("paymentIntentId", payload.PaymentIntentId)
-
-	err = e.App.Save(userBalanceLedgerRecord)
-	if err != nil {
-		return e.BadRequestError("Error saving userBalanceLedgerRecord record:", nil)
-	}
-	return nil
-}
-
 func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 	stripeWebhookSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
 	if stripeWebhookSecret == "" {

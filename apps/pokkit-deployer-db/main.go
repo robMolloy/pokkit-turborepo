@@ -51,7 +51,6 @@ func main() {
 	app.OnCollectionAfterUpdateSuccess().BindFunc(pokkitSetup.WriteCollectionsToCollectionsFileAfterCollectionChangeEventHandler)
 	app.OnCollectionAfterDeleteSuccess().BindFunc(pokkitSetup.WriteCollectionsToCollectionsFileAfterCollectionChangeEventHandler)
 
-	// app.OnRecordAfterCreateSuccess(db.UserBalanceLedgerCollectionName).BindFunc(events.UpdateBalanceAfterUserBalanceLedgerCreatedEventHandler)
 	app.OnRecordAfterCreateSuccess(db.StripeBalanceLedgerCollectionName).BindFunc(events.UpdateBalanceAfterStripeBalanceLedgerCreatedEventHandler)
 
 	app.OnRecordAfterCreateSuccess(db.UsersCollectionName).BindFunc(events.PromoteFirstUserToApprovedAdminAfterUserCreateEventHandler)
@@ -65,7 +64,7 @@ func main() {
 	app.OnRecordAfterDeleteSuccess(db.InstancesCollectionName).BindFunc(events.ExecuteBashCommandFromCommandTemplatesForChangedInstanceRecordAfterInstanceRecordDeletedEventHandler)
 	app.OnRecordAfterDeleteSuccess(db.InstancesCollectionName).BindFunc(events.ExecuteBashCommandFromCommandTemplatesForAllInstanceRecordsAfterInstanceRecordDeletedEventHandler)
 
-	app.OnRecordCreateRequest(db.OrganisationsCollectionName).BindFunc(events.PromoteOrganisationCreatorToOrgAdminAfterUserCreateEventHandler)
+	app.OnRecordCreateRequest(db.AuthOrganisationsCollectionName).BindFunc(events.PromoteOrganisationCreatorToOrgAdminAfterUserCreateEventHandler)
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)
