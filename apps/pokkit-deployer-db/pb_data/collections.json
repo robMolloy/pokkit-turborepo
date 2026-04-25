@@ -1614,6 +1614,18 @@
       },
       {
         "hidden": false,
+        "id": "number928573309",
+        "max": null,
+        "min": null,
+        "name": "amountTotal",
+        "onlyInt": false,
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "number"
+      },
+      {
+        "hidden": false,
         "id": "number2683508278",
         "max": null,
         "min": null,
@@ -1715,7 +1727,7 @@
       "CREATE INDEX `idx_Bzj0h4o9vr` ON `stripeLedger` (`paymentIntentId`)"
     ],
     "created": "2026-04-23 10:02:37.517Z",
-    "updated": "2026-04-24 23:34:46.435Z",
+    "updated": "2026-04-24 23:50:57.837Z",
     "system": false
   }
 ]

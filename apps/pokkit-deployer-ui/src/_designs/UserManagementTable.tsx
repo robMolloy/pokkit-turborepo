@@ -1,4 +1,3 @@
-import { createToastProps } from "@/lib/createToastProps";
 import { cn } from "@/lib/utils";
 import {
   TStripeLedgerRecord,
@@ -8,14 +7,9 @@ import {
   TUserBalanceRecord,
   useUserBalanceRecordsStore,
 } from "@/modules/instanceRecords/dbUserBalanceRecords";
-import { TUser, useUserRecordsStore, useUserStore } from "@repo/pokkit-auth";
-import { ModalContent, NumberInput, useModalStore } from "@repo/pokkit-components";
+import { TUser, useUserRecordsStore } from "@repo/pokkit-auth";
 import {
   Button,
-  Field,
-  FieldGroup,
-  FieldLabel,
-  Input,
   Table,
   TableBody,
   TableCell,
@@ -23,16 +17,8 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/pokkit-shadcn";
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  ChevronDown,
-  ChevronRight,
-  Settings2,
-  Users,
-} from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, ChevronDown, ChevronRight, Users } from "lucide-react";
 import * as React from "react";
-import { toast } from "sonner";
 
 type TUserBalanceDetails = {
   userRecord: TUser;
@@ -109,16 +95,13 @@ function DisplayUserBalanceLedgerRecord(p: { userBalanceLedgerRecord: TStripeLed
           p.userBalanceLedgerRecord.quantity >= 0 ? "text-primary" : "text-destructive",
         )}
       >
-        {formatTokens(p.userBalanceLedgerRecord.quantity)}
+        {p.userBalanceLedgerRecord.amountTotal} {p.userBalanceLedgerRecord.currency}
       </span>
     </div>
   );
 }
 
-function UserManagementTableRow(p: {
-  userBalanceDetails: TUserBalanceDetails;
-  onAdjustButtonClick: () => void;
-}) {
+function UserManagementTableRow(p: { userBalanceDetails: TUserBalanceDetails }) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
@@ -133,20 +116,11 @@ function UserManagementTableRow(p: {
         <TableCell className="text-muted-foreground">
           {p.userBalanceDetails.userRecord.email}
         </TableCell>
-        <TableCell>
-          {formatTokens(p.userBalanceDetails.userBalanceRecord?.tokenAmount ?? 0)}
-        </TableCell>
-        <TableCell className="text-right">
-          <Button variant="outline" size="sm" onClick={p.onAdjustButtonClick} className="gap-1.5">
-            <Settings2 className="size-3.5" />
-            Adjust
-          </Button>
-        </TableCell>
       </TableRow>
 
       {isOpen && (
         <TableRow>
-          <TableCell colSpan={6}>
+          <TableCell colSpan={4}>
             <div className="space-y-2">
               {p.userBalanceDetails.userBalanceLedgerRecords.map((userBalanceLedgerRecord) => (
                 <DisplayUserBalanceLedgerRecord
@@ -162,98 +136,7 @@ function UserManagementTableRow(p: {
   );
 }
 
-const AdjustUserBalanceForm = (p: {
-  userRecord: TUser;
-  userBalanceRecord?: TUserBalanceRecord;
-  onSuccess: (messages: string[]) => void;
-  onError: (messages: string[]) => void;
-}) => {
-  const [tokenAmount, setTokenAmount] = React.useState(0);
-  const [reason, setReason] = React.useState("admin_adjustment");
-
-  const currentBalance = p.userBalanceRecord?.tokenAmount ?? 0;
-
-  const resultingBalance = currentBalance + tokenAmount;
-
-  return (
-    <form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        // const userId = p.userRecord.id;
-        // const resp = await createAdminAdjustmentUserBalanceLedgerRecord({
-        //   pb,
-        //   data: { userId, tokenAmount },
-        // });
-        // const onCompleteFn = resp.success ? p.onSuccess : p.onError;
-        // onCompleteFn(resp.messages);
-      }}
-      className="flex flex-col gap-6"
-    >
-      <FieldGroup className="flex flex-col gap-6">
-        <div className="flex gap-4">
-          <div>
-            <Field>
-              <FieldLabel>Current balance</FieldLabel>
-              <div className="font-mono text-sm text-muted-foreground">
-                {formatTokens(currentBalance)}
-              </div>
-            </Field>
-          </div>
-
-          <div className="border-l"></div>
-
-          <div>
-            <Field>
-              <FieldLabel>Resulting balance</FieldLabel>
-
-              <div className="flex justify-between gap-6">
-                <div className="font-mono text-base font-semibold">
-                  {formatTokens(resultingBalance)}
-                </div>
-
-                <div
-                  className={cn(
-                    "text-xs mt-1",
-                    tokenAmount >= 0 ? "text-primary" : "text-destructive",
-                  )}
-                >
-                  {(() => {
-                    if (tokenAmount === 0) return "no change";
-                    return formatTokens(tokenAmount);
-                  })()}
-                </div>
-              </div>
-            </Field>
-          </div>
-        </div>
-
-        <Field>
-          <FieldLabel>Adjustment</FieldLabel>
-          <NumberInput
-            placeholder="e.g. +500 or -200"
-            value={tokenAmount}
-            onValueChange={(num) => setTokenAmount(num)}
-          />
-        </Field>
-
-        <Field>
-          <FieldLabel>Reason</FieldLabel>
-          <Input disabled value={reason} onChange={(e) => setReason(e.target.value)} />
-        </Field>
-      </FieldGroup>
-
-      <div className="flex justify-end">
-        <Button disabled={tokenAmount === 0} type="submit">
-          Confirm Adjustment
-        </Button>
-      </div>
-    </form>
-  );
-};
-
 export function ManageUserBalancesTable() {
-  const modalStore = useModalStore();
-  useUserStore();
   const userRecordsStore = useUserRecordsStore();
   const userRecords = userRecordsStore.data;
 
@@ -292,8 +175,6 @@ export function ManageUserBalancesTable() {
             <TableHead />
             <TableHead>Name</TableHead>
             <TableHead>Email</TableHead>
-            <TableHead>Tokens</TableHead>
-            <TableHead />
           </TableRow>
         </TableHeader>
 
@@ -302,29 +183,6 @@ export function ManageUserBalancesTable() {
             <UserManagementTableRow
               key={userAccountSummary.userRecord.id}
               userBalanceDetails={userAccountSummary}
-              onAdjustButtonClick={() => {
-                modalStore.setData(
-                  <>
-                    <ModalContent
-                      title={"Adjust Token Balance"}
-                      description={`Update balance for ${userAccountSummary.userRecord.name}. Use positive values to add,
-                      negative to remove`}
-                    >
-                      <AdjustUserBalanceForm
-                        onSuccess={(messages) => {
-                          toast.success(...createToastProps(messages));
-                          modalStore.setData(null);
-                        }}
-                        onError={(messages) => {
-                          toast.error(...createToastProps(messages));
-                        }}
-                        userRecord={userAccountSummary.userRecord}
-                        userBalanceRecord={userAccountSummary.userBalanceRecord}
-                      />
-                    </ModalContent>
-                  </>,
-                );
-              }}
             />
           ))}
         </TableBody>

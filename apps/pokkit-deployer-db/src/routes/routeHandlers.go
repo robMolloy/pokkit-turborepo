@@ -233,6 +233,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 			Quantity:         quantity,
 			EventType:        string(event.Type),
 			Currency:         string(checkoutSession.Currency),
+			AmountTotal:      int(checkoutSession.AmountTotal),
 			PaymentIntentId:  checkoutSession.ID,
 			SubscriptionId:   subscriptionId,
 			UserId:           checkoutSession.Metadata["userId"],
