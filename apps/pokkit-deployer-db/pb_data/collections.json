@@ -1562,6 +1562,20 @@
       {
         "autogeneratePattern": "",
         "hidden": false,
+        "id": "text1031527505",
+        "max": 0,
+        "min": 0,
+        "name": "invoiceId",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
         "id": "text3346823387",
         "max": 0,
         "min": 0,
@@ -1727,7 +1741,7 @@
       "CREATE INDEX `idx_Bzj0h4o9vr` ON `stripeLedger` (`paymentIntentId`)"
     ],
     "created": "2026-04-23 10:02:37.517Z",
-    "updated": "2026-04-24 23:50:57.837Z",
+    "updated": "2026-04-25 00:12:36.172Z",
     "system": false
   }
 ]

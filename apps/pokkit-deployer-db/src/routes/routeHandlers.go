@@ -133,6 +133,10 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 	params := &stripe.CheckoutSessionParams{
 		Mode: productData.PaymentMode,
 
+		InvoiceCreation: &stripe.CheckoutSessionInvoiceCreationParams{
+			Enabled: stripe.Bool(true),
+		},
+
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			{
 				Price:    productData.PriceId,
@@ -228,6 +232,10 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		if checkoutSession.Subscription != nil {
 			subscriptionId = checkoutSession.Subscription.ID
 		}
+		var invoiceId string
+		if checkoutSession.Invoice != nil {
+			invoiceId = checkoutSession.Invoice.ID
+		}
 
 		stripeLedgeRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
 			Quantity:         quantity,
@@ -236,6 +244,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 			AmountTotal:      int(checkoutSession.AmountTotal),
 			PaymentIntentId:  checkoutSession.ID,
 			SubscriptionId:   subscriptionId,
+			InvoiceId:        invoiceId,
 			UserId:           checkoutSession.Metadata["userId"],
 			ProductName:      checkoutSession.Metadata["productName"],
 			ProductId:        checkoutSession.Metadata["productId"],
