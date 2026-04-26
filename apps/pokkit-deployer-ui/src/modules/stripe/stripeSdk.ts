@@ -41,6 +41,41 @@ export const stripeRetrieveCheckoutSession = async (p: {
   }
 };
 
+const invoiceSchema = z.object({
+  hosted_invoice_url: z.string(),
+});
+
+export type TInvoiceSchema = z.infer<typeof invoiceSchema>;
+export const stripeRetrieveInvoice = async (p: {
+  invoiceId: string;
+  abortController?: AbortController;
+}) => {
+  try {
+    const resp = await pb.send("/stripe-retrieve-invoice", {
+      method: "POST",
+      body: JSON.stringify({ invoiceId: p.invoiceId }),
+      signal: p.abortController?.signal,
+    });
+
+    const respSchema = z.object({ invoice: invoiceSchema });
+    const data = respSchema.parse(resp);
+    const messages = ["Successfully retrieved stripe invoice"];
+
+    return { success: true, data: data.invoice, messages } as const;
+  } catch (error) {
+    const isAbort = (error as { isAbort?: boolean }).isAbort;
+    if (isAbort)
+      return {
+        success: false,
+        messages: ["Retrieved stripe invoice request cancelled"] as string[],
+      } as const;
+
+    const messages = ["Failed to retrieve stripe invoice"];
+
+    return { success: false, error, messages } as const;
+  }
+};
+
 export const createStripeCheckoutSession = async (p1: {
   productName: string;
   quantity: number;
@@ -52,7 +87,6 @@ export const createStripeCheckoutSession = async (p1: {
     });
     const schema = z.object({ url: z.string() });
     const data = schema.parse(res);
-    console.log(`stripeSdk.ts:${/*LL*/ 54}`, { data });
 
     const messages = ["Successfully set up the stripe checkout session"];
     return { success: true, data, messages } as const;

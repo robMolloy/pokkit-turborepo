@@ -16,20 +16,24 @@ import (
 	stripe "github.com/stripe/stripe-go/v85"
 	stripeSession "github.com/stripe/stripe-go/v85/checkout/session"
 	stripeCustomer "github.com/stripe/stripe-go/v85/customer"
+	stripeInvoice "github.com/stripe/stripe-go/v85/invoice"
 	stripeWebhook "github.com/stripe/stripe-go/v85/webhook"
 )
 
 var ProductDataLookup = map[string]struct {
-	PriceId     *string
-	PaymentMode *string
+	PriceId         *string
+	PaymentMode     *string
+	isOneOffPayment bool
 }{
 	"instance_subscription": {
-		PriceId:     stripe.String("price_1TMo82IGFJRyk0RhQn1z0oHK"),
-		PaymentMode: stripe.String(stripe.CheckoutSessionModeSubscription),
+		PriceId:         stripe.String("price_1TMo82IGFJRyk0RhQn1z0oHK"),
+		PaymentMode:     stripe.String(stripe.CheckoutSessionModeSubscription),
+		isOneOffPayment: false,
 	},
 	"token": {
-		PriceId:     stripe.String("price_1TJL40IGFJRyk0RhbikH1gy9"),
-		PaymentMode: stripe.String(stripe.CheckoutSessionModePayment),
+		PriceId:         stripe.String("price_1TJL40IGFJRyk0RhbikH1gy9"),
+		PaymentMode:     stripe.String(stripe.CheckoutSessionModePayment),
+		isOneOffPayment: true,
 	},
 }
 
@@ -87,6 +91,42 @@ func StripeRetrieveCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 		"checkoutSession": checkoutSession,
 	})
 }
+func StripeRetrieveInvoiceRouteHandler(e *pbCore.RequestEvent) error {
+	auth := e.Auth
+	if auth == nil {
+		return e.BadRequestError("not_logged_id", nil)
+	}
+	userId := auth.Id
+	if userId == "" {
+		return e.BadRequestError("not_logged_id", nil)
+	}
+	userEmail := auth.Email()
+	if userEmail == "" {
+		return e.BadRequestError("no_email_provided", nil)
+	}
+
+	body := e.Request.Body
+	defer body.Close()
+	data, err := io.ReadAll(body)
+	if err != nil {
+		return e.BadRequestError("invalid_request_body", err)
+	}
+
+	req := struct {
+		InvoiceId string `json:"invoiceId"`
+	}{}
+	err = json.Unmarshal(data, &req)
+	if err != nil {
+		return e.BadRequestError("invalid_json", err)
+	}
+
+	invoice, err := stripeInvoice.Get(req.InvoiceId, nil)
+	if err != nil {
+		return e.BadRequestError("no checkout session id provided", nil)
+	}
+
+	return e.JSON(http.StatusOK, map[string]any{"invoice": invoice})
+}
 
 func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 	auth := e.Auth
@@ -133,10 +173,6 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 	params := &stripe.CheckoutSessionParams{
 		Mode: productData.PaymentMode,
 
-		InvoiceCreation: &stripe.CheckoutSessionInvoiceCreationParams{
-			Enabled: stripe.Bool(true),
-		},
-
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			{
 				Price:    productData.PriceId,
@@ -156,6 +192,12 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 			"productId":        *productData.PriceId,
 			"quantity":         strconv.FormatInt(int64(req.Quantity), 10),
 		},
+	}
+
+	if productData.isOneOffPayment {
+		params.InvoiceCreation = &stripe.CheckoutSessionInvoiceCreationParams{
+			Enabled: stripe.Bool(true),
+		}
 	}
 
 	checkoutSession, err := stripeSession.New(params)

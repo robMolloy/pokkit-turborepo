@@ -8,12 +8,13 @@ export const stripeLedgerRecordsCollectionName = "stripeLedger";
 export const stripeLedgerRecordSchema = z.object({
   id: z.string(),
   userId: z.string(),
+  eventType: z.string(),
   productName: z.string(),
   currency: z.string(),
   quantity: z.number(),
   amountTotal: z.number(),
   paymentIntentId: z.string().nullish(),
-  instanceId: z.string().nullish(),
+  invoiceId: z.string().nullish(),
   created: z.string(),
   updated: z.string(),
 });

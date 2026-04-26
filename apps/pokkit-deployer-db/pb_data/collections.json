@@ -1524,8 +1524,8 @@
   },
   {
     "id": "pbc_3068566530",
-    "listRule": "@request.auth.id != \"\" \u0026\u0026 @request.auth.id = userId ",
-    "viewRule": "@request.auth.id != \"\" \u0026\u0026 @request.auth.id = userId",
+    "listRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = userId ||\n@collection.authGlobalUserPermissions.userId ?= @request.auth.id \u0026\u0026\n@collection.authGlobalUserPermissions.role = \"admin\")",
+    "viewRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = userId ||\n@collection.authGlobalUserPermissions.userId ?= @request.auth.id \u0026\u0026\n@collection.authGlobalUserPermissions.role = \"admin\")",
     "createRule": null,
     "updateRule": null,
     "deleteRule": null,
@@ -1741,7 +1741,7 @@
       "CREATE INDEX `idx_Bzj0h4o9vr` ON `stripeLedger` (`paymentIntentId`)"
     ],
     "created": "2026-04-23 10:02:37.517Z",
-    "updated": "2026-04-25 00:12:36.172Z",
+    "updated": "2026-04-26 19:22:03.160Z",
     "system": false
   }
 ]

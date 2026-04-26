@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/dateUtils";
 import { cn } from "@/lib/utils";
 import {
   TStripeLedgerRecord,
@@ -51,14 +52,6 @@ function formatTokens(amount: number): string {
   const internationalisedAmount = new Intl.NumberFormat("en-US").format(Math.abs(amount));
 
   return `${amount >= 0 ? "+" : "-"}${internationalisedAmount}`;
-}
-
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
 }
 
 function DisplayUserBalanceLedgerRecord(p: { userBalanceLedgerRecord: TStripeLedgerRecord }) {

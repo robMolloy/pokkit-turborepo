@@ -15,11 +15,11 @@ export const LeftSidebar = (p: { pb: PocketBase }) => {
             Home
           </SidebarButton>
           <SidebarButton
-            href="/manage-user-balances"
-            isHighlighted={location.pathname === "/manage-user-balances"}
+            href="/stripe-payments"
+            isHighlighted={location.pathname === "/stripe-payments"}
             iconName="Home"
           >
-            manage-user-balances
+            stripe-payments
           </SidebarButton>
           <SidebarButton
             href="/topup-user-balance"
@@ -65,6 +65,13 @@ export const LeftSidebar = (p: { pb: PocketBase }) => {
       bottom={
         <>
           <SignedInRouteProtector>
+            <SidebarButton
+              href="/manage-user-balances"
+              isHighlighted={location.pathname === "/manage-user-balances"}
+              iconName="Home"
+            >
+              manage-user-balances
+            </SidebarButton>
             <SidebarButton
               iconName="LogOut"
               onClick={() => signOut({ pb: p.pb })}
