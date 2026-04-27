@@ -1,5 +1,6 @@
 export * from "./button";
 export * from "./CustomIcon";
+export * from "./DisplayAnything";
 export * from "./Header";
 export * from "./input";
 export * from "./label";

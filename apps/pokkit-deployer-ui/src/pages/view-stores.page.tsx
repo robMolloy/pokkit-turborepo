@@ -3,6 +3,7 @@ import { useStripeLedgerRecordsStore } from "@/modules/instanceRecords/dbStripeL
 import { useUserBalanceRecordStore } from "@/modules/instanceRecords/dbUserBalanceRecord";
 import { useUserBalanceRecordsStore } from "@/modules/instanceRecords/dbUserBalanceRecords";
 import { useGlobalUserPermissionStore, useUserRecordsStore, useUserStore } from "@repo/pokkit-auth";
+import { DisplayAnything } from "@repo/pokkit-components";
 
 const IndexPage = () => {
   const userStore = useUserStore();
@@ -18,8 +19,9 @@ const IndexPage = () => {
       <h1>Stores</h1>
 
       <pre>
-        {JSON.stringify(
-          {
+        <DisplayAnything
+          title=""
+          data={{
             userStore,
             userRecordsStore,
             globalUserPermissionStore,
@@ -27,10 +29,10 @@ const IndexPage = () => {
             userBalanceRecordStore,
             userBalanceRecordsStore,
             stripeLedgerRecordsStore,
-          },
-          undefined,
-          2,
-        )}
+          }}
+          hideFunctions={true}
+          expandLevel={1}
+        />
       </pre>
     </div>
   );
