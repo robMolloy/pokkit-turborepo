@@ -1424,8 +1424,8 @@
   },
   {
     "id": "pbc_2852184993",
-    "listRule": null,
-    "viewRule": null,
+    "listRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = userId ||\n@collection.authGlobalUserPermissions.userId ?= @request.auth.id \u0026\u0026\n@collection.authGlobalUserPermissions.role = \"admin\")",
+    "viewRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = userId ||\n@collection.authGlobalUserPermissions.userId ?= @request.auth.id \u0026\u0026\n@collection.authGlobalUserPermissions.role = \"admin\")",
     "createRule": null,
     "updateRule": null,
     "deleteRule": null,
@@ -1519,7 +1519,7 @@
     ],
     "indexes": [],
     "created": "2026-04-17 11:13:52.471Z",
-    "updated": "2026-04-24 15:27:23.810Z",
+    "updated": "2026-04-27 07:28:16.344Z",
     "system": false
   },
   {

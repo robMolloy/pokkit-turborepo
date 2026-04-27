@@ -326,7 +326,6 @@ func UpdateProductsAfterStripeLedgerCreatedEventHandler(e *pbCore.RecordEvent) e
 	}
 
 	if stripeLedgerRecordStruct.ProductName == "instance_subscription" {
-
 		err = instanceSubscriptionsSdk.FindInstancesSubscriptionRecordAndUpdateFromStripeLedgerStruct(e.App, stripeLedgerRecordStruct)
 		if err != nil {
 			e.App.Logger().Error("Error Incrementing number of instances on userBalanceRecord", "err", err)

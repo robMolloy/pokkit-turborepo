@@ -4,6 +4,7 @@ import (
 	"app-db/src/db"
 	"app-db/src/modules/stripeLedgerRecordsSdk"
 	"app-db/src/modules/stripeSdk"
+	"fmt"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 	pbTypes "github.com/pocketbase/pocketbase/tools/types"
@@ -31,32 +32,73 @@ func ConvertInstanceSubscriptionRecordToStruct(record *pbCore.Record) TInstanceS
 	}
 }
 
+func ConvertInstancesSubscriptionStructToRecord(app pbCore.App, data TInstanceSubscriptionRecordStruct) (*pbCore.Record, error) {
+	instancesSubscriptionsCollection, err := app.FindCollectionByNameOrId(db.InstancesSubscriptionsCollectionName)
+	if err != nil {
+		return nil, err
+	}
+	record := pbCore.NewRecord(instancesSubscriptionsCollection)
+
+	PopulateInstancesSubscriptionRecordWithStruct(record, data)
+
+	return record, nil
+}
+func PopulateInstancesSubscriptionRecordWithStruct(record *pbCore.Record, data TInstanceSubscriptionRecordStruct) {
+	record.Set("id", data.Id)
+	record.Set("userId", data.UserId)
+	record.Set("subscriptionId", data.SubscriptionId)
+	record.Set("numberOfInstances", data.NumberOfInstances)
+	record.Set("paidUntilDateTime", data.PaidUntilDateTime)
+	record.Set("created", data.Created)
+	record.Set("updated", data.Updated)
+}
+
 func FindInstancesSubscriptionRecordAndUpdateFromStripeLedgerStruct(app pbCore.App, stripeLedgerStruct stripeLedgerRecordsSdk.TStripeLedgerStruct) error {
 	subscription, err := stripeSdk.RetrieveStripeSubscription(stripeLedgerStruct.SubscriptionId)
-	app.Logger().Error("subscription", "subscription", subscription)
+
 	if err != nil {
 		return err
 	}
 
 	currentPeriodEnd, err := stripeSdk.GetCurrentPeriodEndFromStripeSubscription(subscription)
-
-	instancesSubscriptionsCollection, err := app.FindCollectionByNameOrId(db.InstancesSubscriptionsCollectionName)
-	instancesSubscriptionsRecord, _ := app.FindRecordById(db.InstancesSubscriptionsCollectionName, stripeLedgerStruct.UserId)
-
-	if instancesSubscriptionsRecord == nil {
-		instancesSubscriptionsRecord = pbCore.NewRecord(instancesSubscriptionsCollection)
-		instancesSubscriptionsRecord.Set("id", stripeLedgerStruct.UserId)
-		instancesSubscriptionsRecord.Set("userId", stripeLedgerStruct.UserId)
+	if err != nil {
+		return err
 	}
 
-	instancesSubscriptionsRecord.Set("numberOfInstances", stripeLedgerStruct.Quantity)
+	currentPeriodEndDateTime, err := pbTypes.ParseDateTime(currentPeriodEnd)
+	if err != nil {
+		currentPeriodEndDateTime = pbTypes.NowDateTime()
+	}
 
-	instancesSubscriptionsRecord.Set("paidUntilDateTime", currentPeriodEnd)
-	instancesSubscriptionsRecord.Set("subscriptionId", subscription.ID)
+	instancesSubscriptionsCollection, err := app.FindCollectionByNameOrId(db.InstancesSubscriptionsCollectionName)
+	if err != nil {
+		return fmt.Errorf("%v collection cannot be found", db.InstancesSubscriptionsCollectionName)
+	}
 
-	app.Logger().Error("instancesSubscriptionsRecord", "instancesSubscriptionsRecord", instancesSubscriptionsRecord)
+	instancesSubscriptionRecord, err := app.FindFirstRecordByData(db.InstancesSubscriptionsCollectionName, "subscriptionId", stripeLedgerStruct.SubscriptionId)
+	if instancesSubscriptionRecord == nil {
+		instancesSubscriptionRecord = pbCore.NewRecord(instancesSubscriptionsCollection)
+	}
 
-	if err = app.Save(instancesSubscriptionsRecord); err != nil {
+	instancesSubscriptionStruct := ConvertInstanceSubscriptionRecordToStruct(instancesSubscriptionRecord)
+	instancesSubscriptionExists := instancesSubscriptionStruct.Id != ""
+
+	if instancesSubscriptionExists && instancesSubscriptionStruct.UserId != stripeLedgerStruct.UserId {
+		return fmt.Errorf("stripe ledger userId does not match instancesSubscriptionRecord userId")
+	}
+
+	if !instancesSubscriptionExists {
+		instancesSubscriptionStruct.UserId = stripeLedgerStruct.UserId
+	}
+
+	instancesSubscriptionStruct.NumberOfInstances = stripeLedgerStruct.Quantity
+	instancesSubscriptionStruct.PaidUntilDateTime = currentPeriodEndDateTime
+	instancesSubscriptionStruct.SubscriptionId = subscription.ID
+
+	newInstancesSubscriptionRecord := pbCore.NewRecord(instancesSubscriptionsCollection)
+	PopulateInstancesSubscriptionRecordWithStruct(newInstancesSubscriptionRecord, instancesSubscriptionStruct)
+
+	if err = app.Save(newInstancesSubscriptionRecord); err != nil {
 		return err
 	}
 	return nil

@@ -1,4 +1,5 @@
 import { useInstanceRecordsStore } from "@/modules/instanceRecords/dbInstanceRecords";
+import { useInstancesSubscriptionRecordsStore } from "@/modules/instanceRecords/dbInstancesSubscriptionRecords";
 import { useStripeLedgerRecordsStore } from "@/modules/instanceRecords/dbStripeLedgerRecords";
 import { useUserBalanceRecordStore } from "@/modules/instanceRecords/dbUserBalanceRecord";
 import { useUserBalanceRecordsStore } from "@/modules/instanceRecords/dbUserBalanceRecords";
@@ -13,6 +14,7 @@ const IndexPage = () => {
   const userBalanceRecordStore = useUserBalanceRecordStore();
   const userBalanceRecordsStore = useUserBalanceRecordsStore();
   const stripeLedgerRecordsStore = useStripeLedgerRecordsStore();
+  const instancesSubscriptionRecordsStore = useInstancesSubscriptionRecordsStore();
 
   return (
     <div>
@@ -29,6 +31,7 @@ const IndexPage = () => {
             userBalanceRecordStore,
             userBalanceRecordsStore,
             stripeLedgerRecordsStore,
+            instancesSubscriptionRecordsStore,
           }}
           hideFunctions={true}
           expandLevel={1}
