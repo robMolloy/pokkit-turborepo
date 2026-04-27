@@ -790,7 +790,7 @@
   {
     "id": "pbc_2680520508",
     "listRule": "@request.auth.id != \"\" \u0026\u0026 (\n  @request.auth.id = id || \n  @collection.authGlobalUserPermissions.id ?= @request.auth.id \u0026\u0026 @collection.authGlobalUserPermissions.role ?= \"admin\"\n)",
-    "viewRule": "@request.auth.id != \"\" \u0026\u0026 @request.auth.id = id || @collection.authGlobalUserPermissions.id ?= @request.auth.id \u0026\u0026 @collection.authGlobalUserPermissions.role ?= \"admin\"",
+    "viewRule": "@request.auth.id != \"\" \u0026\u0026 (\n  @request.auth.id = id || \n  @collection.authGlobalUserPermissions.id ?= @request.auth.id \u0026\u0026 @collection.authGlobalUserPermissions.role ?= \"admin\"\n)",
     "createRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.authGlobalUserPermissions.id ?= @request.auth.id \u0026\u0026 \n@collection.authGlobalUserPermissions.role ?= \"admin\"",
     "updateRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.authGlobalUserPermissions.id ?= @request.auth.id \u0026\u0026 \n@collection.authGlobalUserPermissions.role ?= \"admin\"",
     "deleteRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.authGlobalUserPermissions.id ?= @request.auth.id \u0026\u0026 \n@collection.authGlobalUserPermissions.role ?= \"admin\"",
@@ -876,7 +876,7 @@
     ],
     "indexes": [],
     "created": "2026-04-17 11:13:52.458Z",
-    "updated": "2026-04-24 15:59:53.427Z",
+    "updated": "2026-04-27 06:46:14.303Z",
     "system": false
   },
   {

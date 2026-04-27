@@ -72,6 +72,7 @@ export const useInitReactiveAuthStoreSync = (p: { pb: PocketBase }) => {
     p.pb.authStore.onChange(() => syncAuthStore());
   }, []);
 };
+
 export const useUserStoreSync = (p: { pb: PocketBase; id: string | undefined }) => {
   const userStore = useUserStore();
   const smartSubscribeRespPromises = useRef<ReturnType<typeof smartSubscribeToUserRecordById>[]>(

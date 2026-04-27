@@ -1,11 +1,14 @@
 import { envConfig } from "@/config/envConfig";
-import { useInstanceRecordsStore } from "@/modules/instanceRecords/dbInstanceRecords";
-import { SignedInRouteProtector, SignedOutRouteProtector } from "@repo/pokkit-auth";
+import {
+  SignedInRouteProtector,
+  SignedOutRouteProtector,
+  useGlobalUserPermissionStore,
+} from "@repo/pokkit-auth";
 import { useNavigate } from "react-router-dom";
 
 const IndexPage = () => {
   const navigate = useNavigate();
-  const instanceRecordsStore = useInstanceRecordsStore();
+  const globalUserPermissionStore = useGlobalUserPermissionStore();
 
   return (
     <div className="p-6">
@@ -13,7 +16,7 @@ const IndexPage = () => {
 
       <br />
 
-      <pre>{JSON.stringify({ instanceRecordsStore }, undefined, 2)}</pre>
+      <pre>{JSON.stringify({ globalUserPermissionStore }, undefined, 2)}</pre>
 
       <SignedInRouteProtector ifUserIsUnverified={() => navigate("/auth/verification-request")}>
         <br />

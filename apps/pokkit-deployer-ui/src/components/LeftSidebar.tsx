@@ -1,5 +1,10 @@
 import { PocketBase } from "@/config/pocketbaseConfig";
-import { SignedInRouteProtector, SignedOutRouteProtector, signOut } from "@repo/pokkit-auth";
+import {
+  IsAdminRouteProtector,
+  SignedInRouteProtector,
+  SignedOutRouteProtector,
+  signOut,
+} from "@repo/pokkit-auth";
 import { LeftSidebar as LeftSidebarTemplate, SidebarButton } from "@repo/pokkit-components";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -64,7 +69,7 @@ export const LeftSidebar = (p: { pb: PocketBase }) => {
       }
       bottom={
         <>
-          <SignedInRouteProtector>
+          <IsAdminRouteProtector>
             <SidebarButton
               href="/manage-user-balances"
               isHighlighted={location.pathname === "/manage-user-balances"}
@@ -72,6 +77,8 @@ export const LeftSidebar = (p: { pb: PocketBase }) => {
             >
               manage-user-balances
             </SidebarButton>
+          </IsAdminRouteProtector>
+          <SignedInRouteProtector>
             <SidebarButton
               iconName="LogOut"
               onClick={() => signOut({ pb: p.pb })}

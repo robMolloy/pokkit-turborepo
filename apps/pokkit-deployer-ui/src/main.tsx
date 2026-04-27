@@ -1,5 +1,6 @@
 import {
   useAuthMethodsListStoreSync,
+  useGlobalUserPermissionSync,
   useReactiveAuthStoreSync,
   useUserRecordsSync,
 } from "@repo/pokkit-auth";
@@ -18,8 +19,8 @@ import { envConfig } from "./config/envConfig";
 import { pb } from "./config/pocketbaseConfig";
 import { useInstanceRecordsSync } from "./modules/instanceRecords/dbInstanceRecords";
 import { useStripeLedgerRecordsSync } from "./modules/instanceRecords/dbStripeLedgerRecords";
-import { useUserBalanceRecordsSync } from "./modules/instanceRecords/dbUserBalanceRecords";
 import { useUserBalanceRecordSync } from "./modules/instanceRecords/dbUserBalanceRecord";
+import { useUserBalanceRecordsSync } from "./modules/instanceRecords/dbUserBalanceRecords";
 
 const Routes = () => {
   return useRoutes(routes);
@@ -28,6 +29,7 @@ const Routes = () => {
 const useAuthSync = () => {
   useReactiveAuthStoreSync({ pb });
   useAuthMethodsListStoreSync({ pb });
+  useGlobalUserPermissionSync({ pb });
 };
 
 const App = () => {

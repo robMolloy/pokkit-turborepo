@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useReactiveAuthStore } from "../hooks/reactiveAuthStore";
 import { TAuthStore } from "../utils";
+import { useGlobalUserPermissionStore } from "../hooks";
 
 export const SignedInRouteProtector = (
   p: (
@@ -68,5 +69,12 @@ export const UnverifiedUserRouteProtector = (p: {
   }, [reactiveAuthStore?.record.verified]);
 
   if (!reactiveAuthStore?.record.verified) return <>{p.children}</>;
+  return <></>;
+};
+
+export const IsAdminRouteProtector = (p: { children: React.ReactNode }) => {
+  const globalUserPermissionStore = useGlobalUserPermissionStore();
+
+  if (globalUserPermissionStore.data?.role === "admin") return p.children;
   return <></>;
 };
