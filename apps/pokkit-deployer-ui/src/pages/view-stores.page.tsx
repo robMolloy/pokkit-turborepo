@@ -2,11 +2,12 @@ import { useInstanceRecordsStore } from "@/modules/instanceRecords/dbInstanceRec
 import { useStripeLedgerRecordsStore } from "@/modules/instanceRecords/dbStripeLedgerRecords";
 import { useUserBalanceRecordStore } from "@/modules/instanceRecords/dbUserBalanceRecord";
 import { useUserBalanceRecordsStore } from "@/modules/instanceRecords/dbUserBalanceRecords";
-import { useUserRecordsStore, useUserStore } from "@repo/pokkit-auth";
+import { useGlobalUserPermissionStore, useUserRecordsStore, useUserStore } from "@repo/pokkit-auth";
 
 const IndexPage = () => {
   const userStore = useUserStore();
   const userRecordsStore = useUserRecordsStore();
+  const globalUserPermissionStore = useGlobalUserPermissionStore();
   const instanceRecordsStore = useInstanceRecordsStore();
   const userBalanceRecordStore = useUserBalanceRecordStore();
   const userBalanceRecordsStore = useUserBalanceRecordsStore();
@@ -21,6 +22,7 @@ const IndexPage = () => {
           {
             userStore,
             userRecordsStore,
+            globalUserPermissionStore,
             instanceRecordsStore,
             userBalanceRecordStore,
             userBalanceRecordsStore,
