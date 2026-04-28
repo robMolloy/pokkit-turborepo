@@ -29,6 +29,7 @@ func main() {
 		se.Router.POST("/stripe-create-checkout-session", routes.StripeCreateCheckoutSessionRouteHandler).Bind(pbApis.RequireAuth())
 		se.Router.POST("/stripe-retrieve-checkout-session", routes.StripeRetrieveCheckoutSessionRouteHandler).Bind(pbApis.RequireAuth())
 		se.Router.POST("/stripe-retrieve-invoice", routes.StripeRetrieveInvoiceRouteHandler).Bind(pbApis.RequireAuth())
+		se.Router.POST("/stripe-retrieve-subscription", routes.StripeRetrieveSubscriptionRouteHandler).Bind(pbApis.RequireAuth())
 		se.Next()
 
 		return nil

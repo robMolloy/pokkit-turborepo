@@ -1,4 +1,5 @@
 import { pb } from "@/config/pocketbaseConfig";
+import { extractMessageFromPbError } from "@repo/pokkit-auth";
 import z from "zod";
 
 const checkoutSessionSchema = z.object({
@@ -71,6 +72,43 @@ export const stripeRetrieveInvoice = async (p: {
       } as const;
 
     const messages = ["Failed to retrieve stripe invoice"];
+
+    return { success: false, error, messages } as const;
+  }
+};
+
+const stripeSubscriptionSchema = z
+  .object({
+    id: z.string(),
+  })
+  .loose();
+
+export type TStripeSubscription = z.infer<typeof stripeSubscriptionSchema>;
+export const retrieveStripeSubscription = async (p: {
+  subscriptionId: string;
+  abortController?: AbortController;
+}) => {
+  try {
+    const resp = await pb.send("/stripe-retrieve-subscription", {
+      method: "POST",
+      body: JSON.stringify({ subscriptionId: p.subscriptionId }),
+      signal: p.abortController?.signal,
+    });
+
+    const respSchema = z.object({ subscription: stripeSubscriptionSchema });
+    const data = respSchema.parse(resp);
+    const messages = ["Successfully retrieved stripe subscription"];
+    return { success: true, data: data.subscription, messages } as const;
+  } catch (error) {
+    const isAbort = (error as { isAbort?: boolean }).isAbort;
+    if (isAbort)
+      return {
+        success: false,
+        messages: ["Retrieved stripe subscription request cancelled"] as string[],
+      } as const;
+
+    const messagesResp = extractMessageFromPbError({ error }) ?? [];
+    const messages = ["Failed to retrieve stripe subscription", ...messagesResp];
 
     return { success: false, error, messages } as const;
   }

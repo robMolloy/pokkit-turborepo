@@ -24,7 +24,9 @@ type TStripeLedgerStruct struct {
 }
 
 func PopulateStripeLedgerRecord(record *pbCore.Record, data TStripeLedgerStruct) *pbCore.Record {
-	record.Set("id", data.Id)
+	if data.Id != "" {
+		record.Set("id", data.Id)
+	}
 	record.Set("userId", data.UserId)
 	record.Set("quantity", data.Quantity)
 	record.Set("invoiceId", data.InvoiceId)

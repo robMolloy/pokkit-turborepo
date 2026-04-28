@@ -1498,6 +1498,42 @@
       },
       {
         "hidden": false,
+        "id": "json3174873989",
+        "maxSize": 0,
+        "name": "subscriptionRawData",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "json"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text432467915",
+        "max": 0,
+        "min": 0,
+        "name": "interval",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "number1524867112",
+        "max": null,
+        "min": null,
+        "name": "intervalCount",
+        "onlyInt": false,
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "number"
+      },
+      {
+        "hidden": false,
         "id": "autodate2990389176",
         "name": "created",
         "onCreate": true,
@@ -1519,7 +1555,7 @@
     ],
     "indexes": [],
     "created": "2026-04-17 11:13:52.471Z",
-    "updated": "2026-04-27 07:28:16.344Z",
+    "updated": "2026-04-27 20:48:51.220Z",
     "system": false
   },
   {
@@ -1600,17 +1636,6 @@
         "required": false,
         "system": false,
         "type": "text"
-      },
-      {
-        "hidden": false,
-        "id": "date1277129423",
-        "max": "",
-        "min": "",
-        "name": "subscriptionExpiresAtDateTime",
-        "presentable": false,
-        "required": false,
-        "system": false,
-        "type": "date"
       },
       {
         "autogeneratePattern": "",
@@ -1741,7 +1766,7 @@
       "CREATE INDEX `idx_Bzj0h4o9vr` ON `stripeLedger` (`paymentIntentId`)"
     ],
     "created": "2026-04-23 10:02:37.517Z",
-    "updated": "2026-04-26 19:22:03.160Z",
+    "updated": "2026-04-27 19:35:38.537Z",
     "system": false
   }
 ]

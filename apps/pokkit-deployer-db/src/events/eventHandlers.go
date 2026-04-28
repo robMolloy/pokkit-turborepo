@@ -305,39 +305,36 @@ func UpdateProductsAfterStripeLedgerCreatedEventHandler(e *pbCore.RecordEvent) e
 	log.Println("OnStripeLedgerRecordAfterCreateSuccess")
 	stripeLedgerRecord := e.Record
 	stripeLedgerRecordStruct := stripeLedgerRecordsSdk.ConvertStripeLedgerRecordToStruct(stripeLedgerRecord)
+
 	if stripeLedgerRecordStruct.EventType != "checkout.session.completed" {
 		e.App.Logger().Info("event type must be checkout.session.completed to update products")
-		return e.Next()
+		return nil
 	}
+
 	if stripeLedgerRecordStruct.Quantity <= 0 {
-		e.App.Logger().Error("stripeLedgerRecordStruct.Quantity cannot be <= 0", "stripeLedgerRecordStruct", stripeLedgerRecordStruct)
-		return e.Next()
+		return fmt.Errorf("stripeLedgerRecordStruct.Quantity cannot be <= 0")
 	}
 	if stripeLedgerRecordStruct.Currency != "usd" {
-		e.App.Logger().Error("currency must be usd")
-		return e.Next()
+		return fmt.Errorf("currency must be usd")
 	}
 
 	userId := stripeLedgerRecordStruct.UserId
 	user, err := userRecordsSdk.FindUserRecordStructById(e.App, userId)
 	if user == nil || err != nil {
-		e.App.Logger().Error("no user found")
-		return e.Next()
+		return fmt.Errorf("no user found: %w", err)
 	}
 
 	if stripeLedgerRecordStruct.ProductName == "instance_subscription" {
 		err = instanceSubscriptionsSdk.FindInstancesSubscriptionRecordAndUpdateFromStripeLedgerStruct(e.App, stripeLedgerRecordStruct)
 		if err != nil {
-			e.App.Logger().Error("Error Incrementing number of instances on userBalanceRecord", "err", err)
-			return err
+			return fmt.Errorf("Error Incrementing number of instances on userBalanceRecord: %w", err)
 		}
 	}
 
 	if stripeLedgerRecordStruct.ProductName == "token" {
 		err = userBalanceRecordsSdk.FindUserBalanceRecordAndIncrementTokenAmount(e.App, userId, stripeLedgerRecordStruct.Quantity)
 		if err != nil {
-			e.App.Logger().Error("Error Incrementing TokenAmount on userBalanceRecord", "err", err)
-			return err
+			return fmt.Errorf("userBalanceRecordsSdk.FindUserBalanceRecordAndIncrementTokenAmount error: %w", err)
 		}
 	}
 

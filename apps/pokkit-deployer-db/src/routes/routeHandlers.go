@@ -3,6 +3,7 @@ package routes
 import (
 	"app-db/src/db"
 	"app-db/src/modules/stripeLedgerRecordsSdk"
+	"app-db/src/modules/stripeSdk"
 	"app-db/src/utils"
 	"encoding/json"
 	"fmt"
@@ -14,9 +15,6 @@ import (
 	pbCore "github.com/pocketbase/pocketbase/core"
 
 	stripe "github.com/stripe/stripe-go/v85"
-	stripeSession "github.com/stripe/stripe-go/v85/checkout/session"
-	stripeCustomer "github.com/stripe/stripe-go/v85/customer"
-	stripeInvoice "github.com/stripe/stripe-go/v85/invoice"
 	stripeWebhook "github.com/stripe/stripe-go/v85/webhook"
 )
 
@@ -82,7 +80,7 @@ func StripeRetrieveCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 		return e.BadRequestError("invalid_json", err)
 	}
 
-	checkoutSession, err := stripeSession.Get(req.CheckoutSessionId, nil)
+	checkoutSession, err := stripeSdk.RetrieveStripeCheckoutSession(req.CheckoutSessionId)
 	if err != nil {
 		return e.BadRequestError("no checkout session id provided", nil)
 	}
@@ -120,12 +118,49 @@ func StripeRetrieveInvoiceRouteHandler(e *pbCore.RequestEvent) error {
 		return e.BadRequestError("invalid_json", err)
 	}
 
-	invoice, err := stripeInvoice.Get(req.InvoiceId, nil)
+	invoice, err := stripeSdk.RetrieveStripeInvoice(req.InvoiceId)
 	if err != nil {
 		return e.BadRequestError("no checkout session id provided", nil)
 	}
 
 	return e.JSON(http.StatusOK, map[string]any{"invoice": invoice})
+}
+
+func StripeRetrieveSubscriptionRouteHandler(e *pbCore.RequestEvent) error {
+	auth := e.Auth
+	if auth == nil {
+		return e.BadRequestError("not_logged_id", nil)
+	}
+	userId := auth.Id
+	if userId == "" {
+		return e.BadRequestError("not_logged_id", nil)
+	}
+	userEmail := auth.Email()
+	if userEmail == "" {
+		return e.BadRequestError("no_email_provided", nil)
+	}
+
+	body := e.Request.Body
+	defer body.Close()
+	data, err := io.ReadAll(body)
+	if err != nil {
+		return e.BadRequestError("invalid_request_body", err)
+	}
+
+	req := struct {
+		SubscriptionId string `json:"subscriptionId"`
+	}{}
+	err = json.Unmarshal(data, &req)
+	if err != nil {
+		return e.BadRequestError("invalid_json", err)
+	}
+
+	subscription, err := stripeSdk.RetrieveStripeSubscription(req.SubscriptionId)
+	if err != nil {
+		return e.BadRequestError("no subscription found", nil)
+	}
+
+	return e.JSON(http.StatusOK, map[string]any{"subscription": subscription})
 }
 
 func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
@@ -142,9 +177,7 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 		return e.BadRequestError("no_email_provided", nil)
 	}
 
-	cust, err := stripeCustomer.New(&stripe.CustomerParams{
-		Email: stripe.String(userEmail),
-	})
+	stripeCustomer, err := stripeSdk.CreateStripeCustomer(userEmail)
 	if err != nil {
 		return e.InternalServerError(fmt.Sprintf("failed to create stripe customer from: %v", userEmail), err)
 	}
@@ -180,13 +213,13 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 			},
 		},
 
-		Customer: stripe.String(cust.ID),
+		Customer: stripe.String(stripeCustomer.ID),
 
 		SuccessURL: stripe.String("http://localhost:5173/stripe-checkout-session/success?checkoutSessionId={CHECKOUT_SESSION_ID}"),
 		CancelURL:  stripe.String("http://localhost:5173/stripe-checkout-session/cancelled"),
 
 		Metadata: map[string]string{
-			"stripeCustomerId": cust.ID,
+			"stripeCustomerId": stripeCustomer.ID,
 			"userId":           userId,
 			"productName":      ProductName,
 			"productId":        *productData.PriceId,
@@ -200,7 +233,7 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 		}
 	}
 
-	checkoutSession, err := stripeSession.New(params)
+	checkoutSession, err := stripeSdk.CreateStripeCheckoutSession(params)
 	if err != nil {
 		return e.InternalServerError("stripe session failed", err)
 	}
@@ -230,7 +263,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 	}
 
 	var logAllStripeEvents = true
-	var stripeLedgeRecordStruct stripeLedgerRecordsSdk.TStripeLedgerStruct
+	var stripeLedgerRecordStruct stripeLedgerRecordsSdk.TStripeLedgerStruct
 	if event.Type == "payment_intent.succeeded" || logAllStripeEvents {
 		var paymentIntent stripe.PaymentIntent
 		err = json.Unmarshal(event.Data.Raw, &paymentIntent)
@@ -243,7 +276,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 			quantity = 0
 		}
 
-		stripeLedgeRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
+		stripeLedgerRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
 			Quantity:        quantity,
 			EventType:       string(event.Type),
 			Currency:        string(paymentIntent.Currency),
@@ -254,7 +287,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 			ProductName:      paymentIntent.Metadata["productName"],
 			ProductId:        paymentIntent.Metadata["productId"],
 			StripeCustomerId: paymentIntent.Metadata["stripeCustomerId"],
-			RawData:          paymentIntent,
+			// RawData:          paymentIntent,
 		}
 	}
 
@@ -279,7 +312,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 			invoiceId = checkoutSession.Invoice.ID
 		}
 
-		stripeLedgeRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
+		stripeLedgerRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
 			Quantity:         quantity,
 			EventType:        string(event.Type),
 			Currency:         string(checkoutSession.Currency),
@@ -295,7 +328,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		}
 	}
 
-	if stripeLedgeRecordStruct.EventType == "" && !logAllStripeEvents {
+	if !logAllStripeEvents && stripeLedgerRecordStruct.EventType == "" {
 		return e.JSON(http.StatusOK, map[string]any{"url": "url"})
 	}
 
@@ -305,9 +338,10 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 	}
 
 	stripeLedgerRecord := pbCore.NewRecord(stripeLedgerCollection)
-	stripeLedgerRecordsSdk.PopulateStripeLedgerRecord(stripeLedgerRecord, stripeLedgeRecordStruct)
+	stripeLedgerRecordsSdk.PopulateStripeLedgerRecord(stripeLedgerRecord, stripeLedgerRecordStruct)
 	err = e.App.Save(stripeLedgerRecord)
 	if err != nil {
+		e.App.Logger().Error("stripeLedgerRecord", "stripeLedgerRecord", stripeLedgerRecord, "stripeLedgeRecordStruct", stripeLedgerRecordStruct)
 		return e.BadRequestError("Unable to save stripeLedgerRecord", err)
 	}
 
