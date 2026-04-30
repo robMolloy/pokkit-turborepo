@@ -1497,16 +1497,6 @@
         "type": "date"
       },
       {
-        "hidden": false,
-        "id": "json3174873989",
-        "maxSize": 0,
-        "name": "subscriptionRawData",
-        "presentable": false,
-        "required": false,
-        "system": false,
-        "type": "json"
-      },
-      {
         "autogeneratePattern": "",
         "hidden": false,
         "id": "text432467915",
@@ -1533,6 +1523,42 @@
         "type": "number"
       },
       {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text1767278655",
+        "max": 0,
+        "min": 0,
+        "name": "currency",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "number2392944706",
+        "max": null,
+        "min": null,
+        "name": "amount",
+        "onlyInt": false,
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "number"
+      },
+      {
+        "hidden": false,
+        "id": "json3174873989",
+        "maxSize": 0,
+        "name": "subscriptionRawData",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "json"
+      },
+      {
         "hidden": false,
         "id": "autodate2990389176",
         "name": "created",
@@ -1555,7 +1581,7 @@
     ],
     "indexes": [],
     "created": "2026-04-17 11:13:52.471Z",
-    "updated": "2026-04-27 20:48:51.220Z",
+    "updated": "2026-04-30 19:07:21.590Z",
     "system": false
   },
   {

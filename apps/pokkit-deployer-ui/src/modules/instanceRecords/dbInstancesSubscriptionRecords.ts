@@ -10,6 +10,11 @@ export const instancesSubscriptionRecordSchema = z.object({
   userId: z.string(),
   subscriptionId: z.string(),
   numberOfInstances: z.number(),
+  amount: z.number(),
+  currency: z.string(),
+  interval: z.string(),
+  intervalCount: z.number(),
+  paidUntilDateTime: z.string(),
   created: z.string(),
   updated: z.string(),
 });
@@ -54,6 +59,8 @@ export const useInstancesSubscriptionRecordsSync = (p: { pb: PocketBase }) => {
       collectionName: instancesSubscriptionRecordsCollectionName,
       itemSchema: instancesSubscriptionRecordSchema,
       onChange: (x) => instancesSubscriptionRecordsStore.setData(x),
+      onParsedItemFailedFn: (x) =>
+        console.log(`dbInstancesSubscriptionRecords.ts:${/*LL*/ 65}`, { x }),
     });
 
     return () => {

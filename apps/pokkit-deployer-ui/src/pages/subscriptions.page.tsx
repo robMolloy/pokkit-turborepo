@@ -1,4 +1,6 @@
 import { createToastProps } from "@/lib/createToastProps";
+import { formatCurrency } from "@/lib/currencyUtils";
+import { formatDate } from "@/lib/dateUtils";
 import {
   TInstancesSubscriptionRecord,
   useInstancesSubscriptionRecordsStore,
@@ -24,30 +26,30 @@ export function StripeLedgerRecordRowTemplate(p: {
             <RefreshCcw className="size-3.5" />
           </div>
           <div>
-            {p.instancesSubscriptionRecord.numberOfInstances} instance(s)
-            {/* <p className="text-sm font-medium">
-            {formatPositiveNegativeNumber(p.stripeLedgerRecord.quantity)}{" "}
-            {p.stripeLedgerRecord.productName}(s)
-          </p> */}
-            {/* <p className="text-xs text-muted-foreground">
-            {formatDate(p.stripeLedgerRecord.created)}
-          </p> */}
+            <p>{p.instancesSubscriptionRecord.numberOfInstances} instance(s)</p>
+            <p className="text-xs text-muted-foreground">
+              paid until {formatDate(p.instancesSubscriptionRecord.paidUntilDateTime)}
+            </p>
           </div>
         </div>
         <div className="flex gap-4 items-center">
-          {/* <span
-          className={cn(
-            "font-mono text-sm font-medium",
-            p.stripeLedgerRecord.quantity >= 0 ? "text-primary" : "text-destructive",
-          )}
-        >
-          {formatCurrency(p.stripeLedgerRecord)}
-        </span> */}
+          <div>
+            <p>
+              {formatCurrency({
+                currency: p.instancesSubscriptionRecord.currency,
+                amountTotal: p.instancesSubscriptionRecord.amount,
+              })}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              every {p.instancesSubscriptionRecord.intervalCount}{" "}
+              {p.instancesSubscriptionRecord.interval}
+            </p>
+          </div>
+          <span className="font-mono text-sm font-medium"></span>
           {subscriptionId && (
             <Button
               onClick={async () => {
                 const resp = await retrieveStripeSubscription({ subscriptionId });
-                console.log(`subscriptions.page.tsx:${/*LL*/ 48}`, { resp });
                 if (!resp.success) return toast.error(...createToastProps(resp.messages));
                 toast.success(...createToastProps(resp.messages));
                 setSubscription(resp.data);
@@ -77,7 +79,6 @@ export default function Page() {
         (() => {
           const data = instancesSubscriptionRecordsStore.data!;
 
-          // return data.map((x) => <pre key={x.id}>{JSON.stringify({ x }, undefined, 2)}</pre>);
           return (
             <div className="flex flex-col gap-2">
               {data.map((x) => (

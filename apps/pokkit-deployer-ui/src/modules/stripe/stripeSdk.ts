@@ -34,6 +34,7 @@ export const stripeRetrieveCheckoutSession = async (p: {
       return {
         success: false,
         messages: ["Retrieved stripe checkout session request cancelled"] as string[],
+        scenario: "REQUEST_ABORTED",
       } as const;
 
     const messages = ["Failed to retrieve stripe checkout session"];

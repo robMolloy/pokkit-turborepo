@@ -18,6 +18,8 @@ type TInstanceSubscriptionRecordStruct struct {
 	UserId              string           `json:"userId"`
 	SubscriptionId      string           `json:"subscriptionId"`
 	NumberOfInstances   int              `json:"numberOfInstances"`
+	Currency            string           `json:"currency"`
+	Amount              int              `json:"amount"`
 	Interval            string           `json:"interval"`
 	IntervalCount       int              `json:"intervalCount"`
 	PaidUntilDateTime   pbTypes.DateTime `json:"paidUntilDateTime"`
@@ -32,6 +34,8 @@ func ConvertInstanceSubscriptionRecordToStruct(record *pbCore.Record) TInstanceS
 		UserId:              record.GetString("userId"),
 		SubscriptionId:      record.GetString("subscriptionId"),
 		NumberOfInstances:   record.GetInt("numberOfInstances"),
+		Currency:            record.GetString("currency"),
+		Amount:              record.GetInt("amount"),
 		Interval:            record.GetString("interval"),
 		IntervalCount:       record.GetInt("intervalCount"),
 		PaidUntilDateTime:   record.GetDateTime("paidUntilDateTime"),
@@ -39,6 +43,20 @@ func ConvertInstanceSubscriptionRecordToStruct(record *pbCore.Record) TInstanceS
 		Created:             record.GetDateTime("created"),
 		Updated:             record.GetDateTime("updated"),
 	}
+}
+func PopulateInstancesSubscriptionRecordWithStruct(record *pbCore.Record, data TInstanceSubscriptionRecordStruct) {
+	record.Set("id", data.Id)
+	record.Set("userId", data.UserId)
+	record.Set("subscriptionId", data.SubscriptionId)
+	record.Set("numberOfInstances", data.NumberOfInstances)
+	record.Set("amount", data.Amount)
+	record.Set("currency", data.Currency)
+	record.Set("interval", data.Interval)
+	record.Set("intervalCount", data.IntervalCount)
+	record.Set("paidUntilDateTime", data.PaidUntilDateTime)
+	record.Set("subscriptionRawData", data.SubscriptionRawData)
+	record.Set("created", data.Created)
+	record.Set("updated", data.Updated)
 }
 
 func ConvertInstancesSubscriptionStructToRecord(app pbCore.App, data TInstanceSubscriptionRecordStruct) (*pbCore.Record, error) {
@@ -50,18 +68,6 @@ func ConvertInstancesSubscriptionStructToRecord(app pbCore.App, data TInstanceSu
 	PopulateInstancesSubscriptionRecordWithStruct(record, data)
 
 	return record, nil
-}
-func PopulateInstancesSubscriptionRecordWithStruct(record *pbCore.Record, data TInstanceSubscriptionRecordStruct) {
-	record.Set("id", data.Id)
-	record.Set("userId", data.UserId)
-	record.Set("subscriptionId", data.SubscriptionId)
-	record.Set("numberOfInstances", data.NumberOfInstances)
-	record.Set("interval", data.Interval)
-	record.Set("intervalCount", data.IntervalCount)
-	record.Set("paidUntilDateTime", data.PaidUntilDateTime)
-	record.Set("subscriptionRawData", data.SubscriptionRawData)
-	record.Set("created", data.Created)
-	record.Set("updated", data.Updated)
 }
 
 func FindInstancesSubscriptionRecordAndUpdateFromStripeLedgerStruct(app pbCore.App, stripeLedgerStruct stripeLedgerRecordsSdk.TStripeLedgerStruct) error {
@@ -121,6 +127,8 @@ func FindInstancesSubscriptionRecordAndUpdateFromStripeLedgerStruct(app pbCore.A
 	}
 
 	instancesSubscriptionStruct.SubscriptionRawData = subscription
+	instancesSubscriptionStruct.Amount = stripeLedgerStruct.AmountTotal
+	instancesSubscriptionStruct.Currency = string(subscription.Currency)
 	instancesSubscriptionStruct.NumberOfInstances = stripeLedgerStruct.Quantity
 	instancesSubscriptionStruct.PaidUntilDateTime = currentPeriodEndDateTime
 	instancesSubscriptionStruct.SubscriptionId = subscription.ID

@@ -17,6 +17,7 @@ export default function Page() {
       if (!checkoutSessionId) return setState(null);
 
       const resp = await stripeRetrieveCheckoutSession({ checkoutSessionId, abortController });
+      if (resp.scenario === "REQUEST_ABORTED") return;
 
       const toastFn = resp.success ? toast.success : toast.error;
       toastFn(...createToastProps(resp.messages));
