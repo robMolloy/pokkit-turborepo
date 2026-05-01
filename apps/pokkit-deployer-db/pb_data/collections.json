@@ -1624,6 +1624,20 @@
       {
         "autogeneratePattern": "",
         "hidden": false,
+        "id": "text1883776062",
+        "max": 0,
+        "min": 0,
+        "name": "eventType",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
         "id": "text1031527505",
         "max": 0,
         "min": 0,
@@ -1744,20 +1758,6 @@
         "type": "text"
       },
       {
-        "autogeneratePattern": "",
-        "hidden": false,
-        "id": "text1883776062",
-        "max": 0,
-        "min": 0,
-        "name": "eventType",
-        "pattern": "",
-        "presentable": false,
-        "primaryKey": false,
-        "required": false,
-        "system": false,
-        "type": "text"
-      },
-      {
         "hidden": false,
         "id": "json1111784733",
         "maxSize": 0,
@@ -1792,7 +1792,7 @@
       "CREATE INDEX `idx_Bzj0h4o9vr` ON `stripeLedger` (`paymentIntentId`)"
     ],
     "created": "2026-04-23 10:02:37.517Z",
-    "updated": "2026-04-27 19:35:38.537Z",
+    "updated": "2026-05-01 11:52:34.146Z",
     "system": false
   }
 ]

@@ -244,6 +244,57 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 	})
 }
 
+func UpdateStripeSubscriptionRouteHandler(e *pbCore.RequestEvent) error {
+	auth := e.Auth
+	if auth == nil {
+		return e.BadRequestError("not_logged_id", nil)
+	}
+	userId := auth.Id
+	if userId == "" {
+		return e.BadRequestError("not_logged_id", nil)
+	}
+
+	req, err := utils.ReadRequestBodyJsonIntoResult[struct {
+		SubscriptionId string `json:"subscriptionId"`
+		Quantity       int64  `json:"quantity"`
+	}](e.Request.Body)
+	if err != nil {
+		return e.BadRequestError("error ReadingRequestBodyJsonIntoResult", err)
+	}
+
+	if req.SubscriptionId == "" {
+		return e.BadRequestError("subscriptionId is required", nil)
+	}
+	if req.Quantity < 1 {
+		return e.BadRequestError(fmt.Sprintf("%v is an invalid quantity", req.Quantity), nil)
+	}
+
+	// Fetch subscription to get the subscription item ID
+	existingSub, err := stripeSdk.RetrieveStripeSubscription(req.SubscriptionId)
+	if err != nil {
+		return e.InternalServerError(fmt.Sprintf("failed to retrieve subscription: %v", req.SubscriptionId), err)
+	}
+	if len(existingSub.Items.Data) == 0 {
+		return e.InternalServerError("subscription has no items", nil)
+	}
+
+	subItemId := existingSub.Items.Data[0].ID
+
+	updatedSub, err := stripeSdk.UpdateStripeSubscriptionQuantity(req.SubscriptionId, &stripe.SubscriptionItemsParams{
+		ID:       stripe.String(subItemId),
+		Quantity: stripe.Int64(req.Quantity),
+	})
+	if err != nil {
+		return e.InternalServerError("failed to update stripe subscription", err)
+	}
+
+	return e.JSON(http.StatusOK, map[string]any{
+		"subscriptionId": updatedSub.ID,
+		"quantity":       updatedSub.Items.Data[0].Quantity,
+		"status":         updatedSub.Status,
+	})
+}
+
 func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 	stripeWebhookSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
 	if stripeWebhookSecret == "" {
@@ -328,8 +379,70 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		}
 	}
 
-	if !logAllStripeEvents && stripeLedgerRecordStruct.EventType == "" {
-		return e.JSON(http.StatusOK, map[string]any{"url": "url"})
+	if event.Type == "customer.subscription.updated" {
+		var subscription stripe.Subscription
+		err = json.Unmarshal(event.Data.Raw, &subscription)
+		if err != nil {
+			return e.BadRequestError("Could not unmarshal JSON from stripe payment intent:", err)
+		}
+
+		item := subscription.Items.Data[0]
+
+		stripeLedgerRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
+			EventType: string(event.Type),
+			Quantity:  int(item.Quantity),
+			Currency:  string(item.Price.Currency),
+			// 		AmountTotal:      int(checkoutSession.AmountTotal),
+			// 		PaymentIntentId:  checkoutSession.ID,
+			SubscriptionId: subscription.ID,
+			// 		InvoiceId:        invoiceId,
+			// UserId:           checkoutSession.Metadata["userId"],
+			// 		ProductName:      checkoutSession.Metadata["productName"],
+			// 		ProductId:        checkoutSession.Metadata["productId"],
+			StripeCustomerId: string(subscription.Customer.ID),
+			RawData:          subscription,
+		}
+	}
+	// if event.Type == "customer.subscription.updated" {
+	// 	var checkoutSession stripe.CheckoutSession
+	// 	err = json.Unmarshal(event.Data.Raw, &checkoutSession)
+	// 	if err != nil {
+	// 		return e.BadRequestError("Could not unmarshal JSON from checkout session:", err)
+	// 	}
+
+	// 	quantity, err := strconv.Atoi(checkoutSession.Metadata["quantity"])
+	// 	if err != nil {
+	// 		quantity = 0
+	// 	}
+
+	// 	var subscriptionId string
+	// 	if checkoutSession.Subscription != nil {
+	// 		subscriptionId = checkoutSession.Subscription.ID
+	// 	}
+	// 	var invoiceId string
+	// 	if checkoutSession.Invoice != nil {
+	// 		invoiceId = checkoutSession.Invoice.ID
+	// 	}
+
+	// 	stripeLedgerRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
+	// 		Quantity:         quantity,
+	// 		EventType:        string(event.Type),
+	// 		Currency:         string(checkoutSession.Currency),
+	// 		AmountTotal:      int(checkoutSession.AmountTotal),
+	// 		PaymentIntentId:  checkoutSession.ID,
+	// 		SubscriptionId:   subscriptionId,
+	// 		InvoiceId:        invoiceId,
+	// 		UserId:           checkoutSession.Metadata["userId"],
+	// 		ProductName:      checkoutSession.Metadata["productName"],
+	// 		ProductId:        checkoutSession.Metadata["productId"],
+	// 		StripeCustomerId: checkoutSession.Metadata["stripeCustomerId"],
+	// 		RawData:          checkoutSession,
+	// 	}
+	// }
+
+	hasNotBeenPopulated := stripeLedgerRecordStruct.EventType == ""
+	if !logAllStripeEvents && hasNotBeenPopulated {
+		return e.JSON(http.StatusOK, map[string]any{})
 	}
 
 	stripeLedgerCollection, err := e.App.FindCollectionByNameOrId(db.StripeLedgerCollectionName)

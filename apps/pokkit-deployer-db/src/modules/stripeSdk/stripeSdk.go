@@ -49,6 +49,12 @@ func RetrieveStripeCheckoutSession(checkoutSessionId string) (*stripe.CheckoutSe
 func CreateStripeCheckoutSession(params *stripe.CheckoutSessionParams) (*stripe.CheckoutSession, error) {
 	return stripeCheckoutSession.New(params)
 }
+func UpdateStripeSubscriptionQuantity(subscriptionId string, item *stripe.SubscriptionItemsParams) (*stripe.Subscription, error) {
+	return stripeSubscription.Update(subscriptionId, &stripe.SubscriptionParams{
+		ProrationBehavior: stripe.String("create_prorations"),
+		Items:             []*stripe.SubscriptionItemsParams{item},
+	})
+}
 
 func CreateStripeCustomer(email string) (*stripe.Customer, error) {
 	return stripeCustomer.New(&stripe.CustomerParams{

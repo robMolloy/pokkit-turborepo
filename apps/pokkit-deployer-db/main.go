@@ -27,6 +27,7 @@ func main() {
 		se.Router.POST("/bye", routes.ByeNameRouteHandler)
 		se.Router.POST("/stripe-webhook", routes.StripeWebHookRouteHandler)
 		se.Router.POST("/stripe-create-checkout-session", routes.StripeCreateCheckoutSessionRouteHandler).Bind(pbApis.RequireAuth())
+		se.Router.POST("/update-stripe-subscription", routes.UpdateStripeSubscriptionRouteHandler)
 		se.Router.POST("/stripe-retrieve-checkout-session", routes.StripeRetrieveCheckoutSessionRouteHandler).Bind(pbApis.RequireAuth())
 		se.Router.POST("/stripe-retrieve-invoice", routes.StripeRetrieveInvoiceRouteHandler).Bind(pbApis.RequireAuth())
 		se.Router.POST("/stripe-retrieve-subscription", routes.StripeRetrieveSubscriptionRouteHandler).Bind(pbApis.RequireAuth())

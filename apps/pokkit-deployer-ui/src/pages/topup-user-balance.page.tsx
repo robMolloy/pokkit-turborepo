@@ -1,6 +1,9 @@
 import { pb } from "@/config/pocketbaseConfig";
 import { createToastProps } from "@/lib/createToastProps";
-import { createStripeCheckoutSession } from "@/modules/stripe/stripeSdk";
+import {
+  createStripeCheckoutSession,
+  updateStripeSubscriptionQuantity,
+} from "@/modules/stripe/stripeSdk";
 import { Button } from "@repo/pokkit-components";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -61,14 +64,29 @@ export default function Page() {
               productName: "instance_subscription",
               quantity: 100,
             });
+            setIsLoading(false);
 
             if (!sessionResp.success) return toast.error(...createToastProps(sessionResp.messages));
-
             window.location.href = sessionResp.data.url;
-            setIsLoading(false);
           }}
         >
           create a subscription
+        </Button>
+        <Button
+          loading={isLoading}
+          onClick={async () => {
+            setIsLoading(true);
+            const sessionResp = await updateStripeSubscriptionQuantity({
+              quantity: Math.floor(Math.random() * 100),
+              subscriptionId: "sub_1TSEhBIGFJRyk0RhOHwSuOOa",
+            });
+            setIsLoading(false);
+
+            if (!sessionResp.success) return toast.error(...createToastProps(sessionResp.messages));
+            return toast.success(...createToastProps(sessionResp.messages));
+          }}
+        >
+          edit a subscription
         </Button>
       </span>
     </span>
