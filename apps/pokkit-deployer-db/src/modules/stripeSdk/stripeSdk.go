@@ -19,6 +19,12 @@ func RetrieveStripeSubscriptionWithRecurrenceData(subscriptionId string) (*strip
 
 	return stripeSubscription.Get(subscriptionId, params)
 }
+func RetrieveStripeSubscriptionWithLatestInvoice(subscriptionId string) (*stripe.Subscription, error) {
+	params := &stripe.SubscriptionParams{}
+	params.AddExpand("latest_invoice")
+
+	return stripeSubscription.Get(subscriptionId, params)
+}
 func GetRecurrenceFromStripeSubscription(subscription *stripe.Subscription) (*stripe.PriceRecurring, error) {
 	if subscription == nil {
 		return nil, fmt.Errorf("subscription is nil")

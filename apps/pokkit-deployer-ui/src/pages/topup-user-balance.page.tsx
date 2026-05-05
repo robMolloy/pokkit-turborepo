@@ -78,7 +78,7 @@ export default function Page() {
             setIsLoading(true);
             const sessionResp = await updateStripeSubscriptionQuantity({
               quantity: Math.floor(Math.random() * 100),
-              subscriptionId: "sub_1TSEhBIGFJRyk0RhOHwSuOOa",
+              subscriptionId: "sub_1TTV8mIGFJRyk0RhRUyO3Wsc",
             });
             setIsLoading(false);
 

@@ -12,6 +12,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/pocketbase/dbx"
 	pbCore "github.com/pocketbase/pocketbase/core"
 
 	stripe "github.com/stripe/stripe-go/v85"
@@ -328,16 +329,16 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		}
 
 		stripeLedgerRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
-			Quantity:        quantity,
-			EventType:       string(event.Type),
-			Currency:        string(paymentIntent.Currency),
-			PaymentIntentId: paymentIntent.ID,
-			SubscriptionId:  "",
-			// SubscriptionExpiresAtDateTime:   "",
+			Quantity:         quantity,
+			EventType:        string(event.Type),
+			Currency:         string(paymentIntent.Currency),
+			PaymentIntentId:  paymentIntent.ID,
 			UserId:           paymentIntent.Metadata["userId"],
 			ProductName:      paymentIntent.Metadata["productName"],
 			ProductId:        paymentIntent.Metadata["productId"],
 			StripeCustomerId: paymentIntent.Metadata["stripeCustomerId"],
+			// SubscriptionId:  "",
+			// SubscriptionExpiresAtDateTime:   "",
 			// RawData:          paymentIntent,
 		}
 	}
@@ -381,26 +382,49 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 
 	if event.Type == "customer.subscription.updated" {
 		var subscription stripe.Subscription
+		// get products
+		// get invoice Id
+		// get PaymentIntentId
 		err = json.Unmarshal(event.Data.Raw, &subscription)
 		if err != nil {
 			return e.BadRequestError("Could not unmarshal JSON from stripe payment intent:", err)
 		}
 
 		item := subscription.Items.Data[0]
+		quantity := int(item.Quantity)
+		costPerUnit := int(item.Price.UnitAmount)
+		amountTotal := quantity * costPerUnit
+
+		StripeLedgerCheckoutSessionCompletedRecord, err := e.App.FindFirstRecordByFilter(
+			db.StripeLedgerCollectionName,
+			"subscriptionId={:subId} && eventType='checkout.session.completed'",
+			dbx.Params{"subId": subscription.ID},
+		)
+		if err != nil {
+			return e.InternalServerError("Error finding existing checkout.session.completed record for subscriptionId: "+subscription.ID, err)
+		}
 
 		stripeLedgerRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
-			EventType: string(event.Type),
-			Quantity:  int(item.Quantity),
-			Currency:  string(item.Price.Currency),
-			// 		AmountTotal:      int(checkoutSession.AmountTotal),
-			// 		PaymentIntentId:  checkoutSession.ID,
+			EventType:      string(event.Type),
+			Currency:       string(item.Price.Currency),
+			Quantity:       int(item.Quantity),
+			CostPerUnit:    costPerUnit,
+			AmountTotal:    amountTotal,
 			SubscriptionId: subscription.ID,
-			// 		InvoiceId:        invoiceId,
-			// UserId:           checkoutSession.Metadata["userId"],
-			// 		ProductName:      checkoutSession.Metadata["productName"],
-			// 		ProductId:        checkoutSession.Metadata["productId"],
+			InvoiceId:      subscription.LatestInvoice.ID, // Product?
+			// 		PaymentIntentId:  checkoutSession.ID,// Product?
+			// UserId:           checkoutSession.Metadata["userId"], // Product?
+			// ProductName:      item.
+			// 		ProductName:      checkoutSession.Metadata["productName"], // Product?
+			ProductId:        item.Price.Product.ID, // Product?
 			StripeCustomerId: string(subscription.Customer.ID),
-			RawData:          subscription,
+			RawData: struct {
+				Subscription stripe.Subscription
+				Record       any
+			}{
+				Subscription: subscription,
+				Record:       StripeLedgerCheckoutSessionCompletedRecord,
+			},
 		}
 	}
 	// if event.Type == "customer.subscription.updated" {

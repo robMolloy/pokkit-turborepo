@@ -10,6 +10,7 @@ type TStripeLedgerStruct struct {
 	UserId           string           `json:"userId"`
 	AmountTotal      int              `json:"amountTotal"`
 	Quantity         int              `json:"quantity"`
+	CostPerUnit      int              `json:"costPerUnit"`
 	PaymentIntentId  string           `json:"paymentIntentId"`
 	SubscriptionId   string           `json:"subscriptionId"`
 	InvoiceId        string           `json:"invoiceId"`

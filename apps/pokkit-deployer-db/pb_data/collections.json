@@ -1693,10 +1693,10 @@
       },
       {
         "hidden": false,
-        "id": "number928573309",
+        "id": "number2683508278",
         "max": null,
         "min": null,
-        "name": "amountTotal",
+        "name": "quantity",
         "onlyInt": false,
         "presentable": false,
         "required": false,
@@ -1705,10 +1705,22 @@
       },
       {
         "hidden": false,
-        "id": "number2683508278",
+        "id": "number3327837906",
         "max": null,
         "min": null,
-        "name": "quantity",
+        "name": "costPerUnit",
+        "onlyInt": false,
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "number"
+      },
+      {
+        "hidden": false,
+        "id": "number928573309",
+        "max": null,
+        "min": null,
+        "name": "amountTotal",
         "onlyInt": false,
         "presentable": false,
         "required": false,
@@ -1792,7 +1804,7 @@
       "CREATE INDEX `idx_Bzj0h4o9vr` ON `stripeLedger` (`paymentIntentId`)"
     ],
     "created": "2026-04-23 10:02:37.517Z",
-    "updated": "2026-05-01 11:52:34.146Z",
+    "updated": "2026-05-04 22:14:26.406Z",
     "system": false
   }
 ]
