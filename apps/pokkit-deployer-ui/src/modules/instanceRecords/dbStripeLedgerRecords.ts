@@ -13,7 +13,7 @@ export const stripeLedgerRecordSchema = z.object({
   currency: z.string(),
   quantity: z.number(),
   amountTotal: z.number(),
-  paymentIntentId: z.string().nullish(),
+  stripePayloadId: z.string().nullish(),
   invoiceId: z.string().nullish(),
   created: z.string(),
   updated: z.string(),

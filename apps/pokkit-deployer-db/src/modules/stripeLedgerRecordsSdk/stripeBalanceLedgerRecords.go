@@ -11,7 +11,7 @@ type TStripeLedgerStruct struct {
 	AmountTotal      int              `json:"amountTotal"`
 	Quantity         int              `json:"quantity"`
 	CostPerUnit      int              `json:"costPerUnit"`
-	PaymentIntentId  string           `json:"paymentIntentId"`
+	StripePayloadId  string           `json:"stripePayloadId"`
 	SubscriptionId   string           `json:"subscriptionId"`
 	InvoiceId        string           `json:"invoiceId"`
 	Currency         string           `json:"currency"`
@@ -32,7 +32,7 @@ func PopulateStripeLedgerRecord(record *pbCore.Record, data TStripeLedgerStruct)
 	record.Set("quantity", data.Quantity)
 	record.Set("costPerUnit", data.CostPerUnit)
 	record.Set("invoiceId", data.InvoiceId)
-	record.Set("paymentIntentId", data.PaymentIntentId)
+	record.Set("stripePayloadId", data.StripePayloadId)
 	record.Set("subscriptionId", data.SubscriptionId)
 	record.Set("currency", data.Currency)
 	record.Set("amountTotal", data.AmountTotal)
@@ -53,7 +53,7 @@ func ConvertStripeLedgerRecordToStruct(record *pbCore.Record) TStripeLedgerStruc
 		UserId:           record.GetString("userId"),
 		Quantity:         record.GetInt("quantity"),
 		CostPerUnit:      record.GetInt("costPerUnit"),
-		PaymentIntentId:  record.GetString("paymentIntentId"),
+		StripePayloadId:  record.GetString("stripePayloadId"),
 		InvoiceId:        record.GetString("invoiceId"),
 		SubscriptionId:   record.GetString("subscriptionId"),
 		Currency:         record.GetString("currency"),

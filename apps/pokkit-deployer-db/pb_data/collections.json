@@ -1655,7 +1655,7 @@
         "id": "text3346823387",
         "max": 0,
         "min": 0,
-        "name": "paymentIntentId",
+        "name": "stripePayloadId",
         "pattern": "",
         "presentable": false,
         "primaryKey": false,
@@ -1801,10 +1801,10 @@
       }
     ],
     "indexes": [
-      "CREATE INDEX `idx_Bzj0h4o9vr` ON `stripeLedger` (`paymentIntentId`)"
+      "CREATE INDEX `idx_Bzj0h4o9vr` ON `stripeLedger` (`stripePayloadId`)"
     ],
     "created": "2026-04-23 10:02:37.517Z",
-    "updated": "2026-05-04 22:14:26.406Z",
+    "updated": "2026-05-05 16:43:33.396Z",
     "system": false
   }
 ]
