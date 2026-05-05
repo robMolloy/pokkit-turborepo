@@ -30,6 +30,7 @@ func PopulateStripeLedgerRecord(record *pbCore.Record, data TStripeLedgerStruct)
 	}
 	record.Set("userId", data.UserId)
 	record.Set("quantity", data.Quantity)
+	record.Set("costPerUnit", data.CostPerUnit)
 	record.Set("invoiceId", data.InvoiceId)
 	record.Set("paymentIntentId", data.PaymentIntentId)
 	record.Set("subscriptionId", data.SubscriptionId)
@@ -51,6 +52,7 @@ func ConvertStripeLedgerRecordToStruct(record *pbCore.Record) TStripeLedgerStruc
 		Id:               record.GetString("id"),
 		UserId:           record.GetString("userId"),
 		Quantity:         record.GetInt("quantity"),
+		CostPerUnit:      record.GetInt("costPerUnit"),
 		PaymentIntentId:  record.GetString("paymentIntentId"),
 		InvoiceId:        record.GetString("invoiceId"),
 		SubscriptionId:   record.GetString("subscriptionId"),

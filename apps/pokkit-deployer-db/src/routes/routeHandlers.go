@@ -403,66 +403,27 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		if err != nil {
 			return e.InternalServerError("Error finding existing checkout.session.completed record for subscriptionId: "+subscription.ID, err)
 		}
+		StripeLedgerCheckoutSessionCompletedRecordStruct := stripeLedgerRecordsSdk.ConvertStripeLedgerRecordToStruct(StripeLedgerCheckoutSessionCompletedRecord)
 
 		stripeLedgerRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
-			EventType:      string(event.Type),
-			Currency:       string(item.Price.Currency),
-			Quantity:       int(item.Quantity),
-			CostPerUnit:    costPerUnit,
-			AmountTotal:    amountTotal,
-			SubscriptionId: subscription.ID,
-			InvoiceId:      subscription.LatestInvoice.ID, // Product?
-			// 		PaymentIntentId:  checkoutSession.ID,// Product?
-			// UserId:           checkoutSession.Metadata["userId"], // Product?
-			// ProductName:      item.
-			// 		ProductName:      checkoutSession.Metadata["productName"], // Product?
-			ProductId:        item.Price.Product.ID, // Product?
+			EventType:        string(event.Type),
+			Currency:         string(item.Price.Currency),
+			Quantity:         int(item.Quantity),
+			CostPerUnit:      costPerUnit,
+			AmountTotal:      amountTotal,
+			SubscriptionId:   subscription.ID,
+			InvoiceId:        subscription.LatestInvoice.ID, // Product?
+			PaymentIntentId:  StripeLedgerCheckoutSessionCompletedRecordStruct.PaymentIntentId,
+			UserId:           StripeLedgerCheckoutSessionCompletedRecordStruct.UserId,
+			ProductName:      StripeLedgerCheckoutSessionCompletedRecordStruct.ProductName,
+			ProductId:        StripeLedgerCheckoutSessionCompletedRecordStruct.ProductId,
 			StripeCustomerId: string(subscription.Customer.ID),
-			RawData: struct {
-				Subscription stripe.Subscription
-				Record       any
-			}{
-				Subscription: subscription,
-				Record:       StripeLedgerCheckoutSessionCompletedRecord,
+			RawData: map[string]any{
+				"Subscription": subscription,
+				"Record":       StripeLedgerCheckoutSessionCompletedRecord,
 			},
 		}
 	}
-	// if event.Type == "customer.subscription.updated" {
-	// 	var checkoutSession stripe.CheckoutSession
-	// 	err = json.Unmarshal(event.Data.Raw, &checkoutSession)
-	// 	if err != nil {
-	// 		return e.BadRequestError("Could not unmarshal JSON from checkout session:", err)
-	// 	}
-
-	// 	quantity, err := strconv.Atoi(checkoutSession.Metadata["quantity"])
-	// 	if err != nil {
-	// 		quantity = 0
-	// 	}
-
-	// 	var subscriptionId string
-	// 	if checkoutSession.Subscription != nil {
-	// 		subscriptionId = checkoutSession.Subscription.ID
-	// 	}
-	// 	var invoiceId string
-	// 	if checkoutSession.Invoice != nil {
-	// 		invoiceId = checkoutSession.Invoice.ID
-	// 	}
-
-	// 	stripeLedgerRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
-	// 		Quantity:         quantity,
-	// 		EventType:        string(event.Type),
-	// 		Currency:         string(checkoutSession.Currency),
-	// 		AmountTotal:      int(checkoutSession.AmountTotal),
-	// 		PaymentIntentId:  checkoutSession.ID,
-	// 		SubscriptionId:   subscriptionId,
-	// 		InvoiceId:        invoiceId,
-	// 		UserId:           checkoutSession.Metadata["userId"],
-	// 		ProductName:      checkoutSession.Metadata["productName"],
-	// 		ProductId:        checkoutSession.Metadata["productId"],
-	// 		StripeCustomerId: checkoutSession.Metadata["stripeCustomerId"],
-	// 		RawData:          checkoutSession,
-	// 	}
-	// }
 
 	hasNotBeenPopulated := stripeLedgerRecordStruct.EventType == ""
 	if !logAllStripeEvents && hasNotBeenPopulated {
