@@ -1486,6 +1486,20 @@
         "type": "number"
       },
       {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text3346823387",
+        "max": 0,
+        "min": 0,
+        "name": "paymentIntentId",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
         "hidden": false,
         "id": "date2557496732",
         "max": "",
@@ -1581,7 +1595,7 @@
     ],
     "indexes": [],
     "created": "2026-04-17 11:13:52.471Z",
-    "updated": "2026-04-30 19:07:21.590Z",
+    "updated": "2026-05-05 17:00:29.553Z",
     "system": false
   },
   {

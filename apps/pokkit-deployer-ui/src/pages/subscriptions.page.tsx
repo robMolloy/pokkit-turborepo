@@ -5,9 +5,8 @@ import {
   TInstancesSubscriptionRecord,
   useInstancesSubscriptionRecordsStore,
 } from "@/modules/instanceRecords/dbInstancesSubscriptionRecords";
-import { retrieveStripeSubscription, TStripeSubscription } from "@/modules/stripe/stripeSdk";
-import { DisplayAnything } from "@repo/pokkit-components";
-import { Button } from "@repo/pokkit-shadcn";
+import { updateStripeSubscriptionQuantity } from "@/modules/stripe/stripeSdk";
+import { Button } from "@repo/pokkit-components";
 import { RefreshCcw } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -16,7 +15,7 @@ export function StripeLedgerRecordRowTemplate(p: {
   instancesSubscriptionRecord: TInstancesSubscriptionRecord;
 }) {
   const subscriptionId = p.instancesSubscriptionRecord.subscriptionId;
-  const [subscription, setSubscription] = useState<TStripeSubscription>();
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <div className="border bg-card rounded-md px-3 py-2">
@@ -48,11 +47,18 @@ export function StripeLedgerRecordRowTemplate(p: {
           <span className="font-mono text-sm font-medium"></span>
           {subscriptionId && (
             <Button
+              loading={isLoading}
               onClick={async () => {
-                const resp = await retrieveStripeSubscription({ subscriptionId });
-                if (!resp.success) return toast.error(...createToastProps(resp.messages));
-                toast.success(...createToastProps(resp.messages));
-                setSubscription(resp.data);
+                setIsLoading(true);
+                const sessionResp = await updateStripeSubscriptionQuantity({
+                  quantity: Math.floor(Math.random() * 100),
+                  subscriptionId: p.instancesSubscriptionRecord.subscriptionId,
+                });
+                setIsLoading(false);
+
+                if (!sessionResp.success)
+                  return toast.error(...createToastProps(sessionResp.messages));
+                toast.success(...createToastProps(sessionResp.messages));
               }}
             >
               Subscription
@@ -60,9 +66,6 @@ export function StripeLedgerRecordRowTemplate(p: {
           )}
         </div>
       </div>
-      {subscription && (
-        <DisplayAnything data={subscription} title={""} hideFunctions={false} expandLevel={2} />
-      )}
     </div>
   );
 }

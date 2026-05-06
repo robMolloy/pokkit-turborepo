@@ -329,17 +329,15 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		}
 
 		stripeLedgerRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
-			Quantity:                      quantity,
-			EventType:                     string(event.Type),
-			Currency:                      string(paymentIntent.Currency),
-			StripePayloadId:               paymentIntent.ID,
-			UserId:                        paymentIntent.Metadata["userId"],
-			ProductName:                   paymentIntent.Metadata["productName"],
-			ProductId:                     paymentIntent.Metadata["productId"],
-			StripeCustomerId:              paymentIntent.Metadata["stripeCustomerId"],
-			SubscriptionId:                "",
-			SubscriptionExpiresAtDateTime: "",
-			RawData:                       paymentIntent,
+			Quantity:         quantity,
+			EventType:        string(event.Type),
+			Currency:         string(paymentIntent.Currency),
+			StripePayloadId:  paymentIntent.ID,
+			UserId:           paymentIntent.Metadata["userId"],
+			ProductName:      paymentIntent.Metadata["productName"],
+			ProductId:        paymentIntent.Metadata["productId"],
+			StripeCustomerId: paymentIntent.Metadata["stripeCustomerId"],
+			RawData:          paymentIntent,
 		}
 	}
 
