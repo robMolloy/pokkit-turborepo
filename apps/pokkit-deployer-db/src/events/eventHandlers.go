@@ -6,7 +6,6 @@ import (
 	"app-db/src/modules/instanceSubscriptionsSdk"
 	"app-db/src/modules/stripeLedgerRecordsSdk"
 	"app-db/src/modules/userBalanceRecordsSdk"
-	"app-db/src/modules/userRecordsSdk"
 	"app-db/src/pokkitSetup"
 	"app-db/src/utils"
 	"fmt"
@@ -310,26 +309,23 @@ func UpdateProductsAfterStripeLedgerCreatedEventHandler(e *pbCore.RecordEvent) e
 		e.App.Logger().Info("event type must be checkout.session.completed to update products")
 		return nil
 	}
+	e.App.Logger().Error("stripeLedgerRecordStruct309", "stripeLedgerRecordStruct", stripeLedgerRecordStruct)
 
 	if stripeLedgerRecordStruct.Currency != "usd" {
 		return fmt.Errorf("currency must be usd")
 	}
 
 	userId := stripeLedgerRecordStruct.UserId
-	user, err := userRecordsSdk.FindUserRecordStructById(e.App, userId)
-	if user == nil || err != nil {
-		return fmt.Errorf("no user found: %w", err)
-	}
 
 	if stripeLedgerRecordStruct.ProductName == "instance_subscription" {
-		err = instanceSubscriptionsSdk.FindInstancesSubscriptionRecordAndUpdateFromStripeLedgerStruct(e.App, stripeLedgerRecordStruct)
+		err := instanceSubscriptionsSdk.FindInstancesSubscriptionRecordAndUpdateFromStripeLedgerStruct(e.App, stripeLedgerRecordStruct)
 		if err != nil {
-			return fmt.Errorf("Error Incrementing number of instances on userBalanceRecord: %w", err)
+			return fmt.Errorf("instanceSubscriptionsSdk.FindInstancesSubscriptionRecordAndUpdateFromStripeLedgerStruct: %w", err)
 		}
 	}
 
 	if stripeLedgerRecordStruct.ProductName == "token" {
-		err = userBalanceRecordsSdk.FindUserBalanceRecordAndIncrementTokenAmount(e.App, userId, stripeLedgerRecordStruct.Quantity)
+		err := userBalanceRecordsSdk.FindUserBalanceRecordAndIncrementTokenAmount(e.App, userId, stripeLedgerRecordStruct.Quantity)
 		if err != nil {
 			return fmt.Errorf("userBalanceRecordsSdk.FindUserBalanceRecordAndIncrementTokenAmount error: %w", err)
 		}

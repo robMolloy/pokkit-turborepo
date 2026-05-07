@@ -3,8 +3,6 @@ package instanceSubscriptionsSdk
 import (
 	"app-db/src/db"
 	"app-db/src/modules/stripeLedgerRecordsSdk"
-	"app-db/src/modules/stripeSdk"
-	"app-db/src/utils"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -45,7 +43,9 @@ func ConvertInstanceSubscriptionRecordToStruct(record *pbCore.Record) TInstanceS
 	}
 }
 func PopulateInstancesSubscriptionRecordWithStruct(record *pbCore.Record, data TInstanceSubscriptionRecordStruct) {
-	record.Set("id", data.Id)
+	if data.Id != "" {
+		record.Set("id", data.Id)
+	}
 	record.Set("userId", data.UserId)
 	record.Set("subscriptionId", data.SubscriptionId)
 	record.Set("numberOfInstances", data.NumberOfInstances)
@@ -71,72 +71,41 @@ func ConvertInstancesSubscriptionStructToRecord(app pbCore.App, data TInstanceSu
 }
 
 func FindInstancesSubscriptionRecordAndUpdateFromStripeLedgerStruct(app pbCore.App, stripeLedgerStruct stripeLedgerRecordsSdk.TStripeLedgerStruct) error {
-	subscription, err := stripeSdk.RetrieveStripeSubscriptionWithRecurrenceData(stripeLedgerStruct.SubscriptionId)
-	if err != nil {
-		return fmt.Errorf("RetrieveStripeSubscriptionWithRecurrenceData returns error: %w", err)
-	}
-
-	subscriptionRecurrence, err := stripeSdk.GetRecurrenceFromStripeSubscription(subscription)
-	if err != nil {
-		return fmt.Errorf("GetRecurrenceFromStripeSubscription returns error: %w", err)
-	}
-	if subscriptionRecurrence == nil {
-		return fmt.Errorf("subscriptionRecurrence object is nil")
-	}
-	interval := subscriptionRecurrence.Interval
-	if interval == "" {
-		return fmt.Errorf("interval is ''")
-	}
-	intervalCount := subscriptionRecurrence.IntervalCount
-	if intervalCount == 0 {
-		return fmt.Errorf("intervalCount is 0")
-	}
-
-	currentPeriodEnd, err := stripeSdk.GetCurrentPeriodEndFromStripeSubscription(subscription)
-	if err != nil {
-		return fmt.Errorf("GetCurrentPeriodEndFromStripeSubscription returns error: %w", err)
-	}
-
-	currentPeriodEndDateTime, err := utils.ConvertStripeDateIntToPbDateTime(currentPeriodEnd)
-	if err != nil {
-		return fmt.Errorf("ConvertStripeDateIntToPbDateTime returns error: %w", err)
-	}
-
 	instancesSubscriptionsCollection, err := app.FindCollectionByNameOrId(db.InstancesSubscriptionsCollectionName)
 	if err != nil {
 		return fmt.Errorf("FindCollectionByNameOrId(db.InstancesSubscriptionsCollectionName) returns error: %w", err)
 	}
 
-	instancesSubscriptionRecord, err := app.FindFirstRecordByData(db.InstancesSubscriptionsCollectionName, "subscriptionId", stripeLedgerStruct.SubscriptionId)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+	existingInstancesSubscriptionRecord, err := app.FindFirstRecordByData(db.InstancesSubscriptionsCollectionName, "subscriptionId", stripeLedgerStruct.SubscriptionId)
+	isRecordFound := !errors.Is(err, sql.ErrNoRows)
+
+	if err != nil && isRecordFound {
 		return fmt.Errorf("FindFirstRecordByData(db.InstancesSubscriptionsCollectionName... returns error: %w", err)
 	}
-	if errors.Is(err, sql.ErrNoRows) {
-		instancesSubscriptionRecord = pbCore.NewRecord(instancesSubscriptionsCollection)
+	if !isRecordFound {
+		// no record found will be nil
+		existingInstancesSubscriptionRecord = pbCore.NewRecord(instancesSubscriptionsCollection)
 	}
 
-	instancesSubscriptionStruct := ConvertInstanceSubscriptionRecordToStruct(instancesSubscriptionRecord)
-	instancesSubscriptionExists := instancesSubscriptionStruct.Id != ""
-
-	if instancesSubscriptionExists && instancesSubscriptionStruct.UserId != stripeLedgerStruct.UserId {
-		return fmt.Errorf("stripe ledger userId does not match instancesSubscriptionRecord userId")
+	// if exists use existing userId - avoid subscription hijack
+	userId := existingInstancesSubscriptionRecord.GetString("userId")
+	if userId == "" {
+		userId = stripeLedgerStruct.UserId
 	}
 
-	if !instancesSubscriptionExists {
-		instancesSubscriptionStruct.UserId = stripeLedgerStruct.UserId
+	instancesSubscriptionStruct := TInstanceSubscriptionRecordStruct{
+		SubscriptionId:      stripeLedgerStruct.SubscriptionId,
+		NumberOfInstances:   stripeLedgerStruct.Quantity,
+		Currency:            stripeLedgerStruct.Currency,
+		Amount:              stripeLedgerStruct.AmountTotal,
+		Interval:            stripeLedgerStruct.RecurrenceInterval,
+		IntervalCount:       stripeLedgerStruct.RecurrenceIntervalCount,
+		PaidUntilDateTime:   stripeLedgerStruct.RecurrenceIntervalEnd,
+		SubscriptionRawData: stripeLedgerStruct,
+		UserId:              userId,
 	}
 
-	instancesSubscriptionStruct.SubscriptionRawData = subscription
-	instancesSubscriptionStruct.Amount = stripeLedgerStruct.AmountTotal
-	instancesSubscriptionStruct.Currency = stripeLedgerStruct.Currency
-	instancesSubscriptionStruct.NumberOfInstances = stripeLedgerStruct.Quantity
-	instancesSubscriptionStruct.PaidUntilDateTime = currentPeriodEndDateTime
-	instancesSubscriptionStruct.SubscriptionId = subscription.ID
-	instancesSubscriptionStruct.Interval = string(interval)
-	instancesSubscriptionStruct.IntervalCount = int(intervalCount)
+	PopulateInstancesSubscriptionRecordWithStruct(existingInstancesSubscriptionRecord, instancesSubscriptionStruct)
 
-	newInstancesSubscriptionRecord := pbCore.NewRecord(instancesSubscriptionsCollection)
-	PopulateInstancesSubscriptionRecordWithStruct(newInstancesSubscriptionRecord, instancesSubscriptionStruct)
-
-	return app.Save(newInstancesSubscriptionRecord)
+	return app.Save(existingInstancesSubscriptionRecord)
 }

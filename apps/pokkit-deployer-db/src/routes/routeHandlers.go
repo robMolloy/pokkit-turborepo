@@ -314,7 +314,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		return e.BadRequestError("Could not construct webhook event", err)
 	}
 
-	var logAllStripeEvents = true
+	var logAllStripeEvents = false
 	var stripeLedgerRecordStruct stripeLedgerRecordsSdk.TStripeLedgerStruct
 	if event.Type == "payment_intent.succeeded" {
 		var paymentIntent stripe.PaymentIntent
@@ -491,7 +491,6 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 	stripeLedgerRecordsSdk.PopulateStripeLedgerRecord(stripeLedgerRecord, stripeLedgerRecordStruct)
 	err = e.App.Save(stripeLedgerRecord)
 	if err != nil {
-		e.App.Logger().Error("stripeLedgerRecord", "stripeLedgerRecord", stripeLedgerRecord, "stripeLedgeRecordStruct", stripeLedgerRecordStruct)
 		return e.BadRequestError("Unable to save stripeLedgerRecord", err)
 	}
 
