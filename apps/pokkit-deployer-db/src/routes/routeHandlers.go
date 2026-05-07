@@ -314,7 +314,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		return e.BadRequestError("Could not construct webhook event", err)
 	}
 
-	var logAllStripeEvents = false
+	var logAllStripeEvents = true
 	var stripeLedgerRecordStruct stripeLedgerRecordsSdk.TStripeLedgerStruct
 	if event.Type == "payment_intent.succeeded" {
 		var paymentIntent stripe.PaymentIntent

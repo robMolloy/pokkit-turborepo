@@ -16,6 +16,7 @@ type TInstanceSubscriptionRecordStruct struct {
 	UserId              string           `json:"userId"`
 	SubscriptionId      string           `json:"subscriptionId"`
 	NumberOfInstances   int              `json:"numberOfInstances"`
+	CostPerUnit         int              `json:"costPerUnit"`
 	Currency            string           `json:"currency"`
 	Amount              int              `json:"amount"`
 	Interval            string           `json:"interval"`
@@ -32,6 +33,7 @@ func ConvertInstanceSubscriptionRecordToStruct(record *pbCore.Record) TInstanceS
 		UserId:              record.GetString("userId"),
 		SubscriptionId:      record.GetString("subscriptionId"),
 		NumberOfInstances:   record.GetInt("numberOfInstances"),
+		CostPerUnit:         record.GetInt("costPerUnit"),
 		Currency:            record.GetString("currency"),
 		Amount:              record.GetInt("amount"),
 		Interval:            record.GetString("interval"),
@@ -49,6 +51,7 @@ func PopulateInstancesSubscriptionRecordWithStruct(record *pbCore.Record, data T
 	record.Set("userId", data.UserId)
 	record.Set("subscriptionId", data.SubscriptionId)
 	record.Set("numberOfInstances", data.NumberOfInstances)
+	record.Set("costPerUnit", data.CostPerUnit)
 	record.Set("amount", data.Amount)
 	record.Set("currency", data.Currency)
 	record.Set("interval", data.Interval)
@@ -96,6 +99,7 @@ func FindInstancesSubscriptionRecordAndUpdateFromStripeLedgerStruct(app pbCore.A
 	instancesSubscriptionStruct := TInstanceSubscriptionRecordStruct{
 		SubscriptionId:      stripeLedgerStruct.SubscriptionId,
 		NumberOfInstances:   stripeLedgerStruct.Quantity,
+		CostPerUnit:         stripeLedgerStruct.CostPerUnit,
 		Currency:            stripeLedgerStruct.Currency,
 		Amount:              stripeLedgerStruct.AmountTotal,
 		Interval:            stripeLedgerStruct.RecurrenceInterval,

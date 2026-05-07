@@ -309,7 +309,6 @@ func UpdateProductsAfterStripeLedgerCreatedEventHandler(e *pbCore.RecordEvent) e
 		e.App.Logger().Info("event type must be checkout.session.completed to update products")
 		return nil
 	}
-	e.App.Logger().Error("stripeLedgerRecordStruct309", "stripeLedgerRecordStruct", stripeLedgerRecordStruct)
 
 	if stripeLedgerRecordStruct.Currency != "usd" {
 		return fmt.Errorf("currency must be usd")

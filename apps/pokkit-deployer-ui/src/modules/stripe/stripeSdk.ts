@@ -1,4 +1,5 @@
 import { pb } from "@/config/pocketbaseConfig";
+import { errorSchema } from "@/lib/errorUtils";
 import { extractMessageFromPbError } from "@repo/pokkit-auth";
 import z from "zod";
 
@@ -129,13 +130,12 @@ export const createStripeCheckoutSession = async (p1: {
 
     const messages = ["Successfully set up the stripe checkout session"];
     return { success: true, data, messages } as const;
-  } catch (e) {
-    const error = e as { message: string };
-
-    console.error({ error });
+  } catch (error) {
     const messages = ["Failed to set up the stripe checkout session"];
-    if (error.message) messages.push(error.message);
-    return { success: false, messages } as const;
+    const errorResp = errorSchema.loose().safeParse(error);
+    if (errorResp.success) messages.push(errorResp.data.message);
+
+    return { success: false, messages, error } as const;
   }
 };
 export const updateStripeSubscriptionQuantity = async (p: {
@@ -147,18 +147,19 @@ export const updateStripeSubscriptionQuantity = async (p: {
       method: "POST",
       body: JSON.stringify(p),
     });
-    console.log(`stripeSdk.ts:${/*LL*/ 147}`, { res });
     const schema = z.object({ quantity: z.number() });
     const data = schema.parse(res);
 
-    const messages = [`Successfully updated the stripe subscription quantity to ${data.quantity}`];
+    const messages = [
+      `Successfully updated the stripe subscription quantity to ${data.quantity}`,
+      "It may take a short period of time for the changes to show",
+    ];
     return { success: true, data, messages } as const;
-  } catch (e) {
-    const error = e as { message: string };
-
-    console.error({ error });
+  } catch (error) {
     const messages = ["Failed to update the stripe subscription"];
-    if (error.message) messages.push(error.message);
-    return { success: false, messages } as const;
+    const errorResp = errorSchema.loose().safeParse(error);
+    if (errorResp.success) messages.push(errorResp.data.message);
+
+    return { success: false, messages, error } as const;
   }
 };

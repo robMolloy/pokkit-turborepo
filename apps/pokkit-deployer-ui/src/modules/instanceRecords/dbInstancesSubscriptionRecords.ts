@@ -11,6 +11,7 @@ export const instancesSubscriptionRecordSchema = z.object({
   subscriptionId: z.string(),
   numberOfInstances: z.number(),
   amount: z.number(),
+  costPerUnit: z.number(),
   currency: z.string(),
   interval: z.string(),
   intervalCount: z.number(),
