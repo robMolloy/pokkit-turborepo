@@ -56,9 +56,8 @@ export function StripeLedgerRecordRowTemplate(p: {
                 });
                 setIsLoading(false);
 
-                if (!sessionResp.success)
-                  return toast.error(...createToastProps(sessionResp.messages));
-                toast.success(...createToastProps(sessionResp.messages));
+                const toastFn = sessionResp.success ? toast.success : toast.error;
+                toastFn(...createToastProps(sessionResp.messages));
               }}
             >
               Subscription
