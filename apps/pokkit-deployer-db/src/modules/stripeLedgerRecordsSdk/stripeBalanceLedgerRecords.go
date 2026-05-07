@@ -1,28 +1,52 @@
 package stripeLedgerRecordsSdk
 
 import (
+	"reflect"
+
 	pbCore "github.com/pocketbase/pocketbase/core"
 	pbTypes "github.com/pocketbase/pocketbase/tools/types"
 )
 
 type TStripeLedgerStruct struct {
-	Id               string           `json:"id"`
-	UserId           string           `json:"userId"`
-	AmountTotal      int              `json:"amountTotal"`
-	Quantity         int              `json:"quantity"`
-	CostPerUnit      int              `json:"costPerUnit"`
-	StripePayloadId  string           `json:"stripePayloadId"`
-	PaymentIntentId  string           `json:"paymentIntentId"`
-	SubscriptionId   string           `json:"subscriptionId"`
-	InvoiceId        string           `json:"invoiceId"`
-	Currency         string           `json:"currency"`
-	ProductName      string           `json:"productName"`
-	ProductId        string           `json:"productId"`
-	StripeCustomerId string           `json:"stripeCustomerId"`
-	EventType        string           `json:"eventType"`
-	RawData          any              `json:"rawData"`
-	Created          pbTypes.DateTime `json:"created"`
-	Updated          pbTypes.DateTime `json:"updated"`
+	Id                      string           `json:"id"`
+	UserId                  string           `json:"userId"`
+	AmountTotal             int              `json:"amountTotal"`
+	Quantity                int              `json:"quantity"`
+	CostPerUnit             int              `json:"costPerUnit"`
+	StripePayloadId         string           `json:"stripePayloadId"`
+	PaymentIntentId         string           `json:"paymentIntentId"`
+	SubscriptionId          string           `json:"subscriptionId"`
+	InvoiceId               string           `json:"invoiceId"`
+	Currency                string           `json:"currency"`
+	ProductName             string           `json:"productName"`
+	ProductId               string           `json:"productId"`
+	StripeCustomerId        string           `json:"stripeCustomerId"`
+	EventType               string           `json:"eventType"`
+	RecurrenceInterval      string           `json:"recurrenceInterval"`
+	RecurrenceIntervalCount int              `json:"recurrenceIntervalCount"`
+	RawData                 any              `json:"rawData"`
+	Created                 pbTypes.DateTime `json:"created"`
+	Updated                 pbTypes.DateTime `json:"updated"`
+}
+
+func PopulateStripeLedgerRecord2(record *pbCore.Record, data TStripeLedgerStruct) *pbCore.Record {
+	structValue := reflect.ValueOf(data)
+	structType := reflect.TypeOf(data)
+	numberOfFields := structType.NumField()
+
+	for fieldIndex := range numberOfFields {
+		structField := structType.Field(fieldIndex)
+		jsonKey := structField.Tag.Get("json")
+
+		if jsonKey == "" || jsonKey == "-" {
+			continue
+		}
+
+		fieldValue := structValue.Field(fieldIndex).Interface()
+		record.Set(jsonKey, fieldValue)
+	}
+
+	return record
 }
 
 func PopulateStripeLedgerRecord(record *pbCore.Record, data TStripeLedgerStruct) *pbCore.Record {
@@ -42,6 +66,8 @@ func PopulateStripeLedgerRecord(record *pbCore.Record, data TStripeLedgerStruct)
 	record.Set("productId", data.ProductId)
 	record.Set("stripeCustomerId", data.StripeCustomerId)
 	record.Set("eventType", data.EventType)
+	record.Set("recurrenceInterval", data.RecurrenceInterval)
+	record.Set("recurrenceIntervalCount", data.RecurrenceIntervalCount)
 	record.Set("rawData", data.RawData)
 	record.Set("created", data.Created)
 	record.Set("updated", data.Updated)
@@ -51,22 +77,24 @@ func PopulateStripeLedgerRecord(record *pbCore.Record, data TStripeLedgerStruct)
 
 func ConvertStripeLedgerRecordToStruct(record *pbCore.Record) TStripeLedgerStruct {
 	return TStripeLedgerStruct{
-		Id:               record.GetString("id"),
-		UserId:           record.GetString("userId"),
-		Quantity:         record.GetInt("quantity"),
-		CostPerUnit:      record.GetInt("costPerUnit"),
-		StripePayloadId:  record.GetString("stripePayloadId"),
-		PaymentIntentId:  record.GetString("paymentIntentId"),
-		InvoiceId:        record.GetString("invoiceId"),
-		SubscriptionId:   record.GetString("subscriptionId"),
-		Currency:         record.GetString("currency"),
-		AmountTotal:      record.GetInt("amountTotal"),
-		ProductName:      record.GetString("productName"),
-		ProductId:        record.GetString("productId"),
-		StripeCustomerId: record.GetString("stripeCustomerId"),
-		EventType:        record.GetString("eventType"),
-		RawData:          record.GetString("rawData"),
-		Created:          record.GetDateTime("created"),
-		Updated:          record.GetDateTime("updated"),
+		Id:                      record.GetString("id"),
+		UserId:                  record.GetString("userId"),
+		Quantity:                record.GetInt("quantity"),
+		CostPerUnit:             record.GetInt("costPerUnit"),
+		StripePayloadId:         record.GetString("stripePayloadId"),
+		PaymentIntentId:         record.GetString("paymentIntentId"),
+		InvoiceId:               record.GetString("invoiceId"),
+		SubscriptionId:          record.GetString("subscriptionId"),
+		Currency:                record.GetString("currency"),
+		AmountTotal:             record.GetInt("amountTotal"),
+		ProductName:             record.GetString("productName"),
+		ProductId:               record.GetString("productId"),
+		StripeCustomerId:        record.GetString("stripeCustomerId"),
+		EventType:               record.GetString("eventType"),
+		RecurrenceInterval:      record.GetString("RecurrenceInterval"),
+		RecurrenceIntervalCount: record.GetInt("RecurrenceIntervalCount"),
+		RawData:                 record.GetString("rawData"),
+		Created:                 record.GetDateTime("created"),
+		Updated:                 record.GetDateTime("updated"),
 	}
 }

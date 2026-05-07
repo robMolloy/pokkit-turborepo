@@ -306,14 +306,11 @@ func UpdateProductsAfterStripeLedgerCreatedEventHandler(e *pbCore.RecordEvent) e
 	stripeLedgerRecord := e.Record
 	stripeLedgerRecordStruct := stripeLedgerRecordsSdk.ConvertStripeLedgerRecordToStruct(stripeLedgerRecord)
 
-	if stripeLedgerRecordStruct.EventType != "checkout.session.completed" {
+	if stripeLedgerRecordStruct.EventType != "checkout.session.completed" && stripeLedgerRecordStruct.EventType != "customer.subscription.updated" {
 		e.App.Logger().Info("event type must be checkout.session.completed to update products")
 		return nil
 	}
 
-	if stripeLedgerRecordStruct.Quantity <= 0 {
-		return fmt.Errorf("stripeLedgerRecordStruct.Quantity cannot be <= 0")
-	}
 	if stripeLedgerRecordStruct.Currency != "usd" {
 		return fmt.Errorf("currency must be usd")
 	}

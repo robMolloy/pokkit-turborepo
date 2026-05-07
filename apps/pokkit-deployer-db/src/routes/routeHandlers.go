@@ -316,7 +316,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 
 	var logAllStripeEvents = true
 	var stripeLedgerRecordStruct stripeLedgerRecordsSdk.TStripeLedgerStruct
-	if event.Type == "payment_intent.succeeded" || logAllStripeEvents {
+	if event.Type == "payment_intent.succeeded" {
 		var paymentIntent stripe.PaymentIntent
 		err = json.Unmarshal(event.Data.Raw, &paymentIntent)
 		if err != nil {
@@ -348,41 +348,57 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 			return e.BadRequestError("Could not unmarshal JSON from checkout session:", err)
 		}
 
-		quantity, err := strconv.Atoi(checkoutSession.Metadata["quantity"])
-		if err != nil {
-			quantity = 0
-		}
-
 		var subscriptionId string
 		if checkoutSession.Subscription != nil {
 			subscriptionId = checkoutSession.Subscription.ID
 		}
+		subscription, err := stripeSdk.RetrieveStripeSubscriptionWithRecurrenceData(subscriptionId)
+		subscriptionRecurrenceData, err := stripeSdk.GetRecurrenceFromStripeSubscription(subscription)
+		if err != nil {
+			return e.BadRequestError("recurrence data invalid", err)
+		}
+
 		var invoiceId string
 		if checkoutSession.Invoice != nil {
 			invoiceId = checkoutSession.Invoice.ID
 		}
 
+		item := subscription.Items.Data[0]
+		quantity := int(item.Quantity)
+		costPerUnit := int(item.Price.UnitAmount)
+		amountTotal := quantity * costPerUnit
+
 		stripeLedgerRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
-			Quantity:         quantity,
-			EventType:        string(event.Type),
-			Currency:         string(checkoutSession.Currency),
-			AmountTotal:      int(checkoutSession.AmountTotal),
-			StripePayloadId:  checkoutSession.ID,
-			SubscriptionId:   subscriptionId,
-			InvoiceId:        invoiceId,
-			UserId:           checkoutSession.Metadata["userId"],
-			ProductName:      checkoutSession.Metadata["productName"],
-			ProductId:        checkoutSession.Metadata["productId"],
-			StripeCustomerId: checkoutSession.Metadata["stripeCustomerId"],
-			RawData:          checkoutSession,
+			EventType:               string(event.Type),
+			Currency:                string(checkoutSession.Currency),
+			Quantity:                quantity,
+			CostPerUnit:             costPerUnit,
+			AmountTotal:             amountTotal,
+			StripePayloadId:         checkoutSession.ID,
+			SubscriptionId:          subscriptionId,
+			InvoiceId:               invoiceId,
+			UserId:                  checkoutSession.Metadata["userId"],
+			ProductName:             checkoutSession.Metadata["productName"],
+			ProductId:               checkoutSession.Metadata["productId"],
+			StripeCustomerId:        checkoutSession.Metadata["stripeCustomerId"],
+			RawData:                 checkoutSession,
+			RecurrenceInterval:      string(subscriptionRecurrenceData.Interval),
+			RecurrenceIntervalCount: int(subscriptionRecurrenceData.IntervalCount),
 		}
 	}
 
 	if event.Type == "customer.subscription.updated" {
-		var subscription stripe.Subscription
-		err = json.Unmarshal(event.Data.Raw, &subscription)
+		var subscriptionPayload stripe.Subscription
+		err = json.Unmarshal(event.Data.Raw, &subscriptionPayload)
 		if err != nil {
 			return e.BadRequestError("Could not unmarshal JSON from stripe payment intent:", err)
+		}
+
+		subscriptionId := subscriptionPayload.ID
+		subscription, err := stripeSdk.RetrieveStripeSubscriptionWithRecurrenceData(subscriptionId)
+		subscriptionRecurrenceData, err := stripeSdk.GetRecurrenceFromStripeSubscription(subscription)
+		if err != nil {
+			return e.BadRequestError("recurrence data invalid", err)
 		}
 
 		item := subscription.Items.Data[0]
@@ -401,18 +417,20 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		StripeLedgerCheckoutSessionCompletedRecordStruct := stripeLedgerRecordsSdk.ConvertStripeLedgerRecordToStruct(StripeLedgerCheckoutSessionCompletedRecord)
 
 		stripeLedgerRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
-			EventType:        string(event.Type),
-			Currency:         string(item.Price.Currency),
-			Quantity:         int(item.Quantity),
-			CostPerUnit:      costPerUnit,
-			AmountTotal:      amountTotal,
-			SubscriptionId:   subscription.ID,
-			InvoiceId:        subscription.LatestInvoice.ID, // Product?
-			StripePayloadId:  StripeLedgerCheckoutSessionCompletedRecordStruct.StripePayloadId,
-			UserId:           StripeLedgerCheckoutSessionCompletedRecordStruct.UserId,
-			ProductName:      StripeLedgerCheckoutSessionCompletedRecordStruct.ProductName,
-			ProductId:        StripeLedgerCheckoutSessionCompletedRecordStruct.ProductId,
-			StripeCustomerId: string(subscription.Customer.ID),
+			EventType:               string(event.Type),
+			Currency:                string(item.Price.Currency),
+			Quantity:                int(item.Quantity),
+			CostPerUnit:             costPerUnit,
+			AmountTotal:             amountTotal,
+			SubscriptionId:          subscription.ID,
+			InvoiceId:               subscription.LatestInvoice.ID, // Product?
+			StripePayloadId:         StripeLedgerCheckoutSessionCompletedRecordStruct.StripePayloadId,
+			UserId:                  StripeLedgerCheckoutSessionCompletedRecordStruct.UserId,
+			ProductName:             StripeLedgerCheckoutSessionCompletedRecordStruct.ProductName,
+			ProductId:               StripeLedgerCheckoutSessionCompletedRecordStruct.ProductId,
+			StripeCustomerId:        string(subscription.Customer.ID),
+			RecurrenceInterval:      string(subscriptionRecurrenceData.Interval),
+			RecurrenceIntervalCount: int(subscriptionRecurrenceData.IntervalCount),
 			RawData: map[string]any{
 				"Subscription": subscription,
 				"Record":       StripeLedgerCheckoutSessionCompletedRecord,
@@ -421,8 +439,21 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 	}
 
 	hasNotBeenPopulated := stripeLedgerRecordStruct.EventType == ""
-	if !logAllStripeEvents && hasNotBeenPopulated {
-		return e.JSON(http.StatusOK, map[string]any{})
+	if hasNotBeenPopulated {
+		if !logAllStripeEvents {
+			return e.JSON(http.StatusOK, map[string]any{})
+		}
+
+		var payload map[string]any
+		err = json.Unmarshal(event.Data.Raw, &payload)
+		if err != nil {
+			return e.BadRequestError("Could not unmarshal JSON from stripe payment intent:", err)
+		}
+
+		stripeLedgerRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
+			EventType: string(event.Type),
+			RawData:   payload,
+		}
 	}
 
 	stripeLedgerCollection, err := e.App.FindCollectionByNameOrId(db.StripeLedgerCollectionName)
