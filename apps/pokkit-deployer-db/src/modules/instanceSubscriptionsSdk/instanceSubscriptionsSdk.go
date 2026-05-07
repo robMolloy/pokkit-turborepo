@@ -128,7 +128,7 @@ func FindInstancesSubscriptionRecordAndUpdateFromStripeLedgerStruct(app pbCore.A
 
 	instancesSubscriptionStruct.SubscriptionRawData = subscription
 	instancesSubscriptionStruct.Amount = stripeLedgerStruct.AmountTotal
-	instancesSubscriptionStruct.Currency = string(subscription.Currency)
+	instancesSubscriptionStruct.Currency = stripeLedgerStruct.Currency
 	instancesSubscriptionStruct.NumberOfInstances = stripeLedgerStruct.Quantity
 	instancesSubscriptionStruct.PaidUntilDateTime = currentPeriodEndDateTime
 	instancesSubscriptionStruct.SubscriptionId = subscription.ID

@@ -368,6 +368,17 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		costPerUnit := int(item.Price.UnitAmount)
 		amountTotal := quantity * costPerUnit
 
+		recurrenceIntervalStartDateInt := item.CurrentPeriodStart
+		recurrenceIntervalEndDateInt := item.CurrentPeriodEnd
+		recurrenceIntervalStart, err := utils.ConvertStripeDateIntToPbDateTime(recurrenceIntervalStartDateInt)
+		if err != nil {
+			return e.BadRequestError("recurrence data invalid", err)
+		}
+		recurrenceIntervalEnd, err := utils.ConvertStripeDateIntToPbDateTime(recurrenceIntervalEndDateInt)
+		if err != nil {
+			return e.BadRequestError("recurrence data invalid", err)
+		}
+
 		stripeLedgerRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
 			EventType:               string(event.Type),
 			Currency:                string(checkoutSession.Currency),
@@ -384,6 +395,8 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 			RawData:                 checkoutSession,
 			RecurrenceInterval:      string(subscriptionRecurrenceData.Interval),
 			RecurrenceIntervalCount: int(subscriptionRecurrenceData.IntervalCount),
+			RecurrenceIntervalStart: recurrenceIntervalStart,
+			RecurrenceIntervalEnd:   recurrenceIntervalEnd,
 		}
 	}
 
@@ -395,7 +408,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		}
 
 		subscriptionId := subscriptionPayload.ID
-		subscription, err := stripeSdk.RetrieveStripeSubscriptionWithRecurrenceData(subscriptionId)
+		subscription, err := stripeSdk.RetrieveStripeSubscriptionWithRecurrenceDataAndLatestInvoice(subscriptionId)
 		subscriptionRecurrenceData, err := stripeSdk.GetRecurrenceFromStripeSubscription(subscription)
 		if err != nil {
 			return e.BadRequestError("recurrence data invalid", err)
@@ -405,6 +418,17 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		quantity := int(item.Quantity)
 		costPerUnit := int(item.Price.UnitAmount)
 		amountTotal := quantity * costPerUnit
+
+		recurrenceIntervalStartDateInt := item.CurrentPeriodStart
+		recurrenceIntervalEndDateInt := item.CurrentPeriodEnd
+		recurrenceIntervalStart, err := utils.ConvertStripeDateIntToPbDateTime(recurrenceIntervalStartDateInt)
+		if err != nil {
+			return e.BadRequestError("recurrence data invalid", err)
+		}
+		recurrenceIntervalEnd, err := utils.ConvertStripeDateIntToPbDateTime(recurrenceIntervalEndDateInt)
+		if err != nil {
+			return e.BadRequestError("recurrence data invalid", err)
+		}
 
 		StripeLedgerCheckoutSessionCompletedRecord, err := e.App.FindFirstRecordByFilter(
 			db.StripeLedgerCollectionName,
@@ -419,7 +443,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		stripeLedgerRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
 			EventType:               string(event.Type),
 			Currency:                string(item.Price.Currency),
-			Quantity:                int(item.Quantity),
+			Quantity:                quantity,
 			CostPerUnit:             costPerUnit,
 			AmountTotal:             amountTotal,
 			SubscriptionId:          subscription.ID,
@@ -431,6 +455,8 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 			StripeCustomerId:        string(subscription.Customer.ID),
 			RecurrenceInterval:      string(subscriptionRecurrenceData.Interval),
 			RecurrenceIntervalCount: int(subscriptionRecurrenceData.IntervalCount),
+			RecurrenceIntervalStart: recurrenceIntervalStart,
+			RecurrenceIntervalEnd:   recurrenceIntervalEnd,
 			RawData: map[string]any{
 				"Subscription": subscription,
 				"Record":       StripeLedgerCheckoutSessionCompletedRecord,

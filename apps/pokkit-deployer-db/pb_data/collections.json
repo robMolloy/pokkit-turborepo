@@ -1811,6 +1811,28 @@
       },
       {
         "hidden": false,
+        "id": "date3512434289",
+        "max": "",
+        "min": "",
+        "name": "recurrenceIntervalStart",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "date"
+      },
+      {
+        "hidden": false,
+        "id": "date1902542209",
+        "max": "",
+        "min": "",
+        "name": "recurrenceIntervalEnd",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "date"
+      },
+      {
+        "hidden": false,
         "id": "json1111784733",
         "maxSize": 0,
         "name": "rawData",
@@ -1844,7 +1866,7 @@
       "CREATE INDEX `idx_Bzj0h4o9vr` ON `stripeLedger` (`stripePayloadId`)"
     ],
     "created": "2026-04-23 10:02:37.517Z",
-    "updated": "2026-05-07 18:57:00.385Z",
+    "updated": "2026-05-07 20:07:37.113Z",
     "system": false
   }
 ]

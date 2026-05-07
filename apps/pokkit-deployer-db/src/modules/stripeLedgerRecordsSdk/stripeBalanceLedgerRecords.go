@@ -24,6 +24,8 @@ type TStripeLedgerStruct struct {
 	EventType               string           `json:"eventType"`
 	RecurrenceInterval      string           `json:"recurrenceInterval"`
 	RecurrenceIntervalCount int              `json:"recurrenceIntervalCount"`
+	RecurrenceIntervalStart pbTypes.DateTime `json:"recurrenceIntervalStart"`
+	RecurrenceIntervalEnd   pbTypes.DateTime `json:"recurrenceIntervalEnd"`
 	RawData                 any              `json:"rawData"`
 	Created                 pbTypes.DateTime `json:"created"`
 	Updated                 pbTypes.DateTime `json:"updated"`
@@ -68,6 +70,8 @@ func PopulateStripeLedgerRecord(record *pbCore.Record, data TStripeLedgerStruct)
 	record.Set("eventType", data.EventType)
 	record.Set("recurrenceInterval", data.RecurrenceInterval)
 	record.Set("recurrenceIntervalCount", data.RecurrenceIntervalCount)
+	record.Set("recurrenceIntervalStart", data.RecurrenceIntervalStart)
+	record.Set("recurrenceIntervalEnd", data.RecurrenceIntervalEnd)
 	record.Set("rawData", data.RawData)
 	record.Set("created", data.Created)
 	record.Set("updated", data.Updated)
@@ -93,6 +97,8 @@ func ConvertStripeLedgerRecordToStruct(record *pbCore.Record) TStripeLedgerStruc
 		EventType:               record.GetString("eventType"),
 		RecurrenceInterval:      record.GetString("RecurrenceInterval"),
 		RecurrenceIntervalCount: record.GetInt("RecurrenceIntervalCount"),
+		RecurrenceIntervalStart: record.GetDateTime("recurrenceIntervalStart"),
+		RecurrenceIntervalEnd:   record.GetDateTime("recurrenceIntervalEnd"),
 		RawData:                 record.GetString("rawData"),
 		Created:                 record.GetDateTime("created"),
 		Updated:                 record.GetDateTime("updated"),
