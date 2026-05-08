@@ -12,36 +12,36 @@ import (
 )
 
 type TInstanceSubscriptionRecordStruct struct {
-	Id                  string           `json:"id"`
-	UserId              string           `json:"userId"`
-	SubscriptionId      string           `json:"subscriptionId"`
-	NumberOfInstances   int              `json:"numberOfInstances"`
-	CostPerUnit         int              `json:"costPerUnit"`
-	Currency            string           `json:"currency"`
-	Cost                int              `json:"cost"`
-	Interval            string           `json:"interval"`
-	IntervalCount       int              `json:"intervalCount"`
-	PaidUntilDateTime   pbTypes.DateTime `json:"paidUntilDateTime"`
-	SubscriptionRawData any              `json:"subscriptionRawData"`
-	Created             pbTypes.DateTime `json:"created"`
-	Updated             pbTypes.DateTime `json:"updated"`
+	Id                string           `json:"id"`
+	UserId            string           `json:"userId"`
+	SubscriptionId    string           `json:"subscriptionId"`
+	NumberOfInstances int              `json:"numberOfInstances"`
+	CostPerUnit       int              `json:"costPerUnit"`
+	Currency          string           `json:"currency"`
+	Cost              int              `json:"cost"`
+	Interval          string           `json:"interval"`
+	IntervalCount     int              `json:"intervalCount"`
+	PaidUntilDateTime pbTypes.DateTime `json:"paidUntilDateTime"`
+	RawData           any              `json:"rawData"`
+	Created           pbTypes.DateTime `json:"created"`
+	Updated           pbTypes.DateTime `json:"updated"`
 }
 
 func ConvertInstanceSubscriptionRecordToStruct(record *pbCore.Record) TInstanceSubscriptionRecordStruct {
 	return TInstanceSubscriptionRecordStruct{
-		Id:                  record.GetString("id"),
-		UserId:              record.GetString("userId"),
-		SubscriptionId:      record.GetString("subscriptionId"),
-		NumberOfInstances:   record.GetInt("numberOfInstances"),
-		CostPerUnit:         record.GetInt("costPerUnit"),
-		Currency:            record.GetString("currency"),
-		Cost:                record.GetInt("cost"),
-		Interval:            record.GetString("interval"),
-		IntervalCount:       record.GetInt("intervalCount"),
-		PaidUntilDateTime:   record.GetDateTime("paidUntilDateTime"),
-		SubscriptionRawData: record.Get("subscriptionRawData"),
-		Created:             record.GetDateTime("created"),
-		Updated:             record.GetDateTime("updated"),
+		Id:                record.GetString("id"),
+		UserId:            record.GetString("userId"),
+		SubscriptionId:    record.GetString("subscriptionId"),
+		NumberOfInstances: record.GetInt("numberOfInstances"),
+		CostPerUnit:       record.GetInt("costPerUnit"),
+		Currency:          record.GetString("currency"),
+		Cost:              record.GetInt("cost"),
+		Interval:          record.GetString("interval"),
+		IntervalCount:     record.GetInt("intervalCount"),
+		PaidUntilDateTime: record.GetDateTime("paidUntilDateTime"),
+		RawData:           record.Get("rawData"),
+		Created:           record.GetDateTime("created"),
+		Updated:           record.GetDateTime("updated"),
 	}
 }
 func PopulateInstancesSubscriptionRecordWithStruct(record *pbCore.Record, data TInstanceSubscriptionRecordStruct) {
@@ -57,7 +57,7 @@ func PopulateInstancesSubscriptionRecordWithStruct(record *pbCore.Record, data T
 	record.Set("interval", data.Interval)
 	record.Set("intervalCount", data.IntervalCount)
 	record.Set("paidUntilDateTime", data.PaidUntilDateTime)
-	record.Set("subscriptionRawData", data.SubscriptionRawData)
+	record.Set("rawData", data.RawData)
 	record.Set("created", data.Created)
 	record.Set("updated", data.Updated)
 }
@@ -99,16 +99,16 @@ func FindInstancesSubscriptionRecordAndUpdateFromStripeLedgerStruct(app pbCore.A
 	}
 
 	instancesSubscriptionStruct := TInstanceSubscriptionRecordStruct{
-		SubscriptionId:      stripeLedgerStruct.SubscriptionId,
-		NumberOfInstances:   stripeLedgerStruct.Quantity,
-		CostPerUnit:         stripeLedgerStruct.CostPerUnit,
-		Currency:            stripeLedgerStruct.Currency,
-		Cost:                stripeLedgerStruct.Cost,
-		Interval:            stripeLedgerStruct.RecurrenceInterval,
-		IntervalCount:       stripeLedgerStruct.RecurrenceIntervalCount,
-		PaidUntilDateTime:   stripeLedgerStruct.RecurrenceIntervalEnd,
-		SubscriptionRawData: stripeLedgerStruct,
-		UserId:              userId,
+		SubscriptionId:    stripeLedgerStruct.SubscriptionId,
+		NumberOfInstances: stripeLedgerStruct.Quantity,
+		CostPerUnit:       stripeLedgerStruct.CostPerUnit,
+		Currency:          stripeLedgerStruct.Currency,
+		Cost:              stripeLedgerStruct.Cost,
+		Interval:          stripeLedgerStruct.RecurrenceInterval,
+		IntervalCount:     stripeLedgerStruct.RecurrenceIntervalCount,
+		PaidUntilDateTime: stripeLedgerStruct.RecurrenceIntervalEnd,
+		RawData:           stripeLedgerStruct,
+		UserId:            userId,
 	}
 
 	PopulateInstancesSubscriptionRecordWithStruct(existingInstancesSubscriptionRecord, instancesSubscriptionStruct)
