@@ -18,7 +18,7 @@ type TInstanceSubscriptionRecordStruct struct {
 	NumberOfInstances   int              `json:"numberOfInstances"`
 	CostPerUnit         int              `json:"costPerUnit"`
 	Currency            string           `json:"currency"`
-	Amount              int              `json:"amount"`
+	Cost                int              `json:"cost"`
 	Interval            string           `json:"interval"`
 	IntervalCount       int              `json:"intervalCount"`
 	PaidUntilDateTime   pbTypes.DateTime `json:"paidUntilDateTime"`
@@ -35,7 +35,7 @@ func ConvertInstanceSubscriptionRecordToStruct(record *pbCore.Record) TInstanceS
 		NumberOfInstances:   record.GetInt("numberOfInstances"),
 		CostPerUnit:         record.GetInt("costPerUnit"),
 		Currency:            record.GetString("currency"),
-		Amount:              record.GetInt("amount"),
+		Cost:                record.GetInt("cost"),
 		Interval:            record.GetString("interval"),
 		IntervalCount:       record.GetInt("intervalCount"),
 		PaidUntilDateTime:   record.GetDateTime("paidUntilDateTime"),
@@ -52,7 +52,7 @@ func PopulateInstancesSubscriptionRecordWithStruct(record *pbCore.Record, data T
 	record.Set("subscriptionId", data.SubscriptionId)
 	record.Set("numberOfInstances", data.NumberOfInstances)
 	record.Set("costPerUnit", data.CostPerUnit)
-	record.Set("amount", data.Amount)
+	record.Set("cost", data.Cost)
 	record.Set("currency", data.Currency)
 	record.Set("interval", data.Interval)
 	record.Set("intervalCount", data.IntervalCount)
@@ -103,7 +103,7 @@ func FindInstancesSubscriptionRecordAndUpdateFromStripeLedgerStruct(app pbCore.A
 		NumberOfInstances:   stripeLedgerStruct.Quantity,
 		CostPerUnit:         stripeLedgerStruct.CostPerUnit,
 		Currency:            stripeLedgerStruct.Currency,
-		Amount:              stripeLedgerStruct.Cost,
+		Cost:                stripeLedgerStruct.Cost,
 		Interval:            stripeLedgerStruct.RecurrenceInterval,
 		IntervalCount:       stripeLedgerStruct.RecurrenceIntervalCount,
 		PaidUntilDateTime:   stripeLedgerStruct.RecurrenceIntervalEnd,

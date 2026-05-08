@@ -37,7 +37,10 @@ export function StripeLedgerRecordRowTemplate(p: { stripeLedgerRecord: TStripeLe
             p.stripeLedgerRecord.quantity >= 0 ? "text-primary" : "text-destructive",
           )}
         >
-          {formatCurrency(p.stripeLedgerRecord)}
+          {formatCurrency({
+            currency: p.stripeLedgerRecord.currency,
+            amount: p.stripeLedgerRecord.cost,
+          })}
         </span>
         {invoiceId && (
           <Button

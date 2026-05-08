@@ -42,7 +42,7 @@ const EditSubscriptionForm = (p: { subscription: TInstancesSubscriptionRecord })
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Current cost</span>
-            <span>{formatCurrency({ currency: "usd", amount: subscription.amount })}</span>
+            <span>{formatCurrency({ currency: "usd", amount: subscription.cost })}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Billing cycle</span>
@@ -63,6 +63,7 @@ const EditSubscriptionForm = (p: { subscription: TInstancesSubscriptionRecord })
           <div>
             <InputLabel htmlFor="quantity">Number of Instances</InputLabel>
             <NumberInput
+              autoFocus
               id="quantity"
               min={1}
               value={quantity}

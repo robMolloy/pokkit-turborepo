@@ -10,7 +10,7 @@ export const instancesSubscriptionRecordSchema = z.object({
   userId: z.string(),
   subscriptionId: z.string(),
   numberOfInstances: z.number(),
-  amount: z.number(),
+  cost: z.number(),
   costPerUnit: z.number(),
   currency: z.string(),
   interval: z.string(),

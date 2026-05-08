@@ -33,7 +33,7 @@ export function StripeLedgerRecordRowTemplate(p: {
             <p>
               {formatCurrency({
                 currency: p.instancesSubscriptionRecord.currency,
-                amount: p.instancesSubscriptionRecord.amount,
+                amount: p.instancesSubscriptionRecord.cost,
               })}
             </p>
             <p className="text-xs text-muted-foreground">
