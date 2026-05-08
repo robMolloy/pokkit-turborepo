@@ -90,7 +90,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-05-07 22:06:24.687Z",
-    "updated": "2026-05-07 23:35:58.342Z",
+    "updated": "2026-05-08 19:47:55.750Z",
     "system": true
   },
   {
@@ -197,7 +197,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-05-07 22:06:24.689Z",
-    "updated": "2026-05-07 23:35:58.344Z",
+    "updated": "2026-05-08 19:47:55.754Z",
     "system": true
   },
   {
@@ -306,7 +306,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-05-07 22:06:24.690Z",
-    "updated": "2026-05-07 23:35:58.345Z",
+    "updated": "2026-05-08 19:47:55.756Z",
     "system": true
   },
   {
@@ -400,7 +400,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-05-07 22:06:24.691Z",
-    "updated": "2026-05-07 23:35:58.347Z",
+    "updated": "2026-05-08 19:47:55.758Z",
     "system": true
   },
   {
@@ -509,7 +509,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-05-07 22:06:24.693Z",
-    "updated": "2026-05-07 23:35:58.349Z",
+    "updated": "2026-05-08 19:47:55.760Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -718,7 +718,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-05-07 22:06:24.696Z",
-    "updated": "2026-05-07 23:35:58.351Z",
+    "updated": "2026-05-08 19:47:55.761Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -876,7 +876,7 @@
     ],
     "indexes": [],
     "created": "2026-05-07 22:11:26.834Z",
-    "updated": "2026-05-07 23:35:58.352Z",
+    "updated": "2026-05-08 19:47:55.763Z",
     "system": false
   },
   {
@@ -997,7 +997,7 @@
       "CREATE UNIQUE INDEX `idx_0UWlVOdDqD` ON `authOrganisationUserPermissions` (`userOrgKey`)"
     ],
     "created": "2026-05-07 22:11:26.836Z",
-    "updated": "2026-05-07 23:35:58.354Z",
+    "updated": "2026-05-08 19:47:55.765Z",
     "system": false
   },
   {
@@ -1075,7 +1075,7 @@
     ],
     "indexes": [],
     "created": "2026-05-07 22:11:26.838Z",
-    "updated": "2026-05-07 23:35:58.356Z",
+    "updated": "2026-05-08 19:47:55.766Z",
     "system": false
   },
   {
@@ -1178,7 +1178,7 @@
       "CREATE UNIQUE INDEX `idx_MGuOIBNgXv` ON `instances` (`portNumber`)"
     ],
     "created": "2026-05-07 22:11:26.840Z",
-    "updated": "2026-05-07 23:35:58.357Z",
+    "updated": "2026-05-08 19:47:55.768Z",
     "system": false
   },
   {
@@ -1260,7 +1260,7 @@
       "CREATE UNIQUE INDEX `idx_jmZ8IL5Ej4` ON `commandTemplatesForChangedInstanceRecord` (`crudOperation`)"
     ],
     "created": "2026-05-07 22:11:26.842Z",
-    "updated": "2026-05-07 23:35:58.358Z",
+    "updated": "2026-05-08 19:47:55.770Z",
     "system": false
   },
   {
@@ -1342,7 +1342,7 @@
       "CREATE UNIQUE INDEX `idx_2OQVB3k4yj` ON `commandTemplatesForAllInstanceRecords` (`crudOperation`)"
     ],
     "created": "2026-05-07 22:11:26.844Z",
-    "updated": "2026-05-07 23:35:58.359Z",
+    "updated": "2026-05-08 19:47:55.771Z",
     "system": false
   },
   {
@@ -1419,7 +1419,7 @@
       "CREATE UNIQUE INDEX `idx_tKzMrurend` ON `userBalances` (`userId`)"
     ],
     "created": "2026-05-07 22:11:26.846Z",
-    "updated": "2026-05-07 23:35:58.361Z",
+    "updated": "2026-05-08 19:47:55.772Z",
     "system": false
   },
   {
@@ -1607,7 +1607,7 @@
     ],
     "indexes": [],
     "created": "2026-05-07 22:11:26.847Z",
-    "updated": "2026-05-07 23:40:13.677Z",
+    "updated": "2026-05-08 19:47:55.774Z",
     "system": false
   },
   {
@@ -1746,7 +1746,7 @@
         "id": "number928573309",
         "max": null,
         "min": null,
-        "name": "amountTotal",
+        "name": "cost",
         "onlyInt": false,
         "presentable": false,
         "required": false,
@@ -1878,7 +1878,7 @@
       "CREATE INDEX `idx_Bzj0h4o9vr` ON `stripeLedger` (`stripePayloadId`)"
     ],
     "created": "2026-05-07 22:11:26.850Z",
-    "updated": "2026-05-07 23:35:58.364Z",
+    "updated": "2026-05-08 21:47:45.108Z",
     "system": false
   }
 ]

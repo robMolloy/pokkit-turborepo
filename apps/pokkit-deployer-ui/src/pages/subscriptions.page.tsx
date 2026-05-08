@@ -1,21 +1,18 @@
-import { createToastProps } from "@/lib/createToastProps";
 import { formatCurrency } from "@/lib/currencyUtils";
 import { formatDate } from "@/lib/dateUtils";
 import {
   TInstancesSubscriptionRecord,
   useInstancesSubscriptionRecordsStore,
 } from "@/modules/instanceRecords/dbInstancesSubscriptionRecords";
-import { updateStripeSubscriptionQuantity } from "@/modules/stripe/stripeSdk";
 import { Button } from "@repo/pokkit-components";
 import { RefreshCcw } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 export function StripeLedgerRecordRowTemplate(p: {
   instancesSubscriptionRecord: TInstancesSubscriptionRecord;
 }) {
   const subscriptionId = p.instancesSubscriptionRecord.subscriptionId;
-  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="border bg-card rounded-md px-3 py-2">
@@ -36,31 +33,23 @@ export function StripeLedgerRecordRowTemplate(p: {
             <p>
               {formatCurrency({
                 currency: p.instancesSubscriptionRecord.currency,
-                amountTotal: p.instancesSubscriptionRecord.amount,
+                amount: p.instancesSubscriptionRecord.amount,
               })}
             </p>
             <p className="text-xs text-muted-foreground">
-              every {p.instancesSubscriptionRecord.intervalCount}{" "}
-              {p.instancesSubscriptionRecord.interval}
+              {`every ${p.instancesSubscriptionRecord.intervalCount} ${p.instancesSubscriptionRecord.interval}`}
             </p>
           </div>
           <span className="font-mono text-sm font-medium"></span>
           {subscriptionId && (
             <Button
-              loading={isLoading}
               onClick={async () => {
-                setIsLoading(true);
-                const sessionResp = await updateStripeSubscriptionQuantity({
-                  quantity: Math.floor(Math.random() * 100),
-                  subscriptionId: p.instancesSubscriptionRecord.subscriptionId,
-                });
-                setIsLoading(false);
-
-                const toastFn = sessionResp.success ? toast.success : toast.error;
-                toastFn(...createToastProps(sessionResp.messages));
+                navigate(
+                  `/subscription/${p.instancesSubscriptionRecord.subscriptionId}/edit-subscription`,
+                );
               }}
             >
-              Subscription
+              Edit
             </Button>
           )}
         </div>

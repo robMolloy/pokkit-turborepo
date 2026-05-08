@@ -88,7 +88,7 @@ function DisplayUserBalanceLedgerRecord(p: { userBalanceLedgerRecord: TStripeLed
           p.userBalanceLedgerRecord.quantity >= 0 ? "text-primary" : "text-destructive",
         )}
       >
-        {p.userBalanceLedgerRecord.amountTotal} {p.userBalanceLedgerRecord.currency}
+        {p.userBalanceLedgerRecord.cost} {p.userBalanceLedgerRecord.currency}
       </span>
     </div>
   );

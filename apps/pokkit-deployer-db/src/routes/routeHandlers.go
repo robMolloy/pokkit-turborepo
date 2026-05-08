@@ -366,7 +366,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		item := subscription.Items.Data[0]
 		quantity := int(item.Quantity)
 		costPerUnit := int(item.Price.UnitAmount)
-		amountTotal := quantity * costPerUnit
+		cost := quantity * costPerUnit
 
 		recurrenceIntervalStartDateInt := item.CurrentPeriodStart
 		recurrenceIntervalEndDateInt := item.CurrentPeriodEnd
@@ -384,7 +384,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 			Currency:                string(checkoutSession.Currency),
 			Quantity:                quantity,
 			CostPerUnit:             costPerUnit,
-			AmountTotal:             amountTotal,
+			Cost:                    cost,
 			StripePayloadId:         checkoutSession.ID,
 			SubscriptionId:          subscriptionId,
 			InvoiceId:               invoiceId,
@@ -417,7 +417,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		item := subscription.Items.Data[0]
 		quantity := int(item.Quantity)
 		costPerUnit := int(item.Price.UnitAmount)
-		amountTotal := quantity * costPerUnit
+		cost := quantity * costPerUnit
 
 		recurrenceIntervalStartDateInt := item.CurrentPeriodStart
 		recurrenceIntervalEndDateInt := item.CurrentPeriodEnd
@@ -445,7 +445,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 			Currency:                string(item.Price.Currency),
 			Quantity:                quantity,
 			CostPerUnit:             costPerUnit,
-			AmountTotal:             amountTotal,
+			Cost:                    cost,
 			SubscriptionId:          subscription.ID,
 			InvoiceId:               subscription.LatestInvoice.ID, // Product?
 			StripePayloadId:         StripeLedgerCheckoutSessionCompletedRecordStruct.StripePayloadId,

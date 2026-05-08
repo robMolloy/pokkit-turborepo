@@ -90,8 +90,10 @@ func FindInstancesSubscriptionRecordAndUpdateFromStripeLedgerStruct(app pbCore.A
 		existingInstancesSubscriptionRecord = pbCore.NewRecord(instancesSubscriptionsCollection)
 	}
 
+	existingInstancesSubscriptionRecordStruct := ConvertInstanceSubscriptionRecordToStruct(existingInstancesSubscriptionRecord)
+
 	// if exists use existing userId - avoid subscription hijack
-	userId := existingInstancesSubscriptionRecord.GetString("userId")
+	userId := existingInstancesSubscriptionRecordStruct.UserId
 	if userId == "" {
 		userId = stripeLedgerStruct.UserId
 	}
@@ -101,7 +103,7 @@ func FindInstancesSubscriptionRecordAndUpdateFromStripeLedgerStruct(app pbCore.A
 		NumberOfInstances:   stripeLedgerStruct.Quantity,
 		CostPerUnit:         stripeLedgerStruct.CostPerUnit,
 		Currency:            stripeLedgerStruct.Currency,
-		Amount:              stripeLedgerStruct.AmountTotal,
+		Amount:              stripeLedgerStruct.Cost,
 		Interval:            stripeLedgerStruct.RecurrenceInterval,
 		IntervalCount:       stripeLedgerStruct.RecurrenceIntervalCount,
 		PaidUntilDateTime:   stripeLedgerStruct.RecurrenceIntervalEnd,
