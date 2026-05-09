@@ -1866,5 +1866,82 @@
     "created": "2026-05-07 22:11:26.850Z",
     "updated": "2026-05-08 21:58:11.978Z",
     "system": false
+  },
+  {
+    "id": "pbc_792733244",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": "@request.auth.id != \"\" \u0026\u0026\n@collection.instancesSubscriptions.subscriptionId ?= instancesSubscriptionId \u0026\u0026\n@collection.instancesSubscriptions.userId ?= @request.auth.id",
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "instanceRequests",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "cascadeDelete": false,
+        "collectionId": "pbc_2852184993",
+        "hidden": false,
+        "id": "relation1438442264",
+        "maxSelect": 1,
+        "minSelect": 0,
+        "name": "instancesSubscriptionId",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "relation"
+      },
+      {
+        "hidden": false,
+        "id": "number396027798",
+        "max": null,
+        "min": null,
+        "name": "instanceNumber",
+        "onlyInt": false,
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "number"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX `idx_iads1c81Gz` ON `instanceRequests` (\n  `instancesSubscriptionId`,\n  `instanceNumber`\n)"
+    ],
+    "created": "2026-05-08 22:53:33.592Z",
+    "updated": "2026-05-09 17:12:06.916Z",
+    "system": false
   }
 ]
