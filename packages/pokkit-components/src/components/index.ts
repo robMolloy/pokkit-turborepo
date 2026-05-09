@@ -7,4 +7,6 @@ export * from "./label";
 export * from "./LayoutTemplate";
 export * from "./LeftSidebar";
 export * from "./Modal";
+export * from "./Separator";
+export * from "./SimpleCard";
 export * from "./ThemeToggle";
