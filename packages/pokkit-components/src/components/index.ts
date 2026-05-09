@@ -9,4 +9,5 @@ export * from "./LeftSidebar";
 export * from "./Modal";
 export * from "./Separator";
 export * from "./SimpleCard";
+export * from "./StatusIndicator";
 export * from "./ThemeToggle";

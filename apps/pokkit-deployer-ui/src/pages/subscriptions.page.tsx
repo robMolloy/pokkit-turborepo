@@ -4,7 +4,7 @@ import {
   TInstancesSubscriptionRecord,
   useInstancesSubscriptionRecordsStore,
 } from "@/modules/instanceRecords/dbInstancesSubscriptionRecords";
-import { Button, SimpleCard } from "@repo/pokkit-components";
+import { Button, SimpleCard, StatusIndicator } from "@repo/pokkit-components";
 import {
   Accordion,
   AccordionContent,
@@ -63,23 +63,6 @@ export function StripeLedgerRecordRowTemplate(p: {
   );
 }
 
-function StatusIndicator({ status }: { status: "on" | "off" }) {
-  return (
-    <div className="flex items-center gap-2">
-      <div
-        className={`h-2.5 w-2.5 rounded-full ${status === "on" ? "bg-emerald-500" : "bg-zinc-500"}`}
-      />
-      <span
-        className={`text-xs font-medium uppercase tracking-wide ${
-          status === "on" ? "text-emerald-500" : "text-zinc-500"
-        }`}
-      >
-        {status}
-      </span>
-    </div>
-  );
-}
-
 const InstanceCard = (p: {
   instance: { id: string; name: string; status: string; region: string };
 }) => {
@@ -91,17 +74,18 @@ const InstanceCard = (p: {
           <Server className="size-3.5" />
         </div>
         <div>
-          <p className="text-sm font-medium text-zinc-100">{instance.name}</p>
-          <p className="text-xs text-zinc-500">{instance.region}</p>
+          <p>{instance.name}</p>
+          <p className="text-xs text-muted-foreground">{instance.region}</p>
         </div>
       </div>
-      <StatusIndicator status={instance.status as "on" | "off"} />
+      <StatusIndicator color={instance.status === "red" ? "red" : "green"} />
     </div>
   );
 };
 
 export default function Page() {
   const instancesSubscriptionRecordsStore = useInstancesSubscriptionRecordsStore();
+
   return (
     <div className="p-4">
       <h2 className="text-xl font-semibold">Subscriptions</h2>
@@ -128,19 +112,21 @@ export default function Page() {
                         View {x.numberOfInstances} instances
                       </AccordionTrigger>
                       <AccordionContent className="flex flex-col gap-2 py-2">
-                        {[...Array(x.numberOfInstances)].map((_, j) => (
-                          <SimpleCard>
-                            <InstanceCard
-                              key={`id-${j}`}
-                              instance={{
-                                id: `id-${j}`,
-                                name: `name-${j}`,
-                                status: `status-${j}`,
-                                region: `region-${j}`,
-                              }}
-                            />
-                          </SimpleCard>
-                        ))}
+                        {[...Array(x.numberOfInstances)]
+                          .map((_, j) => j + 1)
+                          .map((j) => (
+                            <SimpleCard>
+                              <InstanceCard
+                                key={`id-${j}`}
+                                instance={{
+                                  id: `id-${j}`,
+                                  name: `name-${j}`,
+                                  status: `status-${j}`,
+                                  region: `region-${j}`,
+                                }}
+                              />
+                            </SimpleCard>
+                          ))}
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>
