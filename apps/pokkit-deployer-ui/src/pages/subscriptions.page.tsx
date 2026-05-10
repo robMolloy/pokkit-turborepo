@@ -1,10 +1,17 @@
+import { pb } from "@/config/pocketbaseConfig";
+import { createToastProps } from "@/lib/createToastProps";
 import { formatCurrency } from "@/lib/currencyUtils";
 import { formatDate } from "@/lib/dateUtils";
+import {
+  createInstanceRequestRecord,
+  TInstanceRequestRecord,
+  useInstanceRequestRecordsStore,
+} from "@/modules/instanceRecords/dbInstanceRequestRecords";
 import {
   TInstancesSubscriptionRecord,
   useInstancesSubscriptionRecordsStore,
 } from "@/modules/instanceRecords/dbInstancesSubscriptionRecords";
-import { Button, SimpleCard, StatusIndicator } from "@repo/pokkit-components";
+import { Button, LoadingOnClickButton, SimpleCard, StatusIndicator } from "@repo/pokkit-components";
 import {
   Accordion,
   AccordionContent,
@@ -14,6 +21,7 @@ import {
 } from "@repo/pokkit-shadcn";
 import { RefreshCcw, Server } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export function StripeLedgerRecordRowTemplate(p: {
   instancesSubscriptionRecord: TInstancesSubscriptionRecord;
@@ -63,10 +71,7 @@ export function StripeLedgerRecordRowTemplate(p: {
   );
 }
 
-const InstanceCard = (p: {
-  instance: { id: string; name: string; status: string; region: string };
-}) => {
-  const { instance } = p;
+const InstanceCard = (p: { instanceRequestRecord: TInstanceRequestRecord }) => {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
@@ -74,17 +79,21 @@ const InstanceCard = (p: {
           <Server className="size-3.5" />
         </div>
         <div>
-          <p>{instance.name}</p>
-          <p className="text-xs text-muted-foreground">{instance.region}</p>
+          <p>{p.instanceRequestRecord.instanceNumber}</p>
+          <p className="text-xs text-muted-foreground">
+            {p.instanceRequestRecord.instancesSubscriptionId}
+          </p>
         </div>
       </div>
-      <StatusIndicator color={instance.status === "red" ? "red" : "green"} />
+      <StatusIndicator color={"green"} />
+      {/* <StatusIndicator color={instance.status === "red" ? "red" : "green"} /> */}
     </div>
   );
 };
 
 export default function Page() {
   const instancesSubscriptionRecordsStore = useInstancesSubscriptionRecordsStore();
+  const instanceRequestRecordsStore = useInstanceRequestRecordsStore();
 
   return (
     <div className="p-4">
@@ -95,43 +104,68 @@ export default function Page() {
       {instancesSubscriptionRecordsStore.data === null && <div>error</div>}
       {instancesSubscriptionRecordsStore.data === undefined && <div>loading...</div>}
       {!!instancesSubscriptionRecordsStore.data &&
+        instanceRequestRecordsStore.data &&
         (() => {
-          const data = instancesSubscriptionRecordsStore.data!;
+          const instancesSubscriptionRecords = instancesSubscriptionRecordsStore.data!;
+          const instanceRequestRecords = instanceRequestRecordsStore.data!;
+          const instanceRequestRecordsInstancesSubscriptionIdLookup: {
+            [k: string]: TInstanceRequestRecord[];
+          } = {};
+          instancesSubscriptionRecords.forEach((x) => {
+            instanceRequestRecordsInstancesSubscriptionIdLookup[x.id] = [];
+          });
+          instanceRequestRecords.forEach((x) => {
+            const records =
+              instanceRequestRecordsInstancesSubscriptionIdLookup[x.instancesSubscriptionId];
+            if (records) records.push(x);
+          });
 
           return (
             <div className="flex flex-col gap-4">
-              {data.map((x) => (
-                <SimpleCard>
-                  <StripeLedgerRecordRowTemplate key={x.id} instancesSubscriptionRecord={x} />
+              {instancesSubscriptionRecords.map((x) => {
+                const thisSubscriptionsInstanceRequestRecords =
+                  instanceRequestRecordsInstancesSubscriptionIdLookup[x.id];
+                return (
+                  <SimpleCard key={x.id}>
+                    <StripeLedgerRecordRowTemplate instancesSubscriptionRecord={x} />
 
-                  <Separator className="my-3" />
+                    <Separator className="my-3" />
 
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="a">
-                      <AccordionTrigger className="p-0">
-                        View {x.numberOfInstances} instances
-                      </AccordionTrigger>
-                      <AccordionContent className="flex flex-col gap-2 py-2">
-                        {[...Array(x.numberOfInstances)]
-                          .map((_, j) => j + 1)
-                          .map((j) => (
-                            <SimpleCard>
-                              <InstanceCard
-                                key={`id-${j}`}
-                                instance={{
-                                  id: `id-${j}`,
-                                  name: `name-${j}`,
-                                  status: `status-${j}`,
-                                  region: `region-${j}`,
-                                }}
-                              />
-                            </SimpleCard>
-                          ))}
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </SimpleCard>
-              ))}
+                    <Accordion type="single" collapsible>
+                      <AccordionItem value="a">
+                        <AccordionTrigger className="p-0">
+                          {`View ${thisSubscriptionsInstanceRequestRecords?.length} of ${x.numberOfInstances} instances`}
+                        </AccordionTrigger>
+                        <AccordionContent className="flex flex-col gap-2 py-2">
+                          <LoadingOnClickButton
+                            onClick={async () => {
+                              const resp = await createInstanceRequestRecord({
+                                pb: pb,
+                                data: {
+                                  instancesSubscriptionId: x.id,
+                                  instanceNumber:
+                                    (thisSubscriptionsInstanceRequestRecords?.length ?? 0) + 1,
+                                },
+                              });
+
+                              const toastFn = resp.success ? toast.success : toast.error;
+                              toastFn(...createToastProps(resp.messages));
+                            }}
+                          >
+                            Add new instance
+                          </LoadingOnClickButton>
+                          {!!thisSubscriptionsInstanceRequestRecords &&
+                            thisSubscriptionsInstanceRequestRecords.map((x) => (
+                              <SimpleCard key={x.id}>
+                                <InstanceCard key={x.id} instanceRequestRecord={x} />
+                              </SimpleCard>
+                            ))}
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </SimpleCard>
+                );
+              })}
             </div>
           );
         })()}

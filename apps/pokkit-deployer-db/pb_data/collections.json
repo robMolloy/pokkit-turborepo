@@ -90,7 +90,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-05-07 22:06:24.687Z",
-    "updated": "2026-05-08 21:58:11.928Z",
+    "updated": "2026-05-10 09:43:38.003Z",
     "system": true
   },
   {
@@ -197,7 +197,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-05-07 22:06:24.689Z",
-    "updated": "2026-05-08 21:58:11.930Z",
+    "updated": "2026-05-10 09:43:38.006Z",
     "system": true
   },
   {
@@ -306,7 +306,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-05-07 22:06:24.690Z",
-    "updated": "2026-05-08 21:58:11.932Z",
+    "updated": "2026-05-10 09:43:38.008Z",
     "system": true
   },
   {
@@ -400,7 +400,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-05-07 22:06:24.691Z",
-    "updated": "2026-05-08 21:58:11.939Z",
+    "updated": "2026-05-10 09:43:38.009Z",
     "system": true
   },
   {
@@ -509,7 +509,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-05-07 22:06:24.693Z",
-    "updated": "2026-05-08 21:58:11.943Z",
+    "updated": "2026-05-10 09:43:38.011Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -718,7 +718,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-05-07 22:06:24.696Z",
-    "updated": "2026-05-08 21:58:11.946Z",
+    "updated": "2026-05-10 09:43:38.013Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -876,7 +876,7 @@
     ],
     "indexes": [],
     "created": "2026-05-07 22:11:26.834Z",
-    "updated": "2026-05-08 21:58:11.952Z",
+    "updated": "2026-05-10 09:43:38.016Z",
     "system": false
   },
   {
@@ -997,7 +997,7 @@
       "CREATE UNIQUE INDEX `idx_0UWlVOdDqD` ON `authOrganisationUserPermissions` (`userOrgKey`)"
     ],
     "created": "2026-05-07 22:11:26.836Z",
-    "updated": "2026-05-08 21:58:11.955Z",
+    "updated": "2026-05-10 09:43:38.017Z",
     "system": false
   },
   {
@@ -1075,7 +1075,7 @@
     ],
     "indexes": [],
     "created": "2026-05-07 22:11:26.838Z",
-    "updated": "2026-05-08 21:58:11.956Z",
+    "updated": "2026-05-10 09:43:38.018Z",
     "system": false
   },
   {
@@ -1178,7 +1178,7 @@
       "CREATE UNIQUE INDEX `idx_MGuOIBNgXv` ON `instances` (`portNumber`)"
     ],
     "created": "2026-05-07 22:11:26.840Z",
-    "updated": "2026-05-08 21:58:11.959Z",
+    "updated": "2026-05-10 09:43:38.020Z",
     "system": false
   },
   {
@@ -1260,7 +1260,7 @@
       "CREATE UNIQUE INDEX `idx_jmZ8IL5Ej4` ON `commandTemplatesForChangedInstanceRecord` (`crudOperation`)"
     ],
     "created": "2026-05-07 22:11:26.842Z",
-    "updated": "2026-05-08 21:58:11.963Z",
+    "updated": "2026-05-10 09:43:38.022Z",
     "system": false
   },
   {
@@ -1342,7 +1342,7 @@
       "CREATE UNIQUE INDEX `idx_2OQVB3k4yj` ON `commandTemplatesForAllInstanceRecords` (`crudOperation`)"
     ],
     "created": "2026-05-07 22:11:26.844Z",
-    "updated": "2026-05-08 21:58:11.965Z",
+    "updated": "2026-05-10 09:43:38.023Z",
     "system": false
   },
   {
@@ -1419,7 +1419,7 @@
       "CREATE UNIQUE INDEX `idx_tKzMrurend` ON `userBalances` (`userId`)"
     ],
     "created": "2026-05-07 22:11:26.846Z",
-    "updated": "2026-05-08 21:58:11.972Z",
+    "updated": "2026-05-10 09:43:38.025Z",
     "system": false
   },
   {
@@ -1593,7 +1593,7 @@
     ],
     "indexes": [],
     "created": "2026-05-07 22:11:26.847Z",
-    "updated": "2026-05-08 22:33:53.618Z",
+    "updated": "2026-05-10 09:43:38.027Z",
     "system": false
   },
   {
@@ -1864,14 +1864,14 @@
       "CREATE INDEX `idx_Bzj0h4o9vr` ON `stripeLedger` (`stripePayloadId`)"
     ],
     "created": "2026-05-07 22:11:26.850Z",
-    "updated": "2026-05-08 21:58:11.978Z",
+    "updated": "2026-05-10 09:43:38.028Z",
     "system": false
   },
   {
     "id": "pbc_792733244",
-    "listRule": null,
+    "listRule": "@request.auth.id != \"\" \u0026\u0026\n@collection.instancesSubscriptions.id ?= instancesSubscriptionId \u0026\u0026\n@collection.instancesSubscriptions.userId ?= @request.auth.id",
     "viewRule": null,
-    "createRule": "@request.auth.id != \"\" \u0026\u0026\n@collection.instancesSubscriptions.subscriptionId ?= instancesSubscriptionId \u0026\u0026\n@collection.instancesSubscriptions.userId ?= @request.auth.id",
+    "createRule": "@request.auth.id != \"\" \u0026\u0026\n@collection.instancesSubscriptions.id ?= instancesSubscriptionId \u0026\u0026\n@collection.instancesSubscriptions.userId ?= @request.auth.id \u0026\u0026\n@collection.instancesSubscriptions.numberOfInstances ?\u003e= instanceNumber",
     "updateRule": null,
     "deleteRule": null,
     "name": "instanceRequests",
@@ -1908,11 +1908,11 @@
         "hidden": false,
         "id": "number396027798",
         "max": null,
-        "min": null,
+        "min": 1,
         "name": "instanceNumber",
-        "onlyInt": false,
+        "onlyInt": true,
         "presentable": false,
-        "required": false,
+        "required": true,
         "system": false,
         "type": "number"
       },
@@ -1941,7 +1941,7 @@
       "CREATE UNIQUE INDEX `idx_iads1c81Gz` ON `instanceRequests` (\n  `instancesSubscriptionId`,\n  `instanceNumber`\n)"
     ],
     "created": "2026-05-08 22:53:33.592Z",
-    "updated": "2026-05-09 17:12:06.916Z",
+    "updated": "2026-05-10 10:11:50.334Z",
     "system": false
   }
 ]

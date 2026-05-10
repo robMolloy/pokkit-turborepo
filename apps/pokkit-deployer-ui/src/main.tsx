@@ -22,6 +22,7 @@ import { useStripeLedgerRecordsSync } from "./modules/instanceRecords/dbStripeLe
 import { useUserBalanceRecordSync } from "./modules/instanceRecords/dbUserBalanceRecord";
 import { useUserBalanceRecordsSync } from "./modules/instanceRecords/dbUserBalanceRecords";
 import { useInstancesSubscriptionRecordsSync } from "./modules/instanceRecords/dbInstancesSubscriptionRecords";
+import { useInstanceRequestRecordsSync } from "./modules/instanceRecords/dbInstanceRequestRecords";
 
 const Routes = () => {
   return useRoutes(routes);
@@ -38,6 +39,7 @@ const App = () => {
   useUserRecordsSync({ pb });
   useInstanceRecordsSync({ pb });
   useInstancesSubscriptionRecordsSync({ pb });
+  useInstanceRequestRecordsSync({ pb });
   useUserBalanceRecordSync({ pb });
   useUserBalanceRecordsSync({ pb });
   useStripeLedgerRecordsSync({ pb });

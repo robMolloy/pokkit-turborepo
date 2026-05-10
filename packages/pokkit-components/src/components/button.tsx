@@ -1,5 +1,6 @@
 import { Button as CnButton, cn } from "@repo/pokkit-shadcn";
 import { CustomIcon } from "./CustomIcon";
+import { useState } from "react";
 
 type TCnButtonProps = React.ComponentProps<typeof CnButton>;
 
@@ -33,5 +34,23 @@ export const Button = (
         </div>
       )}
     </CnButton>
+  );
+};
+
+export const LoadingOnClickButton = (initProps: React.ComponentProps<typeof Button>) => {
+  const { onClick, loading, ...p } = initProps;
+
+  const [internalLoading, setInternalLoading] = useState(false);
+
+  return (
+    <Button
+      loading={loading || internalLoading}
+      onClick={async (x) => {
+        setInternalLoading(true);
+        await onClick?.(x);
+        setInternalLoading(false);
+      }}
+      {...p}
+    />
   );
 };
