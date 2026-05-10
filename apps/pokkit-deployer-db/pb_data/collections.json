@@ -1115,7 +1115,7 @@
         "type": "number"
       },
       {
-        "cascadeDelete": false,
+        "cascadeDelete": true,
         "collectionId": "pbc_792733244",
         "hidden": false,
         "id": "relation267956229",
@@ -1123,7 +1123,7 @@
         "minSelect": 0,
         "name": "instanceRequestId",
         "presentable": false,
-        "required": false,
+        "required": true,
         "system": false,
         "type": "relation"
       },
@@ -1149,10 +1149,11 @@
       }
     ],
     "indexes": [
-      "CREATE UNIQUE INDEX `idx_MGuOIBNgXv` ON `instances` (`portNumber`)"
+      "CREATE UNIQUE INDEX `idx_MGuOIBNgXv` ON `instances` (`portNumber`)",
+      "CREATE UNIQUE INDEX `idx_JbxVy7FfOr` ON `instances` (`instanceRequestId`)"
     ],
     "created": "2026-05-07 22:11:26.840Z",
-    "updated": "2026-05-10 14:43:56.955Z",
+    "updated": "2026-05-10 18:08:05.722Z",
     "system": false
   },
   {

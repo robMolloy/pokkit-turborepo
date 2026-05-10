@@ -2,12 +2,30 @@ package instanceRecordsSdk
 
 import (
 	pbCore "github.com/pocketbase/pocketbase/core"
-	"github.com/pocketbase/pocketbase/tools/types"
+	pbTypes "github.com/pocketbase/pocketbase/tools/types"
 )
+
+type TInstanceRecord struct {
+	Id                string           `json:"id"`
+	InstanceRequestId string           `json:"instanceRequestId"`
+	PortNumber        int              `json:"portNumber"`
+	Created           pbTypes.DateTime `json:"created"`
+	Updated           pbTypes.DateTime `json:"updated"`
+}
+
+func ConvertInstanceRecordToStruct(instanceRecord *pbCore.Record) TInstanceRecord {
+	return TInstanceRecord{
+		Id:                instanceRecord.GetString("id"),
+		PortNumber:        instanceRecord.GetInt("portNumber"),
+		InstanceRequestId: instanceRecord.GetString("instanceRequestId"),
+		Created:           instanceRecord.GetDateTime("created"),
+		Updated:           instanceRecord.GetDateTime("updated"),
+	}
+}
 
 func ConvertInstanceRecordToData(instanceRecord *pbCore.Record) map[string]any {
 	paidUntil := instanceRecord.GetDateTime("paidUntil")
-	now := types.NowDateTime()
+	now := pbTypes.NowDateTime()
 	isExpired := paidUntil.Before(now)
 
 	return map[string]any{
@@ -20,6 +38,7 @@ func ConvertInstanceRecordToData(instanceRecord *pbCore.Record) map[string]any {
 		"updated":    instanceRecord.GetDateTime("updated"),
 	}
 }
+
 func ConvertInstanceRecordsToData(instanceRecords []*pbCore.Record) []map[string]any {
 	templatableDataList := []map[string]any{}
 
