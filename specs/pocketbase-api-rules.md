@@ -197,26 +197,20 @@ When asked to create API rules for a collection:
 
 When providing rules, use this structure:
 
-````
+```
 ### [Collection Name] API Rules
 
 **listRule:**
-```javascript
 [rule expression]
-```
-Permissions: [plain language description]
 
 **viewRule:**
-```javascript
 [rule expression]
-```
-Permissions: [plain language description]
 
 [... repeat for create/update/delete ...]
 
 **Access Pattern Summary:**
 [Table showing who can do what]
-````
+```
 
 ## Common Security Patterns
 
