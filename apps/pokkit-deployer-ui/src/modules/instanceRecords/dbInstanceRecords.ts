@@ -7,9 +7,8 @@ import { create } from "zustand";
 export const instanceRecordsCollectionName = "instances";
 export const instanceRecordSchema = z.object({
   id: z.string(),
-  appName: z.string(),
   portNumber: z.number(),
-  userId: z.string(),
+  instanceRequestId: z.string(),
 });
 
 export type TInstanceRecord = z.infer<typeof instanceRecordSchema>;

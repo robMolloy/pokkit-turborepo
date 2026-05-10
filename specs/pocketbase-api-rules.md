@@ -78,7 +78,7 @@ Note: Always use `?=` when querying `@collection.*` to check if matching records
 
 1. **Operator precedence:** `&&` has higher precedence than `||`
 
-   ```javascript
+```javascript
    // These are equivalent:
    condition1 || condition2 && condition3
    condition1 || (condition2 && condition3)
@@ -92,15 +92,15 @@ Note: Always use `?=` when querying `@collection.*` to check if matching records
    @request.auth.id = id ||
    @collection.globalUserPermissions.userId ?= @request.auth.id &&
    @collection.globalUserPermissions.role = "admin"
-   ```
+```
 
-   **Best practice:** Use parentheses for clarity even when not strictly required.
+**Best practice:** Use parentheses for clarity even when not strictly required.
 
 2. **The `?=` operator (existence check):**
 
    Use `?=` when querying `@collection.*` to check if any record exists that matches the condition.
 
-   ```javascript
+```javascript
    // ✅ CORRECT - checks if ANY record in the collection matches
    @collection.permissions.userId ?= @request.auth.id &&
    @collection.permissions.role ?= "admin"
@@ -108,28 +108,29 @@ Note: Always use `?=` when querying `@collection.*` to check if matching records
    // ❌ INCORRECT - unreliable, don't use = with @collection queries
    @collection.permissions.userId = @request.auth.id &&
    @collection.permissions.role = "admin"
-   ```
+```
 
-   **Key distinction:**
-   - `?=` → "Does any record exist where this field equals this value?"
-   - `=` → Direct comparison on the current record being accessed
+**Key distinction:**
 
-   **When chaining with `&&`:** PocketBase looks for at least one record that satisfies ALL conditions:
+- `?=` → "Does any record exist where this field equals this value?"
+- `=` → Direct comparison on the current record being accessed
 
-   ```javascript
+**When chaining with `&&`:** PocketBase looks for at least one record that satisfies ALL conditions:
+
+```javascript
    // This finds ONE record that matches all three conditions:
    @collection.organisationPermissions.userId ?= @request.auth.id &&
    @collection.organisationPermissions.orgId ?= organisationId &&
    @collection.organisationPermissions.role ?= "admin"
-   ```
+```
 
-   **Rule of thumb:** Always use `?=` with `@collection.*` queries.
+**Rule of thumb:** Always use `?=` with `@collection.*` queries.
 
 3. **Field reference syntax:**
 
    When referencing fields in rules, use the field name directly:
 
-   ```javascript
+```javascript
    // ✅ CORRECT - reference fields directly
    organisationId
    userId
@@ -137,27 +138,29 @@ Note: Always use `?=` when querying `@collection.*` to check if matching records
 
    // ❌ INCORRECT - @request.data is not valid syntax
    @request.data.organisationId
-   ```
+```
 
-   **Context matters:**
-   - In **createRule**: Field names refer to the incoming data being created
-   - In **updateRule/viewRule/deleteRule/listRule**: Field names refer to existing record fields
-   - The syntax is the same; PocketBase understands the context
+**Context matters:**
 
-   **Example:**
+- In **createRule**: Field names refer to the incoming data being created
+- In **updateRule/viewRule/deleteRule/listRule**: Field names refer to existing record fields
+- The syntax is the same; PocketBase understands the context
 
-   ```javascript
+**Example:**
+
+```javascript
    // Same syntax works in both createRule and updateRule
    @request.auth.id != "" && @request.auth.id = userId
 
    // createRule: checks if auth.id matches the userId being submitted
    // updateRule: checks if auth.id matches the existing record's userId
-   ```
+```
 
 4. **Authentication is NOT automatic:** Always explicitly check if user is authenticated:
-   ```javascript
+
+```javascript
    @request.auth.id != ""
-   ```
+```
 
 ## Writing Rules Workflow
 
@@ -200,34 +203,31 @@ When providing rules, use this structure:
 **listRule:**
 ```javascript
 [rule expression]
-````
-
+```
 Permissions: [plain language description]
 
 **viewRule:**
-
 ```javascript
 [rule expression]
 ```
-
 Permissions: [plain language description]
 
 [... repeat for create/update/delete ...]
 
 **Access Pattern Summary:**
 [Table showing who can do what]
-
 ````
 
 ## Common Security Patterns
 
 ### Pattern 1: Owner-Only Access
+
 Users can only access their own records.
 
 ```javascript
 // All rules:
 @request.auth.id != "" && @request.auth.id = userId
-````
+```
 
 ### Pattern 2: Public Read, Owner Write
 
@@ -280,6 +280,31 @@ Users can only access records in their organization.
 @request.auth.id != "" &&
 @request.auth.organizationId = organizationId
 ```
+
+### Pattern 6: Ownership Via Multi-Hop Relation
+
+Access is granted based on ownership of a related record two or more levels up the relation chain. Useful when the record being accessed does not directly hold a `userId`, but a parent or grandparent record does.
+
+```javascript
+// All rules:
+@request.auth.id != "" &&
+@collection.parentCollection.id ?= parentId &&
+@collection.grandparentCollection.id ?= @collection.parentCollection.grandparentId &&
+@collection.grandparentCollection.userId ?= @request.auth.id
+```
+
+**How it works:** Each `@collection.*` line resolves one hop in the relation chain. The result of a previous collection query can be referenced on the right-hand side of a subsequent `?=` using `@collection.previousCollection.fieldName`. PocketBase evaluates these in sequence, effectively performing a multi-table join.
+
+**SQL equivalent:**
+
+```sql
+SELECT 1 FROM currentTable t
+JOIN parentCollection p ON p.id = t.parentId
+JOIN grandparentCollection gp ON gp.id = p.grandparentId
+WHERE gp.userId = :auth_user_id
+```
+
+**When to use this pattern:** When your schema has a chain of relations and ownership lives at the top of that chain. Common in subscription/resource hierarchies where a user owns a subscription, the subscription has requests, and the requests have child records.
 
 ## Advanced Patterns
 
@@ -334,6 +359,32 @@ EXISTS (
 )
 ```
 
+### Cross-Collection Joins (Multi-Hop Relations)
+
+PocketBase supports referencing the result of one `@collection.*` query as the right-hand side of another. This allows rules to traverse a chain of relations across multiple collections.
+
+```javascript
+@collection.parentCollection.id ?= parentId &&
+@collection.grandparentCollection.id ?= @collection.parentCollection.grandparentId &&
+@collection.grandparentCollection.userId ?= @request.auth.id
+```
+
+**How to read this:**
+
+1. Find a record in `parentCollection` where `id` matches the current record's `parentId`
+2. Find a record in `grandparentCollection` where `id` matches the `grandparentId` from the record found in step 1
+3. Confirm that `grandparentCollection` record's `userId` matches the authenticated user
+
+**SQL equivalent:**
+
+```sql
+JOIN parentCollection p ON p.id = t.parentId
+JOIN grandparentCollection gp ON gp.id = p.grandparentId
+WHERE gp.userId = :auth_user_id
+```
+
+**Key point:** The right-hand side of `?=` can be `@collection.someCollection.someField`, not just a literal value or current record field. This is what makes multi-hop joins possible.
+
 ### Why Not Use `=`?
 
 ```javascript
@@ -386,6 +437,7 @@ organisationId; // refers to the existing record's field
 - **Update/delete on own records:** Remember to check ownership: `@request.auth.id = userId`
 - **Case sensitivity:** Field names are case-sensitive
 - **Multiple conditions on collections:** When chaining `&&` with `@collection.*` queries, all conditions must be satisfied by at least one record
+- **Multi-hop joins:** When traversing relations across collections, each hop must be resolved explicitly with its own `@collection.*` line. There is no automatic dot-notation traversal across collections.
 
 ## Response Behaviors
 
