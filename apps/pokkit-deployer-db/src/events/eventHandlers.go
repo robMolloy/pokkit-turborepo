@@ -102,6 +102,56 @@ func PromoteFirstUserToApprovedAdminAfterUserCreateEventHandler(e *pbCore.Record
 	return e.Next()
 }
 
+func CreateInstanceFromInstanceRequestEventHandler(e *pbCore.RecordEvent) error {
+	instanceRequestRecord := e.Record
+	instanceRequestRecordId := instanceRequestRecord.GetString("id")
+
+	instanceRecords, err := e.App.FindRecordsByFilter(
+		db.InstancesCollectionName,
+		"",
+		"-portNumber",
+		1,
+		0,
+	)
+
+	if err != nil {
+		e.App.Logger().Error("instanceRecordsErr", "err", err)
+		return e.Next()
+	}
+
+	var instanceRecordStruct instanceRecordsSdk.TInstanceRecordStruct
+	if len(instanceRecords) > 0 {
+		instanceRecordStruct = instanceRecordsSdk.ConvertInstanceRecordToStruct(instanceRecords[0])
+	}
+
+	nextPortNumber := 1000
+	if instanceRecordStruct.PortNumber != 0 {
+		nextPortNumber = instanceRecordStruct.PortNumber + 1
+	}
+
+	instanceRecordCollection, err := e.App.FindCollectionByNameOrId(db.InstancesCollectionName)
+	if err != nil {
+		e.App.Logger().Error("e.App.FindCollectionByNameOrId(db.InstancesCollectionName)", "err", err)
+		return err
+	}
+
+	newInstanceRecordStruct := instanceRecordsSdk.TInstanceRecordStruct{
+		PortNumber:        nextPortNumber,
+		InstanceRequestId: instanceRequestRecordId,
+	}
+
+	newInstanceRecord := pbCore.NewRecord(instanceRecordCollection)
+	instanceRecordsSdk.PopulateInstanceRecordWithStruct(newInstanceRecord, newInstanceRecordStruct)
+	e.App.Logger().Error("newInstanceRecordStruct", "newInstanceRecordStruct", newInstanceRecordStruct)
+
+	err = e.App.Save(newInstanceRecord)
+	if err != nil {
+		e.App.Logger().Error("newInstanceRecordErr", "err", err)
+	}
+
+	return e.Next()
+}
+
 func ExecuteBashCommandFromCommandTemplatesForChangedInstanceRecordAfterInstanceRecordCreatedEventHandler(e *pbCore.RecordEvent) error {
 	log.Println("OnDeplymentRecordAfterCreateSuccess - changedRecord")
 
@@ -113,7 +163,7 @@ func ExecuteBashCommandFromCommandTemplatesForChangedInstanceRecordAfterInstance
 		return e.Next()
 	}
 
-	instanceRecordData := instanceRecordsSdk.ConvertInstanceRecordToData(instanceRecord)
+	instanceRecordData := instanceRecordsSdk.ConvertInstanceRecordToDataMap(instanceRecord)
 
 	for _, commandTemplateRecord := range commandTemplateRecords {
 		bashTemplate := commandTemplateRecord.GetString("bashTemplate")
@@ -170,7 +220,7 @@ func ExecuteBashCommandFromCommandTemplatesForChangedInstanceRecordAfterInstance
 		return e.Next()
 	}
 
-	instanceRecordsData := instanceRecordsSdk.ConvertInstanceRecordToData(e.Record)
+	instanceRecordsData := instanceRecordsSdk.ConvertInstanceRecordToDataMap(e.Record)
 
 	for _, commandTemplateRecord := range commandTemplateRecords {
 		bashTemplate := commandTemplateRecord.GetString("bashTemplate")
@@ -254,7 +304,7 @@ func ExecuteBashCommandFromCommandTemplatesForChangedInstanceRecordAfterInstance
 		return e.Next()
 	}
 
-	instanceRecordData := instanceRecordsSdk.ConvertInstanceRecordToData(e.Record)
+	instanceRecordData := instanceRecordsSdk.ConvertInstanceRecordToDataMap(e.Record)
 
 	for _, commandTemplateRecord := range commandTemplateRecords {
 		bashTemplate := commandTemplateRecord.GetString("bashTemplate")

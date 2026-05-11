@@ -58,6 +58,8 @@ func main() {
 
 	app.OnRecordAfterCreateSuccess(db.UsersCollectionName).BindFunc(events.PromoteFirstUserToApprovedAdminAfterUserCreateEventHandler)
 
+	app.OnRecordAfterCreateSuccess(db.InstanceRequestsCollectionName).BindFunc(events.CreateInstanceFromInstanceRequestEventHandler)
+
 	app.OnRecordAfterCreateSuccess(db.InstancesCollectionName).BindFunc(events.ExecuteBashCommandFromCommandTemplatesForChangedInstanceRecordAfterInstanceRecordCreatedEventHandler)
 	app.OnRecordAfterCreateSuccess(db.InstancesCollectionName).BindFunc(events.ExecuteBashCommandFromCommandTemplatesForAllInstanceRecordsAfterInstanceRecordCreatedEventHandler)
 
