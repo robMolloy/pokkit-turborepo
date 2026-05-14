@@ -9,6 +9,7 @@ export const instanceRecordSchema = z.object({
   id: z.string(),
   portNumber: z.number(),
   instanceRequestId: z.string(),
+  status: z.enum(["pending", "on", "off"]),
 });
 
 export type TInstanceRecord = z.infer<typeof instanceRecordSchema>;

@@ -104,8 +104,14 @@ const InstanceCard = (p: {
           </p>
         </div>
       </div>
-      <StatusIndicator color={p.instanceRecord ? "green" : "red"} />
-      {/* <StatusIndicator color={instance.status === "red" ? "red" : "green"} /> */}
+      <StatusIndicator
+        color={(() => {
+          if (!p.instanceRecord) return "amber";
+
+          const lookup = { on: "green", off: "red", pending: "amber" } as const;
+          return lookup[p.instanceRecord.status];
+        })()}
+      />
     </div>
   );
 };
