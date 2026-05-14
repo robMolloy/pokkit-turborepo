@@ -106,43 +106,23 @@ func CreateInstanceFromInstanceRequestEventHandler(e *pbCore.RecordEvent) error 
 	instanceRequestRecord := e.Record
 	instanceRequestRecordId := instanceRequestRecord.GetString("id")
 
-	instanceRecords, err := e.App.FindRecordsByFilter(
-		db.InstancesCollectionName,
-		"",
-		"-portNumber",
-		1,
-		0,
-	)
-
-	if err != nil {
-		e.App.Logger().Error("instanceRecordsErr", "err", err)
-		return e.Next()
+	highestPortNumber := instanceRecordsSdk.DbGetHighestPortNumber(e.App)
+	if highestPortNumber < 1000 {
+		highestPortNumber = 1000
 	}
-
-	var instanceRecordStruct instanceRecordsSdk.TInstanceRecordStruct
-	if len(instanceRecords) > 0 {
-		instanceRecordStruct = instanceRecordsSdk.ConvertInstanceRecordToStruct(instanceRecords[0])
-	}
-
-	nextPortNumber := 1000
-	if instanceRecordStruct.PortNumber != 0 {
-		nextPortNumber = instanceRecordStruct.PortNumber + 1
-	}
-
-	instanceRecordCollection, err := e.App.FindCollectionByNameOrId(db.InstancesCollectionName)
-	if err != nil {
-		e.App.Logger().Error("e.App.FindCollectionByNameOrId(db.InstancesCollectionName)", "err", err)
-		return err
-	}
+	nextPortNumber := highestPortNumber + 1
 
 	newInstanceRecordStruct := instanceRecordsSdk.TInstanceRecordStruct{
 		PortNumber:        nextPortNumber,
 		InstanceRequestId: instanceRequestRecordId,
 	}
 
-	newInstanceRecord := pbCore.NewRecord(instanceRecordCollection)
+	newInstanceRecord, err := instanceRecordsSdk.NewInstanceRecord(e.App)
+	if err != nil {
+		e.App.Logger().Error("newInstanceRecordErr", "err", err)
+		return e.Next()
+	}
 	instanceRecordsSdk.PopulateInstanceRecordWithStruct(newInstanceRecord, newInstanceRecordStruct)
-	e.App.Logger().Error("newInstanceRecordStruct", "newInstanceRecordStruct", newInstanceRecordStruct)
 
 	err = e.App.Save(newInstanceRecord)
 	if err != nil {
