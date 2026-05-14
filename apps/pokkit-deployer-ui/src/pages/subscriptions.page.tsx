@@ -3,6 +3,10 @@ import { createToastProps } from "@/lib/createToastProps";
 import { formatCurrency } from "@/lib/currencyUtils";
 import { formatDate } from "@/lib/dateUtils";
 import {
+  TInstanceRecord,
+  useInstanceRecordsStore,
+} from "@/modules/instanceRecords/dbInstanceRecords";
+import {
   createInstanceRequestRecord,
   TInstanceRequestRecord,
   useInstanceRequestRecordsStore,
@@ -22,6 +26,18 @@ import {
 import { RefreshCcw, Server } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+
+const createInstanceRequestRecordsOnInstancesSubscriptionIdLookup = (p: {
+  instancesSubscriptionRecords: TInstancesSubscriptionRecord[];
+  instanceRequestRecords: TInstanceRequestRecord[];
+}) => {
+  const rtn: { [k: string]: TInstanceRequestRecord[] } = {};
+  p.instancesSubscriptionRecords.forEach((x) => (rtn[x.id] = []));
+  p.instanceRequestRecords.forEach((x) => (rtn[x.instancesSubscriptionId] = []));
+  p.instanceRequestRecords.forEach((x) => rtn[x.instancesSubscriptionId]!.push(x));
+
+  return rtn;
+};
 
 export function StripeLedgerRecordRowTemplate(p: {
   instancesSubscriptionRecord: TInstancesSubscriptionRecord;
@@ -71,7 +87,10 @@ export function StripeLedgerRecordRowTemplate(p: {
   );
 }
 
-const InstanceCard = (p: { instanceRequestRecord: TInstanceRequestRecord }) => {
+const InstanceCard = (p: {
+  instanceRequestRecord: TInstanceRequestRecord;
+  instanceRecord?: TInstanceRecord;
+}) => {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
@@ -85,7 +104,7 @@ const InstanceCard = (p: { instanceRequestRecord: TInstanceRequestRecord }) => {
           </p>
         </div>
       </div>
-      <StatusIndicator color={"green"} />
+      <StatusIndicator color={p.instanceRecord ? "green" : "red"} />
       {/* <StatusIndicator color={instance.status === "red" ? "red" : "green"} /> */}
     </div>
   );
@@ -94,6 +113,7 @@ const InstanceCard = (p: { instanceRequestRecord: TInstanceRequestRecord }) => {
 export default function Page() {
   const instancesSubscriptionRecordsStore = useInstancesSubscriptionRecordsStore();
   const instanceRequestRecordsStore = useInstanceRequestRecordsStore();
+  const instanceRecordsStore = useInstanceRecordsStore();
 
   return (
     <div className="p-4">
@@ -105,20 +125,22 @@ export default function Page() {
       {instancesSubscriptionRecordsStore.data === undefined && <div>loading...</div>}
       {!!instancesSubscriptionRecordsStore.data &&
         instanceRequestRecordsStore.data &&
+        instanceRecordsStore.data &&
         (() => {
-          const instancesSubscriptionRecords = instancesSubscriptionRecordsStore.data!;
-          const instanceRequestRecords = instanceRequestRecordsStore.data!;
-          const instanceRequestRecordsInstancesSubscriptionIdLookup: {
-            [k: string]: TInstanceRequestRecord[];
-          } = {};
-          instancesSubscriptionRecords.forEach((x) => {
-            instanceRequestRecordsInstancesSubscriptionIdLookup[x.id] = [];
-          });
-          instanceRequestRecords.forEach((x) => {
-            const records =
-              instanceRequestRecordsInstancesSubscriptionIdLookup[x.instancesSubscriptionId];
-            if (records) records.push(x);
-          });
+          const instancesSubscriptionRecords = instancesSubscriptionRecordsStore.data;
+          const instanceRequestRecords = instanceRequestRecordsStore.data;
+          const instanceRecords = instanceRecordsStore.data;
+
+          const instanceRequestRecordsInstancesSubscriptionIdLookup =
+            createInstanceRequestRecordsOnInstancesSubscriptionIdLookup({
+              instancesSubscriptionRecords,
+              instanceRequestRecords,
+            });
+
+          const instanceRecordsIndexedOnInstanceRequestId: { [k: string]: TInstanceRecord } = {};
+          instanceRecords.forEach(
+            (x) => (instanceRecordsIndexedOnInstanceRequestId[x.instanceRequestId] = x),
+          );
 
           return (
             <div className="flex flex-col gap-4">
@@ -157,7 +179,11 @@ export default function Page() {
                           {!!thisSubscriptionsInstanceRequestRecords &&
                             thisSubscriptionsInstanceRequestRecords.map((x) => (
                               <SimpleCard key={x.id}>
-                                <InstanceCard key={x.id} instanceRequestRecord={x} />
+                                <InstanceCard
+                                  key={x.id}
+                                  instanceRequestRecord={x}
+                                  instanceRecord={instanceRecordsIndexedOnInstanceRequestId[x.id]}
+                                />
                               </SimpleCard>
                             ))}
                         </AccordionContent>

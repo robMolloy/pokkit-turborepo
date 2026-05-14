@@ -11,12 +11,12 @@ const IndexPage = () => {
   const userStore = useUserStore();
   const userRecordsStore = useUserRecordsStore();
   const globalUserPermissionStore = useGlobalUserPermissionStore();
-  const instanceRecordsStore = useInstanceRecordsStore();
   const userBalanceRecordStore = useUserBalanceRecordStore();
   const userBalanceRecordsStore = useUserBalanceRecordsStore();
   const stripeLedgerRecordsStore = useStripeLedgerRecordsStore();
   const instancesSubscriptionRecordsStore = useInstancesSubscriptionRecordsStore();
   const instanceRequestRecordsStore = useInstanceRequestRecordsStore();
+  const instanceRecordsStore = useInstanceRecordsStore();
 
   return (
     <div>
