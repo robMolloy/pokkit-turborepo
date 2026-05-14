@@ -13,7 +13,7 @@
     "check-types": "turbo run check-types",
     "build-whisper": "pnpm add -w @tailwindcss/oxide-linux-x64-gnu && pnpm install --no-optional=false && pnpm run build --filter=@repo/pokkit-shadcn && pnpm run build --filter=@repo/pokkit-components && pnpm run build --filter=pokkit-whisper",
     "build-whisper-db": "turbo run build --filter=pokkit-whisper-db",
-    "dev-pokkit-deployer": "turbo run dev tsc pre-dev --filter=pokkit-deployer-*",
+    "dev-pokkit-deployer": "turbo run dev tsc --filter=pokkit-deployer-*",
     "tsc-pokkit-deployer": "turbo run tsc --filter=pokkit-deployer-db --filter=pokkit-deployer-ui",
     "build-pokkit-deployer-db": "turbo run build --filter=pokkit-deployer-db"
   },

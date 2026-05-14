@@ -49,5 +49,5 @@ export const useInstanceRecordsSync = (p: { pb: PocketBase }) => {
     return () => {
       unsubPromise.then((x) => x.unsubscribe());
     };
-  }, [reactiveAuthStore?.record]);
+  }, [reactiveAuthStore?.record.id]);
 };

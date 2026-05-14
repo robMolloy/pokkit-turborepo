@@ -25,10 +25,6 @@ export const useReactiveAuthStoreSync = (p: { pb: PocketBase }) => {
   useInitReactiveAuthStoreSync({ pb: p.pb });
   const userStoreSync = useUserStoreSync({ pb: p.pb, id: initReactiveAuthStore.data?.record.id });
 
-  useEffect(() => {
-    if (userStoreSync.user === null) p.pb.authStore.clear();
-  }, [userStoreSync.user]);
-
   return userStoreSync;
 };
 

@@ -59,16 +59,18 @@ export const UnverifiedUserRouteProtector = (p: {
   children: React.ReactNode;
   ifUserIsVerified?: () => void;
   ifUserIsUnverified?: () => void;
+  ifUserIsLoading?: () => void;
 }) => {
   const reactiveAuthStore = useReactiveAuthStore();
 
   useEffect(() => {
     // leading reactiveAuthStore check rules out signed out and loading states
-    if (reactiveAuthStore && reactiveAuthStore?.record.verified) p.ifUserIsVerified?.();
-    if (reactiveAuthStore && !reactiveAuthStore?.record.verified) p.ifUserIsUnverified?.();
+    if (reactiveAuthStore?.record.verified === true) p.ifUserIsVerified?.();
+    if (reactiveAuthStore?.record.verified === false) p.ifUserIsUnverified?.();
+    if (reactiveAuthStore?.record.verified === undefined) p.ifUserIsLoading?.();
   }, [reactiveAuthStore?.record.verified]);
 
-  if (!reactiveAuthStore?.record.verified) return <>{p.children}</>;
+  if (reactiveAuthStore?.record.verified === false) return <>{p.children}</>;
   return <></>;
 };
 

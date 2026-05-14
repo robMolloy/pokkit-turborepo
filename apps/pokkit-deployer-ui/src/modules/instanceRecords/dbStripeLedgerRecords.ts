@@ -58,7 +58,7 @@ export const useStripeLedgerRecordsSync = (p: { pb: PocketBase }) => {
     return () => {
       unsubPromise.then((x) => x.unsubscribe());
     };
-  }, [reactiveAuthStore?.record]);
+  }, [reactiveAuthStore?.record.id]);
 };
 
 // export const createAdminAdjustmentUserBalanceLedgerRecord = async (p: {
