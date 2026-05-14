@@ -22,8 +22,6 @@ const IndexPage = () => {
     <div>
       <h1>Stores</h1>
 
-      <pre>{JSON.stringify(instanceRecordsStore, undefined, 2)}</pre>
-
       <pre>
         <DisplayAnything
           title=""

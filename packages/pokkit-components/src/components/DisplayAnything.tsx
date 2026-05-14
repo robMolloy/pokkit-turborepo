@@ -10,6 +10,7 @@ export const DisplayAnyObject = (p: {
   const [isOpen, setIsOpen] = useState(p.level <= p.expandLevel);
 
   const isArray = Array.isArray(p.data);
+  const length = Object.keys(p.data).length;
   const leftBracket = isArray ? "[" : "{";
   const rightBracket = isArray ? "]" : "}";
 
@@ -25,7 +26,7 @@ export const DisplayAnyObject = (p: {
     >
       <summary>
         {p.title && <strong>{p.title}:</strong>}{" "}
-        {`${leftBracket}${isOpen ? "" : `...${rightBracket}`}`}
+        {`${leftBracket}${isOpen ? "" : `${length > 0 ? "..." : ""}${rightBracket}`}`}
       </summary>
       <div>
         <div
