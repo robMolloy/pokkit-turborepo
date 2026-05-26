@@ -115,6 +115,7 @@ func CreateInstanceFromInstanceRequestEventHandler(e *pbCore.RecordEvent) error 
 	newInstanceRecordStruct := instanceRecordsSdk.TInstanceRecordStruct{
 		PortNumber:        nextPortNumber,
 		InstanceRequestId: instanceRequestRecordId,
+		Status:            "pending",
 	}
 
 	newInstanceRecord, err := instanceRecordsSdk.NewInstanceRecord(e.App)

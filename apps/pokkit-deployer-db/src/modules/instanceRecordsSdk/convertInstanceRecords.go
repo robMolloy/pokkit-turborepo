@@ -11,15 +11,18 @@ type TInstanceRecordStruct struct {
 	Id                string           `json:"id"`
 	InstanceRequestId string           `json:"instanceRequestId"`
 	PortNumber        int              `json:"portNumber"`
+	Status            string           `json:"status"`
 	Created           pbTypes.DateTime `json:"created"`
 	Updated           pbTypes.DateTime `json:"updated"`
 }
 
+// tested as part of TestConvertStructToInstanceRecordAndBackAgain
 func ConvertInstanceRecordToStruct(instanceRecord *pbCore.Record) TInstanceRecordStruct {
 	return TInstanceRecordStruct{
 		Id:                instanceRecord.GetString("id"),
 		PortNumber:        instanceRecord.GetInt("portNumber"),
 		InstanceRequestId: instanceRecord.GetString("instanceRequestId"),
+		Status:            instanceRecord.GetString("status"),
 		Created:           instanceRecord.GetDateTime("created"),
 		Updated:           instanceRecord.GetDateTime("updated"),
 	}
@@ -48,6 +51,7 @@ func ConvertInstanceRecordsToData(instanceRecords []*pbCore.Record) []map[string
 	return templatableDataList
 }
 
+// tested as part of TestConvertStructToInstanceRecordAndBackAgain
 func PopulateInstanceRecordWithStruct(record *pbCore.Record, data TInstanceRecordStruct) (*pbCore.Record, error) {
 	return utils.PopulateRecord(record, data)
 }

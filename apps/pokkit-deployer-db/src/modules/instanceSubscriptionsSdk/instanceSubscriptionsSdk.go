@@ -11,7 +11,7 @@ import (
 	pbTypes "github.com/pocketbase/pocketbase/tools/types"
 )
 
-type TInstanceSubscriptionRecordStruct struct {
+type TInstancesSubscriptionRecordStruct struct {
 	Id                string           `json:"id"`
 	UserId            string           `json:"userId"`
 	SubscriptionId    string           `json:"subscriptionId"`
@@ -27,8 +27,20 @@ type TInstanceSubscriptionRecordStruct struct {
 	Updated           pbTypes.DateTime `json:"updated"`
 }
 
-func ConvertInstanceSubscriptionRecordToStruct(record *pbCore.Record) TInstanceSubscriptionRecordStruct {
-	return TInstanceSubscriptionRecordStruct{
+type TInstancesSubscriptionRecordAdditionalDataStruct struct {
+	IsExpired bool `json:"isExpired"`
+}
+
+func ConvertInstancesSubscriptionRecordStructToAdditionalData(recordStruct TInstancesSubscriptionRecordStruct) TInstancesSubscriptionRecordAdditionalDataStruct {
+	paidUntilDateTime := recordStruct.PaidUntilDateTime
+
+	return TInstancesSubscriptionRecordAdditionalDataStruct{
+		IsExpired: paidUntilDateTime.Before(pbTypes.NowDateTime()),
+	}
+}
+
+func ConvertInstanceSubscriptionRecordToStruct(record *pbCore.Record) TInstancesSubscriptionRecordStruct {
+	return TInstancesSubscriptionRecordStruct{
 		Id:                record.GetString("id"),
 		UserId:            record.GetString("userId"),
 		SubscriptionId:    record.GetString("subscriptionId"),
@@ -44,7 +56,7 @@ func ConvertInstanceSubscriptionRecordToStruct(record *pbCore.Record) TInstanceS
 		Updated:           record.GetDateTime("updated"),
 	}
 }
-func PopulateInstancesSubscriptionRecordWithStruct(record *pbCore.Record, data TInstanceSubscriptionRecordStruct) {
+func PopulateInstancesSubscriptionRecordWithStruct(record *pbCore.Record, data TInstancesSubscriptionRecordStruct) {
 	if data.Id != "" {
 		record.Set("id", data.Id)
 	}
@@ -62,7 +74,7 @@ func PopulateInstancesSubscriptionRecordWithStruct(record *pbCore.Record, data T
 	record.Set("updated", data.Updated)
 }
 
-func ConvertInstancesSubscriptionStructToRecord(app pbCore.App, data TInstanceSubscriptionRecordStruct) (*pbCore.Record, error) {
+func ConvertInstancesSubscriptionStructToRecord(app pbCore.App, data TInstancesSubscriptionRecordStruct) (*pbCore.Record, error) {
 	instancesSubscriptionsCollection, err := app.FindCollectionByNameOrId(db.InstancesSubscriptionsCollectionName)
 	if err != nil {
 		return nil, err
@@ -98,7 +110,7 @@ func FindInstancesSubscriptionRecordAndUpdateFromStripeLedgerStruct(app pbCore.A
 		userId = stripeLedgerStruct.UserId
 	}
 
-	instancesSubscriptionStruct := TInstanceSubscriptionRecordStruct{
+	instancesSubscriptionStruct := TInstancesSubscriptionRecordStruct{
 		SubscriptionId:    stripeLedgerStruct.SubscriptionId,
 		NumberOfInstances: stripeLedgerStruct.Quantity,
 		CostPerUnit:       stripeLedgerStruct.CostPerUnit,
