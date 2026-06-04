@@ -173,6 +173,7 @@ export default function Page() {
                                   instancesSubscriptionId: x.id,
                                   instanceNumber:
                                     (thisSubscriptionsInstanceRequestRecords?.length ?? 0) + 1,
+                                  requestedStatus: "on",
                                 },
                               });
 

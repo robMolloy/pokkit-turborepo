@@ -2,7 +2,7 @@ package utils
 
 import (
 	"bytes"
-	"html/template"
+	"text/template"
 )
 
 func PopulateTemplate(inputTemplate string, data any) (string, error) {

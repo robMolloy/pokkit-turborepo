@@ -13,20 +13,24 @@ const instanceRequestRecordSchema = z.object({
   id: z.string(),
   instancesSubscriptionId: z.string(),
   instanceNumber: z.number(),
+  requestedStatus: z.enum(["on", "off"]),
   created: z.string(),
   updated: z.string(),
 });
 export type TInstanceRequestRecord = z.infer<typeof instanceRequestRecordSchema>;
 type TInstanceRequestRecordsStoreState = TInstanceRequestRecord[] | null | undefined;
 
-export const createInstanceRequestRecord = async (p1: {
+export const createInstanceRequestRecord = async (p: {
   pb: PocketBase;
-  data: { instancesSubscriptionId: string; instanceNumber: number };
+  data: Pick<
+    TInstanceRequestRecord,
+    "instancesSubscriptionId" | "instanceNumber" | "requestedStatus"
+  >;
 }) =>
   createRecordHelper({
-    pb: p1.pb,
+    pb: p.pb,
     collectionName: instanceRequestRecordsCollectionName,
-    data: p1.data,
+    data: p.data,
     schema: instanceRequestRecordSchema,
     successMessagesFn: (x) => [`Successfully requested instance #${x.instanceNumber}`],
     errorMessagesFn: () => ["Failed to request an instance"],

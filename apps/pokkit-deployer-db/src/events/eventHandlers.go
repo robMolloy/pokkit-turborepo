@@ -179,11 +179,15 @@ func ExecuteBashCommandFromCommandTemplatesForAllInstanceRecordsAfterInstanceRec
 
 	for _, commandTemplateRecord := range commandTemplateRecords {
 		bashTemplate := commandTemplateRecord.GetString("bashTemplate")
+		e.App.Logger().Error("bashTemplate", "bashTemplate", bashTemplate)
+		log.Println("bashTemplate", bashTemplate)
 		bashCommand, err := utils.PopulateTemplate(bashTemplate, instanceRecordsData)
 		if err != nil {
 			log.Println(err)
 			return e.Next()
 		}
+		e.App.Logger().Error("bashCommand", "bashCommand", bashCommand)
+		log.Println("bashCommand", bashCommand)
 
 		cmd := exec.Command("bash", "-c", bashCommand)
 		cmd.Start()
@@ -249,6 +253,20 @@ func ExecuteBashCommandFromCommandTemplatesForAllInstanceRecordsAfterInstanceRec
 	return e.Next()
 }
 
+func GetAllInstanceRecordStructs(app pbCore.App) ([]instanceRecordsSdk.TInstanceRecordStruct, error) {
+	deploymentRecords, err := app.FindAllRecords(db.InstancesCollectionName)
+	if err != nil {
+		return nil, fmt.Errorf("error finding deployments records: %w", err)
+	}
+	deploymentRecordStructs := []instanceRecordsSdk.TInstanceRecordStruct{}
+	for _, deploymentRecord := range deploymentRecords {
+		deploymentRecordStruct := instanceRecordsSdk.ConvertInstanceRecordToStruct(deploymentRecord)
+		deploymentRecordStructs = append(deploymentRecordStructs, deploymentRecordStruct)
+	}
+
+	return deploymentRecordStructs, nil
+}
+
 func ExecuteBashCommandFromCommandTemplatesForAllInstanceRecordsAfterInstanceRecordDeletedEventHandler(e *pbCore.RecordEvent) error {
 	commandTemplateRecords, err := e.App.FindAllRecords(db.CommandTemplatesForAllInstanceRecordsCollectionName, dbx.HashExp{"crudOperation": "delete"})
 	if err != nil {
@@ -257,6 +275,11 @@ func ExecuteBashCommandFromCommandTemplatesForAllInstanceRecordsAfterInstanceRec
 	deploymentRecords, err := e.App.FindAllRecords(db.InstancesCollectionName)
 	if err != nil {
 		return e.Next()
+	}
+	deploymentRecordStructs := []instanceRecordsSdk.TInstanceRecordStruct{}
+	for _, deploymentRecord := range deploymentRecords {
+		deploymentRecordStruct := instanceRecordsSdk.ConvertInstanceRecordToStruct(deploymentRecord)
+		deploymentRecordStructs = append(deploymentRecordStructs, deploymentRecordStruct)
 	}
 
 	instanceRecordsData := instanceRecordsSdk.ConvertInstanceRecordsToData(deploymentRecords)
