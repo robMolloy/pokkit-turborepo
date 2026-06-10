@@ -36,17 +36,6 @@ var ProductDataLookup = map[string]struct {
 	},
 }
 
-func HelloNameRouteHandler(e *pbCore.RequestEvent) error {
-	name := e.Request.PathValue("name")
-	fmt.Println(name)
-	return e.JSON(http.StatusOK, map[string]any{"txt": "hello" + name})
-}
-func ByeNameRouteHandler(e *pbCore.RequestEvent) error {
-	body, _ := utils.ReadJsonFromRequestBody(e.Request.Body)
-	nameString, _ := body["name"].(string)
-	return e.JSON(http.StatusOK, map[string]any{"txt": "bye" + nameString})
-}
-
 type StripeCreateCheckoutRequest struct {
 	Product  string `json:"product"`
 	Quantity int64  `json:"quantity"`
