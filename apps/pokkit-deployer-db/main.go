@@ -3,7 +3,6 @@ package main
 import (
 	"app-db/src/db"
 	"app-db/src/events"
-	"app-db/src/modules/fileWriteTemplateRecordsSdk"
 	"app-db/src/modules/nginxTemplatesSdk"
 	"app-db/src/pokkitSetup"
 	"app-db/src/routes"
@@ -62,22 +61,9 @@ func main() {
 
 	app.OnRecordAfterCreateSuccess(db.InstanceRequestsCollectionName).BindFunc(events.CreateInstanceFromInstanceRequestEventHandler)
 
-	app.OnRecordAfterCreateSuccess(db.InstancesCollectionName).BindFunc(fileWriteTemplateRecordsSdk.PopulateTemplateAndWriteToFileOnCreateEventHandler)
-	app.OnRecordAfterUpdateSuccess(db.InstancesCollectionName).BindFunc(fileWriteTemplateRecordsSdk.PopulateTemplateAndWriteToFileOnUpdateEventHandler)
-	app.OnRecordAfterDeleteSuccess(db.InstancesCollectionName).BindFunc(fileWriteTemplateRecordsSdk.PopulateTemplateAndWriteToFileOnDeleteEventHandler)
-
 	app.OnRecordAfterCreateSuccess(db.InstancesCollectionName).BindFunc(nginxTemplatesSdk.RebuildAndReloadNginxConfigOnChangeEventHandler)
 	app.OnRecordAfterUpdateSuccess(db.InstancesCollectionName).BindFunc(nginxTemplatesSdk.RebuildAndReloadNginxConfigOnChangeEventHandler)
 	app.OnRecordAfterDeleteSuccess(db.InstancesCollectionName).BindFunc(nginxTemplatesSdk.RebuildAndReloadNginxConfigOnChangeEventHandler)
-
-	app.OnRecordAfterCreateSuccess(db.InstancesCollectionName).BindFunc(events.ExecuteBashCommandFromCommandTemplatesForChangedInstanceRecordAfterInstanceRecordCreatedEventHandler)
-	app.OnRecordAfterCreateSuccess(db.InstancesCollectionName).BindFunc(events.ExecuteBashCommandFromCommandTemplatesForAllInstanceRecordsAfterInstanceRecordCreatedEventHandler)
-
-	app.OnRecordAfterUpdateSuccess(db.InstancesCollectionName).BindFunc(events.ExecuteBashCommandFromCommandTemplatesForChangedInstanceRecordAfterInstanceRecordUpdatedEventHandler)
-	app.OnRecordAfterUpdateSuccess(db.InstancesCollectionName).BindFunc(events.ExecuteBashCommandFromCommandTemplatesForAllInstanceRecordsAfterInstanceRecordUpdatedEventHandler)
-
-	app.OnRecordAfterDeleteSuccess(db.InstancesCollectionName).BindFunc(events.ExecuteBashCommandFromCommandTemplatesForChangedInstanceRecordAfterInstanceRecordDeletedEventHandler)
-	app.OnRecordAfterDeleteSuccess(db.InstancesCollectionName).BindFunc(events.ExecuteBashCommandFromCommandTemplatesForAllInstanceRecordsAfterInstanceRecordDeletedEventHandler)
 
 	app.OnRecordCreateRequest(db.AuthOrganisationsCollectionName).BindFunc(events.PromoteOrganisationCreatorToOrgAdminAfterUserCreateEventHandler)
 
