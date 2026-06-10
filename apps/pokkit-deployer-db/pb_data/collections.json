@@ -90,7 +90,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-05-07 22:06:24.687Z",
-    "updated": "2026-05-26 20:58:04.991Z",
+    "updated": "2026-06-09 12:16:15.172Z",
     "system": true
   },
   {
@@ -197,7 +197,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-05-07 22:06:24.689Z",
-    "updated": "2026-05-26 20:58:04.995Z",
+    "updated": "2026-06-09 12:16:15.178Z",
     "system": true
   },
   {
@@ -306,7 +306,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-05-07 22:06:24.690Z",
-    "updated": "2026-05-26 20:58:04.998Z",
+    "updated": "2026-06-09 12:16:15.183Z",
     "system": true
   },
   {
@@ -400,7 +400,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-05-07 22:06:24.691Z",
-    "updated": "2026-05-26 20:58:05.001Z",
+    "updated": "2026-06-09 12:16:15.188Z",
     "system": true
   },
   {
@@ -509,7 +509,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-05-07 22:06:24.693Z",
-    "updated": "2026-05-26 20:58:05.004Z",
+    "updated": "2026-06-09 12:16:15.192Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -718,7 +718,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-05-07 22:06:24.696Z",
-    "updated": "2026-05-26 20:58:05.007Z",
+    "updated": "2026-06-09 12:16:15.197Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -876,7 +876,7 @@
     ],
     "indexes": [],
     "created": "2026-05-07 22:11:26.834Z",
-    "updated": "2026-05-26 20:58:05.012Z",
+    "updated": "2026-06-09 12:16:15.202Z",
     "system": false
   },
   {
@@ -997,7 +997,7 @@
       "CREATE UNIQUE INDEX `idx_0UWlVOdDqD` ON `authOrganisationUserPermissions` (`userOrgKey`)"
     ],
     "created": "2026-05-07 22:11:26.836Z",
-    "updated": "2026-05-26 20:58:05.015Z",
+    "updated": "2026-06-09 12:16:15.206Z",
     "system": false
   },
   {
@@ -1075,7 +1075,7 @@
     ],
     "indexes": [],
     "created": "2026-05-07 22:11:26.838Z",
-    "updated": "2026-05-26 20:58:05.018Z",
+    "updated": "2026-06-09 12:16:15.209Z",
     "system": false
   },
   {
@@ -1168,7 +1168,7 @@
       "CREATE UNIQUE INDEX `idx_JbxVy7FfOr` ON `instances` (`instanceRequestId`)"
     ],
     "created": "2026-05-07 22:11:26.840Z",
-    "updated": "2026-05-26 20:58:05.020Z",
+    "updated": "2026-06-09 12:16:15.211Z",
     "system": false
   },
   {
@@ -1250,7 +1250,7 @@
       "CREATE UNIQUE INDEX `idx_jmZ8IL5Ej4` ON `commandTemplatesForChangedInstanceRecord` (`crudOperation`)"
     ],
     "created": "2026-05-07 22:11:26.842Z",
-    "updated": "2026-05-26 20:58:05.023Z",
+    "updated": "2026-06-09 12:16:15.214Z",
     "system": false
   },
   {
@@ -1332,7 +1332,7 @@
       "CREATE UNIQUE INDEX `idx_2OQVB3k4yj` ON `commandTemplatesForAllInstanceRecords` (`crudOperation`)"
     ],
     "created": "2026-05-07 22:11:26.844Z",
-    "updated": "2026-05-26 20:58:05.025Z",
+    "updated": "2026-06-09 12:16:15.218Z",
     "system": false
   },
   {
@@ -1409,7 +1409,7 @@
       "CREATE UNIQUE INDEX `idx_tKzMrurend` ON `userBalances` (`userId`)"
     ],
     "created": "2026-05-07 22:11:26.846Z",
-    "updated": "2026-05-26 20:58:05.027Z",
+    "updated": "2026-06-09 12:16:15.221Z",
     "system": false
   },
   {
@@ -1583,7 +1583,7 @@
     ],
     "indexes": [],
     "created": "2026-05-07 22:11:26.847Z",
-    "updated": "2026-05-26 20:58:05.030Z",
+    "updated": "2026-06-09 12:16:15.225Z",
     "system": false
   },
   {
@@ -1854,7 +1854,7 @@
       "CREATE INDEX `idx_Bzj0h4o9vr` ON `stripeLedger` (`stripePayloadId`)"
     ],
     "created": "2026-05-07 22:11:26.850Z",
-    "updated": "2026-05-26 20:58:05.034Z",
+    "updated": "2026-06-09 12:16:15.230Z",
     "system": false
   },
   {
@@ -1945,7 +1945,115 @@
       "CREATE UNIQUE INDEX `idx_iads1c81Gz` ON `instanceRequests` (\n  `instancesSubscriptionId`,\n  `instanceNumber`\n)"
     ],
     "created": "2026-05-08 22:53:33.592Z",
-    "updated": "2026-05-27 21:19:21.334Z",
+    "updated": "2026-06-09 12:16:15.236Z",
+    "system": false
+  },
+  {
+    "id": "pbc_3625897364",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "fileWriteTemplates",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "select1581024674",
+        "maxSelect": 1,
+        "name": "crudTrigger",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "select",
+        "values": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ]
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text2539659139",
+        "max": 0,
+        "min": 0,
+        "name": "templateBody",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "select1415628468",
+        "maxSelect": 1,
+        "name": "populatedBy",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "select",
+        "values": [
+          "allRecords",
+          "changedRecord"
+        ]
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text3377378130",
+        "max": 0,
+        "min": 0,
+        "name": "filePath",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "created": "2026-06-09 12:26:42.633Z",
+    "updated": "2026-06-09 12:40:12.874Z",
     "system": false
   }
 ]

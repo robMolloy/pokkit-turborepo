@@ -31,3 +31,7 @@ func ReadJsonFromFile(filePath string) (map[string]any, error) {
 	err = json.Unmarshal([]byte(jsonBytes), &result)
 	return result, err
 }
+
+func WriteStringToFile(contentBodyString string, filePath string) error {
+	return os.WriteFile(filePath, []byte(contentBodyString), 0644)
+}

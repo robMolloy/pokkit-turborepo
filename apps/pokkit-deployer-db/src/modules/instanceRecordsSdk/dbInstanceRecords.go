@@ -4,6 +4,7 @@ import (
 	"app-db/src/db"
 	"fmt"
 
+	"github.com/pocketbase/dbx"
 	pbCore "github.com/pocketbase/pocketbase/core"
 )
 
@@ -40,4 +41,21 @@ func NewInstanceRecord(app pbCore.App) (*pbCore.Record, error) {
 	}
 	newInstanceRecord := pbCore.NewRecord(instanceRecordCollection)
 	return newInstanceRecord, nil
+}
+
+func DbGetAllInstanceRecordStructs(app pbCore.App, dbxExpressions ...dbx.Expression) ([]TInstanceRecordStruct, error) {
+	instanceRecordStructs := []TInstanceRecordStruct{}
+
+	instanceRecords, err := app.FindAllRecords(db.InstancesCollectionName, dbxExpressions...)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, instanceRecord := range instanceRecords {
+		instanceRecordStruct := ConvertInstanceRecordToStruct(instanceRecord)
+		instanceRecordStructs = append(instanceRecordStructs, instanceRecordStruct)
+	}
+
+	return instanceRecordStructs, nil
 }

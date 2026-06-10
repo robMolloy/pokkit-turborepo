@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
-	"github.com/pocketbase/pocketbase/tools/types"
+	pbTypes "github.com/pocketbase/pocketbase/tools/types"
 )
 
 func TestConvertStructToInstanceRecordAndBackAgain(t *testing.T) {
@@ -13,8 +13,8 @@ func TestConvertStructToInstanceRecordAndBackAgain(t *testing.T) {
 		InstanceRequestId: "idReq123",
 		PortNumber:        100,
 		Status:            "pending",
-		Created:           types.NowDateTime(),
-		Updated:           types.NowDateTime(),
+		Created:           pbTypes.NowDateTime(),
+		Updated:           pbTypes.NowDateTime(),
 	}
 
 	mockInstanceCollection := pbCore.Collection{}

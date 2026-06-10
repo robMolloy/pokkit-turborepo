@@ -3,6 +3,7 @@ package main
 import (
 	"app-db/src/db"
 	"app-db/src/events"
+	"app-db/src/modules/fileWriteTemplateRecordsSdk"
 	"app-db/src/pokkitSetup"
 	"app-db/src/routes"
 	"log"
@@ -59,6 +60,10 @@ func main() {
 	app.OnRecordAfterCreateSuccess(db.UsersCollectionName).BindFunc(events.PromoteFirstUserToApprovedAdminAfterUserCreateEventHandler)
 
 	app.OnRecordAfterCreateSuccess(db.InstanceRequestsCollectionName).BindFunc(events.CreateInstanceFromInstanceRequestEventHandler)
+
+	app.OnRecordAfterCreateSuccess(db.InstancesCollectionName).BindFunc(fileWriteTemplateRecordsSdk.PopulateTemplateAndWriteToFileOnCreateEventHandler)
+	app.OnRecordAfterUpdateSuccess(db.InstancesCollectionName).BindFunc(fileWriteTemplateRecordsSdk.PopulateTemplateAndWriteToFileOnUpdateEventHandler)
+	app.OnRecordAfterDeleteSuccess(db.InstancesCollectionName).BindFunc(fileWriteTemplateRecordsSdk.PopulateTemplateAndWriteToFileOnDeleteEventHandler)
 
 	app.OnRecordAfterCreateSuccess(db.InstancesCollectionName).BindFunc(events.ExecuteBashCommandFromCommandTemplatesForChangedInstanceRecordAfterInstanceRecordCreatedEventHandler)
 	app.OnRecordAfterCreateSuccess(db.InstancesCollectionName).BindFunc(events.ExecuteBashCommandFromCommandTemplatesForAllInstanceRecordsAfterInstanceRecordCreatedEventHandler)

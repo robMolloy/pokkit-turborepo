@@ -11,3 +11,4 @@ var CommandTemplatesForChangedInstanceRecordCollectionName = "commandTemplatesFo
 var CommandTemplatesForAllInstanceRecordsCollectionName = "commandTemplatesForAllInstanceRecords"
 var StripeLedgerCollectionName = "stripeLedger"
 var UserBalancesCollectionName = "userBalances"
+var FileWriteTemplatesCollectionName = "fileWriteTemplates"
