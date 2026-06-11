@@ -285,6 +285,67 @@ func UpdateStripeSubscriptionRouteHandler(e *pbCore.RequestEvent) error {
 	})
 }
 
+func getStripeLedgerRecordStructFromCheckoutSessionWebhookEvent(stripeEvent stripe.Event) (*stripeLedgerRecordsSdk.TStripeLedgerStruct, error) {
+	var checkoutSession stripe.CheckoutSession
+	err := json.Unmarshal(stripeEvent.Data.Raw, &checkoutSession)
+	if err != nil {
+		return nil, fmt.Errorf("Could not unmarshal JSON from checkout session: %w", err)
+	}
+
+	var subscriptionId string
+	if checkoutSession.Subscription != nil {
+		subscriptionId = checkoutSession.Subscription.ID
+	}
+	subscription, err := stripeSdk.RetrieveStripeSubscriptionWithRecurrenceData(subscriptionId)
+	subscriptionRecurrenceData, err := stripeSdk.GetRecurrenceFromStripeSubscription(subscription)
+	if err != nil {
+		return nil, fmt.Errorf("recurrence data invalid: %w", err)
+	}
+
+	var invoiceId string
+	if checkoutSession.Invoice != nil {
+		invoiceId = checkoutSession.Invoice.ID
+	}
+
+	item := subscription.Items.Data[0]
+	quantity := int(item.Quantity)
+	costPerUnit := int(item.Price.UnitAmount)
+	cost := quantity * costPerUnit
+
+	recurrenceIntervalStartDateInt := item.CurrentPeriodStart
+	recurrenceIntervalEndDateInt := item.CurrentPeriodEnd
+	recurrenceIntervalStart, err := utils.ConvertStripeDateIntToPbDateTime(recurrenceIntervalStartDateInt)
+	if err != nil {
+		return nil, fmt.Errorf("recurrence data invalid: %w", err)
+	}
+	recurrenceIntervalEnd, err := utils.ConvertStripeDateIntToPbDateTime(recurrenceIntervalEndDateInt)
+	if err != nil {
+		return nil, fmt.Errorf("recurrence data invalid: %w", err)
+	}
+
+	stripeLedgerRecordStruct := stripeLedgerRecordsSdk.TStripeLedgerStruct{
+		EventType:               string(stripeEvent.Type),
+		Currency:                string(checkoutSession.Currency),
+		Quantity:                quantity,
+		CostPerUnit:             costPerUnit,
+		Cost:                    cost,
+		StripePayloadId:         checkoutSession.ID,
+		SubscriptionId:          subscriptionId,
+		InvoiceId:               invoiceId,
+		UserId:                  checkoutSession.Metadata["userId"],
+		ProductName:             checkoutSession.Metadata["productName"],
+		ProductId:               checkoutSession.Metadata["productId"],
+		StripeCustomerId:        checkoutSession.Metadata["stripeCustomerId"],
+		RawData:                 checkoutSession,
+		RecurrenceInterval:      string(subscriptionRecurrenceData.Interval),
+		RecurrenceIntervalCount: int(subscriptionRecurrenceData.IntervalCount),
+		RecurrenceIntervalStart: recurrenceIntervalStart,
+		RecurrenceIntervalEnd:   recurrenceIntervalEnd,
+	}
+
+	return &stripeLedgerRecordStruct, nil
+}
+
 func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 	stripeWebhookSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
 	if stripeWebhookSecret == "" {
@@ -331,62 +392,11 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 	}
 
 	if event.Type == "checkout.session.completed" {
-		var checkoutSession stripe.CheckoutSession
-		err = json.Unmarshal(event.Data.Raw, &checkoutSession)
+		stripeLedgerRecordStructPointer, err := getStripeLedgerRecordStructFromCheckoutSessionWebhookEvent(event)
 		if err != nil {
-			return e.BadRequestError("Could not unmarshal JSON from checkout session:", err)
+			return e.BadRequestError("Could not create stripe ledger record from checkout session webhook event", err)
 		}
-
-		var subscriptionId string
-		if checkoutSession.Subscription != nil {
-			subscriptionId = checkoutSession.Subscription.ID
-		}
-		subscription, err := stripeSdk.RetrieveStripeSubscriptionWithRecurrenceData(subscriptionId)
-		subscriptionRecurrenceData, err := stripeSdk.GetRecurrenceFromStripeSubscription(subscription)
-		if err != nil {
-			return e.BadRequestError("recurrence data invalid", err)
-		}
-
-		var invoiceId string
-		if checkoutSession.Invoice != nil {
-			invoiceId = checkoutSession.Invoice.ID
-		}
-
-		item := subscription.Items.Data[0]
-		quantity := int(item.Quantity)
-		costPerUnit := int(item.Price.UnitAmount)
-		cost := quantity * costPerUnit
-
-		recurrenceIntervalStartDateInt := item.CurrentPeriodStart
-		recurrenceIntervalEndDateInt := item.CurrentPeriodEnd
-		recurrenceIntervalStart, err := utils.ConvertStripeDateIntToPbDateTime(recurrenceIntervalStartDateInt)
-		if err != nil {
-			return e.BadRequestError("recurrence data invalid", err)
-		}
-		recurrenceIntervalEnd, err := utils.ConvertStripeDateIntToPbDateTime(recurrenceIntervalEndDateInt)
-		if err != nil {
-			return e.BadRequestError("recurrence data invalid", err)
-		}
-
-		stripeLedgerRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
-			EventType:               string(event.Type),
-			Currency:                string(checkoutSession.Currency),
-			Quantity:                quantity,
-			CostPerUnit:             costPerUnit,
-			Cost:                    cost,
-			StripePayloadId:         checkoutSession.ID,
-			SubscriptionId:          subscriptionId,
-			InvoiceId:               invoiceId,
-			UserId:                  checkoutSession.Metadata["userId"],
-			ProductName:             checkoutSession.Metadata["productName"],
-			ProductId:               checkoutSession.Metadata["productId"],
-			StripeCustomerId:        checkoutSession.Metadata["stripeCustomerId"],
-			RawData:                 checkoutSession,
-			RecurrenceInterval:      string(subscriptionRecurrenceData.Interval),
-			RecurrenceIntervalCount: int(subscriptionRecurrenceData.IntervalCount),
-			RecurrenceIntervalStart: recurrenceIntervalStart,
-			RecurrenceIntervalEnd:   recurrenceIntervalEnd,
-		}
+		stripeLedgerRecordStruct = *stripeLedgerRecordStructPointer
 	}
 
 	if event.Type == "customer.subscription.updated" {
