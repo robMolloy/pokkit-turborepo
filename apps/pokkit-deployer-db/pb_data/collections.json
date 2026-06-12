@@ -90,7 +90,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-05-07 22:06:24.687Z",
-    "updated": "2026-06-10 22:26:00.941Z",
+    "updated": "2026-06-11 14:38:59.876Z",
     "system": true
   },
   {
@@ -197,7 +197,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-05-07 22:06:24.689Z",
-    "updated": "2026-06-10 22:26:00.948Z",
+    "updated": "2026-06-11 14:38:59.881Z",
     "system": true
   },
   {
@@ -306,7 +306,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-05-07 22:06:24.690Z",
-    "updated": "2026-06-10 22:26:00.960Z",
+    "updated": "2026-06-11 14:38:59.885Z",
     "system": true
   },
   {
@@ -400,7 +400,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-05-07 22:06:24.691Z",
-    "updated": "2026-06-10 22:26:00.965Z",
+    "updated": "2026-06-11 14:38:59.896Z",
     "system": true
   },
   {
@@ -509,7 +509,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-05-07 22:06:24.693Z",
-    "updated": "2026-06-10 22:26:00.968Z",
+    "updated": "2026-06-11 14:38:59.901Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -718,7 +718,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-05-07 22:06:24.696Z",
-    "updated": "2026-06-10 22:26:00.972Z",
+    "updated": "2026-06-11 14:38:59.906Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -876,7 +876,7 @@
     ],
     "indexes": [],
     "created": "2026-05-07 22:11:26.834Z",
-    "updated": "2026-06-10 22:26:00.982Z",
+    "updated": "2026-06-11 14:38:59.915Z",
     "system": false
   },
   {
@@ -997,7 +997,7 @@
       "CREATE UNIQUE INDEX `idx_0UWlVOdDqD` ON `authOrganisationUserPermissions` (`userOrgKey`)"
     ],
     "created": "2026-05-07 22:11:26.836Z",
-    "updated": "2026-06-10 22:26:00.985Z",
+    "updated": "2026-06-11 14:38:59.922Z",
     "system": false
   },
   {
@@ -1075,7 +1075,7 @@
     ],
     "indexes": [],
     "created": "2026-05-07 22:11:26.838Z",
-    "updated": "2026-06-10 22:26:00.987Z",
+    "updated": "2026-06-11 14:38:59.926Z",
     "system": false
   },
   {
@@ -1168,7 +1168,7 @@
       "CREATE UNIQUE INDEX `idx_JbxVy7FfOr` ON `instances` (`instanceRequestId`)"
     ],
     "created": "2026-05-07 22:11:26.840Z",
-    "updated": "2026-06-10 22:26:00.991Z",
+    "updated": "2026-06-11 14:38:59.932Z",
     "system": false
   },
   {
@@ -1245,7 +1245,7 @@
       "CREATE UNIQUE INDEX `idx_tKzMrurend` ON `userBalances` (`userId`)"
     ],
     "created": "2026-05-07 22:11:26.846Z",
-    "updated": "2026-06-10 22:26:01.006Z",
+    "updated": "2026-06-11 14:38:59.936Z",
     "system": false
   },
   {
@@ -1419,7 +1419,7 @@
     ],
     "indexes": [],
     "created": "2026-05-07 22:11:26.847Z",
-    "updated": "2026-06-10 22:26:01.010Z",
+    "updated": "2026-06-11 14:38:59.939Z",
     "system": false
   },
   {
@@ -1690,7 +1690,7 @@
       "CREATE INDEX `idx_Bzj0h4o9vr` ON `stripeLedger` (`stripePayloadId`)"
     ],
     "created": "2026-05-07 22:11:26.850Z",
-    "updated": "2026-06-10 22:26:01.019Z",
+    "updated": "2026-06-11 14:38:59.943Z",
     "system": false
   },
   {
@@ -1781,7 +1781,7 @@
       "CREATE UNIQUE INDEX `idx_iads1c81Gz` ON `instanceRequests` (\n  `instancesSubscriptionId`,\n  `instanceNumber`\n)"
     ],
     "created": "2026-05-08 22:53:33.592Z",
-    "updated": "2026-06-10 22:26:01.024Z",
+    "updated": "2026-06-11 14:38:59.949Z",
     "system": false
   },
   {
@@ -1859,7 +1859,280 @@
     ],
     "indexes": [],
     "created": "2026-06-10 22:07:19.233Z",
-    "updated": "2026-06-10 22:26:01.032Z",
+    "updated": "2026-06-11 14:38:59.953Z",
+    "system": false
+  },
+  {
+    "id": "pbc_917019932",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "stripeProducts",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "created": "2026-06-11 15:30:44.501Z",
+    "updated": "2026-06-11 15:30:44.501Z",
+    "system": false
+  },
+  {
+    "id": "pbc_606399357",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "stripeConfig",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "bool1002600656",
+        "name": "logAllStripeEvents",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "bool"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "created": "2026-06-11 15:41:22.859Z",
+    "updated": "2026-06-11 15:41:22.859Z",
+    "system": false
+  },
+  {
+    "id": "pbc_2499967934",
+    "listRule": "@request.auth.id != \"\" \u0026\u0026 @request.auth.id = userId ",
+    "viewRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = userId ||\n@collection.authGlobalUserPermissions.userId ?= @request.auth.id \u0026\u0026\n@collection.authGlobalUserPermissions.role = \"admin\")",
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "stripePurchasesRecurring",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "cascadeDelete": false,
+        "collectionId": "_pb_users_auth_",
+        "hidden": false,
+        "id": "relation1689669068",
+        "maxSelect": 1,
+        "minSelect": 0,
+        "name": "userId",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "relation"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text3396850601",
+        "max": 0,
+        "min": 0,
+        "name": "subscriptionId",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "number2683508278",
+        "max": null,
+        "min": null,
+        "name": "quantity",
+        "onlyInt": false,
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "number"
+      },
+      {
+        "hidden": false,
+        "id": "date943907490",
+        "max": "",
+        "min": "",
+        "name": "paidUntilDateTime",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "date"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text432467915",
+        "max": 0,
+        "min": 0,
+        "name": "interval",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "number1524867112",
+        "max": null,
+        "min": null,
+        "name": "intervalCount",
+        "onlyInt": false,
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "number"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text1767278655",
+        "max": 0,
+        "min": 0,
+        "name": "currency",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "number405181692",
+        "max": null,
+        "min": null,
+        "name": "cost",
+        "onlyInt": false,
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "number"
+      },
+      {
+        "hidden": false,
+        "id": "number3327837906",
+        "max": null,
+        "min": null,
+        "name": "costPerUnit",
+        "onlyInt": false,
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "number"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "created": "2026-06-11 15:48:13.714Z",
+    "updated": "2026-06-11 15:48:13.714Z",
     "system": false
   }
 ]
