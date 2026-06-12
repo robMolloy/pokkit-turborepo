@@ -346,7 +346,7 @@ func getStripeLedgerRecordStructFromCheckoutSessionCompletedWebhookEvent(stripeE
 	return &stripeLedgerRecordStruct, nil
 }
 
-func getStripeLedgerRecordStructFromCustomerSubscriptionUpdatedWebhookEvent(stripeEvent stripe.Event) (*stripeLedgerRecordsSdk.TStripeLedgerStruct, error) {
+func getStripeLedgerRecordStructFromCustomerSubscriptionUpdatedWebhookEvent(app pbCore.App, stripeEvent stripe.Event) (*stripeLedgerRecordsSdk.TStripeLedgerStruct, error) {
 	var subscriptionPayload stripe.Subscription
 	err := json.Unmarshal(stripeEvent.Data.Raw, &subscriptionPayload)
 	if err != nil {
@@ -376,7 +376,7 @@ func getStripeLedgerRecordStructFromCustomerSubscriptionUpdatedWebhookEvent(stri
 		return nil, fmt.Errorf("recurrence data invalid: %w", err)
 	}
 
-	StripeLedgerCheckoutSessionCompletedRecord, err := e.App.FindFirstRecordByFilter(
+	StripeLedgerCheckoutSessionCompletedRecord, err := app.FindFirstRecordByFilter(
 		db.StripeLedgerCollectionName,
 		"subscriptionId={:subId} && eventType='checkout.session.completed'",
 		dbx.Params{"subId": subscription.ID},
@@ -412,6 +412,33 @@ func getStripeLedgerRecordStructFromCustomerSubscriptionUpdatedWebhookEvent(stri
 	return &stripeLedgerRecordStruct, nil
 }
 
+func getStripeLedgerRecordStructFromPaymentIntentSucceededWebhookEvent(stripeEvent stripe.Event) (*stripeLedgerRecordsSdk.TStripeLedgerStruct, error) {
+
+	var paymentIntent stripe.PaymentIntent
+	err := json.Unmarshal(stripeEvent.Data.Raw, &paymentIntent)
+	if err != nil {
+		return nil, fmt.Errorf("Could not unmarshal JSON from stripe payment intent: %w", err)
+	}
+
+	quantity, err := strconv.Atoi(paymentIntent.Metadata["quantity"])
+	if err != nil {
+		quantity = 0
+	}
+
+	stripeLedgerRecordStruct := stripeLedgerRecordsSdk.TStripeLedgerStruct{
+		Quantity:         quantity,
+		EventType:        string(stripeEvent.Type),
+		Currency:         string(paymentIntent.Currency),
+		StripePayloadId:  paymentIntent.ID,
+		UserId:           paymentIntent.Metadata["userId"],
+		ProductName:      paymentIntent.Metadata["productName"],
+		ProductId:        paymentIntent.Metadata["productId"],
+		StripeCustomerId: paymentIntent.Metadata["stripeCustomerId"],
+		RawData:          paymentIntent,
+	}
+	return &stripeLedgerRecordStruct, nil
+}
+
 func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 	stripeWebhookSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
 	if stripeWebhookSecret == "" {
@@ -432,29 +459,13 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 
 	var logAllStripeEvents = true
 	var stripeLedgerRecordStruct stripeLedgerRecordsSdk.TStripeLedgerStruct
+
 	if event.Type == "payment_intent.succeeded" {
-		var paymentIntent stripe.PaymentIntent
-		err = json.Unmarshal(event.Data.Raw, &paymentIntent)
+		stripeLedgerRecordStructPointer, err := getStripeLedgerRecordStructFromPaymentIntentSucceededWebhookEvent(event)
 		if err != nil {
-			return e.BadRequestError("Could not unmarshal JSON from stripe payment intent:", err)
+			return e.BadRequestError("Could not create stripe ledger record from payment intent webhook event", err)
 		}
-
-		quantity, err := strconv.Atoi(paymentIntent.Metadata["quantity"])
-		if err != nil {
-			quantity = 0
-		}
-
-		stripeLedgerRecordStruct = stripeLedgerRecordsSdk.TStripeLedgerStruct{
-			Quantity:         quantity,
-			EventType:        string(event.Type),
-			Currency:         string(paymentIntent.Currency),
-			StripePayloadId:  paymentIntent.ID,
-			UserId:           paymentIntent.Metadata["userId"],
-			ProductName:      paymentIntent.Metadata["productName"],
-			ProductId:        paymentIntent.Metadata["productId"],
-			StripeCustomerId: paymentIntent.Metadata["stripeCustomerId"],
-			RawData:          paymentIntent,
-		}
+		stripeLedgerRecordStruct = *stripeLedgerRecordStructPointer
 	}
 
 	if event.Type == "checkout.session.completed" {
@@ -466,7 +477,7 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 	}
 
 	if event.Type == "customer.subscription.updated" {
-		stripeLedgerRecordStructPointer, err := getStripeLedgerRecordStructFromCustomerSubscriptionUpdatedWebhookEvent(event)
+		stripeLedgerRecordStructPointer, err := getStripeLedgerRecordStructFromCustomerSubscriptionUpdatedWebhookEvent(e.App, event)
 		if err != nil {
 			return e.BadRequestError("Could not create stripe ledger record from customer subscription updated webhook event", err)
 		}
@@ -474,11 +485,11 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 	}
 
 	hasNotBeenPopulated := stripeLedgerRecordStruct.EventType == ""
-	if hasNotBeenPopulated {
-		if !logAllStripeEvents {
-			return e.JSON(http.StatusOK, map[string]any{})
-		}
+	if hasNotBeenPopulated && !logAllStripeEvents {
+		return e.JSON(http.StatusOK, map[string]any{})
+	}
 
+	if hasNotBeenPopulated {
 		var payload map[string]any
 		err = json.Unmarshal(event.Data.Raw, &payload)
 		if err != nil {
