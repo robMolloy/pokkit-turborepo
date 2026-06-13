@@ -55,7 +55,7 @@ export const serveBuildAndWriteLogs = async (p: {
     pbProcess.stdout.on("data", (data) => {
       const strData = data.toString() as string;
       logStream.write(`[stdout] ${strData}\n`);
-      if (strData.includes(dbPortNumber)) resolve(pbProcess);
+      if (strData.includes("Server started at")) resolve(pbProcess);
     });
 
     pbProcess.stderr.on("data", (data) => {

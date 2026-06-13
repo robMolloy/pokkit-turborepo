@@ -9,20 +9,20 @@ import {
 } from "../helpers/pbHelpers";
 import { setupAndServeDb } from "./setupAndServeDb";
 
-const tempDirPath = `_temp/pocket-testing-health-check-2`;
-const tempDbBuildFilePath = `${tempDirPath}/app-db`;
-const tempDbLogFilePath = `${tempDirPath}/pocketbase.log`;
-const tempDbUrl = `http://0.0.0.0:8111`;
+const sandboxedDbDirPath = `_temp/pocket-testing-health-check-2`;
+const sandboxedDbBuildFilePath = `${sandboxedDbDirPath}/app-db`;
+const sandboxedDbLogFilePath = `${sandboxedDbDirPath}/pocketbase.log`;
+const sandboxedDbUrl = `http://0.0.0.0:8111`;
 const dbSuperuserEmail = "admin@admin.com";
 const dbSuperuserPassword = "admin@admin.com";
 
-const createPbInstance = () => new PocketBase(tempDbUrl);
+const createPbInstance = () => new PocketBase(sandboxedDbUrl);
 
 let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 
 describe("pokkit-testing setupAndServeDb", () => {
   beforeAll(async () => {
-    await killPocketbaseInstanceByDbUrl(tempDbUrl);
+    await killPocketbaseInstanceByDbUrl(sandboxedDbUrl);
     if (spawnProcess) await killPocketbaseInstanceBySpawnProcess(spawnProcess);
 
     spawnProcess = await setupAndServeDb({
@@ -31,27 +31,27 @@ describe("pokkit-testing setupAndServeDb", () => {
         return JSON.parse(collectionsString) as CollectionModel[];
       },
       writeDbBuildToFilePathFn: async () => {
-        fse.ensureFileSync(tempDbBuildFilePath);
-        fse.copyFileSync(`./pocketbase/app-db`, tempDbBuildFilePath);
+        fse.ensureFileSync(sandboxedDbBuildFilePath);
+        fse.copyFileSync(`./pocketbase/app-db`, sandboxedDbBuildFilePath);
       },
-      dbUrl: tempDbUrl,
+      dbUrl: sandboxedDbUrl,
       dbSuperuserEmail: dbSuperuserEmail,
       dbSuperuserPassword: dbSuperuserPassword,
-      dbBuildFilePath: tempDbBuildFilePath,
-      dbLogFilePath: tempDbLogFilePath,
+      dbBuildFilePath: sandboxedDbBuildFilePath,
+      dbLogFilePath: sandboxedDbLogFilePath,
     });
   });
 
   afterAll(async () => {
     if (spawnProcess) await killPocketbaseInstanceBySpawnProcess(spawnProcess);
-    await killPocketbaseInstanceByDbUrl(tempDbUrl);
+    await killPocketbaseInstanceByDbUrl(sandboxedDbUrl);
     spawnProcess = undefined;
 
-    fse.removeSync(tempDirPath);
+    fse.removeSync(sandboxedDbDirPath);
   });
 
   beforeEach(async () => {
-    await clearDb({ dbUrl: tempDbUrl, dbSuperuserEmail, dbSuperuserPassword });
+    await clearDb({ dbUrl: sandboxedDbUrl, dbSuperuserEmail, dbSuperuserPassword });
   });
 
   it("successful health check", async () => {
@@ -62,7 +62,7 @@ describe("pokkit-testing setupAndServeDb", () => {
 
   it("unsuccessful health check once terminated", async () => {
     if (spawnProcess) await killPocketbaseInstanceBySpawnProcess(spawnProcess);
-    await killPocketbaseInstanceByDbUrl(tempDbUrl);
+    await killPocketbaseInstanceByDbUrl(sandboxedDbUrl);
 
     const userPb = createPbInstance();
     try {
