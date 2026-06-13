@@ -2,6 +2,7 @@ package routes
 
 import (
 	"app-db/src/db"
+	stripeConfigSdk "app-db/src/modules/stripeConfigSdk"
 	"app-db/src/modules/stripeLedgerRecordsSdk"
 	"app-db/src/modules/stripeSdk"
 	"app-db/src/utils"
@@ -457,7 +458,12 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		return e.BadRequestError("Could not construct webhook event", err)
 	}
 
-	var logAllStripeEvents = true
+	stripeConfig, err := stripeConfigSdk.GetStripeConfig(e.App)
+	if err != nil {
+		return e.BadRequestError("stripeconfigsdk.GetStripeConfig(e.App)", err)
+	}
+	logAllStripeEvents := stripeConfig.LogAllStripeEvents
+
 	var stripeLedgerRecordStruct stripeLedgerRecordsSdk.TStripeLedgerStruct
 
 	if event.Type == "payment_intent.succeeded" {
