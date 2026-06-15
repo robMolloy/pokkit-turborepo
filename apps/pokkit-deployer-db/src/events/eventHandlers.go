@@ -226,5 +226,29 @@ func UpdateStripeProductRecordAfterStripeLedgerCreatedEventHandler(e *pbCore.Rec
 		}
 	}
 
+	if stripeLedgerRecordStruct.EventType == "price.updated" {
+		stripeProductPriceRecordStructPointer, err :=
+			stripeProductPricesSdk.DbGetStripeProductPriceRecordByStripePriceId(e.App, stripeLedgerRecordStruct.StripePriceId)
+
+		if err != nil {
+			return fmt.Errorf("stripeProductPricesSdk.DbGetStripeProductPriceRecordByStripePriceId: %w", err)
+		}
+		stripeProductPriceRecordStruct := stripeProductPricesSdk.TStripeProductPriceRecordStruct{}
+		if stripeProductPriceRecordStructPointer != nil {
+			stripeProductPriceRecordStruct = *stripeProductPriceRecordStructPointer
+		}
+		stripeProductPriceRecordStruct.StripeProductId = stripeLedgerRecordStruct.ProductId
+		stripeProductPriceRecordStruct.StripePriceId = stripeLedgerRecordStruct.StripePriceId
+		stripeProductPriceRecordStruct.RecurrenceInterval = stripeLedgerRecordStruct.RecurrenceInterval
+		stripeProductPriceRecordStruct.RecurrenceIntervalCount = stripeLedgerRecordStruct.RecurrenceIntervalCount
+		stripeProductPriceRecordStruct.Currency = stripeLedgerRecordStruct.Currency
+		stripeProductPriceRecordStruct.CostPerUnit = stripeLedgerRecordStruct.CostPerUnit
+
+		err = stripeProductPricesSdk.DbUpsertStripeProductPrice(e.App, stripeProductPriceRecordStruct)
+		if err != nil {
+			return fmt.Errorf("stripeProductPricesSdk.DbCreateStripeProductPriceRecord: %w", err)
+		}
+	}
+
 	return e.Next()
 }

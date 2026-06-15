@@ -35,6 +35,18 @@ func ConvertStripeProductPriceRecordToStruct(record *pbCore.Record) TStripeProdu
 	}
 }
 
+func ConvertStripeProductPriceStructToRecord(app pbCore.App, recordStruct TStripeProductPriceRecordStruct) (*pbCore.Record, error) {
+	record, err := NewStripeProductPriceRecord(app)
+	if err != nil {
+		return nil, fmt.Errorf("NewStripeProductPriceRecord(app): %w", err)
+	}
+	record, err = utils.PopulateRecord(record, recordStruct)
+	if err != nil {
+		return nil, fmt.Errorf("utils.PopulateRecord(record, recordStruct): %w", err)
+	}
+	return record, nil
+}
+
 func NewStripeProductPriceRecord(app pbCore.App) (*pbCore.Record, error) {
 	collection, err := app.FindCollectionByNameOrId(db.StripeProductPricesCollectionName)
 	if err != nil {
@@ -72,6 +84,38 @@ func DbGetStripeProductPriceRecordStructs(app pbCore.App) ([]TStripeProductPrice
 
 func DbGetStripeProductPriceCollection(app pbCore.App) (*pbCore.Collection, error) {
 	return app.FindCollectionByNameOrId(db.StripeProductPricesCollectionName)
+}
+
+func DbGetStripeProductPriceRecordByStripePriceId(app pbCore.App, stripePriceId string) (*TStripeProductPriceRecordStruct, error) {
+	collection, err := DbGetStripeProductPriceCollection(app)
+	if err != nil {
+		return nil, fmt.Errorf("DbGetStripeProductPriceCollection(app): %w", err)
+	}
+	record, err := app.FindFirstRecordByData(collection, "stripePriceId", stripePriceId)
+	if err != nil {
+		return nil, fmt.Errorf("app.FindFirstRecordByData(collection, \"stripePriceId\", %q): %w", stripePriceId, err)
+	}
+	if record == nil {
+		return nil, err
+	}
+	stripeProductPriceRecordStruct := ConvertStripeProductPriceRecordToStruct(record)
+	return &stripeProductPriceRecordStruct, nil
+}
+
+func DbUpsertStripeProductPrice(app pbCore.App, recordStruct TStripeProductPriceRecordStruct) error {
+	record, err := NewStripeProductPriceRecord(app)
+	if err != nil {
+		return fmt.Errorf("NewStripeProductPriceRecord(app): %w", err)
+	}
+	record, err = utils.PopulateRecord(record, recordStruct)
+	if err != nil {
+		return fmt.Errorf("utils.PopulateRecord(record, recordStruct): %w", err)
+	}
+
+	if recordStruct.Id != "" {
+		record.MarkAsNotNew()
+	}
+	return app.Save(record)
 }
 
 func DbCreateStripeProductPriceRecord(app pbCore.App, recordStruct TStripeProductPriceRecordStruct) error {

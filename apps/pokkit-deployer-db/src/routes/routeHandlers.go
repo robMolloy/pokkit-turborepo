@@ -416,7 +416,7 @@ func getStripeLedgerRecordStructFromPriceCreatedWebhookEvent(stripeEvent stripe.
 	var payload stripe.Price
 	err := json.Unmarshal(stripeEvent.Data.Raw, &payload)
 	if err != nil {
-		return nil, fmt.Errorf("Could not unmarshal JSON from stripe price: %w", err)
+		return nil, fmt.Errorf("Could not unmarshal JSON from stripe price created: %w", err)
 	}
 
 	recordStruct := stripeLedgerRecordsSdk.TStripeLedgerStruct{
@@ -433,6 +433,28 @@ func getStripeLedgerRecordStructFromPriceCreatedWebhookEvent(stripeEvent stripe.
 	}
 	return &recordStruct, nil
 }
+func getStripeLedgerRecordStructFromPriceUpdatedWebhookEvent(stripeEvent stripe.Event) (*stripeLedgerRecordsSdk.TStripeLedgerStruct, error) {
+	var payload stripe.Price
+	err := json.Unmarshal(stripeEvent.Data.Raw, &payload)
+	if err != nil {
+		return nil, fmt.Errorf("Could not unmarshal JSON from stripe price updated: %w", err)
+	}
+
+	recordStruct := stripeLedgerRecordsSdk.TStripeLedgerStruct{
+		EventType:               string(stripeEvent.Type),
+		StripePayloadId:         payload.ID,
+		StripePriceId:           payload.ID,
+		ProductName:             payload.Product.Name,
+		ProductId:               payload.Product.ID,
+		RawData:                 payload,
+		CostPerUnit:             int(payload.UnitAmount),
+		Currency:                string(payload.Currency),
+		RecurrenceInterval:      string(payload.Recurring.Interval),
+		RecurrenceIntervalCount: int(payload.Recurring.IntervalCount),
+	}
+	return &recordStruct, nil
+}
+
 func getStripeLedgerRecordStructFromProductCreatedWebhookEvent(stripeEvent stripe.Event) (*stripeLedgerRecordsSdk.TStripeLedgerStruct, error) {
 	var payload stripe.Product
 	err := json.Unmarshal(stripeEvent.Data.Raw, &payload)
@@ -540,6 +562,14 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		stripeLedgerRecordStructPointer, err := getStripeLedgerRecordStructFromPriceCreatedWebhookEvent(event)
 		if err != nil {
 			return e.BadRequestError("getStripeLedgerRecordStructFromPriceCreatedWebhookEvent(event)", err)
+		}
+		stripeLedgerRecordStruct = *stripeLedgerRecordStructPointer
+	}
+
+	if event.Type == "price.updated" {
+		stripeLedgerRecordStructPointer, err := getStripeLedgerRecordStructFromPriceUpdatedWebhookEvent(event)
+		if err != nil {
+			return e.BadRequestError("getStripeLedgerRecordStructFromPriceUpdatedWebhookEvent(event)", err)
 		}
 		stripeLedgerRecordStruct = *stripeLedgerRecordStructPointer
 	}
