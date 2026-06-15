@@ -515,6 +515,14 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		stripeLedgerRecordStruct = *stripeLedgerRecordStructPointer
 	}
 
+	// if event.Type == "price.created" {
+	// 	stripeLedgerRecordStructPointer, err := getStripeLedgerRecordStructFromPriceCreatedWebhookEvent(e.App, event)
+	// 	if err != nil {
+	// 		return e.BadRequestError("getStripeLedgerRecordStructFromPriceCreatedWebhookEvent(e.App, event)", err)
+	// 	}
+	// 	stripeLedgerRecordStruct = *stripeLedgerRecordStructPointer
+	// }
+
 	hasNotBeenPopulated := stripeLedgerRecordStruct.EventType == ""
 	if hasNotBeenPopulated && !logAllStripeEvents {
 		return e.JSON(http.StatusOK, map[string]any{})

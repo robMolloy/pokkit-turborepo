@@ -52,6 +52,7 @@ func main() {
 	app.OnCollectionAfterDeleteSuccess().BindFunc(pokkitSetup.WriteCollectionsToCollectionsFileAfterCollectionChangeEventHandler)
 
 	app.OnRecordAfterCreateSuccess(db.StripeLedgerCollectionName).BindFunc(events.UpdateProductsAfterStripeLedgerCreatedEventHandler)
+	app.OnRecordAfterCreateSuccess(db.StripeLedgerCollectionName).BindFunc(events.UpdateStripeProductRecordAfterStripeLedgerCreatedEventHandler)
 
 	app.OnRecordAfterCreateSuccess(db.UsersCollectionName).BindFunc(events.PromoteFirstUserToApprovedAdminAfterUserCreateEventHandler)
 

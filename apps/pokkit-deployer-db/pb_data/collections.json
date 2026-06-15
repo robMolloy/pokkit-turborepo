@@ -90,7 +90,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-05-07 22:06:24.687Z",
-    "updated": "2026-06-13 21:48:22.643Z",
+    "updated": "2026-06-13 22:19:57.865Z",
     "system": true
   },
   {
@@ -197,7 +197,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-05-07 22:06:24.689Z",
-    "updated": "2026-06-13 21:48:22.647Z",
+    "updated": "2026-06-13 22:19:57.870Z",
     "system": true
   },
   {
@@ -306,7 +306,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-05-07 22:06:24.690Z",
-    "updated": "2026-06-13 21:48:22.651Z",
+    "updated": "2026-06-13 22:19:57.874Z",
     "system": true
   },
   {
@@ -400,7 +400,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-05-07 22:06:24.691Z",
-    "updated": "2026-06-13 21:48:22.653Z",
+    "updated": "2026-06-13 22:19:57.878Z",
     "system": true
   },
   {
@@ -509,7 +509,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-05-07 22:06:24.693Z",
-    "updated": "2026-06-13 21:48:22.656Z",
+    "updated": "2026-06-13 22:19:57.882Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -718,7 +718,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-05-07 22:06:24.696Z",
-    "updated": "2026-06-13 21:48:22.659Z",
+    "updated": "2026-06-13 22:19:57.888Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -876,7 +876,7 @@
     ],
     "indexes": [],
     "created": "2026-05-07 22:11:26.834Z",
-    "updated": "2026-06-13 21:48:22.664Z",
+    "updated": "2026-06-13 22:19:57.894Z",
     "system": false
   },
   {
@@ -997,7 +997,7 @@
       "CREATE UNIQUE INDEX `idx_0UWlVOdDqD` ON `authOrganisationUserPermissions` (`userOrgKey`)"
     ],
     "created": "2026-05-07 22:11:26.836Z",
-    "updated": "2026-06-13 21:48:22.667Z",
+    "updated": "2026-06-13 22:19:57.896Z",
     "system": false
   },
   {
@@ -1075,7 +1075,7 @@
     ],
     "indexes": [],
     "created": "2026-05-07 22:11:26.838Z",
-    "updated": "2026-06-13 21:48:22.670Z",
+    "updated": "2026-06-13 22:19:57.899Z",
     "system": false
   },
   {
@@ -1168,7 +1168,7 @@
       "CREATE UNIQUE INDEX `idx_JbxVy7FfOr` ON `instances` (`instanceRequestId`)"
     ],
     "created": "2026-05-07 22:11:26.840Z",
-    "updated": "2026-06-13 21:48:22.673Z",
+    "updated": "2026-06-13 22:19:57.902Z",
     "system": false
   },
   {
@@ -1245,7 +1245,7 @@
       "CREATE UNIQUE INDEX `idx_tKzMrurend` ON `userBalances` (`userId`)"
     ],
     "created": "2026-05-07 22:11:26.846Z",
-    "updated": "2026-06-13 21:48:22.678Z",
+    "updated": "2026-06-13 22:19:57.907Z",
     "system": false
   },
   {
@@ -1419,7 +1419,7 @@
     ],
     "indexes": [],
     "created": "2026-05-07 22:11:26.847Z",
-    "updated": "2026-06-13 21:48:22.682Z",
+    "updated": "2026-06-13 22:19:57.911Z",
     "system": false
   },
   {
@@ -1690,7 +1690,7 @@
       "CREATE INDEX `idx_Bzj0h4o9vr` ON `stripeLedger` (`stripePayloadId`)"
     ],
     "created": "2026-05-07 22:11:26.850Z",
-    "updated": "2026-06-13 22:07:54.480Z",
+    "updated": "2026-06-13 22:19:57.916Z",
     "system": false
   },
   {
@@ -1781,7 +1781,7 @@
       "CREATE UNIQUE INDEX `idx_iads1c81Gz` ON `instanceRequests` (\n  `instancesSubscriptionId`,\n  `instanceNumber`\n)"
     ],
     "created": "2026-05-08 22:53:33.592Z",
-    "updated": "2026-06-13 21:48:22.693Z",
+    "updated": "2026-06-13 22:19:57.922Z",
     "system": false
   },
   {
@@ -1859,57 +1859,7 @@
     ],
     "indexes": [],
     "created": "2026-06-10 22:07:19.233Z",
-    "updated": "2026-06-13 21:48:22.698Z",
-    "system": false
-  },
-  {
-    "id": "pbc_917019932",
-    "listRule": null,
-    "viewRule": null,
-    "createRule": null,
-    "updateRule": null,
-    "deleteRule": null,
-    "name": "stripeProducts",
-    "type": "base",
-    "fields": [
-      {
-        "autogeneratePattern": "[a-z0-9]{15}",
-        "hidden": false,
-        "id": "text3208210256",
-        "max": 15,
-        "min": 15,
-        "name": "id",
-        "pattern": "^[a-z0-9]+$",
-        "presentable": false,
-        "primaryKey": true,
-        "required": true,
-        "system": true,
-        "type": "text"
-      },
-      {
-        "hidden": false,
-        "id": "autodate2990389176",
-        "name": "created",
-        "onCreate": true,
-        "onUpdate": false,
-        "presentable": false,
-        "system": false,
-        "type": "autodate"
-      },
-      {
-        "hidden": false,
-        "id": "autodate3332085495",
-        "name": "updated",
-        "onCreate": true,
-        "onUpdate": true,
-        "presentable": false,
-        "system": false,
-        "type": "autodate"
-      }
-    ],
-    "indexes": [],
-    "created": "2026-06-11 15:30:44.501Z",
-    "updated": "2026-06-13 21:48:22.702Z",
+    "updated": "2026-06-13 22:19:57.926Z",
     "system": false
   },
   {
@@ -1968,7 +1918,7 @@
     ],
     "indexes": [],
     "created": "2026-06-11 15:41:22.859Z",
-    "updated": "2026-06-13 21:48:22.704Z",
+    "updated": "2026-06-13 22:19:57.931Z",
     "system": false
   },
   {
@@ -2132,7 +2082,201 @@
     ],
     "indexes": [],
     "created": "2026-06-11 15:48:13.714Z",
-    "updated": "2026-06-13 21:48:22.707Z",
+    "updated": "2026-06-13 22:19:57.934Z",
+    "system": false
+  },
+  {
+    "id": "pbc_249711327",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "stripeProducts",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text3339685365",
+        "max": 0,
+        "min": 0,
+        "name": "stripeProductId",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text3448522234",
+        "max": 0,
+        "min": 0,
+        "name": "stripeProductName",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "created": "2026-06-13 22:39:21.277Z",
+    "updated": "2026-06-15 01:39:45.961Z",
+    "system": false
+  },
+  {
+    "id": "pbc_2910625769",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "stripeProductPrices",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text3339685365",
+        "max": 0,
+        "min": 0,
+        "name": "stripeProductId",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text3287476027",
+        "max": 0,
+        "min": 0,
+        "name": "recurrenceInterval",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "number2413213763",
+        "max": null,
+        "min": null,
+        "name": "recurrenceIntervalCount",
+        "onlyInt": false,
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "number"
+      },
+      {
+        "autogeneratePattern": "",
+        "hidden": false,
+        "id": "text1767278655",
+        "max": 0,
+        "min": 0,
+        "name": "currency",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "number3327837906",
+        "max": null,
+        "min": null,
+        "name": "costPerUnit",
+        "onlyInt": false,
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "number"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "created": "2026-06-15 01:38:32.862Z",
+    "updated": "2026-06-15 01:39:05.092Z",
     "system": false
   }
 ]

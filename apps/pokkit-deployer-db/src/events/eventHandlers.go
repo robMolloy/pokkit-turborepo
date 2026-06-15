@@ -5,6 +5,7 @@ import (
 	"app-db/src/modules/instanceRecordsSdk"
 	"app-db/src/modules/instanceSubscriptionsSdk"
 	"app-db/src/modules/stripeLedgerRecordsSdk"
+	"app-db/src/modules/stripeProductsSdk"
 	"app-db/src/modules/userBalanceRecordsSdk"
 	"app-db/src/pokkitSetup"
 	"app-db/src/utils"
@@ -167,7 +168,7 @@ func UpdateProductsAfterStripeLedgerCreatedEventHandler(e *pbCore.RecordEvent) e
 
 	if stripeLedgerRecordStruct.EventType != "checkout.session.completed" && stripeLedgerRecordStruct.EventType != "customer.subscription.updated" {
 		e.App.Logger().Info("event type must be checkout.session.completed to update products")
-		return nil
+		return e.Next()
 	}
 
 	if stripeLedgerRecordStruct.Currency != "usd" {
@@ -187,6 +188,27 @@ func UpdateProductsAfterStripeLedgerCreatedEventHandler(e *pbCore.RecordEvent) e
 		err := userBalanceRecordsSdk.FindUserBalanceRecordAndIncrementTokenAmount(e.App, userId, stripeLedgerRecordStruct.Quantity)
 		if err != nil {
 			return fmt.Errorf("userBalanceRecordsSdk.FindUserBalanceRecordAndIncrementTokenAmount error: %w", err)
+		}
+	}
+
+	return e.Next()
+}
+
+func UpdateStripeProductRecordAfterStripeLedgerCreatedEventHandler(e *pbCore.RecordEvent) error {
+	e.App.Logger().Info("UpdateStripeProductRecordAfterStripeLedgerCreatedEventHandler")
+
+	stripeLedgerRecord := e.Record
+	stripeLedgerRecordStruct := stripeLedgerRecordsSdk.ConvertStripeLedgerRecordToStruct(stripeLedgerRecord)
+
+	if stripeLedgerRecordStruct.EventType == "product.created" {
+		stripeProductRecordStruct := stripeProductsSdk.TStripeProductStruct{
+			StripeProductId:   stripeLedgerRecordStruct.ProductId,
+			StripeProductName: stripeLedgerRecordStruct.ProductId,
+		}
+		err := stripeProductsSdk.DbCreateStripeProductRecord(e.App, stripeProductRecordStruct)
+		if err != nil {
+			e.App.Logger().Error("stripeProductSdk.DbCreateStripeProductRecord", "err", err)
+			return fmt.Errorf("stripeProductSdk.DbCreateStripeProductRecord: %w", err)
 		}
 	}
 
