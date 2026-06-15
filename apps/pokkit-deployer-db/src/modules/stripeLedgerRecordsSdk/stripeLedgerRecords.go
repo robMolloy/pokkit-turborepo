@@ -14,6 +14,7 @@ type TStripeLedgerStruct struct {
 	Quantity                int              `json:"quantity"`
 	CostPerUnit             int              `json:"costPerUnit"`
 	StripePayloadId         string           `json:"stripePayloadId"`
+	StripePriceId           string           `json:"stripePriceId"`
 	SubscriptionId          string           `json:"subscriptionId"`
 	InvoiceId               string           `json:"invoiceId"`
 	Currency                string           `json:"currency"`

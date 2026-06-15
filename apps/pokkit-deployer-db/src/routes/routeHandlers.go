@@ -412,6 +412,27 @@ func getStripeLedgerRecordStructFromCustomerSubscriptionUpdatedWebhookEvent(app 
 
 	return &stripeLedgerRecordStruct, nil
 }
+func getStripeLedgerRecordStructFromPriceCreatedWebhookEvent(stripeEvent stripe.Event) (*stripeLedgerRecordsSdk.TStripeLedgerStruct, error) {
+	var payload stripe.Price
+	err := json.Unmarshal(stripeEvent.Data.Raw, &payload)
+	if err != nil {
+		return nil, fmt.Errorf("Could not unmarshal JSON from stripe price: %w", err)
+	}
+
+	recordStruct := stripeLedgerRecordsSdk.TStripeLedgerStruct{
+		EventType:               string(stripeEvent.Type),
+		StripePayloadId:         payload.ID,
+		StripePriceId:           payload.ID,
+		ProductName:             payload.Product.Name,
+		ProductId:               payload.Product.ID,
+		RawData:                 payload,
+		CostPerUnit:             int(payload.UnitAmount),
+		Currency:                string(payload.Currency),
+		RecurrenceInterval:      string(payload.Recurring.Interval),
+		RecurrenceIntervalCount: int(payload.Recurring.IntervalCount),
+	}
+	return &recordStruct, nil
+}
 func getStripeLedgerRecordStructFromProductCreatedWebhookEvent(stripeEvent stripe.Event) (*stripeLedgerRecordsSdk.TStripeLedgerStruct, error) {
 	var payload stripe.Product
 	err := json.Unmarshal(stripeEvent.Data.Raw, &payload)
@@ -515,13 +536,13 @@ func StripeWebHookRouteHandler(e *pbCore.RequestEvent) error {
 		stripeLedgerRecordStruct = *stripeLedgerRecordStructPointer
 	}
 
-	// if event.Type == "price.created" {
-	// 	stripeLedgerRecordStructPointer, err := getStripeLedgerRecordStructFromPriceCreatedWebhookEvent(e.App, event)
-	// 	if err != nil {
-	// 		return e.BadRequestError("getStripeLedgerRecordStructFromPriceCreatedWebhookEvent(e.App, event)", err)
-	// 	}
-	// 	stripeLedgerRecordStruct = *stripeLedgerRecordStructPointer
-	// }
+	if event.Type == "price.created" {
+		stripeLedgerRecordStructPointer, err := getStripeLedgerRecordStructFromPriceCreatedWebhookEvent(event)
+		if err != nil {
+			return e.BadRequestError("getStripeLedgerRecordStructFromPriceCreatedWebhookEvent(event)", err)
+		}
+		stripeLedgerRecordStruct = *stripeLedgerRecordStructPointer
+	}
 
 	hasNotBeenPopulated := stripeLedgerRecordStruct.EventType == ""
 	if hasNotBeenPopulated && !logAllStripeEvents {

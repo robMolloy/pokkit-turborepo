@@ -203,7 +203,7 @@ func UpdateStripeProductRecordAfterStripeLedgerCreatedEventHandler(e *pbCore.Rec
 	if stripeLedgerRecordStruct.EventType == "product.created" {
 		stripeProductRecordStruct := stripeProductsSdk.TStripeProductStruct{
 			StripeProductId:   stripeLedgerRecordStruct.ProductId,
-			StripeProductName: stripeLedgerRecordStruct.ProductId,
+			StripeProductName: stripeLedgerRecordStruct.ProductName,
 		}
 		err := stripeProductsSdk.DbCreateStripeProductRecord(e.App, stripeProductRecordStruct)
 		if err != nil {
