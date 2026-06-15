@@ -2,6 +2,7 @@ package stripeProductPricesSdk
 
 import (
 	"app-db/src/db"
+	"app-db/src/modules/stripeLedgerRecordsSdk"
 	"app-db/src/utils"
 	"fmt"
 
@@ -129,4 +130,16 @@ func DbCreateStripeProductPriceRecord(app pbCore.App, recordStruct TStripeProduc
 		return fmt.Errorf("utils.PopulateRecord(record, recordStruct): %w", err)
 	}
 	return app.Save(record)
+}
+
+func PopulateStripeProductPriceRecordStructWithStripeLedgerRecordStruct(
+	priceRecordStruct *TStripeProductPriceRecordStruct,
+	ledgerRecordStruct stripeLedgerRecordsSdk.TStripeLedgerStruct,
+) {
+	priceRecordStruct.StripeProductId = ledgerRecordStruct.ProductId
+	priceRecordStruct.StripePriceId = ledgerRecordStruct.StripePriceId
+	priceRecordStruct.RecurrenceInterval = ledgerRecordStruct.RecurrenceInterval
+	priceRecordStruct.RecurrenceIntervalCount = ledgerRecordStruct.RecurrenceIntervalCount
+	priceRecordStruct.Currency = ledgerRecordStruct.Currency
+	priceRecordStruct.CostPerUnit = ledgerRecordStruct.CostPerUnit
 }

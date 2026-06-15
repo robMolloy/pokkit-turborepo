@@ -237,12 +237,8 @@ func UpdateStripeProductRecordAfterStripeLedgerCreatedEventHandler(e *pbCore.Rec
 		if stripeProductPriceRecordStructPointer != nil {
 			stripeProductPriceRecordStruct = *stripeProductPriceRecordStructPointer
 		}
-		stripeProductPriceRecordStruct.StripeProductId = stripeLedgerRecordStruct.ProductId
-		stripeProductPriceRecordStruct.StripePriceId = stripeLedgerRecordStruct.StripePriceId
-		stripeProductPriceRecordStruct.RecurrenceInterval = stripeLedgerRecordStruct.RecurrenceInterval
-		stripeProductPriceRecordStruct.RecurrenceIntervalCount = stripeLedgerRecordStruct.RecurrenceIntervalCount
-		stripeProductPriceRecordStruct.Currency = stripeLedgerRecordStruct.Currency
-		stripeProductPriceRecordStruct.CostPerUnit = stripeLedgerRecordStruct.CostPerUnit
+
+		stripeProductPricesSdk.PopulateStripeProductPriceRecordStructWithStripeLedgerRecordStruct(&stripeProductPriceRecordStruct, stripeLedgerRecordStruct)
 
 		err = stripeProductPricesSdk.DbUpsertStripeProductPrice(e.App, stripeProductPriceRecordStruct)
 		if err != nil {
