@@ -52,7 +52,6 @@ func main() {
 	app.OnCollectionAfterDeleteSuccess().BindFunc(pokkitSetup.WriteCollectionsToCollectionsFileAfterCollectionChangeEventHandler)
 
 	app.OnRecordAfterCreateSuccess(db.StripeLedgerCollectionName).BindFunc(events.UpdateProductsAfterStripeLedgerCreatedEventHandler)
-	app.OnRecordAfterCreateSuccess(db.StripeLedgerCollectionName).BindFunc(events.UpdateStripeProductRecordAfterStripeLedgerCreatedEventHandler)
 	app.OnRecordAfterCreateSuccess(db.StripeLedgerCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		err := events.UpdateStripeProductRecordAfterStripeLedgerCreatedEventHandler(e)
 		if err != nil {

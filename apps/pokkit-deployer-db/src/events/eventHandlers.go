@@ -10,6 +10,8 @@ import (
 	"app-db/src/modules/userBalanceRecordsSdk"
 	"app-db/src/pokkitSetup"
 	"app-db/src/utils"
+	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 
@@ -212,39 +214,50 @@ func UpdateStripeProductRecordAfterStripeLedgerCreatedEventHandler(e *pbCore.Rec
 		}
 	}
 	if stripeLedgerRecordStruct.EventType == "price.created" {
-		stripeProductPriceRecordStruct := stripeProductPricesSdk.TStripeProductPriceRecordStruct{
-			StripeProductId:         stripeLedgerRecordStruct.ProductId,
-			StripePriceId:           stripeLedgerRecordStruct.StripePriceId,
-			RecurrenceInterval:      stripeLedgerRecordStruct.RecurrenceInterval,
-			RecurrenceIntervalCount: stripeLedgerRecordStruct.RecurrenceIntervalCount,
-			Currency:                stripeLedgerRecordStruct.Currency,
-			CostPerUnit:             stripeLedgerRecordStruct.CostPerUnit,
-		}
-		err := stripeProductPricesSdk.DbCreateStripeProductPriceRecord(e.App, stripeProductPriceRecordStruct)
+		stripeProductPriceRecordProxy, err := stripeProductPricesSdk.NewStripeProductPriceRecordProxy(e.App)
 		if err != nil {
-			return fmt.Errorf("stripeProductPricesSdk.DbCreateStripeProductPriceRecord: %w", err)
+			return fmt.Errorf("stripeProductPricesSdk.NewStripeProductPriceRecordProxy: %w", err)
+		}
+		stripeProductPriceRecordProxy.SetStripeProductId(stripeLedgerRecordStruct.ProductId)
+		stripeProductPriceRecordProxy.SetStripePriceId(stripeLedgerRecordStruct.StripePriceId)
+		stripeProductPriceRecordProxy.SetRecurrenceInterval(stripeLedgerRecordStruct.RecurrenceInterval)
+		stripeProductPriceRecordProxy.SetRecurrenceIntervalCount(stripeLedgerRecordStruct.RecurrenceIntervalCount)
+		stripeProductPriceRecordProxy.SetCurrency(stripeLedgerRecordStruct.Currency)
+		stripeProductPriceRecordProxy.SetCostPerUnit(stripeLedgerRecordStruct.CostPerUnit)
+
+		err = e.App.Save(stripeProductPriceRecordProxy)
+		if err != nil {
+			return fmt.Errorf("e.App.Save(stripeProductPriceRecordProxy): %w", err)
 		}
 	}
 
 	if stripeLedgerRecordStruct.EventType == "price.updated" {
-		stripeProductPriceRecordStructPointer, err :=
-			stripeProductPricesSdk.DbGetStripeProductPriceRecordByStripePriceId(e.App, stripeLedgerRecordStruct.StripePriceId)
-
-		if err != nil {
-			return fmt.Errorf("stripeProductPricesSdk.DbGetStripeProductPriceRecordByStripePriceId: %w", err)
-		}
-		stripeProductPriceRecordStruct := stripeProductPricesSdk.TStripeProductPriceRecordStruct{}
-		if stripeProductPriceRecordStructPointer != nil {
-			stripeProductPriceRecordStruct = *stripeProductPriceRecordStructPointer
+		stripeProductPriceRecordProxy, err :=
+			stripeProductPricesSdk.DbGetStripeProductPriceRecordProxyByStripePriceId(e.App, stripeLedgerRecordStruct.StripePriceId)
+		recordNotFound := errors.Is(err, sql.ErrNoRows)
+		if err != nil && !recordNotFound {
+			return fmt.Errorf("stripeProductPricesSdk.DbGetStripeProductPriceRecordProxyByStripePriceId: %w", err)
 		}
 
-		stripeProductPricesSdk.PopulateStripeProductPriceRecordStructWithStripeLedgerRecordStruct(&stripeProductPriceRecordStruct, stripeLedgerRecordStruct)
+		if recordNotFound {
+			stripeProductPriceRecordProxy, err = stripeProductPricesSdk.NewStripeProductPriceRecordProxy(e.App)
+			if err != nil {
+				return fmt.Errorf("stripeProductPricesSdk.NewStripeProductPriceRecordProxy: %w", err)
+			}
+		}
 
-		err = stripeProductPricesSdk.DbUpsertStripeProductPrice(e.App, stripeProductPriceRecordStruct)
+		stripeProductPriceRecordProxy.SetStripeProductId(stripeLedgerRecordStruct.ProductId)
+		stripeProductPriceRecordProxy.SetStripePriceId(stripeLedgerRecordStruct.StripePriceId)
+		stripeProductPriceRecordProxy.SetRecurrenceInterval(stripeLedgerRecordStruct.RecurrenceInterval)
+		stripeProductPriceRecordProxy.SetRecurrenceIntervalCount(stripeLedgerRecordStruct.RecurrenceIntervalCount)
+		stripeProductPriceRecordProxy.SetCurrency(stripeLedgerRecordStruct.Currency)
+		stripeProductPriceRecordProxy.SetCostPerUnit(stripeLedgerRecordStruct.CostPerUnit)
+
+		err = e.App.Save(stripeProductPriceRecordProxy)
 		if err != nil {
-			return fmt.Errorf("stripeProductPricesSdk.DbCreateStripeProductPriceRecord: %w", err)
+			return fmt.Errorf("e.App.Save(stripeProductPriceRecordProxy): %w", err)
 		}
 	}
 
-	return e.Next()
+	return nil
 }

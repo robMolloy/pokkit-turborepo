@@ -119,6 +119,17 @@ func NewStripeProductPriceRecord(app pbCore.App) (*pbCore.Record, error) {
 	return record, nil
 }
 
+func NewStripeProductPriceRecordProxy(app pbCore.App) (*TStripeProductPriceRecordProxy, error) {
+	collection, err := app.FindCollectionByNameOrId(db.StripeProductPricesCollectionName)
+	if err != nil {
+		return nil, fmt.Errorf("app.FindCollectionByNameOrId(db.StripeProductPricesCollectionName): %w", err)
+	}
+	record := pbCore.NewRecord(collection)
+	stripeProductPriceRecordProxy := &TStripeProductPriceRecordProxy{}
+	stripeProductPriceRecordProxy.SetProxyRecord(record)
+	return stripeProductPriceRecordProxy, nil
+}
+
 func PopulateStripeProductPriceRecordWithStruct(record *pbCore.Record, data TStripeProductPriceRecordStruct) (*pbCore.Record, error) {
 	return utils.PopulateRecord(record, data)
 }
