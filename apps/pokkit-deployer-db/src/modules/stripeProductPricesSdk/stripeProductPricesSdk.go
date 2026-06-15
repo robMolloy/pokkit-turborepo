@@ -143,6 +143,27 @@ func DbGetStripeProductPriceRecordStructs(app pbCore.App) ([]TStripeProductPrice
 
 	return stripeProductPriceRecordStructs, nil
 }
+func DbGetStripeProductPriceRecordProxies(app pbCore.App) ([]*TStripeProductPriceRecordProxy, error) {
+	collection, err := app.FindCollectionByNameOrId(db.StripeProductPricesCollectionName)
+	if err != nil {
+		app.Logger().Error("app.FindCollectionByNameOrId(db.StripeProductPricesCollectionName)", "err", err)
+		return nil, err
+	}
+
+	records, err := app.FindAllRecords(collection)
+	if err != nil {
+		return nil, fmt.Errorf("app.FindAllRecords(collection): %w", err)
+	}
+
+	stripeProductPriceRecordProxies := []*TStripeProductPriceRecordProxy{}
+	for _, record := range records {
+		stripeProductPriceRecordProxy := &TStripeProductPriceRecordProxy{}
+		stripeProductPriceRecordProxy.SetProxyRecord(record)
+		stripeProductPriceRecordProxies = append(stripeProductPriceRecordProxies, stripeProductPriceRecordProxy)
+	}
+
+	return stripeProductPriceRecordProxies, nil
+}
 
 func DbGetStripeProductPriceCollection(app pbCore.App) (*pbCore.Collection, error) {
 	return app.FindCollectionByNameOrId(db.StripeProductPricesCollectionName)
@@ -163,6 +184,22 @@ func DbGetStripeProductPriceRecordByStripePriceId(app pbCore.App, stripePriceId 
 	stripeProductPriceRecordStruct := ConvertStripeProductPriceRecordToStruct(record)
 	return &stripeProductPriceRecordStruct, nil
 }
+func DbGetStripeProductPriceRecordProxyByStripePriceId(app pbCore.App, stripePriceId string) (*TStripeProductPriceRecordProxy, error) {
+	collection, err := DbGetStripeProductPriceCollection(app)
+	if err != nil {
+		return nil, fmt.Errorf("DbGetStripeProductPriceCollection(app): %w", err)
+	}
+	record, err := app.FindFirstRecordByData(collection, "stripePriceId", stripePriceId)
+	if err != nil {
+		return nil, fmt.Errorf("app.FindFirstRecordByData(collection, \"stripePriceId\", %q): %w", stripePriceId, err)
+	}
+	if record == nil {
+		return nil, err
+	}
+	stripeProductPriceRecordProxy := &TStripeProductPriceRecordProxy{}
+	stripeProductPriceRecordProxy.SetProxyRecord(record)
+	return stripeProductPriceRecordProxy, nil
+}
 
 func DbUpsertStripeProductPrice(app pbCore.App, recordStruct TStripeProductPriceRecordStruct) error {
 	record, err := NewStripeProductPriceRecord(app)
@@ -180,6 +217,10 @@ func DbUpsertStripeProductPrice(app pbCore.App, recordStruct TStripeProductPrice
 	return app.Save(record)
 }
 
+func DbUpsertStripeProductPriceRecordProxy(app pbCore.App, recordProxy TStripeProductPriceRecordProxy) error {
+	return app.Save(recordProxy)
+}
+
 func DbCreateStripeProductPriceRecord(app pbCore.App, recordStruct TStripeProductPriceRecordStruct) error {
 	collection, err := DbGetStripeProductPriceCollection(app)
 	if err != nil {
@@ -191,6 +232,9 @@ func DbCreateStripeProductPriceRecord(app pbCore.App, recordStruct TStripeProduc
 		return fmt.Errorf("utils.PopulateRecord(record, recordStruct): %w", err)
 	}
 	return app.Save(record)
+}
+func DbCreateStripeProductPriceRecordProxy(app pbCore.App, recordProxy TStripeProductPriceRecordProxy) error {
+	return app.Save(recordProxy)
 }
 
 func PopulateStripeProductPriceRecordStructWithStripeLedgerRecordStruct(
