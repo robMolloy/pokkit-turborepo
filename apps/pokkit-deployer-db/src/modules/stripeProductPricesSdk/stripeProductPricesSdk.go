@@ -12,6 +12,7 @@ import (
 type TStripeProductPriceRecordStruct struct {
 	Id                      string           `json:"id"`
 	StripeProductId         string           `json:"stripeProductId"`
+	StripePriceId           string           `json:"stripePriceId"`
 	RecurrenceInterval      string           `json:"recurrenceInterval"`
 	RecurrenceIntervalCount int              `json:"recurrenceIntervalCount"`
 	Currency                string           `json:"currency"`
@@ -24,6 +25,7 @@ func ConvertStripeProductPriceRecordToStruct(record *pbCore.Record) TStripeProdu
 	return TStripeProductPriceRecordStruct{
 		Id:                      record.GetString("id"),
 		StripeProductId:         record.GetString("stripeProductId"),
+		StripePriceId:           record.GetString("stripePriceId"),
 		RecurrenceInterval:      record.GetString("recurrenceInterval"),
 		RecurrenceIntervalCount: record.GetInt("recurrenceIntervalCount"),
 		Currency:                record.GetString("currency"),

@@ -5,6 +5,7 @@ import (
 	"app-db/src/modules/instanceRecordsSdk"
 	"app-db/src/modules/instanceSubscriptionsSdk"
 	"app-db/src/modules/stripeLedgerRecordsSdk"
+	"app-db/src/modules/stripeProductPricesSdk"
 	"app-db/src/modules/stripeProductsSdk"
 	"app-db/src/modules/userBalanceRecordsSdk"
 	"app-db/src/pokkitSetup"
@@ -207,8 +208,21 @@ func UpdateStripeProductRecordAfterStripeLedgerCreatedEventHandler(e *pbCore.Rec
 		}
 		err := stripeProductsSdk.DbCreateStripeProductRecord(e.App, stripeProductRecordStruct)
 		if err != nil {
-			e.App.Logger().Error("stripeProductSdk.DbCreateStripeProductRecord", "err", err)
 			return fmt.Errorf("stripeProductSdk.DbCreateStripeProductRecord: %w", err)
+		}
+	}
+	if stripeLedgerRecordStruct.EventType == "price.created" {
+		stripeProductPriceRecordStruct := stripeProductPricesSdk.TStripeProductPriceRecordStruct{
+			StripeProductId:         stripeLedgerRecordStruct.ProductId,
+			StripePriceId:           stripeLedgerRecordStruct.StripePriceId,
+			RecurrenceInterval:      stripeLedgerRecordStruct.RecurrenceInterval,
+			RecurrenceIntervalCount: stripeLedgerRecordStruct.RecurrenceIntervalCount,
+			Currency:                stripeLedgerRecordStruct.Currency,
+			CostPerUnit:             stripeLedgerRecordStruct.CostPerUnit,
+		}
+		err := stripeProductPricesSdk.DbCreateStripeProductPriceRecord(e.App, stripeProductPriceRecordStruct)
+		if err != nil {
+			return fmt.Errorf("stripeProductPricesSdk.DbCreateStripeProductPriceRecord: %w", err)
 		}
 	}
 

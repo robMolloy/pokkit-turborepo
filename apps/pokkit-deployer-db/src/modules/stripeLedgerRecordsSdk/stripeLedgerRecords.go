@@ -1,7 +1,7 @@
 package stripeLedgerRecordsSdk
 
 import (
-	"reflect"
+	"app-db/src/utils"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 	pbTypes "github.com/pocketbase/pocketbase/tools/types"
@@ -31,53 +31,6 @@ type TStripeLedgerStruct struct {
 	Updated                 pbTypes.DateTime `json:"updated"`
 }
 
-func PopulateStripeLedgerRecord2(record *pbCore.Record, data TStripeLedgerStruct) *pbCore.Record {
-	structValue := reflect.ValueOf(data)
-	structType := reflect.TypeOf(data)
-	numberOfFields := structType.NumField()
-
-	for fieldIndex := range numberOfFields {
-		structField := structType.Field(fieldIndex)
-		jsonKey := structField.Tag.Get("json")
-
-		if jsonKey == "" || jsonKey == "-" {
-			continue
-		}
-
-		fieldValue := structValue.Field(fieldIndex).Interface()
-		record.Set(jsonKey, fieldValue)
-	}
-
-	return record
-}
-
-func PopulateStripeLedgerRecord(record *pbCore.Record, data TStripeLedgerStruct) *pbCore.Record {
-	if data.Id != "" {
-		record.Set("id", data.Id)
-	}
-	record.Set("userId", data.UserId)
-	record.Set("quantity", data.Quantity)
-	record.Set("costPerUnit", data.CostPerUnit)
-	record.Set("invoiceId", data.InvoiceId)
-	record.Set("stripePayloadId", data.StripePayloadId)
-	record.Set("subscriptionId", data.SubscriptionId)
-	record.Set("currency", data.Currency)
-	record.Set("cost", data.Cost)
-	record.Set("productName", data.ProductName)
-	record.Set("productId", data.ProductId)
-	record.Set("stripeCustomerId", data.StripeCustomerId)
-	record.Set("eventType", data.EventType)
-	record.Set("recurrenceInterval", data.RecurrenceInterval)
-	record.Set("recurrenceIntervalCount", data.RecurrenceIntervalCount)
-	record.Set("recurrenceIntervalStart", data.RecurrenceIntervalStart)
-	record.Set("recurrenceIntervalEnd", data.RecurrenceIntervalEnd)
-	record.Set("rawData", data.RawData)
-	record.Set("created", data.Created)
-	record.Set("updated", data.Updated)
-
-	return record
-}
-
 func ConvertStripeLedgerRecordToStruct(record *pbCore.Record) TStripeLedgerStruct {
 	return TStripeLedgerStruct{
 		Id:                      record.GetString("id"),
@@ -85,6 +38,7 @@ func ConvertStripeLedgerRecordToStruct(record *pbCore.Record) TStripeLedgerStruc
 		Quantity:                record.GetInt("quantity"),
 		CostPerUnit:             record.GetInt("costPerUnit"),
 		StripePayloadId:         record.GetString("stripePayloadId"),
+		StripePriceId:           record.GetString("stripePriceId"),
 		InvoiceId:               record.GetString("invoiceId"),
 		SubscriptionId:          record.GetString("subscriptionId"),
 		Currency:                record.GetString("currency"),
@@ -101,4 +55,8 @@ func ConvertStripeLedgerRecordToStruct(record *pbCore.Record) TStripeLedgerStruc
 		Created:                 record.GetDateTime("created"),
 		Updated:                 record.GetDateTime("updated"),
 	}
+}
+
+func PopulateStripeLedgerRecord(record *pbCore.Record, data TStripeLedgerStruct) (*pbCore.Record, error) {
+	return utils.PopulateRecord(record, data)
 }

@@ -53,6 +53,13 @@ func main() {
 
 	app.OnRecordAfterCreateSuccess(db.StripeLedgerCollectionName).BindFunc(events.UpdateProductsAfterStripeLedgerCreatedEventHandler)
 	app.OnRecordAfterCreateSuccess(db.StripeLedgerCollectionName).BindFunc(events.UpdateStripeProductRecordAfterStripeLedgerCreatedEventHandler)
+	app.OnRecordAfterCreateSuccess(db.StripeLedgerCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+		err := events.UpdateStripeProductRecordAfterStripeLedgerCreatedEventHandler(e)
+		if err != nil {
+			e.App.Logger().Error("events.UpdateStripeProductRecordAfterStripeLedgerCreatedEventHandler", "err", err)
+		}
+		return e.Next()
+	})
 
 	app.OnRecordAfterCreateSuccess(db.UsersCollectionName).BindFunc(events.PromoteFirstUserToApprovedAdminAfterUserCreateEventHandler)
 
