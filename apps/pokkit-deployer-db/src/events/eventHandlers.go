@@ -213,8 +213,9 @@ func UpdateStripeProductRecordAfterStripeLedgerCreatedEventHandler(e *pbCore.Rec
 			return fmt.Errorf("stripeProductSdk.DbCreateStripeProductRecord: %w", err)
 		}
 	}
+
 	if stripeLedgerRecordStruct.EventType == "price.created" {
-		stripeProductPriceRecordProxy, err := stripeProductPricesSdk.NewStripeProductPriceRecordProxy(e.App)
+		stripeProductPriceRecordProxy, err := stripeProductPricesSdk.CreateNewStripeProductPriceRecordProxy(e.App)
 		if err != nil {
 			return fmt.Errorf("stripeProductPricesSdk.NewStripeProductPriceRecordProxy: %w", err)
 		}
@@ -233,14 +234,14 @@ func UpdateStripeProductRecordAfterStripeLedgerCreatedEventHandler(e *pbCore.Rec
 
 	if stripeLedgerRecordStruct.EventType == "price.updated" {
 		stripeProductPriceRecordProxy, err :=
-			stripeProductPricesSdk.DbGetStripeProductPriceRecordProxyByStripePriceId(e.App, stripeLedgerRecordStruct.StripePriceId)
+			stripeProductPricesSdk.DbGetStripeProductPriceRecordByStripePriceId(e.App, stripeLedgerRecordStruct.StripePriceId)
 		recordNotFound := errors.Is(err, sql.ErrNoRows)
 		if err != nil && !recordNotFound {
-			return fmt.Errorf("stripeProductPricesSdk.DbGetStripeProductPriceRecordProxyByStripePriceId: %w", err)
+			return fmt.Errorf("stripeProductPricesSdk.DbGetStripeProductPriceRecordByStripePriceId(e.App, stripeLedgerRecordStruct.StripePriceId): %w", err)
 		}
 
 		if recordNotFound {
-			stripeProductPriceRecordProxy, err = stripeProductPricesSdk.NewStripeProductPriceRecordProxy(e.App)
+			stripeProductPriceRecordProxy, err = stripeProductPricesSdk.CreateNewStripeProductPriceRecordProxy(e.App)
 			if err != nil {
 				return fmt.Errorf("stripeProductPricesSdk.NewStripeProductPriceRecordProxy: %w", err)
 			}
