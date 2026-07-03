@@ -1,0 +1,19 @@
+{
+  "name": "pokkit-stripe-db",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "init-dev": "go mod init app-db && go mod tidy",
+    "serve-dev": "go run . serve --http=\"0.0.0.0:8091\"",
+    "build": "go build -o app-db",
+    "serve-build": "./app-db serve --http=\"0.0.0.0:8091\"",
+    "build:on-change-to-dev": "npx nodemon --delay 1 --watch ./ --exec \"pnpm run build\"",
+    "pre-dev": "stripe listen -l --forward-to localhost:8091/stripe-webhook",
+    "test": "go test -v ./...",
+    "dev": "go run . serve --http=\"0.0.0.0:8091\""
+  }
+}
