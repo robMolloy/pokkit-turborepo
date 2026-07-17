@@ -1,4 +1,5 @@
-import PocketBase, { CollectionModel } from "pocketbase";
+import PocketBase from "pocketbase";
+import type { CollectionModel } from "pocketbase";
 import { exec, spawn, type ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
 import { promisify } from "util";

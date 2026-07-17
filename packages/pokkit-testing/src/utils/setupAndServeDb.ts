@@ -1,4 +1,4 @@
-import { CollectionModel } from "pocketbase";
+import type { CollectionModel } from "pocketbase";
 import {
   serveBuildAndWriteLogs,
   upsertAdminCredentials,
@@ -8,19 +8,16 @@ import {
 import fse from "fs-extra";
 
 export const setupAndServeDb = async (p: {
-  getCollectionsFn: () => Promise<CollectionModel[]>;
-  /**
-   * Ensure the db build file is executable
-   */
   writeDbBuildToFilePathFn: () => Promise<unknown>;
   dbBuildFilePath: string;
   dbLogFilePath: string;
   dbUrl: string;
   dbSuperuserEmail: string;
   dbSuperuserPassword: string;
+  applyCollections?:
+    | { required: true; getCollectionsFn: () => Promise<CollectionModel[]> }
+    | { required?: false };
 }) => {
-  const collections = await p.getCollectionsFn();
-
   fse.ensureFileSync(p.dbBuildFilePath);
   await p.writeDbBuildToFilePathFn();
 
@@ -36,12 +33,15 @@ export const setupAndServeDb = async (p: {
     dbSuperuserPassword: p.dbSuperuserPassword,
   });
 
-  await applyCollectionsToDb({
-    dbUrl: p.dbUrl,
-    dbSuperuserEmail: p.dbSuperuserEmail,
-    dbSuperuserPassword: p.dbSuperuserPassword,
-    collections,
-  });
+  if (p.applyCollections?.required) {
+    const collections = await p.applyCollections.getCollectionsFn();
+    await applyCollectionsToDb({
+      dbUrl: p.dbUrl,
+      dbSuperuserEmail: p.dbSuperuserEmail,
+      dbSuperuserPassword: p.dbSuperuserPassword,
+      collections,
+    });
+  }
 
   return pbProcess;
 };
