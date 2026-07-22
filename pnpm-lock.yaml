@@ -213,7 +213,9 @@ importers:
         specifier: ^5.1.4
         version: 5.4.21(@types/node@25.9.5)(lightningcss@1.31.1)
 
-  apps/pokkit-starter-ts-testing:
+  apps/pokkit-starter-db: {}
+
+  apps/pokkit-starter-db-ts-testing:
     dependencies:
       '@repo/pokkit-testing':
         specifier: workspace:^
@@ -10626,13 +10628,13 @@ snapshots:
   '@types/fs-extra@11.0.4':
     dependencies:
       '@types/jsonfile': 6.1.4
-      '@types/node': 22.19.15
+      '@types/node': 25.9.5
 
   '@types/json-schema@7.0.15': {}
 
   '@types/jsonfile@6.1.4':
     dependencies:
-      '@types/node': 22.19.15
+      '@types/node': 25.9.5
 
   '@types/mdx@2.0.13': {}
 
@@ -14273,7 +14275,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 22.19.15
+      '@types/node': 25.9.5
       long: 5.3.2
 
   proxy-addr@2.0.7:
