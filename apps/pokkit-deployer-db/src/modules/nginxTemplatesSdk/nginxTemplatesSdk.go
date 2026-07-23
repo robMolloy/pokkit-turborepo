@@ -1,9 +1,9 @@
 package nginxTemplatesSdk
 
 import (
-	"app-db/src/db"
-	"app-db/src/modules/instanceRecordsSdk"
-	"app-db/src/utils"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/db"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/modules/instanceRecordsSdk"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
 
 	"github.com/pocketbase/dbx"
 	pbCore "github.com/pocketbase/pocketbase/core"

@@ -1,19 +1,20 @@
 package events
 
 import (
-	"app-db/src/db"
-	"app-db/src/modules/instanceRecordsSdk"
-	"app-db/src/modules/instanceSubscriptionsSdk"
-	"app-db/src/modules/stripeLedgerRecordsSdk"
-	"app-db/src/modules/stripeProductPricesSdk"
-	"app-db/src/modules/stripeProductsSdk"
-	"app-db/src/modules/userBalanceRecordsSdk"
-	"app-db/src/pokkitSetup"
-	"app-db/src/utils"
 	"database/sql"
 	"errors"
 	"fmt"
 	"log"
+
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/db"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/modules/instanceRecordsSdk"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/modules/instanceSubscriptionsSdk"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/modules/stripeLedgerRecordsSdk"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/modules/stripeProductPricesSdk"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/modules/stripeProductsSdk"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/modules/userBalanceRecordsSdk"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/pokkitSetup"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 )

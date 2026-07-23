@@ -1,8 +1,9 @@
 package instanceRecordsSdk
 
 import (
-	"app-db/src/db"
 	"fmt"
+
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/db"
 
 	"github.com/pocketbase/dbx"
 	pbCore "github.com/pocketbase/pocketbase/core"

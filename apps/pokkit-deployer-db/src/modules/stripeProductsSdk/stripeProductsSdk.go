@@ -1,9 +1,10 @@
 package stripeProductsSdk
 
 import (
-	"app-db/src/db"
-	"app-db/src/utils"
 	"fmt"
+
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/db"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 	pbTypes "github.com/pocketbase/pocketbase/tools/types"

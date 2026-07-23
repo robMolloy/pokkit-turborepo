@@ -1,0 +1,46 @@
+[stdout] <nil>
+
+[stdout] 2026/07/22 20:22:51 Server started at http://0.0.0.0:8114
+├─ REST API:  http://0.0.0.0:8114/api/
+└─ Dashboard: http://0.0.0.0:8114/_/
+
+[stdout] 
+(!) Launch the URL below in the browser if it hasn't been open already to create your first superuser account:
+http://0.0.0.0:8114/_/#/pbinstall/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJwYmNfMzE0MjYzNTgyMyIsImV4cCI6MTc4NDc0OTk3MSwiaWQiOiJ1bjRtdGZ6ZWoxajBwa3giLCJyZWZyZXNoYWJsZSI6ZmFsc2UsInR5cGUiOiJhdXRoIn0.Ib3ks_Mx8O5-yjn6Fuc8rqfqsiJ-fbo7d7Y2nBRCnYI
+(you can also create your first superuser by running: _sandboxes/pokkit-config-writer-test/app-db superuser upsert EMAIL PASS)
+
+
+[stdout] <nil>
+
+[stdout] 2026/07/22 20:23:25 Server started at http://0.0.0.0:8114
+├─ REST API:  http://0.0.0.0:8114/api/
+└─ Dashboard: http://0.0.0.0:8114/_/
+
+[stdout] _sandboxes/pokkit-config-writer-test/pb_data/../pb_config
+<nil>
+
+[stdout] 2026/07/22 20:23:42 Server started at http://0.0.0.0:8114
+├─ REST API:  http://0.0.0.0:8114/api/
+└─ Dashboard: http://0.0.0.0:8114/_/
+
+[stdout] _sandboxes/pokkit-config-writer-test/pb_data/../pb_config
+<nil>
+
+[stdout] 2026/07/22 20:25:15 Server started at http://0.0.0.0:8114
+├─ REST API:  http://0.0.0.0:8114/api/
+└─ Dashboard: http://0.0.0.0:8114/_/
+
+[stdout] _sandboxes/pokkit-config-writer-test/pb_data/../pb_config
+<nil>
+
+[stdout] 2026/07/23 08:51:33 Server started at http://0.0.0.0:8114
+├─ REST API:  http://0.0.0.0:8114/api/
+└─ Dashboard: http://0.0.0.0:8114/_/
+
+[stdout] _sandboxes/pokkit-config-writer-test/pb_data/../pb_config
+<nil>
+
+[stdout] 2026/07/23 09:16:39 Server started at http://0.0.0.0:8114
+├─ REST API:  http://0.0.0.0:8114/api/
+└─ Dashboard: http://0.0.0.0:8114/_/
+

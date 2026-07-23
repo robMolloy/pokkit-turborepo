@@ -1,13 +1,14 @@
 package main
 
 import (
-	"app-db/src/db"
-	"app-db/src/events"
-	"app-db/src/modules/nginxTemplatesSdk"
-	"app-db/src/pokkitSetup"
-	"app-db/src/routes"
 	"log"
 	"os"
+
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/db"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/events"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/modules/nginxTemplatesSdk"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/pokkitSetup"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/routes"
 
 	pocketbase "github.com/pocketbase/pocketbase"
 	pbApis "github.com/pocketbase/pocketbase/apis"

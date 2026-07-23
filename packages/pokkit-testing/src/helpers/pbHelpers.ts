@@ -54,16 +54,19 @@ export const serveBuildAndWriteLogs = async (p: {
 
   return new Promise((resolve) => {
     pbProcess.stdout.on("data", (data) => {
+      console.log(`packages/pokkit-testing/src/helpers/pbHelpers.ts:${/*LL*/ 57}`, {});
       const strData = data.toString() as string;
       logStream.write(`[stdout] ${strData}\n`);
       if (strData.includes("Server started at")) resolve(pbProcess);
     });
 
     pbProcess.stderr.on("data", (data) => {
+      console.log(`packages/pokkit-testing/src/helpers/pbHelpers.ts:${/*LL*/ 64}`, {});
       logStream.write(`[stderr] ${data.toString()}\n`);
     });
 
     pbProcess.on("error", (error) => {
+      console.log(`packages/pokkit-testing/src/helpers/pbHelpers.ts:${/*LL*/ 69}`, {});
       logStream.write(`[error] ${error.message}\n`);
       logStream.end();
     });

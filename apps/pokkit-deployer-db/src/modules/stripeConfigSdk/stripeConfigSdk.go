@@ -1,8 +1,8 @@
 package stripeConfigSdk
 
 import (
-	"app-db/src/db"
-	"app-db/src/utils"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/db"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 	pbTypes "github.com/pocketbase/pocketbase/tools/types"

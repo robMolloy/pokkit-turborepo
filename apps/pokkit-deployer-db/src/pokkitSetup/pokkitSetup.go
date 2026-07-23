@@ -1,10 +1,11 @@
 package pokkitSetup
 
 import (
-	"app-db/src/utils"
 	"encoding/json"
 	"fmt"
 	"os"
+
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 )

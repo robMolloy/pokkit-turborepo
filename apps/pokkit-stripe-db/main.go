@@ -1,8 +1,9 @@
 package main
 
 import (
-	"app-db/src/pokkit"
 	"log"
+
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-stripe-db/src/pokkit"
 
 	pocketbase "github.com/pocketbase/pocketbase"
 	pbCore "github.com/pocketbase/pocketbase/core"

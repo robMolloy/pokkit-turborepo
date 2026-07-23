@@ -1,11 +1,12 @@
 package instanceSubscriptionsSdk
 
 import (
-	"app-db/src/db"
-	"app-db/src/modules/stripeLedgerRecordsSdk"
 	"database/sql"
 	"errors"
 	"fmt"
+
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/db"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/modules/stripeLedgerRecordsSdk"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 	pbTypes "github.com/pocketbase/pocketbase/tools/types"

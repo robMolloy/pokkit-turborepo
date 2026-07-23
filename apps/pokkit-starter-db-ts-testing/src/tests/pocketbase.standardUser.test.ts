@@ -13,7 +13,7 @@ import { userPayloadBuilder } from "../utils/pocketbaseUserHelpers";
 
 const dbBuildFilePath = "./pb/app-db";
 
-const sandboxDirPath = `_temp/test`;
+const sandboxDirPath = `_sandboxes/standard-user-test`;
 const sandboxDbBuildFilePath = `${sandboxDirPath}/app-db`;
 const sandboxDbLogFilePath = `${sandboxDirPath}/log.txt`;
 
