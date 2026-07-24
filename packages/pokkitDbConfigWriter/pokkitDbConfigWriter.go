@@ -3,50 +3,38 @@ package pokkitDbConfigWriter
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
+	pokkitDbUtils "github.com/robMolloy/pokkit-turborepo/packages/pokkit-db-utils"
 )
 
+var configDirName = "pb_config"
 var collectionsFileName = "collections.json"
 var secretsFileName = "secrets.json"
-
-func CreateConfigDirPath(app pbCore.App) string {
-	configDirPath := fmt.Sprintf("%s/%s", app.DataDir(), "../pb_config")
-	return configDirPath
-}
 
 // WriteCollectionsToCollectionsFile writes collections to pb_data/collections.json.
 // If successful, true is returned.
 // If this file doesn't exist, a boolean of false is returned.
-func WriteCollectionsToCollectionsFile(app pbCore.App) (bool, error) {
-	configDirPath := CreateConfigDirPath(app)
-	// collectionsFilePath := configDirPath + "/" + collectionsFileName
-	err := os.MkdirAll(filepath.Dir(app.DataDir()+"/"+"asda"), 0755)
-	fmt.Println(configDirPath)
-
-	err = os.MkdirAll(filepath.Dir(configDirPath), 0755)
+func WriteCollectionsToCollectionsFile(app pbCore.App) error {
+	configDirPath := app.DataDir() + "/../" + configDirName
+	err := os.MkdirAll(configDirPath, 0755)
 
 	if err != nil {
-		return false, fmt.Errorf("failed to create directory: %w", err)
+		return fmt.Errorf("failed to create configDirPath: %w", err)
 	}
-	fmt.Println(err)
-	// if err := os.MkdirAll(filepath.Dir(configDirPath), 0755); err != nil {
-	// 	return false, fmt.Errorf("failed to create directory: %w", err)
-	// }
 
-	return true, err
+	collectionsFilePath := configDirPath + "/" + collectionsFileName
+	collectionsData, err := app.FindAllCollections()
+	if err != nil {
+		return fmt.Errorf("failed to find all collections: %w", err)
+	}
+
+	err = pokkitDbUtils.WriteDataToFileAsJson(collectionsFilePath, collectionsData)
+	if err != nil {
+		return fmt.Errorf("failed to write collections to file: %w", err)
+	}
+	return err
 }
-
-// 	collectionsData, err := app.FindAllCollections()
-// 	if err != nil {
-// 		return false, err
-// 	}
-
-// 	err = pokkitDbUtils.WriteDataToFileAsJson(collectionsFilePath, collectionsData)
-
-// 	return err == nil, err
-// }
 
 // func SaveSecretsJsonAsEnvVars(app pbCore.App) error {
 // 	configDirPath := CreateConfigDirPath(app)
@@ -168,7 +156,10 @@ func WriteCollectionsToCollectionsFile(app pbCore.App) (bool, error) {
 // }
 
 func Setup(se *pbCore.ServeEvent) error {
-	_, _ = WriteCollectionsToCollectionsFile(se.App)
+	err := WriteCollectionsToCollectionsFile(se.App)
+	if err != nil {
+		se.App.Logger().Error("WriteCollectionsToCollectionsFile", "err", err)
+	}
 	return se.Next()
 
 }

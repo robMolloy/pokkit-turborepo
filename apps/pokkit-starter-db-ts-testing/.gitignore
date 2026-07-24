@@ -34,4 +34,4 @@ pocketbase/app-db/pb_data/backups/*_test.zip*
 pocketbase/test-db/*
 !pocketbase/test-db/pocketbase*
 
-_temp
+_sandboxes

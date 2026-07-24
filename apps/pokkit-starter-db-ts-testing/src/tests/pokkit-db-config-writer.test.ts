@@ -28,6 +28,7 @@ let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 
 describe("pokkit-db config writer tests", () => {
   beforeAll(async () => {
+    await fse.removeSync(sandboxDirPath);
     spawnProcess = await setupAndServeDb({
       writeDbBuildToFilePathFn: async () => {
         await fse.copyFileSync(dbBuildFilePath, sandboxDbBuildFilePath);
