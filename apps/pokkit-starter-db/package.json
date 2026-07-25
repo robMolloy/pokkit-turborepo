@@ -13,7 +13,7 @@
     "build:any-changed-deps": "go build -o build/app-db ./...",
     "build": "pnpm run build:any-changed-deps",
     "serve-build": "./build/app-db serve --http=\"0.0.0.0:8091\"",
-    "build:on-change-to-dev": "npx nodemon --delay 1 --watch ./main.go --exec \"pnpm run build\" --ext \"*\"",
+    "build:on-change-to-dev": "npx nodemon --delay 1 --watch ./main.go --watch ../../packages --exec \"pnpm run build\" --ext \"*\"",
     "pre-dev": "stripe listen -l --forward-to localhost:8091/stripe-webhook",
     "test": "go test -v ./...",
     "dev": "go run . serve --http=\"0.0.0.0:8091\""

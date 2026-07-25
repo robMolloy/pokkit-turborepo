@@ -5,18 +5,48 @@ import (
 	"os"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
 	pokkitDbUtils "github.com/robMolloy/pokkit-turborepo/packages/pokkit-db-utils"
 )
 
 var configDirName = "pb_config"
 var collectionsFileName = "collections.json"
 var secretsFileName = "secrets.json"
+var getConfigDirPath = func(app pbCore.App) string {
+	return app.DataDir() + "/../" + configDirName
+}
+
+// ImportCollectionsFromCollectionsFile imports collections from pb_data/collections.json.
+// If successful, true is returned.
+// If this file doesn't exist, a boolean of false is returned.
+func ImportCollectionsFromCollectionsFile(app pbCore.App) (bool, error) {
+	configDirPath := getConfigDirPath(app)
+	collectionsFilePath := configDirPath + "/" + collectionsFileName
+
+	isExist := utils.FileExists(collectionsFilePath)
+	if !isExist {
+		return false, nil
+	}
+
+	// File definitely exists, this will only fail with an error that should be logged
+	collectionsData, err := os.ReadFile(collectionsFilePath)
+	if err != nil {
+		return false, err
+	}
+
+	err = app.ImportCollectionsByMarshaledJSON(collectionsData, false)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
 
 // WriteCollectionsToCollectionsFile writes collections to pb_data/collections.json.
 // If successful, true is returned.
 // If this file doesn't exist, a boolean of false is returned.
 func WriteCollectionsToCollectionsFile(app pbCore.App) error {
-	configDirPath := app.DataDir() + "/../" + configDirName
+	configDirPath := getConfigDirPath(app)
 	err := os.MkdirAll(configDirPath, 0755)
 
 	if err != nil {
@@ -78,32 +108,6 @@ func WriteCollectionsToCollectionsFile(app pbCore.App) error {
 // 	return true, nil
 // }
 
-// // ImportCollectionsFromCollectionsFile imports collections from pb_data/collections.json.
-// // If successful, true is returned.
-// // If this file doesn't exist, a boolean of false is returned.
-// func ImportCollectionsFromCollectionsFile(app pbCore.App) (bool, error) {
-// 	configDirPath := CreateConfigDirPath(app)
-// 	collectionsFilePath := configDirPath + "/" + collectionsFileName
-
-// 	isExist := utils.FileExists(collectionsFilePath)
-// 	if !isExist {
-// 		return false, nil
-// 	}
-
-// 	// File definitely exists, this will only fail with an error that should be logged
-// 	collectionsData, err := os.ReadFile(collectionsFilePath)
-// 	if err != nil {
-// 		return false, err
-// 	}
-
-// 	err = app.ImportCollectionsByMarshaledJSON(collectionsData, false)
-// 	if err != nil {
-// 		return false, err
-// 	}
-
-// 	return true, nil
-// }
-
 // func WriteSettingsToSettingsFileOnSettingsReloadEventHandler(e *pbCore.SettingsReloadEvent) error {
 // 	e.App.Logger().Info("OnSettingsReload")
 // 	if err := e.Next(); err != nil {
@@ -155,16 +159,26 @@ func WriteCollectionsToCollectionsFile(app pbCore.App) error {
 // 	return nil
 // }
 
-func Setup(se *pbCore.ServeEvent) error {
-	err := WriteCollectionsToCollectionsFile(se.App)
-	if err != nil {
-		se.App.Logger().Error("WriteCollectionsToCollectionsFile", "err", err)
-	}
-	return se.Next()
-
-}
-
 func BindFunctions(app pbCore.App) {
 	app.Store().Set("isSetupComplete", false)
-	app.OnServe().BindFunc(Setup)
+
+	app.OnServe().BindFunc(func(se *pbCore.ServeEvent) error {
+		err := WriteCollectionsToCollectionsFile(se.App)
+		if err != nil {
+			se.App.Logger().Error("WriteCollectionsToCollectionsFile", "err", err)
+		}
+		// didImport, err := ImportCollectionsFromCollectionsFile(se.App)
+		// if err != nil {
+		// 	se.App.Logger().Error("ImportCollectionsFromCollectionsFile", "err", err)
+		// }
+
+		// if didImport == false {
+		// 	err = WriteCollectionsToCollectionsFile(se.App)
+		// 	if err != nil {
+		// 		se.App.Logger().Error("WriteCollectionsToCollectionsFile", "err", err)
+		// 	}
+		// }
+
+		return se.Next()
+	})
 }
