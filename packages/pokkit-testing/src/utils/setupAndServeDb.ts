@@ -43,5 +43,10 @@ export const setupAndServeDb = async (p: {
     });
   }
 
+  await upsertAdminCredentials({
+    buildFilePath: p.dbBuildFilePath,
+    dbSuperuserEmail: p.dbSuperuserEmail,
+    dbSuperuserPassword: p.dbSuperuserPassword,
+  });
   return pbProcess;
 };

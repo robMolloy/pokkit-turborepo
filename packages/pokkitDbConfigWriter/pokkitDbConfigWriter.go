@@ -159,22 +159,50 @@ func WriteCollectionsToCollectionsFile(app pbCore.App) error {
 // 	return nil
 // }
 
+func onServeSyncCollectionsWithFile(se *pbCore.ServeEvent) error {
+	didImport, err := ImportCollectionsFromCollectionsFile(se.App)
+	if err != nil {
+		se.App.Logger().Error("ImportCollectionsFromCollectionsFile", "err", err)
+	}
+
+	if didImport == true {
+		fmt.Println("successfully imported collections from collections.json")
+	}
+	if didImport == false {
+		err = WriteCollectionsToCollectionsFile(se.App)
+		if err != nil {
+			se.App.Logger().Error("WriteCollectionsToCollectionsFile", "err", err)
+		}
+	}
+
+	return se.Next()
+}
+
+func OnCollectionChangeWriteCollectionsToFile(e *pbCore.CollectionEvent) error {
+	isSetupComplete := e.App.Store().Get("isSetupComplete").(bool)
+	if !isSetupComplete {
+		return e.Next()
+	}
+
+	err := WriteCollectionsToCollectionsFile(e.App)
+	if err != nil {
+		e.App.Logger().Error("WriteCollectionsToCollectionsFile", "err", err)
+	}
+
+	return e.Next()
+}
+
 func BindFunctions(app pbCore.App) {
 	app.Store().Set("isSetupComplete", false)
 
-	app.OnServe().BindFunc(func(se *pbCore.ServeEvent) error {
-		didImport, err := ImportCollectionsFromCollectionsFile(se.App)
-		if err != nil {
-			se.App.Logger().Error("ImportCollectionsFromCollectionsFile", "err", err)
-		}
+	app.OnServe().BindFunc(onServeSyncCollectionsWithFile)
 
-		if didImport == false {
-			err = WriteCollectionsToCollectionsFile(se.App)
-			if err != nil {
-				se.App.Logger().Error("WriteCollectionsToCollectionsFile", "err", err)
-			}
-		}
-
-		return se.Next()
+	app.OnServe().BindFunc(func(e *pbCore.ServeEvent) error {
+		app.Store().Set("isSetupComplete", true)
+		return e.Next()
 	})
+
+	app.OnCollectionAfterCreateSuccess().BindFunc(OnCollectionChangeWriteCollectionsToFile)
+	app.OnCollectionAfterUpdateSuccess().BindFunc(OnCollectionChangeWriteCollectionsToFile)
+	app.OnCollectionAfterDeleteSuccess().BindFunc(OnCollectionChangeWriteCollectionsToFile)
 }

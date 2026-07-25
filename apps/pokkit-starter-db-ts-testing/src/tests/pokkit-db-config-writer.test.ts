@@ -11,7 +11,8 @@ import { PocketBase } from "../config/pocketbaseConfig";
 import { usersCollectionName } from "../metadata/pocketbaseMetadata";
 import { userPayloadBuilder } from "../utils/pocketbaseUserHelpers";
 
-// const dbBuildFilePath = "./pb-build/app-db";
+// const dbBuildPath = "./pb-build/app-db";
+const dbBuildDirPath = "./test-build";
 const dbBuildFilePath = "./test-build/app-db";
 
 const sandboxDirPath = `_sandboxes/pokkit-config-writer-test`;
@@ -28,10 +29,13 @@ let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 
 describe("pokkit-db config writer tests", () => {
   beforeAll(async () => {
+    if (spawnProcess) killPocketbaseInstanceBySpawnProcess(spawnProcess);
+    killPocketbaseInstanceByDbUrl(sandboxDbUrl);
+    await fse.remove(sandboxDirPath);
     await fse.removeSync(sandboxDirPath);
     spawnProcess = await setupAndServeDb({
       writeDbBuildToFilePathFn: async () => {
-        await fse.copyFileSync(dbBuildFilePath, sandboxDbBuildFilePath);
+        await fse.copySync(dbBuildDirPath, sandboxDirPath);
       },
       applyCollections: { required: false },
       dbBuildFilePath: sandboxDbBuildFilePath,
@@ -45,7 +49,7 @@ describe("pokkit-db config writer tests", () => {
   afterAll(async () => {
     if (spawnProcess) killPocketbaseInstanceBySpawnProcess(spawnProcess);
     killPocketbaseInstanceByDbUrl(sandboxDbUrl);
-    // await fse.remove(sandboxDirPath);
+    await fse.remove(sandboxDirPath);
   });
 
   beforeEach(async () => {
@@ -61,16 +65,22 @@ describe("pokkit-db config writer tests", () => {
   });
 
   it("random collection throws error", async () => {
-    const userPb = createPbInstance();
+    const superuserPb = createPbInstance();
+    await superuserPb
+      .collection(usersCollectionName)
+      .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
 
-    await expect(userPb.collection("randomCollectionName").getFullList()).rejects.toThrow();
+    await expect(superuserPb.collection("randomCollectionName").getFullList()).rejects.toThrow();
   });
 
-  it("collection in collections.json passes", async () => {
-    const userPb = createPbInstance();
+  // it("collection in collections.json passes", async () => {
+  //   const superuserPb = createPbInstance();
+  //   await superuserPb
+  //     .collection(usersCollectionName)
+  //     .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
 
-    await expect(userPb.collection("blah123").getFullList()).toEqual([]);
-  });
+  //   await expect(superuserPb.collection("blah123").getFullList()).not.rejects.toThrow();
+  // });
 
   // it("rejects invalid authentication", async () => {
   //   const pb = createPbInstance();

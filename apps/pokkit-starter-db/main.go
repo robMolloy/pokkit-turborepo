@@ -11,7 +11,7 @@ import (
 
 func main() {
 	app := pocketbase.New()
-
+	// asdasd
 	pokkitDbConfigWriter.BindFunctions(app)
 
 	app.OnServe().BindFunc(func(se *pbCore.ServeEvent) error {
