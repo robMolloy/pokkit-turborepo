@@ -60,6 +60,18 @@ describe("pokkit-db config writer tests", () => {
     expect(true).toBe(true);
   });
 
+  it("random collection throws error", async () => {
+    const userPb = createPbInstance();
+
+    await expect(userPb.collection("randomCollectionName").getFullList()).rejects.toThrow();
+  });
+
+  it("collection in collections.json passes", async () => {
+    const userPb = createPbInstance();
+
+    await expect(userPb.collection("blah123").getFullList()).toEqual([]);
+  });
+
   // it("rejects invalid authentication", async () => {
   //   const pb = createPbInstance();
   //   expect(pb).toBeInstanceOf(PocketBase);

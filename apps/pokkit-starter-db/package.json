@@ -9,9 +9,10 @@
   "scripts": {
     "init-dev": "go mod init app-db && go mod tidy",
     "serve-dev": "go run . serve --http=\"0.0.0.0:8091\"",
+    "copy-pbconfig-to-build": "rm -rf ./build/pb_config && cp -r ./pb_config ./build/pb_config",
     "build:no-cache": "go build -a -o build/app-db",
-    "build:any-changed-deps": "go build -o build/app-db ./...",
-    "build": "pnpm run build:any-changed-deps",
+    "build:any-changed-deps": "go build -o build/app-db ./... && cp -r ./pb_config ./build/pb_config && cp -r ./pb_data ./build",
+    "build": "pnpm run build:any-changed-deps && pnpm run copy-pbconfig-to-build",
     "serve-build": "./build/app-db serve --http=\"0.0.0.0:8091\"",
     "build:on-change-to-dev": "npx nodemon --delay 1 --watch ./main.go --watch ../../packages --exec \"pnpm run build\" --ext \"*\"",
     "pre-dev": "stripe listen -l --forward-to localhost:8091/stripe-webhook",

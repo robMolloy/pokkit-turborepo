@@ -11,7 +11,6 @@ import (
 
 func main() {
 	app := pocketbase.New()
-	// aasd
 
 	pokkitDbConfigWriter.BindFunctions(app)
 

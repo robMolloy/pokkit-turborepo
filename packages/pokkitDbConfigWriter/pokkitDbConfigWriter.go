@@ -163,21 +163,17 @@ func BindFunctions(app pbCore.App) {
 	app.Store().Set("isSetupComplete", false)
 
 	app.OnServe().BindFunc(func(se *pbCore.ServeEvent) error {
-		err := WriteCollectionsToCollectionsFile(se.App)
+		didImport, err := ImportCollectionsFromCollectionsFile(se.App)
 		if err != nil {
-			se.App.Logger().Error("WriteCollectionsToCollectionsFile", "err", err)
+			se.App.Logger().Error("ImportCollectionsFromCollectionsFile", "err", err)
 		}
-		// didImport, err := ImportCollectionsFromCollectionsFile(se.App)
-		// if err != nil {
-		// 	se.App.Logger().Error("ImportCollectionsFromCollectionsFile", "err", err)
-		// }
 
-		// if didImport == false {
-		// 	err = WriteCollectionsToCollectionsFile(se.App)
-		// 	if err != nil {
-		// 		se.App.Logger().Error("WriteCollectionsToCollectionsFile", "err", err)
-		// 	}
-		// }
+		if didImport == false {
+			err = WriteCollectionsToCollectionsFile(se.App)
+			if err != nil {
+				se.App.Logger().Error("WriteCollectionsToCollectionsFile", "err", err)
+			}
+		}
 
 		return se.Next()
 	})

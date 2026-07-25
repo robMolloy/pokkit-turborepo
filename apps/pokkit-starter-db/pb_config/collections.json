@@ -94,7 +94,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-06-25 20:24:54.568Z",
-    "updated": "2026-06-25 20:24:54.568Z",
+    "updated": "2026-07-25 06:00:41.765Z",
     "system": true
   },
   {
@@ -206,7 +206,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-06-25 20:24:54.572Z",
-    "updated": "2026-06-25 20:24:54.572Z",
+    "updated": "2026-07-25 06:00:41.767Z",
     "system": true
   },
   {
@@ -320,7 +320,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-06-25 20:24:54.575Z",
-    "updated": "2026-06-25 20:24:54.575Z",
+    "updated": "2026-07-25 06:00:41.769Z",
     "system": true
   },
   {
@@ -418,7 +418,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-06-25 20:24:54.579Z",
-    "updated": "2026-06-25 20:24:54.579Z",
+    "updated": "2026-07-25 06:00:41.771Z",
     "system": true
   },
   {
@@ -533,7 +533,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-06-25 20:24:54.581Z",
-    "updated": "2026-06-25 20:24:54.581Z",
+    "updated": "2026-07-25 06:00:41.772Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -750,7 +750,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-06-25 20:24:54.587Z",
-    "updated": "2026-06-25 20:24:54.604Z",
+    "updated": "2026-07-25 06:00:41.776Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -818,5 +818,56 @@
       "subject": "Confirm your {APP_NAME} new email address",
       "body": "\u003cp\u003eHello,\u003c/p\u003e\n\u003cp\u003eClick on the button below to confirm your new email address.\u003c/p\u003e\n\u003cp\u003e\n  \u003ca class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\"\u003eConfirm new email\u003c/a\u003e\n\u003c/p\u003e\n\u003cp\u003e\u003ci\u003eIf you didn't ask to change your email address, please ignore this email.\u003c/i\u003e\u003c/p\u003e\n\u003cp\u003e\n  Thanks,\u003cbr/\u003e\n  {APP_NAME} team\n\u003c/p\u003e"
     }
+  },
+  {
+    "id": "pbc_1122568616",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "blah123",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "created": "2026-07-24 15:25:54.794Z",
+    "updated": "2026-07-25 06:00:41.781Z",
+    "system": false
   }
 ]

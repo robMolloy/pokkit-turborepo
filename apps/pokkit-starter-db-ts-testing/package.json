@@ -12,8 +12,8 @@
     "get-platform-arch": "node -e \"console.log(process.platform + '_' + process.arch + (process.platform === 'win32' ? '.exe' : ''))\"",
     "copy-build": "rm -rf ./test-build && cp -r ../pokkit-starter-db/build ./test-build",
     "copy-build:watch": "npx nodemon --delay 1 --watch ../pokkit-starter-db/build --exec \"pnpm run copy-build\" --ext \"*\"",
-    "dev1": "npm run test",
-    "dev2": "npm run tsc"
+    "pre-dev": "npm run copy-build:watch",
+    "dev": "npm run test"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
