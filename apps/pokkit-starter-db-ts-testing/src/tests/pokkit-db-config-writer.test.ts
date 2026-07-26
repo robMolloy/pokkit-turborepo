@@ -9,12 +9,9 @@ import type { ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
-import { superusersCollectionName, usersCollectionName } from "../metadata/pocketbaseMetadata";
-import { userPayloadBuilder } from "../utils/pocketbaseUserHelpers";
+import { superusersCollectionName } from "../metadata/pocketbaseMetadata";
 
-// const dbBuildPath = "./pb-build/app-db";
 const dbBuildDirPath = "./source-build";
-const dbBuildFilePath = "./source-build/app-db";
 
 const sandboxDirPath = `_sandboxes/pokkit-config-writer-test`;
 const sandboxDbBuildFilePath = `${sandboxDirPath}/app-db`;
