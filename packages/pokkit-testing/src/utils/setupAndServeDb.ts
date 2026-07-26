@@ -8,9 +8,7 @@ import {
 import fse from "fs-extra";
 
 export const setupAndServeDb = async (p: {
-  writeDbBuildToFilePathFn: () => Promise<unknown>;
-  dbBuildFilePath: string;
-  dbLogFilePath: string;
+  dbBuildDirPath: string;
   dbUrl: string;
   dbSuperuserEmail: string;
   dbSuperuserPassword: string;
@@ -18,33 +16,29 @@ export const setupAndServeDb = async (p: {
     | { required: true; getCollectionsFn: () => Promise<CollectionModel[]> }
     | { required?: false };
 }) => {
-  fse.ensureFileSync(p.dbBuildFilePath);
-  await p.writeDbBuildToFilePathFn();
+  const dbBuildFilePath = `${p.dbBuildDirPath}/app-db`;
+  const dbLogFilePath = `${p.dbBuildDirPath}/log.txt`;
+
+  const buildFileExists = await fse.pathExists(dbBuildFilePath);
+  if (!buildFileExists)
+    throw new Error(`setupAndServeDb: dbBuildFile does not exist: ${dbBuildFilePath}`);
+
+  fse.ensureFile(dbLogFilePath);
 
   const pbProcess = await serveBuildAndWriteLogs({
-    dbBuildFilePath: p.dbBuildFilePath,
-    dbLogFilePath: p.dbLogFilePath,
+    dbBuildFilePath,
+    dbLogFilePath,
     dbUrl: p.dbUrl,
   });
 
   await upsertAdminCredentials({
-    buildFilePath: p.dbBuildFilePath,
+    buildFilePath: dbBuildFilePath,
     dbSuperuserEmail: p.dbSuperuserEmail,
     dbSuperuserPassword: p.dbSuperuserPassword,
   });
 
-  if (p.applyCollections?.required) {
-    const collections = await p.applyCollections.getCollectionsFn();
-    await applyCollectionsToDb({
-      dbUrl: p.dbUrl,
-      dbSuperuserEmail: p.dbSuperuserEmail,
-      dbSuperuserPassword: p.dbSuperuserPassword,
-      collections,
-    });
-  }
-
   await upsertAdminCredentials({
-    buildFilePath: p.dbBuildFilePath,
+    buildFilePath: dbBuildFilePath,
     dbSuperuserEmail: p.dbSuperuserEmail,
     dbSuperuserPassword: p.dbSuperuserPassword,
   });

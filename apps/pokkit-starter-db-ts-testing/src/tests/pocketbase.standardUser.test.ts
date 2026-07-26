@@ -11,12 +11,9 @@ import { PocketBase } from "../config/pocketbaseConfig";
 import { usersCollectionName } from "../metadata/pocketbaseMetadata";
 import { userPayloadBuilder } from "../utils/pocketbaseUserHelpers";
 
-// const dbBuildPath = "./pb-build/app-db";
-const dbBuildDirPath = "./source-build";
+const sourceBuildDirPath = "./source-build";
 
 const sandboxDirPath = `_sandboxes/standard-user-test`;
-const sandboxDbBuildFilePath = `${sandboxDirPath}/app-db`;
-const sandboxDbLogFilePath = `${sandboxDirPath}/log.txt`;
 
 const sandboxDbPortNumber = 8113;
 const sandboxDbUrl = `http://0.0.0.0:${sandboxDbPortNumber}`;
@@ -29,13 +26,11 @@ let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 describe("test rules", () => {
   beforeAll(async () => {
     await fse.removeSync(sandboxDirPath);
+    await fse.copySync(sourceBuildDirPath, sandboxDirPath);
+
     spawnProcess = await setupAndServeDb({
-      writeDbBuildToFilePathFn: async () => {
-        await fse.copySync(dbBuildDirPath, sandboxDirPath);
-      },
       applyCollections: { required: false },
-      dbBuildFilePath: sandboxDbBuildFilePath,
-      dbLogFilePath: sandboxDbLogFilePath,
+      dbBuildDirPath: sandboxDirPath,
       dbUrl: sandboxDbUrl,
       dbSuperuserEmail: sandboxDbSuperuserEmail,
       dbSuperuserPassword: sandboxDbSuperuserPassword,

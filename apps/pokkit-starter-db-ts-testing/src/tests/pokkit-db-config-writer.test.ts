@@ -11,11 +11,10 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { superusersCollectionName } from "../metadata/pocketbaseMetadata";
 
-const dbBuildDirPath = "./source-build";
+const sourceBuildDirPath = "./source-build";
 
 const sandboxDirPath = `_sandboxes/pokkit-config-writer-test`;
 const sandboxDbBuildFilePath = `${sandboxDirPath}/app-db`;
-const sandboxDbLogFilePath = `${sandboxDirPath}/log.txt`;
 
 const sandboxDbPortNumber = 8114;
 const sandboxDbUrl = `http://0.0.0.0:${sandboxDbPortNumber}`;
@@ -28,13 +27,11 @@ let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 describe("pokkit-db config writer tests", () => {
   beforeAll(async () => {
     await fse.removeSync(sandboxDirPath);
+    await fse.copySync(sourceBuildDirPath, sandboxDirPath);
+
     spawnProcess = await setupAndServeDb({
-      writeDbBuildToFilePathFn: async () => {
-        await fse.copySync(dbBuildDirPath, sandboxDirPath);
-      },
       applyCollections: { required: false },
-      dbBuildFilePath: sandboxDbBuildFilePath,
-      dbLogFilePath: sandboxDbLogFilePath,
+      dbBuildDirPath: sandboxDirPath,
       dbUrl: sandboxDbUrl,
       dbSuperuserEmail: sandboxDbSuperuserEmail,
       dbSuperuserPassword: sandboxDbSuperuserPassword,
