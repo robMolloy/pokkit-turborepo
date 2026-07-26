@@ -10,9 +10,9 @@
     "attempt-kill-port": "kill -9 $(lsof -ti :\"$PORT\" 2>/dev/null | head -n 1) 2>/dev/null || true",
     "kill-port": "PORT=$PORT npm run attempt-kill-port",
     "get-platform-arch": "node -e \"console.log(process.platform + '_' + process.arch + (process.platform === 'win32' ? '.exe' : ''))\"",
-    "copy-build": "rm -rf ./test-build && cp -r ../pokkit-starter-db/build ./test-build",
-    "copy-build:watch": "npx nodemon --delay 1 --watch ../pokkit-starter-db/build --exec \"pnpm run copy-build\" --ext \"*\"",
-    "pre-dev": "npm run copy-build:watch",
+    "copy-source-build": "rm -rf ./source-build && cp -r ../pokkit-starter-db/build ./source-build",
+    "copy-source-build:watch": "npx nodemon --delay 1 --watch ../pokkit-starter-db/build --exec \"pnpm run copy-source-build\" --ext \"*\"",
+    "pre-dev": "npm run copy-source-build:watch",
     "dev": "npm run test"
   },
   "devDependencies": {

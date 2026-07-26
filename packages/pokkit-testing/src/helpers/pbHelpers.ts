@@ -89,9 +89,13 @@ export const upsertAdminCredentials = async (p: {
     p.dbSuperuserPassword,
   ]);
 
+  upsertProcess.on("error", (err) => console.error("spawn error:", err));
+
   return new Promise((resolve) => {
     upsertProcess.stdout.on("data", (data) => {
-      if (data.toString().includes("Successfully saved")) resolve(true);
+      if (data.toString().includes("Successfully saved")) {
+        resolve(true);
+      }
     });
   });
 };

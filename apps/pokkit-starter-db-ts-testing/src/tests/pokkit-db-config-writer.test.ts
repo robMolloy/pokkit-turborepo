@@ -3,17 +3,18 @@ import {
   killPocketbaseInstanceByDbUrl,
   killPocketbaseInstanceBySpawnProcess,
   setupAndServeDb,
+  upsertAdminCredentials,
 } from "@repo/pokkit-testing";
 import type { ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
-import { usersCollectionName } from "../metadata/pocketbaseMetadata";
+import { superusersCollectionName, usersCollectionName } from "../metadata/pocketbaseMetadata";
 import { userPayloadBuilder } from "../utils/pocketbaseUserHelpers";
 
 // const dbBuildPath = "./pb-build/app-db";
-const dbBuildDirPath = "./test-build";
-const dbBuildFilePath = "./test-build/app-db";
+const dbBuildDirPath = "./source-build";
+const dbBuildFilePath = "./source-build/app-db";
 
 const sandboxDirPath = `_sandboxes/pokkit-config-writer-test`;
 const sandboxDbBuildFilePath = `${sandboxDirPath}/app-db`;
@@ -29,9 +30,6 @@ let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 
 describe("pokkit-db config writer tests", () => {
   beforeAll(async () => {
-    if (spawnProcess) killPocketbaseInstanceBySpawnProcess(spawnProcess);
-    killPocketbaseInstanceByDbUrl(sandboxDbUrl);
-    await fse.remove(sandboxDirPath);
     await fse.removeSync(sandboxDirPath);
     spawnProcess = await setupAndServeDb({
       writeDbBuildToFilePathFn: async () => {
@@ -58,6 +56,12 @@ describe("pokkit-db config writer tests", () => {
       dbSuperuserEmail: sandboxDbSuperuserEmail,
       dbSuperuserPassword: sandboxDbSuperuserPassword,
     });
+
+    await upsertAdminCredentials({
+      buildFilePath: sandboxDbBuildFilePath,
+      dbSuperuserEmail: sandboxDbSuperuserEmail,
+      dbSuperuserPassword: sandboxDbSuperuserPassword,
+    });
   });
 
   it("true test", async () => {
@@ -67,7 +71,7 @@ describe("pokkit-db config writer tests", () => {
   it("random collection throws error", async () => {
     const superuserPb = createPbInstance();
     await superuserPb
-      .collection(usersCollectionName)
+      .collection(superusersCollectionName)
       .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
 
     await expect(superuserPb.collection("randomCollectionName").getFullList()).rejects.toThrow();
