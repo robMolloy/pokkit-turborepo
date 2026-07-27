@@ -1,5 +1,6 @@
 import {
   clearDb,
+  createPbLogFilePath,
   killPocketbaseInstanceByDbUrl,
   killPocketbaseInstanceBySpawnProcess,
   setupAndServeDb as servePokkitDb,
@@ -14,7 +15,8 @@ import { userPayloadBuilder } from "../utils/pocketbaseUserHelpers";
 
 const sourceBuildDirPath = "./source-build";
 
-const sandboxDirPath = `_sandboxes/pokkit-config-writer-test`;
+const testSuiteName = `pokkit-config-writer-tests`;
+const sandboxDirPath = `_sandboxes/${testSuiteName}`;
 
 const sandboxDbPortNumber = 8114;
 const sandboxDbSuperuserEmail = "admin@admin.com";
@@ -44,7 +46,11 @@ describe("pokkit-db config writer tests", () => {
   afterAll(async () => {
     if (spawnProcess) killPocketbaseInstanceBySpawnProcess(spawnProcess);
     if (sandboxDbUrl) killPocketbaseInstanceByDbUrl(sandboxDbUrl);
-    await fse.remove(sandboxDirPath);
+    const logFilePath = createPbLogFilePath({ dirPath: sandboxDirPath });
+    const storedLogsFilePath = `_logs/${testSuiteName}.logs.txt`;
+    fse.removeSync(storedLogsFilePath);
+    fse.copySync(logFilePath, storedLogsFilePath);
+    fse.removeSync(sandboxDirPath);
   });
 
   beforeEach(async () => {
@@ -69,11 +75,11 @@ describe("pokkit-db config writer tests", () => {
 
   it("does not reject a valid superuser authentication", async () => {
     const superuserPb = createPbConnection();
-    const userRecordResponse = await superuserPb
+    const superuserRecordResponse = await superuserPb
       .collection(superusersCollectionName)
       .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
 
-    expect(userRecordResponse.record.id).toBeTruthy();
+    expect(superuserRecordResponse.record.id).toBeTruthy();
   });
 
   it("random collection throws error", async () => {
@@ -83,15 +89,6 @@ describe("pokkit-db config writer tests", () => {
       .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
 
     await expect(superuserPb.collection("randomCollectionName").getFullList()).rejects.toThrow();
-  });
-
-  it("collection from collections.json does not throw error", async () => {
-    const superuserPb = createPbConnection();
-    await superuserPb
-      .collection(superusersCollectionName)
-      .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
-
-    await expect(await superuserPb.collection("blah123").getFullList()).toEqual([]);
   });
 
   it("authenticate superuser if wrong password gives 400", async () => {
@@ -112,7 +109,7 @@ describe("pokkit-db config writer tests", () => {
     ).rejects.toThrow();
   });
 
-  it("allow create:  user with valid email and password", async () => {
+  it("allow create: user with valid email and password", async () => {
     const userPb = createPbConnection();
 
     // throwaway record - first user gains an approved admin global permission
@@ -125,6 +122,25 @@ describe("pokkit-db config writer tests", () => {
       passwordConfirm: userData.password,
     });
     expect(resp.id).not.toBeNull();
+  });
+
+  it("when superuser creates a collection it writes to collection data to collection.json file and collection is acccessible by superuser", async () => {
+    const newCollectionName = "blah321";
+
+    const superuserPb = createPbConnection();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
+
+    const resp = await superuserPb.collections.create({ name: newCollectionName });
+    expect(resp.name).toBe(newCollectionName);
+
+    await expect(await superuserPb.collection(newCollectionName).getFullList()).toEqual([]);
+
+    const collectionsFileBuffer = fse.readFileSync(`${sandboxDirPath}/pb_config/collections.json`);
+    const collectionsFileStr = collectionsFileBuffer.toString();
+
+    expect(collectionsFileStr.includes(`"name": "${newCollectionName}"`)).toBe(true);
   });
 
   // it("deny read: user record when not authenticated; allow read: of own user record when authenticated; deny read: of other user records when authenticated", async () => {

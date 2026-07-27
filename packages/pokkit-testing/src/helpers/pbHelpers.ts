@@ -56,7 +56,7 @@ export const serveDbAndWriteLogs = async (p: {
   fse.ensureFileSync(dbLogFilePath);
 
   const logStream = fse.createWriteStream(dbLogFilePath, { flags: "a" });
-  const pbProcess = spawn(dbBuildFilePath, ["serve", `--http=${dbServeUrl}`]);
+  const pbProcess = spawn(dbBuildFilePath, ["serve", `--http=${dbServeUrl}`, "--dev"]);
 
   await new Promise((resolve) => {
     pbProcess.stdout.on("data", (data) => {
