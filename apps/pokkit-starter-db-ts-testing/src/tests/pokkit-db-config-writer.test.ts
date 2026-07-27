@@ -2,7 +2,7 @@ import {
   clearDb,
   killPocketbaseInstanceByDbUrl,
   killPocketbaseInstanceBySpawnProcess,
-  setupAndServeDb,
+  setupAndServeDb as servePokkitDb,
   upsertAdminCredentials,
 } from "@repo/pokkit-testing";
 import type { ChildProcessWithoutNullStreams } from "child_process";
@@ -14,7 +14,6 @@ import { superusersCollectionName } from "../metadata/pocketbaseMetadata";
 const sourceBuildDirPath = "./source-build";
 
 const sandboxDirPath = `_sandboxes/pokkit-config-writer-test`;
-const sandboxDbBuildFilePath = `${sandboxDirPath}/app-db`;
 
 const sandboxDbPortNumber = 8114;
 const sandboxDbUrl = `http://0.0.0.0:${sandboxDbPortNumber}`;
@@ -29,13 +28,14 @@ describe("pokkit-db config writer tests", () => {
     await fse.removeSync(sandboxDirPath);
     await fse.copySync(sourceBuildDirPath, sandboxDirPath);
 
-    spawnProcess = await setupAndServeDb({
-      applyCollections: { required: false },
+    const resp = await servePokkitDb({
       dbBuildDirPath: sandboxDirPath,
-      dbUrl: sandboxDbUrl,
+      dbPortNumber: sandboxDbPortNumber,
       dbSuperuserEmail: sandboxDbSuperuserEmail,
       dbSuperuserPassword: sandboxDbSuperuserPassword,
     });
+
+    spawnProcess = resp.pbProcess;
   });
 
   afterAll(async () => {
@@ -46,13 +46,13 @@ describe("pokkit-db config writer tests", () => {
 
   beforeEach(async () => {
     await clearDb({
-      dbUrl: sandboxDbUrl,
+      dbPortNumber: sandboxDbPortNumber,
       dbSuperuserEmail: sandboxDbSuperuserEmail,
       dbSuperuserPassword: sandboxDbSuperuserPassword,
     });
 
     await upsertAdminCredentials({
-      buildFilePath: sandboxDbBuildFilePath,
+      buildDirPath: sandboxDirPath,
       dbSuperuserEmail: sandboxDbSuperuserEmail,
       dbSuperuserPassword: sandboxDbSuperuserPassword,
     });

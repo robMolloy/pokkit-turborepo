@@ -24,38 +24,45 @@ export const killPocketbaseInstanceBySpawnProcess = (
   return spawnProcess.kill("SIGTERM");
 };
 
+export const createPbServeAddress = (p: { portNumber: number }) => `0.0.0.0:${p.portNumber}`;
+export const createPbServeUrl = (p: { portNumber: number }) => `http://0.0.0.0:${p.portNumber}`;
+export const createPbBuildFilePath = (p: { dirPath: string }) => `${p.dirPath}/app-db`;
+export const createPbLogFilePath = (p: { dirPath: string }) => `${p.dirPath}/log.txt`;
+
 /**
  * Serves the PocketBase build and writes logs to a file.
- *
- * assumptions:
- * - the directory containing the log file already exists
- * - the build file path is to an existing PocketBase executable
  *
  * @param buildFilePath - Path to the existing PocketBase executable to serve.
  * @param logFilePath - Path to the file where logs will be written.
  * @param dbUrl - Database URL in the format http://anyurl:1234 (port number after second colon).
  */
-export const serveBuildAndWriteLogs = async (p: {
-  dbBuildFilePath: string;
-  dbLogFilePath: string;
+export const serveDbAndWriteLogs = async (p: {
+  dbBuildDirPath: string;
+  dbPortNumber: number;
+}): Promise<{
+  pbProcess: ChildProcessWithoutNullStreams;
+  dbServeUrl: string;
   dbUrl: string;
-}): Promise<ChildProcessWithoutNullStreams> => {
-  const dbServeUrl = p.dbUrl.replace("http://", "");
-  const dbPortNumber = getPortNumberFromDbUrl(p.dbUrl);
+}> => {
+  const dbServeUrl = createPbServeAddress({ portNumber: p.dbPortNumber });
+  const dbUrl = createPbServeUrl({ portNumber: p.dbPortNumber });
+  const dbBuildFilePath = createPbBuildFilePath({ dirPath: p.dbBuildDirPath });
+  const dbLogFilePath = createPbLogFilePath({ dirPath: p.dbBuildDirPath });
 
-  if (!dbPortNumber)
-    throw new Error(
-      `Invalid dbUrl: ${p.dbUrl} - requires format http://anyurl:1234 (port number after second colon)`,
-    );
+  const buildFileExists = await fse.pathExists(dbBuildFilePath);
+  if (!buildFileExists)
+    throw new Error(`setupAndServeDb: dbBuildFile does not exist: ${dbBuildFilePath}`);
 
-  fse.ensureFileSync(p.dbLogFilePath);
-  const logStream = fse.createWriteStream(p.dbLogFilePath, { flags: "a" });
-  const pbProcess = spawn(p.dbBuildFilePath, ["serve", `--http=${dbServeUrl}`]);
+  fse.ensureFileSync(dbLogFilePath);
 
-  return new Promise((resolve) => {
+  const logStream = fse.createWriteStream(dbLogFilePath, { flags: "a" });
+  const pbProcess = spawn(dbBuildFilePath, ["serve", `--http=${dbServeUrl}`]);
+
+  await new Promise((resolve) => {
     pbProcess.stdout.on("data", (data) => {
       const strData = data.toString() as string;
       logStream.write(`[stdout] ${strData}\n`);
+
       if (strData.includes("Server started at")) resolve(pbProcess);
     });
 
@@ -68,6 +75,8 @@ export const serveBuildAndWriteLogs = async (p: {
       logStream.end();
     });
   });
+
+  return { pbProcess, dbUrl, dbServeUrl };
 };
 
 /**
@@ -78,11 +87,13 @@ export const serveBuildAndWriteLogs = async (p: {
  * @param dbSuperuserPassword - The password to set for the superuser account.
  */
 export const upsertAdminCredentials = async (p: {
-  buildFilePath: string;
+  buildDirPath: string;
   dbSuperuserEmail: string;
   dbSuperuserPassword: string;
 }) => {
-  const upsertProcess = spawn(`${p.buildFilePath}`, [
+  const dbBuildFilePath = `${p.buildDirPath}/app-db`;
+
+  const upsertProcess = spawn(`${dbBuildFilePath}`, [
     "superuser",
     "upsert",
     p.dbSuperuserEmail,

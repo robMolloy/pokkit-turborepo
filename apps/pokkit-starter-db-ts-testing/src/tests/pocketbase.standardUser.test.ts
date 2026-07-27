@@ -16,36 +16,38 @@ const sourceBuildDirPath = "./source-build";
 const sandboxDirPath = `_sandboxes/standard-user-test`;
 
 const sandboxDbPortNumber = 8113;
-const sandboxDbUrl = `http://0.0.0.0:${sandboxDbPortNumber}`;
 const sandboxDbSuperuserEmail = "admin@admin.com";
 const sandboxDbSuperuserPassword = "admin@admin.com";
 
-const createPbInstance = () => new PocketBase(sandboxDbUrl);
 let spawnProcess: ChildProcessWithoutNullStreams | undefined;
+let sandboxDbUrl: string | undefined;
+
+const createPbInstance = () => new PocketBase(sandboxDbUrl as string);
 
 describe("test rules", () => {
   beforeAll(async () => {
     await fse.removeSync(sandboxDirPath);
     await fse.copySync(sourceBuildDirPath, sandboxDirPath);
 
-    spawnProcess = await setupAndServeDb({
-      applyCollections: { required: false },
+    const resp = await setupAndServeDb({
       dbBuildDirPath: sandboxDirPath,
-      dbUrl: sandboxDbUrl,
+      dbPortNumber: sandboxDbPortNumber,
       dbSuperuserEmail: sandboxDbSuperuserEmail,
       dbSuperuserPassword: sandboxDbSuperuserPassword,
     });
+    spawnProcess = resp.pbProcess;
+    sandboxDbUrl = resp.dbUrl;
   });
 
   afterAll(async () => {
     if (spawnProcess) killPocketbaseInstanceBySpawnProcess(spawnProcess);
-    killPocketbaseInstanceByDbUrl(sandboxDbUrl);
+    if (sandboxDbUrl) killPocketbaseInstanceByDbUrl(sandboxDbUrl);
     await fse.remove(sandboxDirPath);
   });
 
   beforeEach(async () => {
     await clearDb({
-      dbUrl: sandboxDbUrl,
+      dbPortNumber: sandboxDbPortNumber,
       dbSuperuserEmail: sandboxDbSuperuserEmail,
       dbSuperuserPassword: sandboxDbSuperuserPassword,
     });

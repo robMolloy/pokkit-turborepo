@@ -2,11 +2,11 @@ import PocketBase from "pocketbase";
 import { superusersCollectionName } from "../helpers/pbMetadata";
 
 export const clearDb = async (p: {
-  dbUrl: string;
+  dbPortNumber: number;
   dbSuperuserEmail: string;
   dbSuperuserPassword: string;
 }) => {
-  const superuserPb = new PocketBase(p.dbUrl);
+  const superuserPb = new PocketBase(`http://0.0.0.0:${p.dbPortNumber}`);
   await superuserPb
     .collection(superusersCollectionName)
     .authWithPassword(p.dbSuperuserEmail, p.dbSuperuserPassword);
