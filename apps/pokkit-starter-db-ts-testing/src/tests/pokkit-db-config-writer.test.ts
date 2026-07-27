@@ -9,19 +9,21 @@ import type { ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
-import { superusersCollectionName } from "../metadata/pocketbaseMetadata";
+import { superusersCollectionName, usersCollectionName } from "../metadata/pocketbaseMetadata";
+import { userPayloadBuilder } from "../utils/pocketbaseUserHelpers";
 
 const sourceBuildDirPath = "./source-build";
 
 const sandboxDirPath = `_sandboxes/pokkit-config-writer-test`;
 
 const sandboxDbPortNumber = 8114;
-const sandboxDbUrl = `http://0.0.0.0:${sandboxDbPortNumber}`;
 const sandboxDbSuperuserEmail = "admin@admin.com";
 const sandboxDbSuperuserPassword = "admin@admin.com";
 
-const createPbInstance = () => new PocketBase(sandboxDbUrl);
 let spawnProcess: ChildProcessWithoutNullStreams | undefined;
+let sandboxDbUrl: string | undefined;
+
+const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
 
 describe("pokkit-db config writer tests", () => {
   beforeAll(async () => {
@@ -36,11 +38,12 @@ describe("pokkit-db config writer tests", () => {
     });
 
     spawnProcess = resp.pbProcess;
+    sandboxDbUrl = resp.dbUrl;
   });
 
   afterAll(async () => {
     if (spawnProcess) killPocketbaseInstanceBySpawnProcess(spawnProcess);
-    killPocketbaseInstanceByDbUrl(sandboxDbUrl);
+    if (sandboxDbUrl) killPocketbaseInstanceByDbUrl(sandboxDbUrl);
     await fse.remove(sandboxDirPath);
   });
 
@@ -58,12 +61,23 @@ describe("pokkit-db config writer tests", () => {
     });
   });
 
-  it("true test", async () => {
-    expect(true).toBe(true);
+  it("is connection healthy", async () => {
+    const pb = createPbConnection();
+    const isHealthy = await pb.health.check();
+    expect(isHealthy.code).toBe(200);
+  });
+
+  it("does not reject a valid superuser authentication", async () => {
+    const superuserPb = createPbConnection();
+    const userRecordResponse = await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
+
+    expect(userRecordResponse.record.id).toBeTruthy();
   });
 
   it("random collection throws error", async () => {
-    const superuserPb = createPbInstance();
+    const superuserPb = createPbConnection();
     await superuserPb
       .collection(superusersCollectionName)
       .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
@@ -71,38 +85,47 @@ describe("pokkit-db config writer tests", () => {
     await expect(superuserPb.collection("randomCollectionName").getFullList()).rejects.toThrow();
   });
 
-  // it("collection in collections.json passes", async () => {
-  //   const superuserPb = createPbInstance();
-  //   await superuserPb
-  //     .collection(usersCollectionName)
-  //     .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
+  it("collection from collections.json does not throw error", async () => {
+    const superuserPb = createPbConnection();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
 
-  //   await expect(superuserPb.collection("blah123").getFullList()).not.rejects.toThrow();
-  // });
+    await expect(await superuserPb.collection("blah123").getFullList()).toEqual([]);
+  });
 
-  // it("rejects invalid authentication", async () => {
-  //   const pb = createPbInstance();
-  //   expect(pb).toBeInstanceOf(PocketBase);
-  //   const userPb = createPbInstance();
-  //   await expect(
-  //     userPb.collection(usersCollectionName).authWithPassword("test@example.com", "wrong-password"),
-  //   ).rejects.toThrow();
-  // });
+  it("authenticate superuser if wrong password gives 400", async () => {
+    const superuserPb = createPbConnection();
 
-  // it("allow create:  user with valid email and password", async () => {
-  //   const userPb = createPbInstance();
+    try {
+      await superuserPb
+        .collection(superusersCollectionName)
+        .authWithPassword(sandboxDbSuperuserEmail, "wrong-password");
+    } catch (error) {
+      expect((error as { status: number }).status).toBe(400);
+    }
 
-  //   // throwaway record - first user gains an approved admin global permission
-  //   await userPb.collection(usersCollectionName).create(userPayloadBuilder.forCreateRandomData());
+    await expect(
+      superuserPb
+        .collection(superusersCollectionName)
+        .authWithPassword(sandboxDbSuperuserEmail, "wrong-password"),
+    ).rejects.toThrow();
+  });
 
-  //   const userData = userPayloadBuilder.forCreateRandomData();
-  //   const resp = await userPb.collection(usersCollectionName).create({
-  //     email: userData.email,
-  //     password: userData.password,
-  //     passwordConfirm: userData.password,
-  //   });
-  //   expect(resp.id).not.toBeNull();
-  // });
+  it("allow create:  user with valid email and password", async () => {
+    const userPb = createPbConnection();
+
+    // throwaway record - first user gains an approved admin global permission
+    await userPb.collection(usersCollectionName).create(userPayloadBuilder.forCreateRandomData());
+
+    const userData = userPayloadBuilder.forCreateRandomData();
+    const resp = await userPb.collection(usersCollectionName).create({
+      email: userData.email,
+      password: userData.password,
+      passwordConfirm: userData.password,
+    });
+    expect(resp.id).not.toBeNull();
+  });
 
   // it("deny read: user record when not authenticated; allow read: of own user record when authenticated; deny read: of other user records when authenticated", async () => {
   //   const userPb = createPbInstance();

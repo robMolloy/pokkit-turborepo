@@ -22,7 +22,7 @@ const sandboxDbSuperuserPassword = "admin@admin.com";
 let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 let sandboxDbUrl: string | undefined;
 
-const createPbInstance = () => new PocketBase(sandboxDbUrl as string);
+const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
 
 describe("test rules", () => {
   beforeAll(async () => {
@@ -53,21 +53,23 @@ describe("test rules", () => {
     });
   });
 
-  it("true test", async () => {
-    expect(true).toBe(true);
+  it("is connection healthy", async () => {
+    const pb = createPbConnection();
+    const isHealthy = await pb.health.check();
+    expect(isHealthy.code).toBe(200);
   });
 
   it("rejects invalid authentication", async () => {
-    const pb = createPbInstance();
+    const pb = createPbConnection();
     expect(pb).toBeInstanceOf(PocketBase);
-    const userPb = createPbInstance();
+    const userPb = createPbConnection();
     await expect(
       userPb.collection(usersCollectionName).authWithPassword("test@example.com", "wrong-password"),
     ).rejects.toThrow();
   });
 
   it("allow create:  user with valid email and password", async () => {
-    const userPb = createPbInstance();
+    const userPb = createPbConnection();
 
     // throwaway record - first user gains an approved admin global permission
     await userPb.collection(usersCollectionName).create(userPayloadBuilder.forCreateRandomData());
@@ -82,7 +84,7 @@ describe("test rules", () => {
   });
 
   it("deny read: user record when not authenticated; allow read: of own user record when authenticated; deny read: of other user records when authenticated", async () => {
-    const userPb = createPbInstance();
+    const userPb = createPbConnection();
 
     // throwaway record - first user gains an approved admin global permission
     await userPb.collection(usersCollectionName).create(userPayloadBuilder.forCreateRandomData());
@@ -117,7 +119,7 @@ describe("test rules", () => {
   });
 
   it("allow list: standard user returns list with only own record when authenticated; allow list: when not authenticated list returns empty array", async () => {
-    const userPb = createPbInstance();
+    const userPb = createPbConnection();
 
     // throwaway record - first user gains an approved admin global permission
     await userPb.collection(usersCollectionName).create(userPayloadBuilder.forCreateRandomData());
