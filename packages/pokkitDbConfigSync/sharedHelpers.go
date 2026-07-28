@@ -1,4 +1,4 @@
-package pokkitDbConfigWriter
+package pokkitDbConfigSync
 
 import (
 	pbCore "github.com/pocketbase/pocketbase/core"

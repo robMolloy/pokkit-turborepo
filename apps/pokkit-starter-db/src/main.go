@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	pokkitDbConfigWriter "github.com/robMolloy/pokkit-turborepo/packages/pokkitDbConfigWriter"
+	pokkitDbConfigSync "github.com/robMolloy/pokkit-turborepo/packages/pokkitDbConfigSync"
 
 	pocketbase "github.com/pocketbase/pocketbase"
 	pbCore "github.com/pocketbase/pocketbase/core"
@@ -12,7 +12,7 @@ import (
 func main() {
 	app := pocketbase.New()
 	// asdasdasdasd
-	pokkitDbConfigWriter.BindFunctions(app)
+	pokkitDbConfigSync.BindFunctions(app)
 
 	app.OnServe().BindFunc(func(se *pbCore.ServeEvent) error {
 		return se.Next()

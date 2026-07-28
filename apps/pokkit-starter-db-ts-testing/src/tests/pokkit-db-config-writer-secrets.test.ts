@@ -10,8 +10,7 @@ import type { ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
-import { superusersCollectionName, usersCollectionName } from "../metadata/pocketbaseMetadata";
-import { userPayloadBuilder } from "../utils/pocketbaseUserHelpers";
+import { superusersCollectionName } from "../metadata/pocketbaseMetadata";
 
 const sourceBuildDirPath = "./source-build";
 
@@ -48,7 +47,6 @@ describe("pokkit-db config writer secrets tests", () => {
     if (sandboxDbUrl) killPocketbaseInstanceByDbUrl(sandboxDbUrl);
     const logFilePath = createPbLogFilePath({ dirPath: sandboxDirPath });
     const storedLogsFilePath = `_logs/${testSuiteName}.logs.txt`;
-    fse.removeSync(storedLogsFilePath);
     fse.copySync(logFilePath, storedLogsFilePath);
     fse.removeSync(sandboxDirPath);
   });

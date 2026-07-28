@@ -1,9 +1,8 @@
-import PocketBase from "pocketbase";
-import type { CollectionModel } from "pocketbase";
 import { exec, spawn, type ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
 import { promisify } from "util";
-import { superusersCollectionName } from "./pbMetadata";
+import PocketBase from "pocketbase";
+import { superusersCollectionName } from "../helpers/pbMetadata";
 
 const execAsync = promisify(exec);
 
@@ -111,45 +110,47 @@ export const upsertAdminCredentials = async (p: {
   });
 };
 
-/**
- * Retrieves all collections from the specified PocketBase database.
- *
- * @param dbUrl - The URL of the PocketBase database to connect to.
- * @param dbSuperuserEmail - The email address of the superuser account.
- * @param dbSuperuserPassword - The password of the superuser account.
- */
-export const getCollectionsFromRunningDbInstance = async (p: {
-  dbUrl: string;
+export const setupAndServeDb = async (p: {
+  dbBuildDirPath: string;
+  dbPortNumber: number;
   dbSuperuserEmail: string;
   dbSuperuserPassword: string;
 }) => {
-  const appPb = new PocketBase(p.dbUrl);
-  await appPb
-    .collection(superusersCollectionName)
-    .authWithPassword(p.dbSuperuserEmail, p.dbSuperuserPassword);
+  const resp = await serveDbAndWriteLogs({
+    dbBuildDirPath: p.dbBuildDirPath,
+    dbPortNumber: p.dbPortNumber,
+  });
 
-  const collections = await appPb.collections.getFullList();
-  return collections;
+  await upsertAdminCredentials({
+    buildDirPath: p.dbBuildDirPath,
+    dbSuperuserEmail: p.dbSuperuserEmail,
+    dbSuperuserPassword: p.dbSuperuserPassword,
+  });
+  return resp;
 };
 
-/**
- * Applies the given collections to the specified PocketBase database
- *
- * @param p.dbUrl - The URL of the PocketBase database to connect to.
- * @param p.dbSuperuserEmail - The email address of the superuser account.
- * @param p.dbSuperuserPassword - The password of the superuser account.
- * @param p.collections - An array of CollectionModel objects to import into the database.
- */
-export const applyCollectionsToDb = async (p: {
-  dbUrl: string;
+export const clearDb = async (p: {
+  dbPortNumber: number;
   dbSuperuserEmail: string;
   dbSuperuserPassword: string;
-  collections: CollectionModel[];
 }) => {
-  const testPb = new PocketBase(p.dbUrl);
-  await testPb
+  const superuserPb = new PocketBase(`http://0.0.0.0:${p.dbPortNumber}`);
+  await superuserPb
     .collection(superusersCollectionName)
     .authWithPassword(p.dbSuperuserEmail, p.dbSuperuserPassword);
 
-  await testPb.collections.import(p.collections);
+  const collections = await superuserPb.collections.getFullList();
+
+  const truncationPromises = collections
+    .filter((coll) => coll.name !== superusersCollectionName)
+    .map((coll) => superuserPb.collections.truncate(coll.name));
+  await Promise.all(truncationPromises);
+
+  const superuserRecords = await superuserPb.collection(superusersCollectionName).getFullList();
+  const deleteSuperuserPromises = superuserRecords
+    .filter((record) => record.email !== p.dbSuperuserEmail)
+    .map((record) => superuserPb.collection(superusersCollectionName).delete(record.id));
+  await Promise.all(deleteSuperuserPromises);
+
+  superuserPb.authStore.clear();
 };

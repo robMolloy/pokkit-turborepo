@@ -48,7 +48,6 @@ describe("pokkit-db config writer collection tests", () => {
     if (sandboxDbUrl) killPocketbaseInstanceByDbUrl(sandboxDbUrl);
     const logFilePath = createPbLogFilePath({ dirPath: sandboxDirPath });
     const storedLogsFilePath = `_logs/${testSuiteName}.logs.txt`;
-    fse.removeSync(storedLogsFilePath);
     fse.copySync(logFilePath, storedLogsFilePath);
     fse.removeSync(sandboxDirPath);
   });

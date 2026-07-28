@@ -1,4 +1,4 @@
-package pokkitDbConfigWriter
+package pokkitDbConfigSync
 
 import (
 	"os"
