@@ -94,7 +94,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-06-25 20:24:54.568Z",
-    "updated": "2026-07-28 13:30:42.655Z",
+    "updated": "2026-07-28 20:35:41.840Z",
     "system": true
   },
   {
@@ -206,7 +206,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-06-25 20:24:54.572Z",
-    "updated": "2026-07-28 13:30:42.659Z",
+    "updated": "2026-07-28 20:35:41.854Z",
     "system": true
   },
   {
@@ -320,7 +320,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-06-25 20:24:54.575Z",
-    "updated": "2026-07-28 13:30:42.663Z",
+    "updated": "2026-07-28 20:35:41.861Z",
     "system": true
   },
   {
@@ -418,7 +418,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-06-25 20:24:54.579Z",
-    "updated": "2026-07-28 13:30:42.667Z",
+    "updated": "2026-07-28 20:35:41.868Z",
     "system": true
   },
   {
@@ -533,7 +533,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-06-25 20:24:54.581Z",
-    "updated": "2026-07-28 13:30:42.669Z",
+    "updated": "2026-07-28 20:35:41.884Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -750,7 +750,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-06-25 20:24:54.587Z",
-    "updated": "2026-07-28 13:30:42.674Z",
+    "updated": "2026-07-28 20:35:41.897Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -867,7 +867,58 @@
     ],
     "indexes": [],
     "created": "2026-07-24 15:25:54.794Z",
-    "updated": "2026-07-28 13:30:42.678Z",
+    "updated": "2026-07-28 20:35:41.904Z",
+    "system": false
+  },
+  {
+    "id": "pbc_4156550400",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "asd",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "created": "2026-07-28 16:47:37.061Z",
+    "updated": "2026-07-28 20:35:41.912Z",
     "system": false
   },
   {
@@ -926,68 +977,11 @@
         "type": "text"
       },
       {
-        "help": "",
-        "hidden": false,
-        "id": "date2990389176",
-        "max": "",
-        "min": "",
-        "name": "created",
-        "presentable": false,
-        "required": true,
-        "system": false,
-        "type": "date"
-      },
-      {
-        "help": "",
-        "hidden": false,
-        "id": "date3332085495",
-        "max": "",
-        "min": "",
-        "name": "updated",
-        "presentable": false,
-        "required": true,
-        "system": false,
-        "type": "date"
-      }
-    ],
-    "indexes": [
-      "CREATE UNIQUE INDEX `idx_secrets_key` ON `_pb_config_secrets` (key)"
-    ],
-    "created": "2026-07-28 16:43:36.956Z",
-    "updated": "2026-07-28 16:43:36.956Z",
-    "system": false
-  },
-  {
-    "id": "pbc_4156550400",
-    "listRule": null,
-    "viewRule": null,
-    "createRule": null,
-    "updateRule": null,
-    "deleteRule": null,
-    "name": "asd",
-    "type": "base",
-    "fields": [
-      {
-        "autogeneratePattern": "[a-z0-9]{15}",
-        "help": "",
-        "hidden": false,
-        "id": "text3208210256",
-        "max": 15,
-        "min": 15,
-        "name": "id",
-        "pattern": "^[a-z0-9]+$",
-        "presentable": false,
-        "primaryKey": true,
-        "required": true,
-        "system": true,
-        "type": "text"
-      },
-      {
         "hidden": false,
         "id": "autodate2990389176",
         "name": "created",
         "onCreate": true,
-        "onUpdate": false,
+        "onUpdate": true,
         "presentable": false,
         "system": false,
         "type": "autodate"
@@ -996,16 +990,18 @@
         "hidden": false,
         "id": "autodate3332085495",
         "name": "updated",
-        "onCreate": true,
+        "onCreate": false,
         "onUpdate": true,
         "presentable": false,
         "system": false,
         "type": "autodate"
       }
     ],
-    "indexes": [],
-    "created": "2026-07-28 16:47:37.061Z",
-    "updated": "2026-07-28 16:47:37.061Z",
+    "indexes": [
+      "CREATE UNIQUE INDEX `idx_secrets_key` ON `_pb_config_secrets` (key)"
+    ],
+    "created": "2026-07-28 20:35:42.026Z",
+    "updated": "2026-07-28 20:35:42.026Z",
     "system": false
   }
 ]
