@@ -3,8 +3,8 @@ import {
   createPbLogFilePath,
   killPocketbaseInstanceByDbPortNumber,
   killPocketbaseInstanceBySpawnProcess,
-  setupAndServeDb as servePokkitDb,
-  upsertAdminCredentials,
+  serveDbAndWriteLogs,
+  upsertAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
 import type { ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
@@ -31,15 +31,19 @@ describe("pokkit-db config writer secrets tests - when secrets file does not exi
     await fse.copySync(sourceBuildDirPath, sandboxDirPath);
     await fse.removeSync(sandboxDirPath + "/pb_config/secrets.json");
 
-    const resp = await servePokkitDb({
+    const resp = await serveDbAndWriteLogs({
       dbBuildDirPath: sandboxDirPath,
       dbPortNumber: sandboxDbPortNumber,
-      dbSuperuserEmail: sandboxDbSuperuserEmail,
-      dbSuperuserPassword: sandboxDbSuperuserPassword,
     });
 
     spawnProcess = resp.pbProcess;
     sandboxDbUrl = resp.dbUrl;
+
+    await upsertAdminCredentialsFromCli({
+      buildDirPath: sandboxDirPath,
+      dbSuperuserEmail: sandboxDbSuperuserEmail,
+      dbSuperuserPassword: sandboxDbSuperuserPassword,
+    });
   });
 
   afterAll(async () => {
@@ -54,12 +58,6 @@ describe("pokkit-db config writer secrets tests - when secrets file does not exi
   beforeEach(async () => {
     await clearDb({
       dbPortNumber: sandboxDbPortNumber,
-      dbSuperuserEmail: sandboxDbSuperuserEmail,
-      dbSuperuserPassword: sandboxDbSuperuserPassword,
-    });
-
-    await upsertAdminCredentials({
-      buildDirPath: sandboxDirPath,
       dbSuperuserEmail: sandboxDbSuperuserEmail,
       dbSuperuserPassword: sandboxDbSuperuserPassword,
     });

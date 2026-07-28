@@ -2,10 +2,9 @@ import {
   clearDb,
   createPbLogFilePath,
   killPocketbaseInstanceByDbPortNumber,
-  killPocketbaseInstanceByDbUrl,
   killPocketbaseInstanceBySpawnProcess,
-  setupAndServeDb as servePokkitDb,
-  upsertAdminCredentials,
+  upsertAdminCredentialsFromCli,
+  serveDbAndWriteLogs,
 } from "@repo/pokkit-testing";
 import type { ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
@@ -32,9 +31,12 @@ describe("pokkit-db config writer secrets tests", () => {
     await fse.removeSync(sandboxDirPath);
     await fse.copySync(sourceBuildDirPath, sandboxDirPath);
 
-    const resp = await servePokkitDb({
+    const resp = await serveDbAndWriteLogs({
       dbBuildDirPath: sandboxDirPath,
       dbPortNumber: sandboxDbPortNumber,
+    });
+    await upsertAdminCredentialsFromCli({
+      buildDirPath: sandboxDirPath,
       dbSuperuserEmail: sandboxDbSuperuserEmail,
       dbSuperuserPassword: sandboxDbSuperuserPassword,
     });
@@ -59,7 +61,7 @@ describe("pokkit-db config writer secrets tests", () => {
       dbSuperuserPassword: sandboxDbSuperuserPassword,
     });
 
-    await upsertAdminCredentials({
+    await upsertAdminCredentialsFromCli({
       buildDirPath: sandboxDirPath,
       dbSuperuserEmail: sandboxDbSuperuserEmail,
       dbSuperuserPassword: sandboxDbSuperuserPassword,

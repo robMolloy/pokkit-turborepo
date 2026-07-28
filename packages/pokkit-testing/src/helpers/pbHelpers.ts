@@ -90,7 +90,7 @@ export const serveDbAndWriteLogs = async (p: {
  * @param dbSuperuserEmail - The email address to set for the superuser account.
  * @param dbSuperuserPassword - The password to set for the superuser account.
  */
-export const upsertAdminCredentials = async (p: {
+export const upsertAdminCredentialsFromCli = async (p: {
   buildDirPath: string;
   dbSuperuserEmail: string;
   dbSuperuserPassword: string;
@@ -113,25 +113,6 @@ export const upsertAdminCredentials = async (p: {
       }
     });
   });
-};
-
-export const setupAndServeDb = async (p: {
-  dbBuildDirPath: string;
-  dbPortNumber: number;
-  dbSuperuserEmail: string;
-  dbSuperuserPassword: string;
-}) => {
-  const resp = await serveDbAndWriteLogs({
-    dbBuildDirPath: p.dbBuildDirPath,
-    dbPortNumber: p.dbPortNumber,
-  });
-
-  await upsertAdminCredentials({
-    buildDirPath: p.dbBuildDirPath,
-    dbSuperuserEmail: p.dbSuperuserEmail,
-    dbSuperuserPassword: p.dbSuperuserPassword,
-  });
-  return resp;
 };
 
 export const clearDb = async (p: {
