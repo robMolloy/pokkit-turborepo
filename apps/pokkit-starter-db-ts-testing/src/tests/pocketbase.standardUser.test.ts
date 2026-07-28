@@ -1,8 +1,9 @@
 import {
   clearDb,
+  createPbLogFilePath,
   killPocketbaseInstanceByDbUrl,
   killPocketbaseInstanceBySpawnProcess,
-  serveDbAndWriteLogs,
+  serveDb,
   upsertAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
 import type { ChildProcessWithoutNullStreams } from "child_process";
@@ -30,9 +31,12 @@ describe("test rules", () => {
     await fse.removeSync(sandboxDirPath);
     await fse.copySync(sourceBuildDirPath, sandboxDirPath);
 
-    const resp = await serveDbAndWriteLogs({
+    const logFilePath = createPbLogFilePath({ dirPath: sandboxDirPath });
+
+    const resp = await serveDb({
       dbBuildDirPath: sandboxDirPath,
       dbPortNumber: sandboxDbPortNumber,
+      logFilePath,
     });
     spawnProcess = resp.pbProcess;
     sandboxDbUrl = resp.dbUrl;

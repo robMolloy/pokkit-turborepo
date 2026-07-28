@@ -3,7 +3,7 @@ import {
   createPbLogFilePath,
   killPocketbaseInstanceByDbUrl,
   killPocketbaseInstanceBySpawnProcess,
-  serveDbAndWriteLogs,
+  serveDb,
   upsertAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
 import type { ChildProcessWithoutNullStreams } from "child_process";
@@ -31,10 +31,12 @@ describe("pokkit-db config writer collection tests", () => {
   beforeAll(async () => {
     await fse.removeSync(sandboxDirPath);
     await fse.copySync(sourceBuildDirPath, sandboxDirPath);
+    const logFilePath = createPbLogFilePath({ dirPath: sandboxDirPath });
 
-    const resp = await serveDbAndWriteLogs({
+    const resp = await serveDb({
       dbBuildDirPath: sandboxDirPath,
       dbPortNumber: sandboxDbPortNumber,
+      logFilePath,
     });
 
     spawnProcess = resp.pbProcess;
@@ -50,9 +52,6 @@ describe("pokkit-db config writer collection tests", () => {
   afterAll(async () => {
     if (spawnProcess) killPocketbaseInstanceBySpawnProcess(spawnProcess);
     if (sandboxDbUrl) killPocketbaseInstanceByDbUrl(sandboxDbUrl);
-    const logFilePath = createPbLogFilePath({ dirPath: sandboxDirPath });
-    const storedLogsFilePath = `_logs/${testSuiteName}.logs.txt`;
-    fse.copySync(logFilePath, storedLogsFilePath);
     fse.removeSync(sandboxDirPath);
   });
 

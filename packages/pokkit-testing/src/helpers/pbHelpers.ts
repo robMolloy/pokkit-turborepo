@@ -40,9 +40,10 @@ export const createPbLogFilePath = (p: { dirPath: string }) => `${p.dirPath}/log
  * @param logFilePath - Path to the file where logs will be written.
  * @param dbUrl - Database URL in the format http://anyurl:1234 (port number after second colon).
  */
-export const serveDbAndWriteLogs = async (p: {
+export const serveDb = async (p: {
   dbBuildDirPath: string;
   dbPortNumber: number;
+  logFilePath?: string;
 }): Promise<{
   pbProcess: ChildProcessWithoutNullStreams;
   dbServeUrl: string;
@@ -51,32 +52,33 @@ export const serveDbAndWriteLogs = async (p: {
   const dbServeUrl = createPbServeAddress({ portNumber: p.dbPortNumber });
   const dbUrl = createPbServeUrl({ portNumber: p.dbPortNumber });
   const dbBuildFilePath = createPbBuildFilePath({ dirPath: p.dbBuildDirPath });
-  const dbLogFilePath = createPbLogFilePath({ dirPath: p.dbBuildDirPath });
 
   const buildFileExists = await fse.pathExists(dbBuildFilePath);
   if (!buildFileExists)
     throw new Error(`setupAndServeDb: dbBuildFile does not exist: ${dbBuildFilePath}`);
 
-  fse.ensureFileSync(dbLogFilePath);
-
-  const logStream = fse.createWriteStream(dbLogFilePath, { flags: "a" });
   const pbProcess = spawn(dbBuildFilePath, ["serve", `--http=${dbServeUrl}`, "--dev"]);
+
+  if (p.logFilePath) fse.ensureFileSync(p.logFilePath);
+  const logStream = p.logFilePath
+    ? fse.createWriteStream(p.logFilePath, { flags: "a" })
+    : undefined;
 
   await new Promise((resolve) => {
     pbProcess.stdout.on("data", (data) => {
-      const strData = data.toString() as string;
-      logStream.write(`[stdout] ${strData}\n`);
+      const strData = data.toString();
+      logStream?.write(`[stdout] ${strData}\n`);
 
       if (strData.includes("Server started at")) resolve(pbProcess);
     });
 
     pbProcess.stderr.on("data", (data) => {
-      logStream.write(`[stderr] ${data.toString()}\n`);
+      logStream?.write(`[stderr] ${data.toString()}\n`);
     });
 
     pbProcess.on("error", (error) => {
-      logStream.write(`[error] ${error.message}\n`);
-      logStream.end();
+      logStream?.write(`[error] ${error.message}\n`);
+      logStream?.end();
     });
   });
 
@@ -120,7 +122,7 @@ export const clearDb = async (p: {
   dbSuperuserEmail: string;
   dbSuperuserPassword: string;
 }) => {
-  const superuserPb = new PocketBase(`http://0.0.0.0:${p.dbPortNumber}`);
+  const superuserPb = new PocketBase(createPbServeUrl({ portNumber: p.dbPortNumber }));
   await superuserPb
     .collection(superusersCollectionName)
     .authWithPassword(p.dbSuperuserEmail, p.dbSuperuserPassword);

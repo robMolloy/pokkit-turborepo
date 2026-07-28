@@ -3,7 +3,7 @@ import {
   createPbLogFilePath,
   killPocketbaseInstanceByDbPortNumber,
   killPocketbaseInstanceBySpawnProcess,
-  serveDbAndWriteLogs,
+  serveDb,
   upsertAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
 import type { ChildProcessWithoutNullStreams } from "child_process";
@@ -31,9 +31,12 @@ describe("pokkit-db config writer secrets tests - when secrets file does not exi
     await fse.copySync(sourceBuildDirPath, sandboxDirPath);
     await fse.removeSync(sandboxDirPath + "/pb_config/secrets.json");
 
-    const resp = await serveDbAndWriteLogs({
+    const logFilePath = createPbLogFilePath({ dirPath: sandboxDirPath });
+
+    const resp = await serveDb({
       dbBuildDirPath: sandboxDirPath,
       dbPortNumber: sandboxDbPortNumber,
+      logFilePath,
     });
 
     spawnProcess = resp.pbProcess;
@@ -49,9 +52,6 @@ describe("pokkit-db config writer secrets tests - when secrets file does not exi
   afterAll(async () => {
     killPocketbaseInstanceByDbPortNumber(sandboxDbPortNumber);
     if (spawnProcess) killPocketbaseInstanceBySpawnProcess(spawnProcess);
-    const logFilePath = createPbLogFilePath({ dirPath: sandboxDirPath });
-    const storedLogsFilePath = `_logs/${testSuiteName}.logs.txt`;
-    fse.copySync(logFilePath, storedLogsFilePath);
     fse.removeSync(sandboxDirPath);
   });
 
