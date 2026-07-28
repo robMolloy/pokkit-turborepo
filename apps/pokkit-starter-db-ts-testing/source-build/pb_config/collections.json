@@ -94,7 +94,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-06-25 20:24:54.568Z",
-    "updated": "2026-07-28 07:51:36.413Z",
+    "updated": "2026-07-28 13:30:42.655Z",
     "system": true
   },
   {
@@ -206,7 +206,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-06-25 20:24:54.572Z",
-    "updated": "2026-07-28 07:51:36.418Z",
+    "updated": "2026-07-28 13:30:42.659Z",
     "system": true
   },
   {
@@ -320,7 +320,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-06-25 20:24:54.575Z",
-    "updated": "2026-07-28 07:51:36.427Z",
+    "updated": "2026-07-28 13:30:42.663Z",
     "system": true
   },
   {
@@ -418,7 +418,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-06-25 20:24:54.579Z",
-    "updated": "2026-07-28 07:51:36.436Z",
+    "updated": "2026-07-28 13:30:42.667Z",
     "system": true
   },
   {
@@ -533,7 +533,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-06-25 20:24:54.581Z",
-    "updated": "2026-07-28 07:51:36.452Z",
+    "updated": "2026-07-28 13:30:42.669Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -750,7 +750,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-06-25 20:24:54.587Z",
-    "updated": "2026-07-28 07:51:36.471Z",
+    "updated": "2026-07-28 13:30:42.674Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -867,7 +867,7 @@
     ],
     "indexes": [],
     "created": "2026-07-24 15:25:54.794Z",
-    "updated": "2026-07-28 07:51:36.478Z",
+    "updated": "2026-07-28 13:30:42.678Z",
     "system": false
   },
   {
@@ -906,7 +906,7 @@
         "pattern": "",
         "presentable": false,
         "primaryKey": false,
-        "required": false,
+        "required": true,
         "system": false,
         "type": "text"
       },
@@ -921,8 +921,65 @@
         "pattern": "",
         "presentable": false,
         "primaryKey": false,
-        "required": false,
+        "required": true,
         "system": false,
+        "type": "text"
+      },
+      {
+        "help": "",
+        "hidden": false,
+        "id": "date2990389176",
+        "max": "",
+        "min": "",
+        "name": "created",
+        "presentable": false,
+        "required": true,
+        "system": false,
+        "type": "date"
+      },
+      {
+        "help": "",
+        "hidden": false,
+        "id": "date3332085495",
+        "max": "",
+        "min": "",
+        "name": "updated",
+        "presentable": false,
+        "required": true,
+        "system": false,
+        "type": "date"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX `idx_secrets_key` ON `_pb_config_secrets` (key)"
+    ],
+    "created": "2026-07-28 16:43:36.956Z",
+    "updated": "2026-07-28 16:43:36.956Z",
+    "system": false
+  },
+  {
+    "id": "pbc_4156550400",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "asd",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
         "type": "text"
       },
       {
@@ -947,8 +1004,8 @@
       }
     ],
     "indexes": [],
-    "created": "2026-07-28 07:52:21.245Z",
-    "updated": "2026-07-28 07:52:21.245Z",
+    "created": "2026-07-28 16:47:37.061Z",
+    "updated": "2026-07-28 16:47:37.061Z",
     "system": false
   }
 ]

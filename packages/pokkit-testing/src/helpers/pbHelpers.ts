@@ -16,6 +16,11 @@ export const killPocketbaseInstanceByDbUrl = (dbUrl: string) => {
     `kill -9 $(lsof -ti :"${portNumber}" 2>/dev/null | head -n 1) 2>/dev/null || true`,
   );
 };
+export const killPocketbaseInstanceByDbPortNumber = (portNumber: number) => {
+  return execAsync(
+    `kill -9 $(lsof -ti :"${portNumber}" 2>/dev/null | head -n 1) 2>/dev/null || true`,
+  );
+};
 
 export const killPocketbaseInstanceBySpawnProcess = (
   spawnProcess: ChildProcessWithoutNullStreams,

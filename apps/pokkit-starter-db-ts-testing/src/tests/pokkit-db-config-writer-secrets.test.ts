@@ -1,6 +1,7 @@
 import {
   clearDb,
   createPbLogFilePath,
+  killPocketbaseInstanceByDbPortNumber,
   killPocketbaseInstanceByDbUrl,
   killPocketbaseInstanceBySpawnProcess,
   setupAndServeDb as servePokkitDb,
@@ -24,6 +25,8 @@ const sandboxDbSuperuserPassword = "admin@admin.com";
 let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 let sandboxDbUrl: string | undefined;
 
+const secretsCollectionName = "_pb_config_secrets";
+
 const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
 
 describe("pokkit-db config writer secrets tests", () => {
@@ -43,8 +46,8 @@ describe("pokkit-db config writer secrets tests", () => {
   });
 
   afterAll(async () => {
+    killPocketbaseInstanceByDbPortNumber(sandboxDbPortNumber);
     if (spawnProcess) killPocketbaseInstanceBySpawnProcess(spawnProcess);
-    if (sandboxDbUrl) killPocketbaseInstanceByDbUrl(sandboxDbUrl);
     const logFilePath = createPbLogFilePath({ dirPath: sandboxDirPath });
     const storedLogsFilePath = `_logs/${testSuiteName}.logs.txt`;
     fse.copySync(logFilePath, storedLogsFilePath);
@@ -72,8 +75,6 @@ describe("pokkit-db config writer secrets tests", () => {
   });
 
   it("superuser can access _pb_config_secrets collection", async () => {
-    const secretsCollectionName = "_pb_config_secrets";
-
     const superuserPb = createPbConnection();
     await superuserPb
       .collection(superusersCollectionName)
@@ -81,4 +82,37 @@ describe("pokkit-db config writer secrets tests", () => {
 
     await expect(await superuserPb.collection(secretsCollectionName).getFullList()).toEqual([]);
   });
+
+  it("superuser can write to _pb_config_secrets collection which then updates the secrets file", async () => {
+    const superuserPb = createPbConnection();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
+
+    const mockSecretRecord = { key: "testKey", value: "testValue" };
+
+    await superuserPb.collection(secretsCollectionName).create(mockSecretRecord);
+
+    const mockSecretRecords = await superuserPb.collection(secretsCollectionName).getFullList();
+    const savedSecretRecord = mockSecretRecords.find((x) => x.key === mockSecretRecord.key);
+
+    expect(savedSecretRecord?.value).toBe(mockSecretRecord.value);
+
+    const secretsFileContent = fse.readFileSync(sandboxDirPath + "/pb_config/secrets.json", "utf8");
+    expect(secretsFileContent).toBeTruthy();
+
+    const parsedSecrets = safeJsonParse(secretsFileContent);
+    expect(parsedSecrets.success).toBe(true);
+
+    expect(parsedSecrets.data).toEqual({ [mockSecretRecord.key]: mockSecretRecord.value });
+  });
 });
+
+const safeJsonParse = (str: string) => {
+  try {
+    const json = JSON.parse(str);
+    return { success: true, data: json } as const;
+  } catch (error) {
+    return { success: false, error } as const;
+  }
+};

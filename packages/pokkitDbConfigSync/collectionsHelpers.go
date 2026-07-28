@@ -9,6 +9,15 @@ import (
 	pokkitDbUtils "github.com/robMolloy/pokkit-turborepo/packages/pokkit-db-utils"
 )
 
+var isCollectionsSyncSetupCompleteStoreKey = "isCollectionsSyncSetupComplete"
+
+func GetIsCollectionsSyncSetupComplete(app pbCore.App) bool {
+	return app.Store().Get(isCollectionsSyncSetupCompleteStoreKey).(bool)
+}
+func SetIsCollectionsSyncSetupComplete(app pbCore.App, isCollectionsSyncSetupComplete bool) {
+	app.Store().Set(isCollectionsSyncSetupCompleteStoreKey, isCollectionsSyncSetupComplete)
+}
+
 // ImportCollectionsFromCollectionsFile imports collections from pb_data/collections.json.
 // If successful, true is returned.
 // If this file doesn't exist, a boolean of false is returned.
@@ -77,14 +86,14 @@ func OnServeSyncCollectionsWithCollectionsFileHandler(se *pbCore.ServeEvent) err
 }
 
 func OnCollectionChangeWriteCollectionsToFileHandler(e *pbCore.CollectionEvent) error {
-	isSetupComplete := e.App.Store().Get("isSetupComplete").(bool)
-	if !isSetupComplete {
+	isCollectionsSyncSetupComplete := GetIsCollectionsSyncSetupComplete(e.App)
+	if !isCollectionsSyncSetupComplete {
 		return e.Next()
 	}
 
 	err := WriteCollectionsToCollectionsFile(e.App)
 	if err != nil {
-		e.App.Logger().Error("WriteCollectionsToCollectionsFile", "err", err)
+		e.App.Logger().Error("WriteCollectionsToCollectionsFile in OnCollectionChangeWriteCollectionsToFileHandler", "err", err)
 	}
 
 	return e.Next()
