@@ -58,12 +58,6 @@ describe("pokkit-db config writer secrets tests", () => {
       dbSuperuserEmail: sandboxDbSuperuserEmail,
       dbSuperuserPassword: sandboxDbSuperuserPassword,
     });
-
-    await upsertAdminCredentialsFromCli({
-      buildDirPath: sandboxDirPath,
-      dbSuperuserEmail: sandboxDbSuperuserEmail,
-      dbSuperuserPassword: sandboxDbSuperuserPassword,
-    });
   });
 
   it("is connection healthy", async () => {

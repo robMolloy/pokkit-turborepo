@@ -68,6 +68,7 @@ describe("pokkit-db config writer secrets tests - when secrets file does not exi
     const isHealthy = await pb.health.check();
     expect(isHealthy.code).toBe(200);
   });
+
   it("secrets file is created on startup when it does not exist", async () => {
     const secretsFileContent = fse.readFileSync(sandboxDirPath + "/pb_config/secrets.json", "utf8");
     expect(secretsFileContent).toBeTruthy();
