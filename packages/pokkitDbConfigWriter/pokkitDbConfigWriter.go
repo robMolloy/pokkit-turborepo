@@ -14,6 +14,8 @@ func BindFunctions(app pbCore.App) {
 
 	app.OnServe().BindFunc(OnServeSyncCollectionsWithCollectionsFileHandler)
 
+	app.OnServe().BindFunc(OnServeImportEnvVarsFromSecretsFileHandler)
+
 	app.OnServe().BindFunc(func(e *pbCore.ServeEvent) error {
 		app.Store().Set("isSetupComplete", true)
 		return e.Next()
