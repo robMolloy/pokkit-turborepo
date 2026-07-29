@@ -1,13 +1,25 @@
 package pokkitDbConfigSync
 
 import (
-	"encoding/json"
-	"os"
+	"fmt"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
+	pokkitDbUtils "github.com/robMolloy/pokkit-turborepo/packages/pokkit-db-utils"
 )
 
+var isSettingsSyncSetupCompleteStoreKey = "isSettingsSyncSetupComplete"
+
+func GetIsSettingsSyncSetupComplete(app pbCore.App) bool {
+	return app.Store().Get(isSettingsSyncSetupCompleteStoreKey).(bool)
+}
+func SetIsSettingsSyncSetupComplete(app pbCore.App, isSettingsSyncSetupComplete bool) {
+	app.Store().Set(isSettingsSyncSetupCompleteStoreKey, isSettingsSyncSetupComplete)
+}
+
+// ImportCollectionsFromCollectionsFile imports collections from pb_data/collections.json.
+// If successful, true is returned.
+// If this file doesn't exist, a boolean of false is returned.
 func ImportSettingsFromSettingsFile(app pbCore.App) (bool, error) {
 	configDirPath := GetConfigDirPath(app)
 	settingsFilePath := configDirPath + "/" + SettingsFileName
@@ -18,72 +30,89 @@ func ImportSettingsFromSettingsFile(app pbCore.App) (bool, error) {
 	}
 
 	// File definitely exists, this will only fail with an error that should be logged
-	settingsData, readFileErr := os.ReadFile(settingsFilePath)
-	if readFileErr != nil {
-		return false, readFileErr
+	settingsData, err := utils.ReadJsonFromFileGeneric[*pbCore.Settings](settingsFilePath)
+	if err != nil {
+		return false, err
 	}
+	fmt.Println(settingsData)
 
-	settings := app.Settings()
-	unmarshalErr := json.Unmarshal(settingsData, settings)
-	if unmarshalErr != nil {
-		return false, unmarshalErr
-	}
-
-	saveSettingsError := app.Save(settings)
-	if saveSettingsError != nil {
-		return false, saveSettingsError
+	err = app.Settings().Merge(settingsData) // needs to be of type *core.Settings
+	if err != nil {
+		return false, err
 	}
 
 	return true, nil
 }
 
-// func WriteSettingsToSettingsFileOnSettingsReloadEventHandler(e *pbCore.SettingsReloadEvent) error {
-// 	e.App.Logger().Info("OnSettingsReload")
-// 	if err := e.Next(); err != nil {
-// 		return err
-// 	}
+// WriteSettingsToSettingsFile writes settings to pb_data/settings.json.
+// If successful, true is returned.
+// If this file doesn't exist, a boolean of false is returned.
+func WriteSettingsToSettingsFile(app pbCore.App) error {
+	configDirPath := GetConfigDirPath(app)
+	settingsFilePath := configDirPath + "/" + SettingsFileName
 
-// 	isSetupComplete := e.App.Store().Get("isSetupComplete").(bool)
-// 	if isSetupComplete {
-// 		writeErr := utils.WriteDataToFileAsJson(e.App.DataDir()+"/settings.json", e.App.Settings())
-// 		if writeErr != nil {
-// 			e.App.Logger().Error("Error when writing to settings.json")
-// 		}
-// 	}
+	settingsData := app.Settings()
 
-// 	e.App.Logger().Info("OnSettingsReload - after")
-// 	return nil
-// }
+	err := pokkitDbUtils.WriteDataToFileAsJson(settingsFilePath, settingsData)
+	if err != nil {
+		return fmt.Errorf("failed to WriteDataToFileAsJson: %w", err)
+	}
+	return err
+}
 
-// func WriteCollectionsToCollectionsFileAfterCollectionChangeEventHandler(e *pbCore.CollectionEvent) error {
-// 	e.App.Logger().Info("OnCollectionAfterDeleteSuccess")
-// 	e.Next()
+func SyncSettingsWithSettingsFile(app pbCore.App) error {
+	didImport, err := ImportSettingsFromSettingsFile(app)
+	if err != nil {
+		return fmt.Errorf("failed to ImportSettingsFromSettingsFile %w", err)
+	}
+	if didImport == false {
+		err = WriteSettingsToSettingsFile(app)
+	}
 
-// 	isSetupComplete := e.App.Store().Get("isSetupComplete").(bool)
-// 	if isSetupComplete {
-// 		_, writeErr := WriteCollectionsToCollectionsFile(e.App)
-// 		if writeErr != nil {
-// 			e.App.Logger().Error("Error when writing to collections.json", "writeErr", writeErr)
-// 		}
-// 	}
+	if err != nil {
+		return fmt.Errorf("failed to SyncCollectionsWithCollectionsFile %w", err)
+	}
 
-// 	return nil
-// }
+	return nil
+}
 
-// func SetupCollectionsSettingsAndEnvVarsOnServe(se *pbCore.ServeEvent) error {
-// 	resp, err := ImportCollectionsFromCollectionsFile(se.App)
-// 	se.App.Logger().Info("ImportCollectionsFromCollectionsFilePath", "resp", resp, "err", err)
+func ImportThenWriteSettingsToSettingsFile(app pbCore.App) error {
+	_, err := ImportSettingsFromSettingsFile(app)
+	if err == nil {
+		err = WriteSettingsToSettingsFile(app)
+	}
 
-// 	resp, err = ImportSettingsFromSettingsFile(se.App)
-// 	se.App.Logger().Info("ImportSettingsFromSettingsFilePath", "resp", resp, "err", err)
+	if err != nil {
+		return fmt.Errorf("failed to SyncCollectionsWithCollectionsFile %w", err)
+	}
 
-// 	err = SaveSecretsJsonAsEnvVars(se.App)
-// 	se.App.Logger().Info("SaveSecretsJsonAsEnvVars", "err", err)
+	return nil
+}
 
-// 	se.Next()
+func OnServeSyncSettingsWithSettingsFileHandler(se *pbCore.ServeEvent) error {
+	err := SyncSettingsWithSettingsFile(se.App)
 
-// 	se.App.Store().Set("isSetupComplete", true)
+	if err != nil {
+		se.App.Logger().Error("OnServeSyncSettingsWithSettingsFileHandler", "err", err)
+		return err
+	}
 
-// 	se.App.Logger().Info("Setup complete.")
-// 	return nil
-// }
+	return se.Next()
+}
+
+func OnSettingsChangeWriteSettingsToSettingsFileHandler(e *pbCore.SettingsUpdateRequestEvent) error {
+	// e.NewSettings
+	isSettingsSyncSetupComplete := GetIsSettingsSyncSetupComplete(e.App)
+	if !isSettingsSyncSetupComplete {
+		return e.Next()
+	}
+
+	e.Next()
+
+	err := WriteSettingsToSettingsFile(e.App)
+	if err != nil {
+		e.App.Logger().Error("WriteSettingsToSettingsFile in OnSettingsChangeWriteSettingsToFileHandler", "err", err)
+	}
+
+	return nil
+}
