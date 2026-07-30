@@ -12,13 +12,14 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { superusersCollectionName, usersCollectionName } from "../metadata/pocketbaseMetadata";
 import { userPayloadBuilder } from "../utils/pocketbaseUserHelpers";
+import { testPortNumbers } from "./_testsMetadata";
 
 const sourceBuildDirPath = "./source-build";
 
 const testSuiteName = `pokkit-config-writer-collection-tests`;
 const sandboxDirPath = `_sandboxes/${testSuiteName}`;
 
-const sandboxDbPortNumber = 8114;
+const sandboxDbPortNumber = testPortNumbers.pokkitDbConfigSyncCollection;
 const sandboxDbSuperuserEmail = "admin@admin.com";
 const sandboxDbSuperuserPassword = "admin@admin.com";
 

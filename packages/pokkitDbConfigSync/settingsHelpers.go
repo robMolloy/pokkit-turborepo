@@ -2,6 +2,7 @@ package pokkitDbConfigSync
 
 import (
 	"fmt"
+	"log"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
@@ -34,9 +35,8 @@ func ImportSettingsFromSettingsFile(app pbCore.App) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	fmt.Println(settingsData)
 
-	err = app.Settings().Merge(settingsData) // needs to be of type *core.Settings
+	err = app.Settings().Merge(settingsData)
 	if err != nil {
 		return false, err
 	}
@@ -78,23 +78,22 @@ func SyncSettingsWithSettingsFile(app pbCore.App) error {
 
 func ImportThenWriteSettingsToSettingsFile(app pbCore.App) error {
 	_, err := ImportSettingsFromSettingsFile(app)
-	if err == nil {
-		err = WriteSettingsToSettingsFile(app)
-	}
-
 	if err != nil {
-		return fmt.Errorf("failed to SyncCollectionsWithCollectionsFile %w", err)
+		return fmt.Errorf("failed to ImportSettingsFromSettingsFile in ImportThenWriteSettingsToSettingsFile %w", err)
+	}
+	err = WriteSettingsToSettingsFile(app)
+	if err != nil {
+		return fmt.Errorf("failed to WriteSettingsToSettingsFile in ImportThenWriteSettingsToSettingsFile %w", err)
 	}
 
 	return nil
 }
 
-func OnServeSyncSettingsWithSettingsFileHandler(se *pbCore.ServeEvent) error {
-	err := SyncSettingsWithSettingsFile(se.App)
+func OnServeImportThenWriteSettingsToSettingsFileHandler(se *pbCore.ServeEvent) error {
+	err := ImportThenWriteSettingsToSettingsFile(se.App)
 
 	if err != nil {
-		se.App.Logger().Error("OnServeSyncSettingsWithSettingsFileHandler", "err", err)
-		return err
+		log.Fatal("failed to ImportSettingsFromSettingsFile in ImportThenWriteSettingsToSettingsFile %w", err)
 	}
 
 	return se.Next()

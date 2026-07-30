@@ -74,11 +74,13 @@ export const serveDb = async (p: {
 
     pbProcess.stderr.on("data", (data) => {
       logStream?.write(`[stderr] ${data.toString()}\n`);
+      resolve(pbProcess);
     });
 
     pbProcess.on("error", (error) => {
       logStream?.write(`[error] ${error.message}\n`);
       logStream?.end();
+      resolve(pbProcess);
     });
   });
 

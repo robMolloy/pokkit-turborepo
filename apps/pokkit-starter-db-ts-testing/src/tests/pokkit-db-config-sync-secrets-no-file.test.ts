@@ -10,13 +10,14 @@ import type { ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
+import { testPortNumbers } from "./_testsMetadata";
 
 const sourceBuildDirPath = "./source-build";
 
 const testSuiteName = `pokkit-config-writer-secrets-no-file-tests`;
 const sandboxDirPath = `_sandboxes/${testSuiteName}`;
 
-const sandboxDbPortNumber = 8116;
+const sandboxDbPortNumber = testPortNumbers.pokkitDbConfigSyncSecretsNoFile;
 const sandboxDbSuperuserEmail = "admin@admin.com";
 const sandboxDbSuperuserPassword = "admin@admin.com";
 

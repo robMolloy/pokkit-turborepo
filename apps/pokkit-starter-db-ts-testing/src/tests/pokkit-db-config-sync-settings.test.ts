@@ -10,13 +10,14 @@ import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { superusersCollectionName } from "../metadata/pocketbaseMetadata";
+import { testPortNumbers } from "./_testsMetadata";
 
 const sourceBuildDirPath = "./source-build";
 
 const testSuiteName = `pokkit-config-writer-secrets-tests`;
 const sandboxDirPath = `_sandboxes/${testSuiteName}`;
 
-const sandboxDbPortNumber = 8115;
+const sandboxDbPortNumber = testPortNumbers.pokkitDbConfigSyncSettings;
 const sandboxDbSuperuserEmail = "admin@admin.com";
 const sandboxDbSuperuserPassword = "admin@admin.com";
 
@@ -73,9 +74,8 @@ describe("pokkit-db config writer secrets tests", () => {
 
     const newAppName = "My New App Name";
 
-    const updatedSettingsResp = await superUserPb.settings.update({
-      meta: { appName: newAppName },
-    });
+    await superUserPb.settings.update({ meta: { appName: newAppName } });
+
     const updatedSettings = await superUserPb.settings.getAll();
     expect(updatedSettings.meta.appName).toBe(newAppName);
 
@@ -83,7 +83,6 @@ describe("pokkit-db config writer secrets tests", () => {
       sandboxDirPath + "/pb_config/settings.json",
       "utf8",
     );
-    console.log({ settingsFileContent, updatedSettingsResp });
     expect(settingsFileContent).toBeTruthy();
 
     const parsedSettings = safeJsonParse(settingsFileContent);

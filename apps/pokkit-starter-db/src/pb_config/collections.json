@@ -94,7 +94,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-06-25 20:24:54.568Z",
-    "updated": "2026-07-29 21:50:18.563Z",
+    "updated": "2026-07-29 23:25:35.809Z",
     "system": true
   },
   {
@@ -206,7 +206,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-06-25 20:24:54.572Z",
-    "updated": "2026-07-29 21:50:18.592Z",
+    "updated": "2026-07-29 23:25:35.815Z",
     "system": true
   },
   {
@@ -320,7 +320,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-06-25 20:24:54.575Z",
-    "updated": "2026-07-29 21:50:18.599Z",
+    "updated": "2026-07-29 23:25:35.821Z",
     "system": true
   },
   {
@@ -418,7 +418,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-06-25 20:24:54.579Z",
-    "updated": "2026-07-29 21:50:18.612Z",
+    "updated": "2026-07-29 23:25:35.828Z",
     "system": true
   },
   {
@@ -533,7 +533,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-06-25 20:24:54.581Z",
-    "updated": "2026-07-29 21:50:18.625Z",
+    "updated": "2026-07-29 23:25:35.844Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -750,7 +750,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-06-25 20:24:54.587Z",
-    "updated": "2026-07-29 21:50:18.645Z",
+    "updated": "2026-07-29 23:25:35.872Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -867,7 +867,7 @@
     ],
     "indexes": [],
     "created": "2026-07-24 15:25:54.794Z",
-    "updated": "2026-07-29 21:50:18.665Z",
+    "updated": "2026-07-29 23:25:35.887Z",
     "system": false
   },
   {
@@ -918,7 +918,7 @@
     ],
     "indexes": [],
     "created": "2026-07-28 16:47:37.061Z",
-    "updated": "2026-07-29 21:50:18.674Z",
+    "updated": "2026-07-29 23:25:35.890Z",
     "system": false
   },
   {
@@ -1000,8 +1000,8 @@
     "indexes": [
       "CREATE UNIQUE INDEX `idx_secrets_key` ON `_pb_config_secrets` (key)"
     ],
-    "created": "2026-07-29 21:50:18.747Z",
-    "updated": "2026-07-29 21:50:18.747Z",
+    "created": "2026-07-29 23:25:35.954Z",
+    "updated": "2026-07-29 23:25:35.954Z",
     "system": false
   }
 ]

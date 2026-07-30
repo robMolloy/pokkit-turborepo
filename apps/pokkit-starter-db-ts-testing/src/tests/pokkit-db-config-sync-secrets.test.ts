@@ -10,13 +10,14 @@ import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { secretsCollectionName, superusersCollectionName } from "../metadata/pocketbaseMetadata";
+import { testPortNumbers } from "./_testsMetadata";
 
 const sourceBuildDirPath = "./source-build";
 
 const testSuiteName = `pokkit-config-writer-secrets-tests`;
 const sandboxDirPath = `_sandboxes/${testSuiteName}`;
 
-const sandboxDbPortNumber = 8115;
+const sandboxDbPortNumber = testPortNumbers.pokkitDbConfigSyncSecrets;
 const sandboxDbSuperuserEmail = "admin@admin.com";
 const sandboxDbSuperuserPassword = "admin@admin.com";
 

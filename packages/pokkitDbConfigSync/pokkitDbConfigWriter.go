@@ -10,6 +10,7 @@ import (
 func BindFunctions(app pbCore.App) {
 	SetIsCollectionsSyncSetupComplete(app, false)
 	SetIsSecretsSyncSetupComplete(app, false)
+	SetIsSettingsSyncSetupComplete(app, false)
 
 	configDirPath := GetConfigDirPath(app)
 	os.MkdirAll(configDirPath, 0755)
@@ -43,7 +44,7 @@ func BindFunctions(app pbCore.App) {
 		return e.Next()
 	})
 
-	app.OnServe().BindFunc(OnServeSyncSettingsWithSettingsFileHandler)
+	app.OnServe().BindFunc(OnServeImportThenWriteSettingsToSettingsFileHandler)
 	app.OnServe().BindFunc(func(e *pbCore.ServeEvent) error {
 		SetIsSettingsSyncSetupComplete(e.App, true)
 		return e.Next()
