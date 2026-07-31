@@ -94,10 +94,6 @@ export const servePb = async (p: {
 
 /**
  * Creates or updates the superuser admin credentials for the test database.
- *
- * @param buildFilePath - Path to the temporary test PocketBase executable used to apply the credential change.
- * @param dbSuperuserEmail - The email address to set for the superuser account.
- * @param dbSuperuserPassword - The password to set for the superuser account.
  */
 export const upsertPbAdminCredentialsFromCli = async (p: {
   pbFilePath: string;
