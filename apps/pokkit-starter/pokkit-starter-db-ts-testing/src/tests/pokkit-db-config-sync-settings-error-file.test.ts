@@ -8,8 +8,7 @@ import fse from "fs-extra";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { testsMetadata } from "./_testsMetadata";
-
-const sourceDirPath = "./source-build";
+import { sourcePbDirPath } from "./_constants";
 
 const testMetadata = testsMetadata.pokkitDbConfigSyncSettingsErrorFile;
 const testSuiteName = testMetadata.name;
@@ -28,7 +27,7 @@ describe("pokkit-db config writer settings tests - when settings file does not e
     await killPbInstance({ pbPortNumber });
 
     fse.removeSync(pbDirPath);
-    fse.copySync(sourceDirPath, pbDirPath);
+    fse.copySync(sourcePbDirPath, pbDirPath);
     fse.removeSync(pokkitDbSettingsFilePath);
     fse.writeFileSync(pokkitDbSettingsFilePath, "error");
 

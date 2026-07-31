@@ -11,10 +11,8 @@ import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { secretsCollectionName, superusersCollectionName } from "../metadata/pocketbaseMetadata";
-import { superuserEmail, superuserPassword } from "./_constants";
+import { sourcePbDirPath, superuserEmail, superuserPassword } from "./_constants";
 import { testsMetadata } from "./_testsMetadata";
-
-const sourceDirPath = "./source-build";
 
 const testMetadata = testsMetadata.pokkitDbConfigSyncSecrets;
 const testSuiteName = testMetadata.name;
@@ -32,7 +30,7 @@ describe("pokkit-db config writer secrets tests", () => {
     await killPbInstance({ pbPortNumber });
 
     fse.removeSync(pbDirPath);
-    fse.copySync(sourceDirPath, pbDirPath);
+    fse.copySync(sourcePbDirPath, pbDirPath);
 
     await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 
