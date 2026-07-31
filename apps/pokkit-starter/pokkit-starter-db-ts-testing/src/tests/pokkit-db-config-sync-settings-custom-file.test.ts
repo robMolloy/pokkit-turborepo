@@ -10,6 +10,7 @@ import { PocketBase } from "../config/pocketbaseConfig";
 import { superusersCollectionName } from "../metadata/pocketbaseMetadata";
 import { testsMetadata } from "./_testsMetadata";
 import { settingsMock } from "./mocks/settingsMock";
+import { testSuperuser } from "./_constants";
 
 const sourceDirPath = "./source-build";
 
@@ -18,8 +19,6 @@ const testSuiteName = testMetadata.name;
 const sandboxDbPortNumber = testMetadata.portNumber;
 
 const sandboxDirPath = `_sandboxes/${testSuiteName}`;
-
-import { testSuperuser } from "./_constants";
 
 let sandboxDbUrl: string | undefined;
 
