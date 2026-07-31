@@ -1,5 +1,5 @@
 import {
-  clearDb,
+  clearPb,
   createPbServeUrl,
   killPbInstance,
   servePb,
@@ -9,7 +9,7 @@ import { safeJsonParse } from "@repo/pokkit-utils";
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
-import { testSuperuser } from "./_constants";
+import { superuserEmail, superuserPassword } from "./_constants";
 import { testsMetadata } from "./_testsMetadata";
 
 const sourceDirPath = "./source-build";
@@ -35,11 +35,7 @@ describe("pokkit-db config writer secrets tests - when secrets file does not exi
 
     await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 
-    await upsertAdminCredentialsFromCli({
-      pbFilePath,
-      pbSuperuserEmail: testSuperuser.email,
-      pbSuperuserPassword: testSuperuser.password,
-    });
+    await upsertAdminCredentialsFromCli({ pbFilePath, superuserEmail, superuserPassword });
   });
 
   afterAll(async () => {
@@ -48,10 +44,10 @@ describe("pokkit-db config writer secrets tests - when secrets file does not exi
   });
 
   beforeEach(async () => {
-    await clearDb({
-      dbPortNumber: pbPortNumber,
-      dbSuperuserEmail: testSuperuser.email,
-      dbSuperuserPassword: testSuperuser.password,
+    await clearPb({
+      pbPortNumber: pbPortNumber,
+      superuserEmail,
+      superuserPassword,
     });
   });
 

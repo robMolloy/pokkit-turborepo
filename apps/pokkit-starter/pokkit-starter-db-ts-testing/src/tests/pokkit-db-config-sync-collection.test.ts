@@ -1,5 +1,5 @@
 import {
-  clearDb,
+  clearPb,
   createPbServeUrl,
   killPbInstance,
   servePb,
@@ -10,7 +10,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { superusersCollectionName, usersCollectionName } from "../metadata/pocketbaseMetadata";
 import { userPayloadBuilder } from "../utils/pocketbaseUserHelpers";
-import { testSuperuser } from "./_constants";
+import { superuserEmail, superuserPassword } from "./_constants";
 import { testsMetadata } from "./_testsMetadata";
 
 const sourceDirPath = "./source-build";
@@ -33,11 +33,7 @@ describe("pokkit-db config writer collection tests", () => {
     fse.copySync(sourceDirPath, pbDirPath);
     await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 
-    await upsertAdminCredentialsFromCli({
-      pbFilePath,
-      pbSuperuserEmail: testSuperuser.email,
-      pbSuperuserPassword: testSuperuser.password,
-    });
+    await upsertAdminCredentialsFromCli({ pbFilePath, superuserEmail, superuserPassword });
   });
 
   afterAll(async () => {
@@ -46,17 +42,13 @@ describe("pokkit-db config writer collection tests", () => {
   });
 
   beforeEach(async () => {
-    await clearDb({
-      dbPortNumber: pbPortNumber,
-      dbSuperuserEmail: testSuperuser.email,
-      dbSuperuserPassword: testSuperuser.password,
+    await clearPb({
+      pbPortNumber: pbPortNumber,
+      superuserEmail,
+      superuserPassword,
     });
 
-    await upsertAdminCredentialsFromCli({
-      pbFilePath,
-      pbSuperuserEmail: testSuperuser.email,
-      pbSuperuserPassword: testSuperuser.password,
-    });
+    await upsertAdminCredentialsFromCli({ pbFilePath, superuserEmail, superuserPassword });
   });
 
   it("is connection healthy", async () => {
@@ -69,7 +61,7 @@ describe("pokkit-db config writer collection tests", () => {
     const superuserPb = createPbConnection();
     const superuserRecordResponse = await superuserPb
       .collection(superusersCollectionName)
-      .authWithPassword(testSuperuser.email, testSuperuser.password);
+      .authWithPassword(superuserEmail, superuserPassword);
 
     expect(superuserRecordResponse.record.id).toBeTruthy();
   });
@@ -78,7 +70,7 @@ describe("pokkit-db config writer collection tests", () => {
     const superuserPb = createPbConnection();
     await superuserPb
       .collection(superusersCollectionName)
-      .authWithPassword(testSuperuser.email, testSuperuser.password);
+      .authWithPassword(superuserEmail, superuserPassword);
 
     await expect(superuserPb.collection("randomCollectionName").getFullList()).rejects.toThrow();
   });
@@ -89,7 +81,7 @@ describe("pokkit-db config writer collection tests", () => {
     await expect(
       superuserPb
         .collection(superusersCollectionName)
-        .authWithPassword(testSuperuser.email, "wrong-password"),
+        .authWithPassword(superuserEmail, "wrong-password"),
     ).rejects.toMatchObject({ status: 400 });
   });
 
@@ -114,7 +106,7 @@ describe("pokkit-db config writer collection tests", () => {
     const superuserPb = createPbConnection();
     await superuserPb
       .collection(superusersCollectionName)
-      .authWithPassword(testSuperuser.email, testSuperuser.password);
+      .authWithPassword(superuserEmail, superuserPassword);
 
     const resp = await superuserPb.collections.create({ name: newCollectionName });
     expect(resp.name).toBe(newCollectionName);

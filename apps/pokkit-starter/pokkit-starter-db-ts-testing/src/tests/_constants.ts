@@ -1,4 +1,2 @@
-export const testSuperuser = {
-  email: "admin@admin.com",
-  password: "admin@admin.com",
-};
+export const superuserEmail = "admin@admin.com";
+export const superuserPassword = "admin@admin.com";

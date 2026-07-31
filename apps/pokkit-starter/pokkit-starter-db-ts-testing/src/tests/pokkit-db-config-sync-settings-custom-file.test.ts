@@ -1,5 +1,5 @@
 import {
-  clearDb,
+  clearPb,
   createPbServeUrl,
   killPbInstance,
   servePb,
@@ -9,7 +9,7 @@ import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { superusersCollectionName } from "../metadata/pocketbaseMetadata";
-import { testSuperuser } from "./_constants";
+import { superuserEmail, superuserPassword } from "./_constants";
 import { testsMetadata } from "./_testsMetadata";
 import { settingsMock } from "./mocks/settingsMock";
 
@@ -40,11 +40,7 @@ describe("pokkit-db config writer settings tests - when settings file does not e
 
     await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 
-    await upsertAdminCredentialsFromCli({
-      pbFilePath,
-      pbSuperuserEmail: testSuperuser.email,
-      pbSuperuserPassword: testSuperuser.password,
-    });
+    await upsertAdminCredentialsFromCli({ pbFilePath, superuserEmail, superuserPassword });
   });
 
   afterAll(async () => {
@@ -53,10 +49,10 @@ describe("pokkit-db config writer settings tests - when settings file does not e
   });
 
   beforeEach(async () => {
-    await clearDb({
-      dbPortNumber: pbPortNumber,
-      dbSuperuserEmail: testSuperuser.email,
-      dbSuperuserPassword: testSuperuser.password,
+    await clearPb({
+      pbPortNumber: pbPortNumber,
+      superuserEmail,
+      superuserPassword,
     });
   });
 
@@ -70,7 +66,7 @@ describe("pokkit-db config writer settings tests - when settings file does not e
     const superUserPb = createPbConnection();
     await superUserPb
       .collection(superusersCollectionName)
-      .authWithPassword(testSuperuser.email, testSuperuser.password);
+      .authWithPassword(superuserEmail, superuserPassword);
 
     const settings = await superUserPb.settings.getAll();
     expect(settings).toEqual(settingsMock);

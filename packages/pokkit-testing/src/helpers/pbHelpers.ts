@@ -102,14 +102,14 @@ export const servePb = async (p: {
  */
 export const upsertAdminCredentialsFromCli = async (p: {
   pbFilePath: string;
-  pbSuperuserEmail: string;
-  pbSuperuserPassword: string;
+  superuserEmail: string;
+  superuserPassword: string;
 }) => {
   const upsertProcess = spawn(`${p.pbFilePath}`, [
     "superuser",
     "upsert",
-    p.pbSuperuserEmail,
-    p.pbSuperuserPassword,
+    p.superuserEmail,
+    p.superuserPassword,
   ]);
 
   upsertProcess.on("error", (err) => console.error("spawn error:", err));
@@ -123,15 +123,15 @@ export const upsertAdminCredentialsFromCli = async (p: {
   });
 };
 
-export const clearDb = async (p: {
-  dbPortNumber: number;
-  dbSuperuserEmail: string;
-  dbSuperuserPassword: string;
+export const clearPb = async (p: {
+  pbPortNumber: number;
+  superuserEmail: string;
+  superuserPassword: string;
 }) => {
-  const superuserPb = new PocketBase(createPbServeUrl({ pbPortNumber: p.dbPortNumber }));
+  const superuserPb = new PocketBase(createPbServeUrl({ pbPortNumber: p.pbPortNumber }));
   await superuserPb
     .collection(superusersCollectionName)
-    .authWithPassword(p.dbSuperuserEmail, p.dbSuperuserPassword);
+    .authWithPassword(p.superuserEmail, p.superuserPassword);
 
   const collections = await superuserPb.collections.getFullList();
 
@@ -142,7 +142,7 @@ export const clearDb = async (p: {
 
   const superuserRecords = await superuserPb.collection(superusersCollectionName).getFullList();
   const deleteSuperuserPromises = superuserRecords
-    .filter((record) => record.email !== p.dbSuperuserEmail)
+    .filter((record) => record.email !== p.superuserEmail)
     .map((record) => superuserPb.collection(superusersCollectionName).delete(record.id));
   await Promise.all(deleteSuperuserPromises);
 
