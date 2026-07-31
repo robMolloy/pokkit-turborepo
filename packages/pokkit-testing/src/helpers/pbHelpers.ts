@@ -37,8 +37,7 @@ export const killPbInstance = (
 
 export const getPbServeAddress = (p: { portNumber: number }) => `0.0.0.0:${p.portNumber}`;
 export const getPbServeUrl = (p: { pbPortNumber: number }) => `http://0.0.0.0:${p.pbPortNumber}`;
-export const getPbBuildFilePath = (p: { dirPath: string }) => p.dirPath + "/app-db";
-export const getPbLogFilePath = (p: { dirPath: string }) => p.dirPath + "/log.txt";
+export const getPbFilePath = (p: { pbDirPath: string }) => p.pbDirPath + "/app-db";
 
 /**
  * Serves the PocketBase build and writes logs to a file.
@@ -100,7 +99,7 @@ export const servePb = async (p: {
  * @param dbSuperuserEmail - The email address to set for the superuser account.
  * @param dbSuperuserPassword - The password to set for the superuser account.
  */
-export const upsertAdminCredentialsFromCli = async (p: {
+export const upsertPbAdminCredentialsFromCli = async (p: {
   pbFilePath: string;
   superuserEmail: string;
   superuserPassword: string;

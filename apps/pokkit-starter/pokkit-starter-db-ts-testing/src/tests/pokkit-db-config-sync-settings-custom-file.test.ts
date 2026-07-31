@@ -1,10 +1,11 @@
 import {
   clearPb,
+  getPbFilePath,
   getPbServeUrl,
   getPokkitDbSettingsFilePath,
   killPbInstance,
   servePb,
-  upsertAdminCredentialsFromCli,
+  upsertPbAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
@@ -19,7 +20,7 @@ const testSuiteName = testMetadata.name;
 
 const pbPortNumber = testMetadata.portNumber;
 const pbDirPath = `_sandboxes/${testSuiteName}`;
-const pbFilePath = pbDirPath + "/app-db";
+const pbFilePath = getPbFilePath({ pbDirPath });
 
 const pbServeUrl = getPbServeUrl({ pbPortNumber });
 const pokkitDbSettingsFilePath = getPokkitDbSettingsFilePath({ pbDirPath });
@@ -37,7 +38,7 @@ describe("pokkit-db config writer settings tests - when settings file does not e
 
     await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 
-    await upsertAdminCredentialsFromCli({ pbFilePath, superuserEmail, superuserPassword });
+    await upsertPbAdminCredentialsFromCli({ pbFilePath, superuserEmail, superuserPassword });
   });
 
   afterAll(async () => {

@@ -1,4 +1,5 @@
 import {
+  getPbFilePath,
   getPbServeUrl,
   getPokkitDbSettingsFilePath,
   killPbInstance,
@@ -15,7 +16,7 @@ const testSuiteName = testMetadata.name;
 
 const pbPortNumber = testMetadata.portNumber;
 const pbDirPath = `_sandboxes/${testSuiteName}`;
-const pbFilePath = pbDirPath + "/app-db";
+const pbFilePath = getPbFilePath({ pbDirPath });
 
 const pbServeUrl = getPbServeUrl({ pbPortNumber });
 const pokkitDbSettingsFilePath = getPokkitDbSettingsFilePath({ pbDirPath });

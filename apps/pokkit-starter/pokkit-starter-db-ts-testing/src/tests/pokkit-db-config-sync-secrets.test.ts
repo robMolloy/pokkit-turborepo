@@ -1,10 +1,11 @@
 import {
   clearPb,
+  getPbFilePath,
   getPbServeUrl,
   getPokkitDbSecretsFilePath,
   killPbInstance,
   servePb,
-  upsertAdminCredentialsFromCli,
+  upsertPbAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
 import { safeJsonParse } from "@repo/pokkit-utils";
 import fse from "fs-extra";
@@ -19,7 +20,7 @@ const testSuiteName = testMetadata.name;
 
 const pbPortNumber = testMetadata.portNumber;
 const pbDirPath = `_sandboxes/${testSuiteName}`;
-const pbFilePath = pbDirPath + "/app-db";
+const pbFilePath = getPbFilePath({ pbDirPath });
 
 const pbServeUrl = getPbServeUrl({ pbPortNumber });
 
@@ -34,7 +35,7 @@ describe("pokkit-db config writer secrets tests", () => {
 
     await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 
-    await upsertAdminCredentialsFromCli({ pbFilePath, superuserEmail, superuserPassword });
+    await upsertPbAdminCredentialsFromCli({ pbFilePath, superuserEmail, superuserPassword });
   });
 
   afterAll(async () => {
