@@ -2,18 +2,16 @@ import {
   clearDb,
   createPbLogFilePath,
   killPocketbaseInstanceByDbPortNumber,
-  killPocketbaseInstanceBySpawnProcess,
   serveDb,
   upsertAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
-import type { ChildProcessWithoutNullStreams } from "child_process";
+import { safeJsonParse } from "@repo/pokkit-utils";
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { testsMetadata } from "./_testsMetadata";
-import { safeJsonParse } from "@repo/pokkit-utils";
 
-const sourceBuildDirPath = "./source-build";
+const sourceDirPath = "./source-build";
 
 const testMetadata = testsMetadata.pokkitDbConfigSyncSecretsNoFile;
 const testSuiteName = testMetadata.name;
@@ -24,7 +22,6 @@ const sandboxDirPath = `_sandboxes/${testSuiteName}`;
 const sandboxDbSuperuserEmail = "admin@admin.com";
 const sandboxDbSuperuserPassword = "admin@admin.com";
 
-let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 let sandboxDbUrl: string | undefined;
 
 const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
@@ -32,7 +29,7 @@ const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
 describe("pokkit-db config writer secrets tests - when secrets file does not exist", () => {
   beforeAll(async () => {
     await fse.removeSync(sandboxDirPath);
-    await fse.copySync(sourceBuildDirPath, sandboxDirPath);
+    await fse.copySync(sourceDirPath, sandboxDirPath);
     await fse.removeSync(sandboxDirPath + "/pb_config/secrets.json");
 
     const logFilePath = createPbLogFilePath({ dirPath: sandboxDirPath });
@@ -43,7 +40,6 @@ describe("pokkit-db config writer secrets tests - when secrets file does not exi
       logFilePath,
     });
 
-    spawnProcess = resp.pbProcess;
     sandboxDbUrl = resp.dbUrl;
 
     await upsertAdminCredentialsFromCli({
@@ -55,7 +51,6 @@ describe("pokkit-db config writer secrets tests - when secrets file does not exi
 
   afterAll(async () => {
     killPocketbaseInstanceByDbPortNumber(sandboxDbPortNumber);
-    if (spawnProcess) killPocketbaseInstanceBySpawnProcess(spawnProcess);
     fse.removeSync(sandboxDirPath);
   });
 

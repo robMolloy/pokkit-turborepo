@@ -2,19 +2,17 @@ import {
   clearDb,
   createPbLogFilePath,
   killPocketbaseInstanceByDbPortNumber,
-  killPocketbaseInstanceBySpawnProcess,
   serveDb,
   upsertAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
 import { safeJsonParse } from "@repo/pokkit-utils";
-import type { ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { superusersCollectionName } from "../metadata/pocketbaseMetadata";
 import { testsMetadata } from "./_testsMetadata";
 
-const sourceBuildDirPath = "./source-build";
+const sourceDirPath = "./source-build";
 
 const testMetadata = testsMetadata.pokkitDbConfigSyncSettingsNoFile;
 const testSuiteName = testMetadata.name;
@@ -25,7 +23,6 @@ const sandboxDirPath = `_sandboxes/${testSuiteName}`;
 const sandboxDbSuperuserEmail = "admin@admin.com";
 const sandboxDbSuperuserPassword = "admin@admin.com";
 
-let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 let sandboxDbUrl: string | undefined;
 
 const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
@@ -33,7 +30,7 @@ const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
 describe("pokkit-db config writer settings tests - when settings file does not exist", () => {
   beforeAll(async () => {
     await fse.removeSync(sandboxDirPath);
-    await fse.copySync(sourceBuildDirPath, sandboxDirPath);
+    await fse.copySync(sourceDirPath, sandboxDirPath);
     await fse.removeSync(sandboxDirPath + "/pb_config/settings.json");
 
     const logFilePath = createPbLogFilePath({ dirPath: sandboxDirPath });
@@ -44,7 +41,6 @@ describe("pokkit-db config writer settings tests - when settings file does not e
       logFilePath,
     });
 
-    spawnProcess = resp.pbProcess;
     sandboxDbUrl = resp.dbUrl;
 
     await upsertAdminCredentialsFromCli({
@@ -56,7 +52,6 @@ describe("pokkit-db config writer settings tests - when settings file does not e
 
   afterAll(async () => {
     killPocketbaseInstanceByDbPortNumber(sandboxDbPortNumber);
-    if (spawnProcess) killPocketbaseInstanceBySpawnProcess(spawnProcess);
     fse.removeSync(sandboxDirPath);
   });
 

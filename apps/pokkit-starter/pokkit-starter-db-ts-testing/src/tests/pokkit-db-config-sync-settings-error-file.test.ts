@@ -1,15 +1,10 @@
-import {
-  killPocketbaseInstanceByDbPortNumber,
-  killPocketbaseInstanceBySpawnProcess,
-  serveDb,
-} from "@repo/pokkit-testing";
-import type { ChildProcessWithoutNullStreams } from "child_process";
+import { killPocketbaseInstanceByDbPortNumber, serveDb } from "@repo/pokkit-testing";
 import fse from "fs-extra";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { testsMetadata } from "./_testsMetadata";
 
-const sourceBuildDirPath = "./source-build";
+const sourceDirPath = "./source-build";
 
 const testMetadata = testsMetadata.pokkitDbConfigSyncSettingsErrorFile;
 const testSuiteName = testMetadata.name;
@@ -17,7 +12,6 @@ const sandboxDbPortNumber = testMetadata.portNumber;
 
 const sandboxDirPath = `_sandboxes/${testSuiteName}`;
 
-let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 let sandboxDbUrl: string | undefined;
 
 const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
@@ -25,7 +19,7 @@ const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
 describe("pokkit-db config writer settings tests - when settings file does not exist", () => {
   beforeAll(async () => {
     await fse.removeSync(sandboxDirPath);
-    await fse.copySync(sourceBuildDirPath, sandboxDirPath);
+    await fse.copySync(sourceDirPath, sandboxDirPath);
     await fse.removeSync(sandboxDirPath + "/pb_config/settings.json");
     await fse.writeFileSync(sandboxDirPath + "/pb_config/settings.json", "error");
 
@@ -37,13 +31,11 @@ describe("pokkit-db config writer settings tests - when settings file does not e
       logFilePath,
     });
 
-    spawnProcess = resp.pbProcess;
     sandboxDbUrl = resp.dbUrl;
   });
 
   afterAll(async () => {
     killPocketbaseInstanceByDbPortNumber(sandboxDbPortNumber);
-    if (spawnProcess) killPocketbaseInstanceBySpawnProcess(spawnProcess);
     fse.removeSync(sandboxDirPath);
   });
 

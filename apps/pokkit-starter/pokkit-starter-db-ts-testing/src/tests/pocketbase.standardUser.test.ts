@@ -2,11 +2,9 @@ import {
   clearDb,
   createPbLogFilePath,
   killPocketbaseInstanceByDbUrl,
-  killPocketbaseInstanceBySpawnProcess,
   serveDb,
   upsertAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
-import type { ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
@@ -14,7 +12,7 @@ import { usersCollectionName } from "../metadata/pocketbaseMetadata";
 import { userPayloadBuilder } from "../utils/pocketbaseUserHelpers";
 import { testsMetadata } from "./_testsMetadata";
 
-const sourceBuildDirPath = "./source-build";
+const sourceDirPath = "./source-build";
 
 const testMetadata = testsMetadata.pocketbaseStandardUser;
 const testSuiteName = testMetadata.name;
@@ -25,7 +23,6 @@ const sandboxDirPath = `_sandboxes/${testSuiteName}`;
 const sandboxDbSuperuserEmail = "admin@admin.com";
 const sandboxDbSuperuserPassword = "admin@admin.com";
 
-let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 let sandboxDbUrl: string | undefined;
 
 const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
@@ -33,7 +30,7 @@ const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
 describe("test rules", () => {
   beforeAll(async () => {
     await fse.removeSync(sandboxDirPath);
-    await fse.copySync(sourceBuildDirPath, sandboxDirPath);
+    await fse.copySync(sourceDirPath, sandboxDirPath);
 
     const logFilePath = createPbLogFilePath({ dirPath: sandboxDirPath });
 
@@ -42,7 +39,6 @@ describe("test rules", () => {
       dbPortNumber: sandboxDbPortNumber,
       logFilePath,
     });
-    spawnProcess = resp.pbProcess;
     sandboxDbUrl = resp.dbUrl;
 
     await upsertAdminCredentialsFromCli({
@@ -53,7 +49,6 @@ describe("test rules", () => {
   });
 
   afterAll(async () => {
-    if (spawnProcess) killPocketbaseInstanceBySpawnProcess(spawnProcess);
     if (sandboxDbUrl) killPocketbaseInstanceByDbUrl(sandboxDbUrl);
     await fse.remove(sandboxDirPath);
   });

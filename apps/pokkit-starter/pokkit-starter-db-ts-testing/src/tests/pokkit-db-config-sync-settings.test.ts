@@ -1,20 +1,18 @@
 import {
   clearDb,
   killPocketbaseInstanceByDbPortNumber,
-  killPocketbaseInstanceBySpawnProcess,
   serveDb,
   upsertAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
-import type { ChildProcessWithoutNullStreams } from "child_process";
+import { safeJsonParse } from "@repo/pokkit-utils";
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { superusersCollectionName } from "../metadata/pocketbaseMetadata";
 import { testsMetadata } from "./_testsMetadata";
 import { settingsMock } from "./mocks/settingsMock";
-import { safeJsonParse } from "@repo/pokkit-utils";
 
-const sourceBuildDirPath = "./source-build";
+const sourceDirPath = "./source-build";
 
 const testMetadata = testsMetadata.pokkitDbConfigSyncSettings;
 const testSuiteName = testMetadata.name;
@@ -24,7 +22,6 @@ const sandboxDirPath = `_sandboxes/${testSuiteName}`;
 const sandboxDbSuperuserEmail = "admin@admin.com";
 const sandboxDbSuperuserPassword = "admin@admin.com";
 
-let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 let sandboxDbUrl: string | undefined;
 
 const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
@@ -32,8 +29,8 @@ const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
 describe("pokkit-db config writer secrets tests", () => {
   beforeAll(async () => {
     await killPocketbaseInstanceByDbPortNumber(sandboxDbPortNumber);
-    await fse.removeSync(sandboxDirPath);
-    await fse.copySync(sourceBuildDirPath, sandboxDirPath);
+    fse.removeSync(sandboxDirPath);
+    fse.copySync(sourceDirPath, sandboxDirPath);
 
     const resp = await serveDb({
       dbBuildDirPath: sandboxDirPath,
@@ -41,7 +38,6 @@ describe("pokkit-db config writer secrets tests", () => {
       logFilePath: `_logs/${testSuiteName}`,
     });
 
-    spawnProcess = resp.pbProcess;
     sandboxDbUrl = resp.dbUrl;
 
     await upsertAdminCredentialsFromCli({
@@ -53,7 +49,6 @@ describe("pokkit-db config writer secrets tests", () => {
 
   afterAll(async () => {
     killPocketbaseInstanceByDbPortNumber(sandboxDbPortNumber);
-    if (spawnProcess) killPocketbaseInstanceBySpawnProcess(spawnProcess);
     fse.removeSync(sandboxDirPath);
   });
 
