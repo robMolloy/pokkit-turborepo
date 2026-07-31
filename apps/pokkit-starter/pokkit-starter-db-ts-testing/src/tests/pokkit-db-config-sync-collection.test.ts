@@ -1,7 +1,7 @@
 import {
   clearDb,
+  createPbServeUrl,
   killPbInstance,
-  killPocketbaseInstanceByDbUrl,
   servePb,
   upsertAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
@@ -21,10 +21,9 @@ const testSuiteName = testMetadata.name;
 const pbPortNumber = testMetadata.portNumber;
 const pbDirPath = `_sandboxes/${testSuiteName}`;
 const pbFilePath = pbDirPath + "/app-db";
+const pbServeUrl = createPbServeUrl({ pbPortNumber });
 
-let sandboxDbUrl: string | undefined;
-
-const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
+const createPbConnection = () => new PocketBase(pbServeUrl);
 
 describe("pokkit-db config writer collection tests", () => {
   beforeAll(async () => {
@@ -32,9 +31,7 @@ describe("pokkit-db config writer collection tests", () => {
 
     fse.removeSync(pbDirPath);
     fse.copySync(sourceDirPath, pbDirPath);
-    const resp = await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
-
-    sandboxDbUrl = resp.dbUrl;
+    await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 
     await upsertAdminCredentialsFromCli({
       pbFilePath,
@@ -44,7 +41,7 @@ describe("pokkit-db config writer collection tests", () => {
   });
 
   afterAll(async () => {
-    if (sandboxDbUrl) killPocketbaseInstanceByDbUrl(sandboxDbUrl);
+    killPbInstance({ pbPortNumber });
     fse.removeSync(pbDirPath);
   });
 

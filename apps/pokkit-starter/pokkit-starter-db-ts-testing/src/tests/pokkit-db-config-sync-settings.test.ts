@@ -1,5 +1,6 @@
 import {
   clearDb,
+  createPbServeUrl,
   killPbInstance,
   servePb,
   upsertAdminCredentialsFromCli,
@@ -22,9 +23,9 @@ const pbPortNumber = testMetadata.portNumber;
 const pbDirPath = `_sandboxes/${testSuiteName}`;
 const pbFilePath = pbDirPath + "/app-db";
 
-let sandboxDbUrl: string | undefined;
+const pbServeUrl = createPbServeUrl({ pbPortNumber });
 
-const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
+const createPbConnection = () => new PocketBase(pbServeUrl);
 
 describe("pokkit-db config writer secrets tests", () => {
   beforeAll(async () => {
@@ -33,8 +34,7 @@ describe("pokkit-db config writer secrets tests", () => {
     fse.removeSync(pbDirPath);
     fse.copySync(sourceDirPath, pbDirPath);
 
-    const resp = await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
-    sandboxDbUrl = resp.dbUrl;
+    await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 
     await upsertAdminCredentialsFromCli({
       pbFilePath,

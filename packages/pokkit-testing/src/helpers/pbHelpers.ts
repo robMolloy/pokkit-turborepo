@@ -36,7 +36,7 @@ export const killPbInstance = (
 };
 
 export const createPbServeAddress = (p: { portNumber: number }) => `0.0.0.0:${p.portNumber}`;
-export const createPbServeUrl = (p: { portNumber: number }) => `http://0.0.0.0:${p.portNumber}`;
+export const createPbServeUrl = (p: { pbPortNumber: number }) => `http://0.0.0.0:${p.pbPortNumber}`;
 export const createPbBuildFilePath = (p: { dirPath: string }) => `${p.dirPath}/app-db`;
 export const createPbLogFilePath = (p: { dirPath: string }) => `${p.dirPath}/log.txt`;
 
@@ -58,7 +58,7 @@ export const servePb = async (p: {
 }> => {
   const portNumber = p.pbPortNumber;
   const dbServeUrl = createPbServeAddress({ portNumber });
-  const dbUrl = createPbServeUrl({ portNumber });
+  const dbUrl = createPbServeUrl({ pbPortNumber: portNumber });
 
   const buildFileExists = await fse.pathExists(p.pbFilePath);
   if (!buildFileExists) throw new Error(`servePb: pbFile does not exist: ${p.pbFilePath}`);
@@ -128,7 +128,7 @@ export const clearDb = async (p: {
   dbSuperuserEmail: string;
   dbSuperuserPassword: string;
 }) => {
-  const superuserPb = new PocketBase(createPbServeUrl({ portNumber: p.dbPortNumber }));
+  const superuserPb = new PocketBase(createPbServeUrl({ pbPortNumber: p.dbPortNumber }));
   await superuserPb
     .collection(superusersCollectionName)
     .authWithPassword(p.dbSuperuserEmail, p.dbSuperuserPassword);
