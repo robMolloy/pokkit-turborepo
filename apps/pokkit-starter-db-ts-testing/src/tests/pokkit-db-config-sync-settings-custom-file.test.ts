@@ -16,7 +16,7 @@ import { testsMetadata } from "./_testsMetadata";
 
 const sourceBuildDirPath = "./source-build";
 
-const testMetadata = testsMetadata.pokkitDbConfigSyncSettingsErrorFile;
+const testMetadata = testsMetadata.pokkitDbConfigSyncSettingsCustomFile;
 const testSuiteName = testMetadata.name;
 const sandboxDbPortNumber = testMetadata.portNumber;
 
@@ -41,7 +41,7 @@ describe("pokkit-db config writer settings tests - when settings file does not e
       JSON.stringify(settingsMock, null, 2),
     );
 
-    const logFilePath = createPbLogFilePath({ dirPath: sandboxDirPath });
+    const logFilePath = `_logs/${testSuiteName}`;
 
     const resp = await serveDb({
       dbBuildDirPath: sandboxDirPath,

@@ -13,8 +13,8 @@ export default (p: { mode: ConfigEnv }) => {
     test: {
       globals: true,
       environment: "node",
-      fileParallelism: false,
-      forceRerunTriggers: ["./source-build/**"],
+      fileParallelism: true,
+      forceRerunTriggers: ["**/source-build/**"],
     },
   });
 };

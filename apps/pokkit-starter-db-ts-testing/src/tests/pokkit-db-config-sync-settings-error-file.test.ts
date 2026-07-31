@@ -30,7 +30,7 @@ describe("pokkit-db config writer settings tests - when settings file does not e
     await fse.removeSync(sandboxDirPath + "/pb_config/settings.json");
     await fse.writeFileSync(sandboxDirPath + "/pb_config/settings.json", "error");
 
-    const logFilePath = createPbLogFilePath({ dirPath: sandboxDirPath });
+    const logFilePath = `_logs/${testSuiteName}`;
 
     const resp = await serveDb({
       dbBuildDirPath: sandboxDirPath,

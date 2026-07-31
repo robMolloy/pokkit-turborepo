@@ -49,8 +49,9 @@ export const serveDb = async (p: {
   dbServeUrl: string;
   dbUrl: string;
 }> => {
-  const dbServeUrl = createPbServeAddress({ portNumber: p.dbPortNumber });
-  const dbUrl = createPbServeUrl({ portNumber: p.dbPortNumber });
+  const portNumber = p.dbPortNumber;
+  const dbServeUrl = createPbServeAddress({ portNumber });
+  const dbUrl = createPbServeUrl({ portNumber });
   const dbBuildFilePath = createPbBuildFilePath({ dirPath: p.dbBuildDirPath });
 
   const buildFileExists = await fse.pathExists(dbBuildFilePath);
