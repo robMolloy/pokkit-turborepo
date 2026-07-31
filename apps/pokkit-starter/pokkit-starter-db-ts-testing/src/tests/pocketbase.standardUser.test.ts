@@ -44,11 +44,7 @@ describe("test rules", () => {
   });
 
   beforeEach(async () => {
-    await clearPb({
-      pbPortNumber: pbPortNumber,
-      superuserEmail,
-      superuserPassword,
-    });
+    await clearPb({ pbPortNumber, superuserEmail, superuserPassword });
   });
 
   it("is connection healthy", async () => {

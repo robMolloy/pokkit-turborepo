@@ -42,11 +42,7 @@ describe("pokkit-db config writer collection tests", () => {
   });
 
   beforeEach(async () => {
-    await clearPb({
-      pbPortNumber: pbPortNumber,
-      superuserEmail,
-      superuserPassword,
-    });
+    await clearPb({ pbPortNumber, superuserEmail, superuserPassword });
 
     await upsertAdminCredentialsFromCli({ pbFilePath, superuserEmail, superuserPassword });
   });

@@ -44,11 +44,7 @@ describe("pokkit-db config writer secrets tests - when secrets file does not exi
   });
 
   beforeEach(async () => {
-    await clearPb({
-      pbPortNumber: pbPortNumber,
-      superuserEmail,
-      superuserPassword,
-    });
+    await clearPb({ pbPortNumber, superuserEmail, superuserPassword });
   });
 
   it("is connection healthy", async () => {

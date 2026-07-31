@@ -49,11 +49,7 @@ describe("pokkit-db config writer settings tests - when settings file does not e
   });
 
   beforeEach(async () => {
-    await clearPb({
-      pbPortNumber: pbPortNumber,
-      superuserEmail,
-      superuserPassword,
-    });
+    await clearPb({ pbPortNumber, superuserEmail, superuserPassword });
   });
 
   it("is connection healthy", async () => {
