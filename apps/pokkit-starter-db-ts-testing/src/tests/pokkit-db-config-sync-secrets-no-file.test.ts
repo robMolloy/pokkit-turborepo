@@ -11,6 +11,7 @@ import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { testsMetadata } from "./_testsMetadata";
+import { safeJsonParse } from "@repo/pokkit-utils";
 
 const sourceBuildDirPath = "./source-build";
 
@@ -80,12 +81,3 @@ describe("pokkit-db config writer secrets tests - when secrets file does not exi
     expect(parsedSecrets.success).toBe(true);
   });
 });
-
-const safeJsonParse = (str: string) => {
-  try {
-    const json = JSON.parse(str);
-    return { success: true, data: json } as const;
-  } catch (error) {
-    return { success: false, error } as const;
-  }
-};

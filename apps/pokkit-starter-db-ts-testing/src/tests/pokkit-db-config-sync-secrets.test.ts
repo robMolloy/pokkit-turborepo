@@ -11,6 +11,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { secretsCollectionName, superusersCollectionName } from "../metadata/pocketbaseMetadata";
 import { testsMetadata } from "./_testsMetadata";
+import { safeJsonParse } from "@repo/pokkit-utils";
 
 const sourceBuildDirPath = "./source-build";
 
@@ -71,13 +72,6 @@ describe("pokkit-db config writer secrets tests", () => {
 
   it("superuser can access _pb_config_secrets collection", async () => {
     const superuserPb = createPbConnection();
-    try {
-      await superuserPb
-        .collection(superusersCollectionName)
-        .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
-    } catch (error) {
-      console.log(`pokkit-db-config-sync-secrets.test.ts:${/*LL*/ 78}`, { error });
-    }
     await superuserPb
       .collection(superusersCollectionName)
       .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
@@ -109,12 +103,3 @@ describe("pokkit-db config writer secrets tests", () => {
     expect(parsedSecrets.data).toEqual({ [mockSecretRecord.key]: mockSecretRecord.value });
   });
 });
-
-const safeJsonParse = (str: string) => {
-  try {
-    const json = JSON.parse(str);
-    return { success: true, data: json } as const;
-  } catch (error) {
-    return { success: false, error } as const;
-  }
-};

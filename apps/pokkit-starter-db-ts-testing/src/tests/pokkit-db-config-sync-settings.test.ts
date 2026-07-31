@@ -12,6 +12,7 @@ import { PocketBase } from "../config/pocketbaseConfig";
 import { superusersCollectionName } from "../metadata/pocketbaseMetadata";
 import { testsMetadata } from "./_testsMetadata";
 import { settingsMock } from "./mocks/settingsMock";
+import { safeJsonParse } from "@repo/pokkit-utils";
 
 const sourceBuildDirPath = "./source-build";
 
@@ -91,15 +92,6 @@ describe("pokkit-db config writer secrets tests", () => {
 
     const parsedSettings = safeJsonParse(settingsFileContent);
     expect(parsedSettings.success).toBe(true);
-    expect(parsedSettings.data.meta.appName).toBe(newAppName);
+    expect((parsedSettings.data as any).meta.appName).toBe(newAppName);
   });
 });
-
-const safeJsonParse = (str: string) => {
-  try {
-    const json = JSON.parse(str);
-    return { success: true, data: json } as const;
-  } catch (error) {
-    return { success: false, error } as const;
-  }
-};

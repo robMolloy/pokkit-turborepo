@@ -6,6 +6,7 @@ import {
   serveDb,
   upsertAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
+import { safeJsonParse } from "@repo/pokkit-utils";
 import type { ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
@@ -92,7 +93,7 @@ describe("pokkit-db config writer settings tests - when settings file does not e
 
     const newAppName = "My New App Name";
 
-    const updatedSettingsResp = await superUserPb.settings.update({
+    await superUserPb.settings.update({
       meta: { appName: newAppName },
     });
     const updatedSettings = await superUserPb.settings.getAll();
@@ -102,20 +103,10 @@ describe("pokkit-db config writer settings tests - when settings file does not e
       sandboxDirPath + "/pb_config/settings.json",
       "utf8",
     );
-    console.log({ settingsFileContent, updatedSettingsResp });
     expect(settingsFileContent).toBeTruthy();
 
     const parsedSettings = safeJsonParse(settingsFileContent);
     expect(parsedSettings.success).toBe(true);
-    expect(parsedSettings.data.meta.appName).toBe(newAppName);
+    expect((parsedSettings.data as any).meta.appName).toBe(newAppName);
   });
 });
-
-const safeJsonParse = (str: string) => {
-  try {
-    const json = JSON.parse(str);
-    return { success: true, data: json } as const;
-  } catch (error) {
-    return { success: false, error } as const;
-  }
-};
