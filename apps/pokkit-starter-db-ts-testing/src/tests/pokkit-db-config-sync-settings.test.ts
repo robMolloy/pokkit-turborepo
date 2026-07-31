@@ -10,14 +10,16 @@ import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { superusersCollectionName } from "../metadata/pocketbaseMetadata";
-import { testPortNumbers } from "./_testsMetadata";
+import { testsMetadata } from "./_testsMetadata";
+import { settingsMock } from "./mocks/settingsMock";
 
 const sourceBuildDirPath = "./source-build";
 
-const testSuiteName = `pokkit-config-writer-secrets-tests`;
+const testMetadata = testsMetadata.pokkitDbConfigSyncSettings;
+const testSuiteName = testMetadata.name;
+const sandboxDbPortNumber = testMetadata.portNumber;
 const sandboxDirPath = `_sandboxes/${testSuiteName}`;
 
-const sandboxDbPortNumber = testPortNumbers.pokkitDbConfigSyncSettings;
 const sandboxDbSuperuserEmail = "admin@admin.com";
 const sandboxDbSuperuserPassword = "admin@admin.com";
 
@@ -28,12 +30,14 @@ const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
 
 describe("pokkit-db config writer secrets tests", () => {
   beforeAll(async () => {
+    await killPocketbaseInstanceByDbPortNumber(sandboxDbPortNumber);
     await fse.removeSync(sandboxDirPath);
     await fse.copySync(sourceBuildDirPath, sandboxDirPath);
 
     const resp = await serveDb({
       dbBuildDirPath: sandboxDirPath,
       dbPortNumber: sandboxDbPortNumber,
+      logFilePath: `_logs/${testSuiteName}`,
     });
 
     spawnProcess = resp.pbProcess;
@@ -74,7 +78,7 @@ describe("pokkit-db config writer secrets tests", () => {
 
     const newAppName = "My New App Name";
 
-    await superUserPb.settings.update({ meta: { appName: newAppName } });
+    await superUserPb.settings.update({ meta: { ...settingsMock.meta, appName: newAppName } });
 
     const updatedSettings = await superUserPb.settings.getAll();
     expect(updatedSettings.meta.appName).toBe(newAppName);

@@ -12,13 +12,16 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { usersCollectionName } from "../metadata/pocketbaseMetadata";
 import { userPayloadBuilder } from "../utils/pocketbaseUserHelpers";
-import { testPortNumbers } from "./_testsMetadata";
+import { testsMetadata } from "./_testsMetadata";
 
 const sourceBuildDirPath = "./source-build";
 
-const sandboxDirPath = `_sandboxes/standard-user-test`;
+const testMetadata = testsMetadata.pocketbaseStandardUser;
+const testSuiteName = testMetadata.name;
+const sandboxDbPortNumber = testMetadata.portNumber;
 
-const sandboxDbPortNumber = testPortNumbers.pocketbaseStandardUser;
+const sandboxDirPath = `_sandboxes/${testSuiteName}`;
+
 const sandboxDbSuperuserEmail = "admin@admin.com";
 const sandboxDbSuperuserPassword = "admin@admin.com";
 

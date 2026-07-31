@@ -10,14 +10,15 @@ import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { secretsCollectionName, superusersCollectionName } from "../metadata/pocketbaseMetadata";
-import { testPortNumbers } from "./_testsMetadata";
+import { testsMetadata } from "./_testsMetadata";
 
 const sourceBuildDirPath = "./source-build";
 
-const testSuiteName = `pokkit-config-writer-secrets-tests`;
-const sandboxDirPath = `_sandboxes/${testSuiteName}`;
+const testMetadata = testsMetadata.pokkitDbConfigSyncSecrets;
+const testSuiteName = testMetadata.name;
+const sandboxDbPortNumber = testMetadata.portNumber;
 
-const sandboxDbPortNumber = testPortNumbers.pokkitDbConfigSyncSecrets;
+const sandboxDirPath = `_sandboxes/${testSuiteName}`;
 const sandboxDbSuperuserEmail = "admin@admin.com";
 const sandboxDbSuperuserPassword = "admin@admin.com";
 
@@ -28,12 +29,14 @@ const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
 
 describe("pokkit-db config writer secrets tests", () => {
   beforeAll(async () => {
+    await killPocketbaseInstanceByDbPortNumber(sandboxDbPortNumber);
     await fse.removeSync(sandboxDirPath);
     await fse.copySync(sourceBuildDirPath, sandboxDirPath);
 
     const resp = await serveDb({
       dbBuildDirPath: sandboxDirPath,
       dbPortNumber: sandboxDbPortNumber,
+      logFilePath: `_logs/${testSuiteName}`,
     });
 
     spawnProcess = resp.pbProcess;
@@ -68,6 +71,13 @@ describe("pokkit-db config writer secrets tests", () => {
 
   it("superuser can access _pb_config_secrets collection", async () => {
     const superuserPb = createPbConnection();
+    try {
+      await superuserPb
+        .collection(superusersCollectionName)
+        .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
+    } catch (error) {
+      console.log(`pokkit-db-config-sync-secrets.test.ts:${/*LL*/ 78}`, { error });
+    }
     await superuserPb
       .collection(superusersCollectionName)
       .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);

@@ -44,7 +44,7 @@ func BindFunctions(app pbCore.App) {
 		return e.Next()
 	})
 
-	app.OnServe().BindFunc(OnServeImportThenWriteSettingsToSettingsFileHandler)
+	app.OnServe().BindFunc(OnServeSyncSettingsHandler)
 	app.OnServe().BindFunc(func(e *pbCore.ServeEvent) error {
 		SetIsSettingsSyncSetupComplete(e.App, true)
 		return e.Next()

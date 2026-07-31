@@ -60,6 +60,20 @@ func WriteSettingsToSettingsFile(app pbCore.App) error {
 	return err
 }
 
+// WriteContentToSettingsFile writes settings to pb_data/settings.json.
+// If successful, true is returned.
+// If this file doesn't exist, a boolean of false is returned.
+func WriteContentToSettingsFile(app pbCore.App, settingsData *pbCore.Settings) error {
+	configDirPath := GetConfigDirPath(app)
+	settingsFilePath := configDirPath + "/" + SettingsFileName
+
+	err := pokkitDbUtils.WriteDataToFileAsJson(settingsFilePath, settingsData)
+	if err != nil {
+		return fmt.Errorf("failed to WriteDataToFileAsJson: %w", err)
+	}
+	return err
+}
+
 func SyncSettingsWithSettingsFile(app pbCore.App) error {
 	didImport, err := ImportSettingsFromSettingsFile(app)
 	if err != nil {
@@ -89,7 +103,7 @@ func ImportThenWriteSettingsToSettingsFile(app pbCore.App) error {
 	return nil
 }
 
-func OnServeImportThenWriteSettingsToSettingsFileHandler(se *pbCore.ServeEvent) error {
+func OnServeSyncSettingsHandler(se *pbCore.ServeEvent) error {
 	err := ImportThenWriteSettingsToSettingsFile(se.App)
 
 	if err != nil {
@@ -100,18 +114,15 @@ func OnServeImportThenWriteSettingsToSettingsFileHandler(se *pbCore.ServeEvent) 
 }
 
 func OnSettingsChangeWriteSettingsToSettingsFileHandler(e *pbCore.SettingsUpdateRequestEvent) error {
-	// e.NewSettings
 	isSettingsSyncSetupComplete := GetIsSettingsSyncSetupComplete(e.App)
 	if !isSettingsSyncSetupComplete {
 		return e.Next()
 	}
 
-	e.Next()
-
-	err := WriteSettingsToSettingsFile(e.App)
+	err := WriteContentToSettingsFile(e.App, e.NewSettings)
 	if err != nil {
-		e.App.Logger().Error("WriteSettingsToSettingsFile in OnSettingsChangeWriteSettingsToFileHandler", "err", err)
+		log.Fatal(err)
 	}
+	return e.Next()
 
-	return nil
 }

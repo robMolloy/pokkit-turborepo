@@ -8,14 +8,15 @@ import type { ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
-import { testPortNumbers } from "./_testsMetadata";
+import { testsMetadata } from "./_testsMetadata";
 
 const sourceBuildDirPath = "./source-build";
 
-const testSuiteName = `pokkit-db-config-sync-settings-error-file`;
-const sandboxDirPath = `_sandboxes/${testSuiteName}`;
+const testMetadata = testsMetadata.pokkitDbConfigSyncSettingsErrorFile;
+const testSuiteName = testMetadata.name;
+const sandboxDbPortNumber = testMetadata.portNumber;
 
-const sandboxDbPortNumber = testPortNumbers.pokkitDbConfigSyncSettingsErrorFile;
+const sandboxDirPath = `_sandboxes/${testSuiteName}`;
 
 let spawnProcess: ChildProcessWithoutNullStreams | undefined;
 let sandboxDbUrl: string | undefined;
