@@ -11,6 +11,7 @@ import { PocketBase } from "../config/pocketbaseConfig";
 import { usersCollectionName } from "../metadata/pocketbaseMetadata";
 import { userPayloadBuilder } from "../utils/pocketbaseUserHelpers";
 import { testsMetadata } from "./_testsMetadata";
+import { testSuperuser } from "./_constants";
 
 const sourceDirPath = "./source-build";
 
@@ -19,9 +20,6 @@ const testSuiteName = testMetadata.name;
 const sandboxDbPortNumber = testMetadata.portNumber;
 
 const sandboxDirPath = `_sandboxes/${testSuiteName}`;
-
-const sandboxDbSuperuserEmail = "admin@admin.com";
-const sandboxDbSuperuserPassword = "admin@admin.com";
 
 let sandboxDbUrl: string | undefined;
 
@@ -43,8 +41,8 @@ describe("test rules", () => {
 
     await upsertAdminCredentialsFromCli({
       buildDirPath: sandboxDirPath,
-      dbSuperuserEmail: sandboxDbSuperuserEmail,
-      dbSuperuserPassword: sandboxDbSuperuserPassword,
+      dbSuperuserEmail: testSuperuser.email,
+      dbSuperuserPassword: testSuperuser.password,
     });
   });
 
@@ -56,8 +54,8 @@ describe("test rules", () => {
   beforeEach(async () => {
     await clearDb({
       dbPortNumber: sandboxDbPortNumber,
-      dbSuperuserEmail: sandboxDbSuperuserEmail,
-      dbSuperuserPassword: sandboxDbSuperuserPassword,
+      dbSuperuserEmail: testSuperuser.email,
+      dbSuperuserPassword: testSuperuser.password,
     });
   });
 

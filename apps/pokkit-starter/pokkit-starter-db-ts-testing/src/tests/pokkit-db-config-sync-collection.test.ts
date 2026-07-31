@@ -20,8 +20,7 @@ const sandboxDbPortNumber = testMetadata.portNumber;
 
 const sandboxDirPath = `_sandboxes/${testSuiteName}`;
 
-const sandboxDbSuperuserEmail = "admin@admin.com";
-const sandboxDbSuperuserPassword = "admin@admin.com";
+import { testSuperuser } from "./_constants";
 
 let sandboxDbUrl: string | undefined;
 
@@ -43,8 +42,8 @@ describe("pokkit-db config writer collection tests", () => {
 
     await upsertAdminCredentialsFromCli({
       buildDirPath: sandboxDirPath,
-      dbSuperuserEmail: sandboxDbSuperuserEmail,
-      dbSuperuserPassword: sandboxDbSuperuserPassword,
+      dbSuperuserEmail: testSuperuser.email,
+      dbSuperuserPassword: testSuperuser.password,
     });
   });
 
@@ -56,14 +55,14 @@ describe("pokkit-db config writer collection tests", () => {
   beforeEach(async () => {
     await clearDb({
       dbPortNumber: sandboxDbPortNumber,
-      dbSuperuserEmail: sandboxDbSuperuserEmail,
-      dbSuperuserPassword: sandboxDbSuperuserPassword,
+      dbSuperuserEmail: testSuperuser.email,
+      dbSuperuserPassword: testSuperuser.password,
     });
 
     await upsertAdminCredentialsFromCli({
       buildDirPath: sandboxDirPath,
-      dbSuperuserEmail: sandboxDbSuperuserEmail,
-      dbSuperuserPassword: sandboxDbSuperuserPassword,
+      dbSuperuserEmail: testSuperuser.email,
+      dbSuperuserPassword: testSuperuser.password,
     });
   });
 
@@ -77,7 +76,7 @@ describe("pokkit-db config writer collection tests", () => {
     const superuserPb = createPbConnection();
     const superuserRecordResponse = await superuserPb
       .collection(superusersCollectionName)
-      .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
+      .authWithPassword(testSuperuser.email, testSuperuser.password);
 
     expect(superuserRecordResponse.record.id).toBeTruthy();
   });
@@ -86,7 +85,7 @@ describe("pokkit-db config writer collection tests", () => {
     const superuserPb = createPbConnection();
     await superuserPb
       .collection(superusersCollectionName)
-      .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
+      .authWithPassword(testSuperuser.email, testSuperuser.password);
 
     await expect(superuserPb.collection("randomCollectionName").getFullList()).rejects.toThrow();
   });
@@ -97,7 +96,7 @@ describe("pokkit-db config writer collection tests", () => {
     await expect(
       superuserPb
         .collection(superusersCollectionName)
-        .authWithPassword(sandboxDbSuperuserEmail, "wrong-password"),
+        .authWithPassword(testSuperuser.email, "wrong-password"),
     ).rejects.toMatchObject({ status: 400 });
   });
 
@@ -122,7 +121,7 @@ describe("pokkit-db config writer collection tests", () => {
     const superuserPb = createPbConnection();
     await superuserPb
       .collection(superusersCollectionName)
-      .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
+      .authWithPassword(testSuperuser.email, testSuperuser.password);
 
     const resp = await superuserPb.collections.create({ name: newCollectionName });
     expect(resp.name).toBe(newCollectionName);

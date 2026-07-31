@@ -19,8 +19,7 @@ const sandboxDbPortNumber = testMetadata.portNumber;
 
 const sandboxDirPath = `_sandboxes/${testSuiteName}`;
 
-const sandboxDbSuperuserEmail = "admin@admin.com";
-const sandboxDbSuperuserPassword = "admin@admin.com";
+import { testSuperuser } from "./_constants";
 
 let sandboxDbUrl: string | undefined;
 
@@ -49,8 +48,8 @@ describe("pokkit-db config writer settings tests - when settings file does not e
 
     await upsertAdminCredentialsFromCli({
       buildDirPath: sandboxDirPath,
-      dbSuperuserEmail: sandboxDbSuperuserEmail,
-      dbSuperuserPassword: sandboxDbSuperuserPassword,
+      dbSuperuserEmail: testSuperuser.email,
+      dbSuperuserPassword: testSuperuser.password,
     });
   });
 
@@ -62,8 +61,8 @@ describe("pokkit-db config writer settings tests - when settings file does not e
   beforeEach(async () => {
     await clearDb({
       dbPortNumber: sandboxDbPortNumber,
-      dbSuperuserEmail: sandboxDbSuperuserEmail,
-      dbSuperuserPassword: sandboxDbSuperuserPassword,
+      dbSuperuserEmail: testSuperuser.email,
+      dbSuperuserPassword: testSuperuser.password,
     });
   });
 
@@ -77,7 +76,7 @@ describe("pokkit-db config writer settings tests - when settings file does not e
     const superUserPb = createPbConnection();
     await superUserPb
       .collection(superusersCollectionName)
-      .authWithPassword(sandboxDbSuperuserEmail, sandboxDbSuperuserPassword);
+      .authWithPassword(testSuperuser.email, testSuperuser.password);
 
     const settings = await superUserPb.settings.getAll();
     expect(settings).toEqual(settingsMock);
