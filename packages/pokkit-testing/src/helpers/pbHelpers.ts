@@ -101,17 +101,15 @@ export const servePb = async (p: {
  * @param dbSuperuserPassword - The password to set for the superuser account.
  */
 export const upsertAdminCredentialsFromCli = async (p: {
-  buildDirPath: string;
-  dbSuperuserEmail: string;
-  dbSuperuserPassword: string;
+  pbFilePath: string;
+  pbSuperuserEmail: string;
+  pbSuperuserPassword: string;
 }) => {
-  const dbBuildFilePath = `${p.buildDirPath}/app-db`;
-
-  const upsertProcess = spawn(`${dbBuildFilePath}`, [
+  const upsertProcess = spawn(`${p.pbFilePath}`, [
     "superuser",
     "upsert",
-    p.dbSuperuserEmail,
-    p.dbSuperuserPassword,
+    p.pbSuperuserEmail,
+    p.pbSuperuserPassword,
   ]);
 
   upsertProcess.on("error", (err) => console.error("spawn error:", err));

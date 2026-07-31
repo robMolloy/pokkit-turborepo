@@ -37,9 +37,9 @@ describe("pokkit-db config writer secrets tests - when secrets file does not exi
     sandboxDbUrl = resp.dbUrl;
 
     await upsertAdminCredentialsFromCli({
-      buildDirPath: pbDirPath,
-      dbSuperuserEmail: testSuperuser.email,
-      dbSuperuserPassword: testSuperuser.password,
+      pbFilePath,
+      pbSuperuserEmail: testSuperuser.email,
+      pbSuperuserPassword: testSuperuser.password,
     });
   });
 

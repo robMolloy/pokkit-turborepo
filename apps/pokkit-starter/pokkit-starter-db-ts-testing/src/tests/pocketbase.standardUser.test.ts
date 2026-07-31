@@ -1,6 +1,5 @@
 import {
   clearDb,
-  createPbLogFilePath,
   killPbInstance,
   killPocketbaseInstanceByDbUrl,
   servePb,
@@ -11,8 +10,8 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { usersCollectionName } from "../metadata/pocketbaseMetadata";
 import { userPayloadBuilder } from "../utils/pocketbaseUserHelpers";
-import { testsMetadata } from "./_testsMetadata";
 import { testSuperuser } from "./_constants";
+import { testsMetadata } from "./_testsMetadata";
 
 const sourceDirPath = "./source-build";
 
@@ -39,9 +38,9 @@ describe("test rules", () => {
     sandboxDbUrl = resp.dbUrl;
 
     await upsertAdminCredentialsFromCli({
-      buildDirPath: pbDirPath,
-      dbSuperuserEmail: testSuperuser.email,
-      dbSuperuserPassword: testSuperuser.password,
+      pbFilePath,
+      pbSuperuserEmail: testSuperuser.email,
+      pbSuperuserPassword: testSuperuser.password,
     });
   });
 
