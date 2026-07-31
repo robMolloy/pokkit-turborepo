@@ -31,9 +31,8 @@ describe("test rules", () => {
     await fse.removeSync(pbDirPath);
     await fse.copySync(sourceDirPath, pbDirPath);
 
-    const logFilePath = createPbLogFilePath({ dirPath: pbDirPath });
+    const resp = await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 
-    const resp = await servePb({ pbFilePath, pbPortNumber, logFilePath });
     sandboxDbUrl = resp.dbUrl;
 
     await upsertAdminCredentialsFromCli({

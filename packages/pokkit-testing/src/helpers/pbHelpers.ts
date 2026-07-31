@@ -61,8 +61,7 @@ export const servePb = async (p: {
   const dbUrl = createPbServeUrl({ portNumber });
 
   const buildFileExists = await fse.pathExists(p.pbFilePath);
-  if (!buildFileExists)
-    throw new Error(`setupAndServeDb: dbBuildFile does not exist: ${p.pbFilePath}`);
+  if (!buildFileExists) throw new Error(`servePb: pbFile does not exist: ${p.pbFilePath}`);
 
   const pbProcess = spawn(p.pbFilePath, ["serve", `--http=${dbServeUrl}`, "--dev"]);
 

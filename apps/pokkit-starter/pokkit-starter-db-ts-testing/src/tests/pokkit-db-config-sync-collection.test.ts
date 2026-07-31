@@ -30,9 +30,7 @@ describe("pokkit-db config writer collection tests", () => {
   beforeAll(async () => {
     await fse.removeSync(pbDirPath);
     await fse.copySync(sourceDirPath, pbDirPath);
-    const logFilePath = createPbLogFilePath({ dirPath: pbDirPath });
-
-    const resp = await servePb({ pbFilePath, pbPortNumber, logFilePath });
+    const resp = await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 
     sandboxDbUrl = resp.dbUrl;
 
