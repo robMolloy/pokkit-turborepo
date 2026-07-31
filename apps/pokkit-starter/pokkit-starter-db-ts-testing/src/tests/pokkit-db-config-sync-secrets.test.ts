@@ -1,6 +1,6 @@
 import {
   clearDb,
-  killPocketbaseInstanceByDbPortNumber,
+  killPbInstance,
   servePb,
   upsertAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
@@ -9,8 +9,8 @@ import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { secretsCollectionName, superusersCollectionName } from "../metadata/pocketbaseMetadata";
-import { testsMetadata } from "./_testsMetadata";
 import { testSuperuser } from "./_constants";
+import { testsMetadata } from "./_testsMetadata";
 
 const sourceDirPath = "./source-build";
 
@@ -27,9 +27,10 @@ const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
 
 describe("pokkit-db config writer secrets tests", () => {
   beforeAll(async () => {
-    await killPocketbaseInstanceByDbPortNumber(pbPortNumber);
-    await fse.removeSync(pbDirPath);
-    await fse.copySync(sourceDirPath, pbDirPath);
+    await killPbInstance({ pbPortNumber });
+
+    fse.removeSync(pbDirPath);
+    fse.copySync(sourceDirPath, pbDirPath);
 
     const resp = await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 
@@ -43,7 +44,7 @@ describe("pokkit-db config writer secrets tests", () => {
   });
 
   afterAll(async () => {
-    killPocketbaseInstanceByDbPortNumber(pbPortNumber);
+    killPbInstance({ pbPortNumber });
     fse.removeSync(pbDirPath);
   });
 

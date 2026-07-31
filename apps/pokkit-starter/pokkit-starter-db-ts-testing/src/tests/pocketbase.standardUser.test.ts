@@ -1,6 +1,7 @@
 import {
   clearDb,
   createPbLogFilePath,
+  killPbInstance,
   killPocketbaseInstanceByDbUrl,
   servePb,
   upsertAdminCredentialsFromCli,
@@ -28,8 +29,10 @@ const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
 
 describe("test rules", () => {
   beforeAll(async () => {
-    await fse.removeSync(pbDirPath);
-    await fse.copySync(sourceDirPath, pbDirPath);
+    await killPbInstance({ pbPortNumber });
+
+    fse.removeSync(pbDirPath);
+    fse.copySync(sourceDirPath, pbDirPath);
 
     const resp = await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 

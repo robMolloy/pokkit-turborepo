@@ -28,7 +28,7 @@ export const killPocketbaseInstanceBySpawnProcess = (
   return spawnProcess.kill("SIGTERM");
 };
 
-export const killPocketbaseInstance = (
+export const killPbInstance = (
   p: { spawnProcess: ChildProcessWithoutNullStreams } | { pbPortNumber: number },
 ) => {
   if ("pbPortNumber" in p) return killPocketbaseInstanceByDbPortNumber(p.pbPortNumber);

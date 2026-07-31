@@ -1,6 +1,6 @@
 import {
   clearDb,
-  killPocketbaseInstanceByDbPortNumber,
+  killPbInstance,
   servePb,
   upsertAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
@@ -27,9 +27,11 @@ const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
 
 describe("pokkit-db config writer settings tests - when settings file does not exist", () => {
   beforeAll(async () => {
-    await fse.removeSync(pbDirPath);
-    await fse.copySync(sourceDirPath, pbDirPath);
-    await fse.removeSync(pbDirPath + "/pb_config/settings.json");
+    await killPbInstance({ pbPortNumber });
+
+    fse.removeSync(pbDirPath);
+    fse.copySync(sourceDirPath, pbDirPath);
+    fse.removeSync(pbDirPath + "/pb_config/settings.json");
 
     const resp = await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 
@@ -43,7 +45,7 @@ describe("pokkit-db config writer settings tests - when settings file does not e
   });
 
   afterAll(async () => {
-    killPocketbaseInstanceByDbPortNumber(pbPortNumber);
+    killPbInstance({ pbPortNumber });
     fse.removeSync(pbDirPath);
   });
 
