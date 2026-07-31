@@ -1,4 +1,9 @@
-import { createPbServeUrl, killPbInstance, servePb } from "@repo/pokkit-testing";
+import {
+  createPbServeUrl,
+  getPokkitDbSettingsFilePath,
+  killPbInstance,
+  servePb,
+} from "@repo/pokkit-testing";
 import fse from "fs-extra";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
@@ -14,6 +19,7 @@ const pbDirPath = `_sandboxes/${testSuiteName}`;
 const pbFilePath = pbDirPath + "/app-db";
 
 const pbServeUrl = createPbServeUrl({ pbPortNumber });
+const pokkitDbSettingsFilePath = getPokkitDbSettingsFilePath({ pbDirPath });
 
 const createPbConnection = () => new PocketBase(pbServeUrl);
 
@@ -23,8 +29,8 @@ describe("pokkit-db config writer settings tests - when settings file does not e
 
     fse.removeSync(pbDirPath);
     fse.copySync(sourceDirPath, pbDirPath);
-    fse.removeSync(pbDirPath + "/pb_config/settings.json");
-    fse.writeFileSync(pbDirPath + "/pb_config/settings.json", "error");
+    fse.removeSync(pokkitDbSettingsFilePath);
+    fse.writeFileSync(pokkitDbSettingsFilePath, "error");
 
     await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
   });

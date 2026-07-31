@@ -1,6 +1,7 @@
 import {
   clearPb,
   createPbServeUrl,
+  getPokkitDbSecretsFilePath,
   killPbInstance,
   servePb,
   upsertAdminCredentialsFromCli,
@@ -31,7 +32,7 @@ describe("pokkit-db config writer secrets tests - when secrets file does not exi
 
     fse.removeSync(pbDirPath);
     fse.copySync(sourceDirPath, pbDirPath);
-    fse.removeSync(pbDirPath + "/pb_config/secrets.json");
+    fse.removeSync(getPokkitDbSecretsFilePath({ pbDirPath }));
 
     await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 
@@ -54,7 +55,7 @@ describe("pokkit-db config writer secrets tests - when secrets file does not exi
   });
 
   it("secrets file is created on startup when it does not exist", async () => {
-    const secretsFileContent = fse.readFileSync(pbDirPath + "/pb_config/secrets.json", "utf8");
+    const secretsFileContent = fse.readFileSync(getPokkitDbSecretsFilePath({ pbDirPath }), "utf8");
     expect(secretsFileContent).toBeTruthy();
 
     const parsedSecrets = safeJsonParse(secretsFileContent);

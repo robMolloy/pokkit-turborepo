@@ -1,6 +1,7 @@
 import {
   clearPb,
   createPbServeUrl,
+  getPokkitDbSettingsFilePath,
   killPbInstance,
   servePb,
   upsertAdminCredentialsFromCli,
@@ -67,7 +68,10 @@ describe("pokkit-db config writer secrets tests", () => {
     const updatedSettings = await superUserPb.settings.getAll();
     expect(updatedSettings.meta.appName).toBe(newAppName);
 
-    const settingsFileContent = fse.readFileSync(pbDirPath + "/pb_config/settings.json", "utf8");
+    const settingsFileContent = fse.readFileSync(
+      getPokkitDbSettingsFilePath({ pbDirPath }),
+      "utf8",
+    );
     expect(settingsFileContent).toBeTruthy();
 
     const parsedSettings = safeJsonParse(settingsFileContent);

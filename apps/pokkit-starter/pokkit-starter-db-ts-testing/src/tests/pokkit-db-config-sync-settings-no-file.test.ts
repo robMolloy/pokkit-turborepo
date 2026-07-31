@@ -1,6 +1,7 @@
 import {
   clearPb,
   createPbServeUrl,
+  getPokkitDbSettingsFilePath,
   killPbInstance,
   servePb,
   upsertAdminCredentialsFromCli,
@@ -23,6 +24,7 @@ const pbDirPath = `_sandboxes/${testSuiteName}`;
 const pbFilePath = pbDirPath + "/app-db";
 
 const pbServeUrl = createPbServeUrl({ pbPortNumber });
+const pokkitDbSettingsFilePath = getPokkitDbSettingsFilePath({ pbDirPath });
 
 const createPbConnection = () => new PocketBase(pbServeUrl);
 
@@ -32,7 +34,7 @@ describe("pokkit-db config writer settings tests - when settings file does not e
 
     fse.removeSync(pbDirPath);
     fse.copySync(sourceDirPath, pbDirPath);
-    fse.removeSync(pbDirPath + "/pb_config/settings.json");
+    fse.removeSync(pokkitDbSettingsFilePath);
 
     await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 
@@ -55,7 +57,7 @@ describe("pokkit-db config writer settings tests - when settings file does not e
   });
 
   it("settings file is created on startup when it does not exist", async () => {
-    const settingsFileContent = fse.readFileSync(pbDirPath + "/pb_config/settings.json", "utf8");
+    const settingsFileContent = fse.readFileSync(pokkitDbSettingsFilePath, "utf8");
     expect(settingsFileContent).toBeTruthy();
 
     const parsedSettings = safeJsonParse(settingsFileContent);
@@ -74,7 +76,7 @@ describe("pokkit-db config writer settings tests - when settings file does not e
     const updatedSettings = await superUserPb.settings.getAll();
     expect(updatedSettings.meta.appName).toBe(newAppName);
 
-    const settingsFileContent = fse.readFileSync(pbDirPath + "/pb_config/settings.json", "utf8");
+    const settingsFileContent = fse.readFileSync(pokkitDbSettingsFilePath, "utf8");
     expect(settingsFileContent).toBeTruthy();
 
     const parsedSettings = safeJsonParse(settingsFileContent);

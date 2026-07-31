@@ -1,6 +1,7 @@
 import {
   clearPb,
   createPbServeUrl,
+  getPokkitDbCollectionsFilePathh,
   killPbInstance,
   servePb,
   upsertAdminCredentialsFromCli,
@@ -31,6 +32,7 @@ describe("pokkit-db config writer collection tests", () => {
 
     fse.removeSync(pbDirPath);
     fse.copySync(sourceDirPath, pbDirPath);
+
     await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 
     await upsertAdminCredentialsFromCli({ pbFilePath, superuserEmail, superuserPassword });
@@ -109,7 +111,7 @@ describe("pokkit-db config writer collection tests", () => {
 
     await expect(await superuserPb.collection(newCollectionName).getFullList()).toEqual([]);
 
-    const collectionsFileBuffer = fse.readFileSync(`${pbDirPath}/pb_config/collections.json`);
+    const collectionsFileBuffer = fse.readFileSync(getPokkitDbCollectionsFilePathh({ pbDirPath }));
     const collectionsFileStr = collectionsFileBuffer.toString();
 
     expect(collectionsFileStr.includes(`"name": "${newCollectionName}"`)).toBe(true);

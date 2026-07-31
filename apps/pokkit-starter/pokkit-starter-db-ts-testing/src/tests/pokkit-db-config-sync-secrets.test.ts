@@ -1,6 +1,7 @@
 import {
   clearPb,
   createPbServeUrl,
+  getPokkitDbSecretsFilePath,
   killPbInstance,
   servePb,
   upsertAdminCredentialsFromCli,
@@ -77,7 +78,7 @@ describe("pokkit-db config writer secrets tests", () => {
 
     expect(savedSecretRecord?.value).toBe(mockSecretRecord.value);
 
-    const secretsFileContent = fse.readFileSync(pbDirPath + "/pb_config/secrets.json", "utf8");
+    const secretsFileContent = fse.readFileSync(getPokkitDbSecretsFilePath({ pbDirPath }), "utf8");
     expect(secretsFileContent).toBeTruthy();
 
     const parsedSecrets = safeJsonParse(secretsFileContent);
