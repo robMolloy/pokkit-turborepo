@@ -213,16 +213,16 @@ importers:
         specifier: ^5.1.4
         version: 5.4.21(@types/node@25.9.5)(lightningcss@1.31.1)
 
-  apps/pokkit-starter-db: {}
+  apps/pokkit-starter/pokkit-starter-db: {}
 
-  apps/pokkit-starter-db-ts-testing:
+  apps/pokkit-starter/pokkit-starter-db-ts-testing:
     dependencies:
       '@repo/pokkit-testing':
         specifier: workspace:^
-        version: link:../../packages/pokkit-testing
+        version: link:../../../packages/pokkit-testing
       '@repo/pokkit-utils':
         specifier: workspace:^
-        version: link:../../packages/pokkit-utils
+        version: link:../../../packages/pokkit-utils
       pocketbase:
         specifier: ^0.26.6
         version: 0.26.8
@@ -255,17 +255,17 @@ importers:
         specifier: ^4.0.18
         version: 4.1.0(@opentelemetry/api@1.9.0)(@types/node@25.9.5)(@vitest/ui@4.0.18)(jsdom@28.1.0(@noble/hashes@1.8.0))(msw@2.12.13(@types/node@25.9.5)(typescript@5.9.3))(vite@7.3.6(@types/node@25.9.5)(jiti@2.6.1)(lightningcss@1.31.1)(yaml@2.8.2))
 
-  apps/pokkit-starter-ui:
+  apps/pokkit-starter/pokkit-starter-ui:
     dependencies:
       '@repo/pokkit-components':
         specifier: workspace:^
-        version: link:../../packages/pokkit-components
+        version: link:../../../packages/pokkit-components
       '@repo/pokkit-shadcn':
         specifier: workspace:^
-        version: link:../../packages/pokkit-shadcn
+        version: link:../../../packages/pokkit-shadcn
       '@repo/ui':
         specifier: workspace:*
-        version: link:../../packages/ui
+        version: link:../../../packages/ui
       '@tailwindcss/vite':
         specifier: ^4.2.1
         version: 4.2.1(vite@5.4.21(@types/node@25.9.5)(lightningcss@1.31.1))
@@ -311,13 +311,13 @@ importers:
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
-        version: link:../../packages/eslint-config
+        version: link:../../../packages/eslint-config
       '@repo/pokkit-auth':
         specifier: workspace:*
-        version: link:../../packages/pokkit-auth
+        version: link:../../../packages/pokkit-auth
       '@repo/typescript-config':
         specifier: workspace:*
-        version: link:../../packages/typescript-config
+        version: link:../../../packages/typescript-config
       '@types/react':
         specifier: ^19.0.1
         version: 19.2.2

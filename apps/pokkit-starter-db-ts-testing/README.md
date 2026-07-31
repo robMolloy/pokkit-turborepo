@@ -1,3 +1,0 @@
-# Pokkit Utils
-
-simple utils
