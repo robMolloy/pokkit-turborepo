@@ -1,5 +1,5 @@
 import {
-  createPbServeUrl,
+  getPbServeUrl,
   getPokkitDbSettingsFilePath,
   killPbInstance,
   servePb,
@@ -18,7 +18,7 @@ const pbPortNumber = testMetadata.portNumber;
 const pbDirPath = `_sandboxes/${testSuiteName}`;
 const pbFilePath = pbDirPath + "/app-db";
 
-const pbServeUrl = createPbServeUrl({ pbPortNumber });
+const pbServeUrl = getPbServeUrl({ pbPortNumber });
 const pokkitDbSettingsFilePath = getPokkitDbSettingsFilePath({ pbDirPath });
 
 const createPbConnection = () => new PocketBase(pbServeUrl);

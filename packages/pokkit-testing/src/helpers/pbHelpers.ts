@@ -35,10 +35,10 @@ export const killPbInstance = (
   return killPocketbaseInstanceBySpawnProcess(p.spawnProcess);
 };
 
-export const createPbServeAddress = (p: { portNumber: number }) => `0.0.0.0:${p.portNumber}`;
-export const createPbServeUrl = (p: { pbPortNumber: number }) => `http://0.0.0.0:${p.pbPortNumber}`;
-export const createPbBuildFilePath = (p: { dirPath: string }) => `${p.dirPath}/app-db`;
-export const createPbLogFilePath = (p: { dirPath: string }) => `${p.dirPath}/log.txt`;
+export const getPbServeAddress = (p: { portNumber: number }) => `0.0.0.0:${p.portNumber}`;
+export const getPbServeUrl = (p: { pbPortNumber: number }) => `http://0.0.0.0:${p.pbPortNumber}`;
+export const getPbBuildFilePath = (p: { dirPath: string }) => p.dirPath + "/app-db";
+export const getPbLogFilePath = (p: { dirPath: string }) => p.dirPath + "/log.txt";
 
 /**
  * Serves the PocketBase build and writes logs to a file.
@@ -57,8 +57,8 @@ export const servePb = async (p: {
   dbUrl: string;
 }> => {
   const portNumber = p.pbPortNumber;
-  const dbServeUrl = createPbServeAddress({ portNumber });
-  const dbUrl = createPbServeUrl({ pbPortNumber: portNumber });
+  const dbServeUrl = getPbServeAddress({ portNumber });
+  const dbUrl = getPbServeUrl({ pbPortNumber: portNumber });
 
   const buildFileExists = await fse.pathExists(p.pbFilePath);
   if (!buildFileExists) throw new Error(`servePb: pbFile does not exist: ${p.pbFilePath}`);
@@ -128,7 +128,7 @@ export const clearPb = async (p: {
   superuserEmail: string;
   superuserPassword: string;
 }) => {
-  const superuserPb = new PocketBase(createPbServeUrl({ pbPortNumber: p.pbPortNumber }));
+  const superuserPb = new PocketBase(getPbServeUrl({ pbPortNumber: p.pbPortNumber }));
   await superuserPb
     .collection(superusersCollectionName)
     .authWithPassword(p.superuserEmail, p.superuserPassword);

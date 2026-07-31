@@ -1,6 +1,6 @@
 import {
   clearPb,
-  createPbServeUrl,
+  getPbServeUrl,
   killPbInstance,
   servePb,
   upsertAdminCredentialsFromCli,
@@ -22,7 +22,7 @@ const pbPortNumber = testMetadata.portNumber;
 const pbDirPath = `_sandboxes/${testSuiteName}`;
 const pbFilePath = pbDirPath + "/app-db";
 
-const pbServeUrl = createPbServeUrl({ pbPortNumber });
+const pbServeUrl = getPbServeUrl({ pbPortNumber });
 
 const createPbConnection = () => new PocketBase(pbServeUrl);
 
