@@ -2,7 +2,7 @@ import {
   clearDb,
   createPbLogFilePath,
   killPocketbaseInstanceByDbUrl,
-  serveDb,
+  servePb,
   upsertAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
 import fse from "fs-extra";
@@ -17,9 +17,10 @@ const sourceDirPath = "./source-build";
 
 const testMetadata = testsMetadata.pocketbaseStandardUser;
 const testSuiteName = testMetadata.name;
-const sandboxDbPortNumber = testMetadata.portNumber;
+const pbPortNumber = testMetadata.portNumber;
 
-const sandboxDirPath = `_sandboxes/${testSuiteName}`;
+const pbDirPath = `_sandboxes/${testSuiteName}`;
+const pbFilePath = pbDirPath + "/app-db";
 
 let sandboxDbUrl: string | undefined;
 
@@ -27,20 +28,16 @@ const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
 
 describe("test rules", () => {
   beforeAll(async () => {
-    await fse.removeSync(sandboxDirPath);
-    await fse.copySync(sourceDirPath, sandboxDirPath);
+    await fse.removeSync(pbDirPath);
+    await fse.copySync(sourceDirPath, pbDirPath);
 
-    const logFilePath = createPbLogFilePath({ dirPath: sandboxDirPath });
+    const logFilePath = createPbLogFilePath({ dirPath: pbDirPath });
 
-    const resp = await serveDb({
-      dbBuildDirPath: sandboxDirPath,
-      dbPortNumber: sandboxDbPortNumber,
-      logFilePath,
-    });
+    const resp = await servePb({ pbFilePath, pbPortNumber, logFilePath });
     sandboxDbUrl = resp.dbUrl;
 
     await upsertAdminCredentialsFromCli({
-      buildDirPath: sandboxDirPath,
+      buildDirPath: pbDirPath,
       dbSuperuserEmail: testSuperuser.email,
       dbSuperuserPassword: testSuperuser.password,
     });
@@ -48,12 +45,12 @@ describe("test rules", () => {
 
   afterAll(async () => {
     if (sandboxDbUrl) killPocketbaseInstanceByDbUrl(sandboxDbUrl);
-    await fse.remove(sandboxDirPath);
+    await fse.remove(pbDirPath);
   });
 
   beforeEach(async () => {
     await clearDb({
-      dbPortNumber: sandboxDbPortNumber,
+      dbPortNumber: pbPortNumber,
       dbSuperuserEmail: testSuperuser.email,
       dbSuperuserPassword: testSuperuser.password,
     });

@@ -1,7 +1,7 @@
 import {
   clearDb,
   killPocketbaseInstanceByDbPortNumber,
-  serveDb,
+  servePb,
   upsertAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
 import { safeJsonParse } from "@repo/pokkit-utils";
@@ -17,8 +17,10 @@ const sourceDirPath = "./source-build";
 
 const testMetadata = testsMetadata.pokkitDbConfigSyncSettings;
 const testSuiteName = testMetadata.name;
-const sandboxDbPortNumber = testMetadata.portNumber;
-const sandboxDirPath = `_sandboxes/${testSuiteName}`;
+
+const pbPortNumber = testMetadata.portNumber;
+const pbDirPath = `_sandboxes/${testSuiteName}`;
+const pbFilePath = pbDirPath + "/app-db";
 
 let sandboxDbUrl: string | undefined;
 
@@ -26,33 +28,28 @@ const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
 
 describe("pokkit-db config writer secrets tests", () => {
   beforeAll(async () => {
-    await killPocketbaseInstanceByDbPortNumber(sandboxDbPortNumber);
-    fse.removeSync(sandboxDirPath);
-    fse.copySync(sourceDirPath, sandboxDirPath);
+    await killPocketbaseInstanceByDbPortNumber(pbPortNumber);
+    fse.removeSync(pbDirPath);
+    fse.copySync(sourceDirPath, pbDirPath);
 
-    const resp = await serveDb({
-      dbBuildDirPath: sandboxDirPath,
-      dbPortNumber: sandboxDbPortNumber,
-      logFilePath: `_logs/${testSuiteName}`,
-    });
-
+    const resp = await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
     sandboxDbUrl = resp.dbUrl;
 
     await upsertAdminCredentialsFromCli({
-      buildDirPath: sandboxDirPath,
+      buildDirPath: pbDirPath,
       dbSuperuserEmail: testSuperuser.email,
       dbSuperuserPassword: testSuperuser.password,
     });
   });
 
   afterAll(async () => {
-    killPocketbaseInstanceByDbPortNumber(sandboxDbPortNumber);
-    fse.removeSync(sandboxDirPath);
+    killPocketbaseInstanceByDbPortNumber(pbPortNumber);
+    fse.removeSync(pbDirPath);
   });
 
   beforeEach(async () => {
     await clearDb({
-      dbPortNumber: sandboxDbPortNumber,
+      dbPortNumber: pbPortNumber,
       dbSuperuserEmail: testSuperuser.email,
       dbSuperuserPassword: testSuperuser.password,
     });
@@ -77,10 +74,7 @@ describe("pokkit-db config writer secrets tests", () => {
     const updatedSettings = await superUserPb.settings.getAll();
     expect(updatedSettings.meta.appName).toBe(newAppName);
 
-    const settingsFileContent = fse.readFileSync(
-      sandboxDirPath + "/pb_config/settings.json",
-      "utf8",
-    );
+    const settingsFileContent = fse.readFileSync(pbDirPath + "/pb_config/settings.json", "utf8");
     expect(settingsFileContent).toBeTruthy();
 
     const parsedSettings = safeJsonParse(settingsFileContent);

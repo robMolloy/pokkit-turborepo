@@ -28,6 +28,13 @@ export const killPocketbaseInstanceBySpawnProcess = (
   return spawnProcess.kill("SIGTERM");
 };
 
+export const killPocketbaseInstance = (
+  p: { spawnProcess: ChildProcessWithoutNullStreams } | { pbPortNumber: number },
+) => {
+  if ("pbPortNumber" in p) return killPocketbaseInstanceByDbPortNumber(p.pbPortNumber);
+  return killPocketbaseInstanceBySpawnProcess(p.spawnProcess);
+};
+
 export const createPbServeAddress = (p: { portNumber: number }) => `0.0.0.0:${p.portNumber}`;
 export const createPbServeUrl = (p: { portNumber: number }) => `http://0.0.0.0:${p.portNumber}`;
 export const createPbBuildFilePath = (p: { dirPath: string }) => `${p.dirPath}/app-db`;
@@ -40,25 +47,24 @@ export const createPbLogFilePath = (p: { dirPath: string }) => `${p.dirPath}/log
  * @param logFilePath - Path to the file where logs will be written.
  * @param dbUrl - Database URL in the format http://anyurl:1234 (port number after second colon).
  */
-export const serveDb = async (p: {
-  dbBuildDirPath: string;
-  dbPortNumber: number;
+export const servePb = async (p: {
+  pbFilePath: string;
+  pbPortNumber: number;
   logFilePath?: string;
 }): Promise<{
   pbProcess: ChildProcessWithoutNullStreams;
   dbServeUrl: string;
   dbUrl: string;
 }> => {
-  const portNumber = p.dbPortNumber;
+  const portNumber = p.pbPortNumber;
   const dbServeUrl = createPbServeAddress({ portNumber });
   const dbUrl = createPbServeUrl({ portNumber });
-  const dbBuildFilePath = createPbBuildFilePath({ dirPath: p.dbBuildDirPath });
 
-  const buildFileExists = await fse.pathExists(dbBuildFilePath);
+  const buildFileExists = await fse.pathExists(p.pbFilePath);
   if (!buildFileExists)
-    throw new Error(`setupAndServeDb: dbBuildFile does not exist: ${dbBuildFilePath}`);
+    throw new Error(`setupAndServeDb: dbBuildFile does not exist: ${p.pbFilePath}`);
 
-  const pbProcess = spawn(dbBuildFilePath, ["serve", `--http=${dbServeUrl}`, "--dev"]);
+  const pbProcess = spawn(p.pbFilePath, ["serve", `--http=${dbServeUrl}`, "--dev"]);
 
   if (p.logFilePath) fse.ensureFileSync(p.logFilePath);
   const logStream = p.logFilePath

@@ -1,8 +1,7 @@
 import {
   clearDb,
-  createPbLogFilePath,
   killPocketbaseInstanceByDbPortNumber,
-  serveDb,
+  servePb,
   upsertAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
 import { safeJsonParse } from "@repo/pokkit-utils";
@@ -10,16 +9,17 @@ import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { superusersCollectionName } from "../metadata/pocketbaseMetadata";
-import { testsMetadata } from "./_testsMetadata";
 import { testSuperuser } from "./_constants";
+import { testsMetadata } from "./_testsMetadata";
 
 const sourceDirPath = "./source-build";
 
 const testMetadata = testsMetadata.pokkitDbConfigSyncSettingsNoFile;
 const testSuiteName = testMetadata.name;
-const sandboxDbPortNumber = testMetadata.portNumber;
 
-const sandboxDirPath = `_sandboxes/${testSuiteName}`;
+const pbPortNumber = testMetadata.portNumber;
+const pbDirPath = `_sandboxes/${testSuiteName}`;
+const pbFilePath = pbDirPath + "/app-db";
 
 let sandboxDbUrl: string | undefined;
 
@@ -27,35 +27,29 @@ const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
 
 describe("pokkit-db config writer settings tests - when settings file does not exist", () => {
   beforeAll(async () => {
-    await fse.removeSync(sandboxDirPath);
-    await fse.copySync(sourceDirPath, sandboxDirPath);
-    await fse.removeSync(sandboxDirPath + "/pb_config/settings.json");
+    await fse.removeSync(pbDirPath);
+    await fse.copySync(sourceDirPath, pbDirPath);
+    await fse.removeSync(pbDirPath + "/pb_config/settings.json");
 
-    const logFilePath = createPbLogFilePath({ dirPath: sandboxDirPath });
-
-    const resp = await serveDb({
-      dbBuildDirPath: sandboxDirPath,
-      dbPortNumber: sandboxDbPortNumber,
-      logFilePath,
-    });
+    const resp = await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 
     sandboxDbUrl = resp.dbUrl;
 
     await upsertAdminCredentialsFromCli({
-      buildDirPath: sandboxDirPath,
+      buildDirPath: pbDirPath,
       dbSuperuserEmail: testSuperuser.email,
       dbSuperuserPassword: testSuperuser.password,
     });
   });
 
   afterAll(async () => {
-    killPocketbaseInstanceByDbPortNumber(sandboxDbPortNumber);
-    fse.removeSync(sandboxDirPath);
+    killPocketbaseInstanceByDbPortNumber(pbPortNumber);
+    fse.removeSync(pbDirPath);
   });
 
   beforeEach(async () => {
     await clearDb({
-      dbPortNumber: sandboxDbPortNumber,
+      dbPortNumber: pbPortNumber,
       dbSuperuserEmail: testSuperuser.email,
       dbSuperuserPassword: testSuperuser.password,
     });
@@ -68,10 +62,7 @@ describe("pokkit-db config writer settings tests - when settings file does not e
   });
 
   it("settings file is created on startup when it does not exist", async () => {
-    const settingsFileContent = fse.readFileSync(
-      sandboxDirPath + "/pb_config/settings.json",
-      "utf8",
-    );
+    const settingsFileContent = fse.readFileSync(pbDirPath + "/pb_config/settings.json", "utf8");
     expect(settingsFileContent).toBeTruthy();
 
     const parsedSettings = safeJsonParse(settingsFileContent);
@@ -92,10 +83,7 @@ describe("pokkit-db config writer settings tests - when settings file does not e
     const updatedSettings = await superUserPb.settings.getAll();
     expect(updatedSettings.meta.appName).toBe(newAppName);
 
-    const settingsFileContent = fse.readFileSync(
-      sandboxDirPath + "/pb_config/settings.json",
-      "utf8",
-    );
+    const settingsFileContent = fse.readFileSync(pbDirPath + "/pb_config/settings.json", "utf8");
     expect(settingsFileContent).toBeTruthy();
 
     const parsedSettings = safeJsonParse(settingsFileContent);

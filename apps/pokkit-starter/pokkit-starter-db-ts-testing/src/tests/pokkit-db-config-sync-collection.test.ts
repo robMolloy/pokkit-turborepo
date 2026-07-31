@@ -2,7 +2,7 @@ import {
   clearDb,
   createPbLogFilePath,
   killPocketbaseInstanceByDbUrl,
-  serveDb,
+  servePb,
   upsertAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
 import fse from "fs-extra";
@@ -17,9 +17,10 @@ const sourceDirPath = "./source-build";
 
 const testMetadata = testsMetadata.pokkitDbConfigSyncCollection;
 const testSuiteName = testMetadata.name;
-const sandboxDbPortNumber = testMetadata.portNumber;
 
-const sandboxDirPath = `_sandboxes/${testSuiteName}`;
+const pbPortNumber = testMetadata.portNumber;
+const pbDirPath = `_sandboxes/${testSuiteName}`;
+const pbFilePath = pbDirPath + "/app-db";
 
 let sandboxDbUrl: string | undefined;
 
@@ -27,20 +28,16 @@ const createPbConnection = () => new PocketBase(sandboxDbUrl as string);
 
 describe("pokkit-db config writer collection tests", () => {
   beforeAll(async () => {
-    await fse.removeSync(sandboxDirPath);
-    await fse.copySync(sourceDirPath, sandboxDirPath);
-    const logFilePath = createPbLogFilePath({ dirPath: sandboxDirPath });
+    await fse.removeSync(pbDirPath);
+    await fse.copySync(sourceDirPath, pbDirPath);
+    const logFilePath = createPbLogFilePath({ dirPath: pbDirPath });
 
-    const resp = await serveDb({
-      dbBuildDirPath: sandboxDirPath,
-      dbPortNumber: sandboxDbPortNumber,
-      logFilePath,
-    });
+    const resp = await servePb({ pbFilePath, pbPortNumber, logFilePath });
 
     sandboxDbUrl = resp.dbUrl;
 
     await upsertAdminCredentialsFromCli({
-      buildDirPath: sandboxDirPath,
+      buildDirPath: pbDirPath,
       dbSuperuserEmail: testSuperuser.email,
       dbSuperuserPassword: testSuperuser.password,
     });
@@ -48,18 +45,18 @@ describe("pokkit-db config writer collection tests", () => {
 
   afterAll(async () => {
     if (sandboxDbUrl) killPocketbaseInstanceByDbUrl(sandboxDbUrl);
-    fse.removeSync(sandboxDirPath);
+    fse.removeSync(pbDirPath);
   });
 
   beforeEach(async () => {
     await clearDb({
-      dbPortNumber: sandboxDbPortNumber,
+      dbPortNumber: pbPortNumber,
       dbSuperuserEmail: testSuperuser.email,
       dbSuperuserPassword: testSuperuser.password,
     });
 
     await upsertAdminCredentialsFromCli({
-      buildDirPath: sandboxDirPath,
+      buildDirPath: pbDirPath,
       dbSuperuserEmail: testSuperuser.email,
       dbSuperuserPassword: testSuperuser.password,
     });
@@ -127,7 +124,7 @@ describe("pokkit-db config writer collection tests", () => {
 
     await expect(await superuserPb.collection(newCollectionName).getFullList()).toEqual([]);
 
-    const collectionsFileBuffer = fse.readFileSync(`${sandboxDirPath}/pb_config/collections.json`);
+    const collectionsFileBuffer = fse.readFileSync(`${pbDirPath}/pb_config/collections.json`);
     const collectionsFileStr = collectionsFileBuffer.toString();
 
     expect(collectionsFileStr.includes(`"name": "${newCollectionName}"`)).toBe(true);
