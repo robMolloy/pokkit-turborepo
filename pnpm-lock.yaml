@@ -255,6 +255,43 @@ importers:
         specifier: ^4.0.18
         version: 4.1.0(@opentelemetry/api@1.9.0)(@types/node@25.9.5)(@vitest/ui@4.0.18)(jsdom@28.1.0(@noble/hashes@1.8.0))(msw@2.12.13(@types/node@25.9.5)(typescript@5.9.3))(vite@7.3.6(@types/node@25.9.5)(jiti@2.6.1)(lightningcss@1.31.1)(yaml@2.8.2))
 
+  apps/pokkit-starter/pokkit-starter-docs:
+    dependencies:
+      '@repo/ui':
+        specifier: workspace:*
+        version: link:../../../packages/ui
+      next:
+        specifier: 16.1.5
+        version: 16.1.5(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.4
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.4(react@19.2.4)
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../../../packages/eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../../packages/typescript-config
+      '@types/node':
+        specifier: ^22.15.3
+        version: 22.19.15
+      '@types/react':
+        specifier: 19.2.2
+        version: 19.2.2
+      '@types/react-dom':
+        specifier: 19.2.2
+        version: 19.2.2(@types/react@19.2.2)
+      eslint:
+        specifier: ^9.39.1
+        version: 9.39.4(jiti@2.6.1)
+      typescript:
+        specifier: 5.9.2
+        version: 5.9.2
+
   apps/pokkit-starter/pokkit-starter-ui:
     dependencies:
       '@repo/pokkit-components':
