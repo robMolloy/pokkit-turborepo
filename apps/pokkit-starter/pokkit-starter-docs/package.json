@@ -1,5 +1,5 @@
 {
-  "name": "my-website",
+  "name": "pokkit-starter-docs",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -12,7 +12,9 @@
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "dev": "pnpm run start",
+    "tsc": "cd ../../.. && apps/pokkit-starter/pokkit-starter-docs/node_modules/.bin/tsc --project apps/pokkit-starter/pokkit-starter-docs/tsconfig.json --noemit --watch"
   },
   "dependencies": {
     "@docusaurus/core": "3.10.2",
