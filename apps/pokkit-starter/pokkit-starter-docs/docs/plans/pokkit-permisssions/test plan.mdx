@@ -2,7 +2,12 @@
 
 ## Scope
 
-This plan covers **required tests for global user permissions** (`globalUserPermissions`). Organisation and organisation-user permission behaviour is out of scope here.
+This plan covers **required tests for**:
+
+- Global user permissions (`globalUserPermissions`)
+- Organisation user permissions (`organisationUserPermissions`)
+
+`organisations` is covered only where needed to support organisation-user permission behaviour (existence, relations, and org-scoped rule matching). Broader organisation CRUD policy beyond that is out of scope here.
 
 Tests describe what must be verified; they do not prescribe implementation details.
 
@@ -10,7 +15,9 @@ Tests describe what must be verified; they do not prescribe implementation detai
 
 - Stock PocketBase `users` auth collection is unchanged.
 - `globalUserPermissions` exists with `userId`, `role` (`standard` | `admin`), and `status` (`pending` | `approved` | `blocked`).
-- A consumer collection (or fixture) uses documented PocketBase API rules that query `@collection.globalUserPermissions` (for example, require an approved global admin).
+- `organisations` exists with at least `name` (and optional `description`).
+- `organisationUserPermissions` exists with `userId`, `orgId`, `role` (`standard` | `admin`), `status` (`pending` | `approved` | `blocked`), and a unique `userOrgKey` per user/organisation pair.
+- Consumer collections (or fixtures) use documented PocketBase API rules that query `@collection.globalUserPermissions` and/or `@collection.organisationUserPermissions` (for example, require an approved global admin, or membership / admin for a record's organisation).
 
 ---
 
@@ -113,3 +120,125 @@ Checks that an approved global admin can list/view other users' records when `us
 ### GUP-21 — Non-admin cannot access other users
 
 Checks that a user without an approved global admin permission cannot list/view another user's record via that global-admin branch of the rule.
+
+---
+
+## Organisation user permissions — schema and records
+
+### OUP-01 — Collection fields
+
+Checks that `organisationUserPermissions` exposes `userId` (relation → `users`), `orgId` (relation → `organisations`), `role`, `status`, and `userOrgKey` with the allowed select values from the spec.
+
+### OUP-02 — Role values
+
+Checks that only `standard` and `admin` are accepted for `role`, and invalid values are rejected.
+
+### OUP-03 — Status values
+
+Checks that only `pending`, `approved`, and `blocked` are accepted for `status`, and invalid values are rejected.
+
+### OUP-04 — Relation to users and organisations
+
+Checks that `userId` must point at a valid `users` record and `orgId` must point at a valid `organisations` record.
+
+### OUP-05 — Unique membership per user/organisation
+
+Checks that `userOrgKey` enforces uniqueness so a user cannot have more than one membership record for the same organisation.
+
+### OUP-06 — Assign roles with status lifecycle
+
+Checks that a membership record can be created and updated through the status lifecycle (`pending` → `approved` → `blocked`) while keeping a `standard` or `admin` role for that organisation.
+
+### OUP-07 — Multiple organisations for one user
+
+Checks that the same user can hold separate `organisationUserPermissions` records for different organisations (different `userOrgKey` values).
+
+---
+
+## Access to `organisationUserPermissions` itself
+
+### OUP-08 — Unauthenticated access denied
+
+Checks that unauthenticated requests cannot list, view, create, update, or delete `organisationUserPermissions` records.
+
+### OUP-09 — Member can read own membership
+
+Checks that an authenticated user can list/view their own `organisationUserPermissions` record when rules allow self-access.
+
+### OUP-10 — Non-admin cannot manage memberships
+
+Checks that a user who is not an organisation admin (and not otherwise authorised) cannot create, update, or delete membership records for that organisation.
+
+### OUP-11 — Organisation admin can manage memberships in their org
+
+Checks that an authenticated user with an approved organisation `admin` role can create, update, and delete `organisationUserPermissions` records for that organisation.
+
+### OUP-12 — Organisation admin cannot manage other orgs
+
+Checks that an organisation admin's manage access does not extend to membership records belonging to a different organisation.
+
+### OUP-13 — Organisation admin can list/view members in their org
+
+Checks that an approved organisation admin can list and view membership records for other users within the same organisation.
+
+---
+
+## Rule-based access via organisation permissions
+
+These tests assume another collection stores (or otherwise references) an organisation id and gates CRUD with the documented organisation-permission rule patterns (auth required; membership / admin checks via `@collection.organisationUserPermissions` matching `userId`, `orgId`, and optionally `role`).
+
+### OUP-14 — Unauthenticated CRUD denied
+
+Checks that requests without `@request.auth.id` are denied for list, view, create, update, and delete on a collection that requires authentication plus organisation permissions.
+
+### OUP-15 — No membership record denied
+
+Checks that an authenticated user with no `organisationUserPermissions` row for the record's organisation is denied access where rules require matching membership.
+
+### OUP-16 — Approved organisation admin allowed
+
+Checks that a user with `role = admin`, `status = approved`, and `orgId` matching the record's organisation is allowed through rules that require an organisation admin.
+
+### OUP-17 — Approved organisation standard role
+
+Checks that a user with `role = standard` and `status = approved` for the record's organisation is allowed only where rules require organisation membership / standard access, and is **denied** where rules require `role = admin`.
+
+### OUP-18 — Pending status does not grant access
+
+Checks that a membership with `status = pending` is denied by rules that require an approved permission, regardless of role or matching `orgId`.
+
+### OUP-19 — Blocked status does not grant access
+
+Checks that a membership with `status = blocked` is denied by rules that require an approved permission, regardless of role or matching `orgId`.
+
+### OUP-20 — Membership does not cross organisations
+
+Checks that an approved membership (standard or admin) for organisation A does not grant access to records belonging to organisation B.
+
+### OUP-21 — Admin rule does not match wrong user
+
+Checks that an organisation admin rule only matches when `userId` equals the authenticated user; another member's admin record for the same organisation must not grant the requester access.
+
+### OUP-22 — Org rule does not match wrong organisation id on the record
+
+Checks that rules comparing `organisationUserPermissions.orgId` to the record's organisation field deny access when those ids differ, even if the user is an approved admin of some other organisation.
+
+### OUP-23 — CRUD actions covered independently
+
+Checks that list, view, create, update, and delete each enforce the organisation permission rule attached to that action (a pass on one action does not imply a pass on another).
+
+---
+
+## Global vs organisation scope separation
+
+### OUP-24 — Global admin is not implied by organisation admin
+
+Checks that an approved organisation admin without a matching `globalUserPermissions` admin record is denied where rules require a **global** admin.
+
+### OUP-25 — Global permission is not implied by organisation membership
+
+Checks that an approved organisation membership (standard or admin) alone does not satisfy rules that only query `globalUserPermissions`.
+
+### OUP-26 — Organisation rule is not satisfied by global permission alone
+
+Checks that an approved global admin (or standard) without membership in the record's organisation is denied where rules require `@collection.organisationUserPermissions` for that organisation—unless a composed rule explicitly also allows global access.
