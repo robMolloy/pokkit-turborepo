@@ -14,4 +14,13 @@ export const testsMetadata = {
   },
   pokkitDbConfigSyncSettingsNoFile: { portNumber: 8126, name: "pokkitDbConfigSyncSettingsNoFile" },
   pokkitDbConfigSyncSettings: { portNumber: 8127, name: "pokkitDbConfigSyncSettings" },
+
+  pokkitDbPermissionsNoCollectionsFile: {
+    portNumber: 8128,
+    name: "pokkitDbPermissionsNoCollectionsFile",
+  },
+  pokkitDbPermissionsFirstUserIsSuperadmin: {
+    portNumber: 8129,
+    name: "pokkitDbPermissionsFirstUserIsSuperadmin",
+  },
 } as const satisfies { [k: string]: { portNumber: number; name: string } };

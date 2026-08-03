@@ -94,7 +94,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-06-25 20:24:54.568Z",
-    "updated": "2026-08-03 21:19:15.415Z",
+    "updated": "2026-08-03 23:04:13.162Z",
     "system": true
   },
   {
@@ -206,7 +206,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-06-25 20:24:54.572Z",
-    "updated": "2026-08-03 21:19:15.418Z",
+    "updated": "2026-08-03 23:04:13.164Z",
     "system": true
   },
   {
@@ -320,7 +320,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-06-25 20:24:54.575Z",
-    "updated": "2026-08-03 21:19:15.419Z",
+    "updated": "2026-08-03 23:04:13.166Z",
     "system": true
   },
   {
@@ -418,7 +418,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-06-25 20:24:54.579Z",
-    "updated": "2026-08-03 21:19:15.420Z",
+    "updated": "2026-08-03 23:04:13.168Z",
     "system": true
   },
   {
@@ -533,7 +533,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-06-25 20:24:54.581Z",
-    "updated": "2026-08-03 21:19:15.422Z",
+    "updated": "2026-08-03 23:04:13.169Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -750,7 +750,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-06-25 20:24:54.587Z",
-    "updated": "2026-08-03 21:19:15.424Z",
+    "updated": "2026-08-03 23:04:13.172Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -867,7 +867,7 @@
     ],
     "indexes": [],
     "created": "2026-07-31 11:09:03.233Z",
-    "updated": "2026-08-03 21:19:15.428Z",
+    "updated": "2026-08-03 23:04:13.173Z",
     "system": false
   },
   {
@@ -918,7 +918,311 @@
     ],
     "indexes": [],
     "created": "2026-07-31 11:09:03.234Z",
-    "updated": "2026-08-03 21:19:15.429Z",
+    "updated": "2026-08-03 23:04:13.176Z",
+    "system": false
+  },
+  {
+    "id": "pbc_2680520508",
+    "listRule": "@request.auth.id != \"\" \u0026\u0026 (\n  @request.auth.id = id || \n  @collection.globalUserPermissions.id ?= @request.auth.id \u0026\u0026 @collection.globalUserPermissions.role ?= \"admin\"\n)",
+    "viewRule": "@request.auth.id != \"\" \u0026\u0026 @request.auth.id = id || @collection.globalUserPermissions.id ?= @request.auth.id \u0026\u0026 @collection.globalUserPermissions.role ?= \"admin\"",
+    "createRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.globalUserPermissions.id ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"admin\"",
+    "updateRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.globalUserPermissions.id ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"admin\"",
+    "deleteRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.globalUserPermissions.id ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"admin\"",
+    "name": "globalUserPermissions",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "help": "",
+        "hidden": false,
+        "id": "select1466534506",
+        "maxSelect": 1,
+        "name": "role",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "select",
+        "values": [
+          "standard",
+          "admin"
+        ]
+      },
+      {
+        "help": "",
+        "hidden": false,
+        "id": "select2063623452",
+        "maxSelect": 1,
+        "name": "status",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "select",
+        "values": [
+          "blocked",
+          "approved",
+          "pending"
+        ]
+      },
+      {
+        "cascadeDelete": true,
+        "collectionId": "_pb_users_auth_",
+        "help": "",
+        "hidden": false,
+        "id": "relation1689669068",
+        "maxSelect": 1,
+        "minSelect": 0,
+        "name": "userId",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "relation"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "created": "2026-08-03 22:12:18.250Z",
+    "updated": "2026-08-03 23:04:13.237Z",
+    "system": false
+  },
+  {
+    "id": "pbc_230240349",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "organisationUserPermissions",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "cascadeDelete": false,
+        "collectionId": "pbc_1053844701",
+        "help": "",
+        "hidden": false,
+        "id": "relation982184766",
+        "maxSelect": 1,
+        "minSelect": 0,
+        "name": "orgId",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "relation"
+      },
+      {
+        "help": "",
+        "hidden": false,
+        "id": "select1466534506",
+        "maxSelect": 1,
+        "name": "role",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "select",
+        "values": [
+          "standard",
+          "admin"
+        ]
+      },
+      {
+        "help": "",
+        "hidden": false,
+        "id": "select2063623452",
+        "maxSelect": 1,
+        "name": "status",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "select",
+        "values": [
+          "blocked",
+          "approved",
+          "pending"
+        ]
+      },
+      {
+        "cascadeDelete": false,
+        "collectionId": "_pb_users_auth_",
+        "help": "",
+        "hidden": false,
+        "id": "relation1689669068",
+        "maxSelect": 1,
+        "minSelect": 0,
+        "name": "userId",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "relation"
+      },
+      {
+        "autogeneratePattern": "",
+        "help": "",
+        "hidden": false,
+        "id": "text1330202256",
+        "max": 0,
+        "min": 0,
+        "name": "userOrgKey",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX `idx_0UWlVOdDqD` ON `organisationUserPermissions` (`userOrgKey`)"
+    ],
+    "created": "2026-08-03 22:12:18.252Z",
+    "updated": "2026-08-03 23:04:13.239Z",
+    "system": false
+  },
+  {
+    "id": "pbc_1053844701",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "organisations",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "help": "",
+        "hidden": false,
+        "id": "text1579384326",
+        "max": 0,
+        "min": 0,
+        "name": "name",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "help": "",
+        "hidden": false,
+        "id": "text1843675174",
+        "max": 0,
+        "min": 0,
+        "name": "description",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "created": "2026-08-03 22:12:18.253Z",
+    "updated": "2026-08-03 23:04:13.241Z",
     "system": false
   },
   {
@@ -1000,8 +1304,8 @@
     "indexes": [
       "CREATE UNIQUE INDEX `idx_secrets_key` ON `_pb_config_secrets` (key)"
     ],
-    "created": "2026-08-03 21:19:15.529Z",
-    "updated": "2026-08-03 21:19:15.529Z",
+    "created": "2026-08-03 23:04:13.227Z",
+    "updated": "2026-08-03 23:04:13.227Z",
     "system": false
   }
 ]
