@@ -4,20 +4,21 @@
 
 This plan covers **required tests for**:
 
-- Global user permissions (`globalUserPermissions`)
+- Global user permissions (`globalUserPermissions`), including the `superadmin` role
+- Organisations (`organisations`) — create by global admin/superadmin, membership provisioning, and CRUD by org admin vs superadmin vs foreign global admin
 - Organisation user permissions (`organisationUserPermissions`)
-
-`organisations` is covered only where needed to support organisation-user permission behaviour (existence, relations, and org-scoped rule matching). Broader organisation CRUD policy beyond that is out of scope here.
+- Scope separation between global and organisation permissions, and the superadmin self-demotion hard rule
 
 Tests describe what must be verified; they do not prescribe implementation details.
 
 ## Setup assumptions
 
 - Stock PocketBase `users` auth collection is unchanged.
-- `globalUserPermissions` exists with `userId`, `role` (`standard` | `admin`), and `status` (`pending` | `approved` | `blocked`).
+- `globalUserPermissions` exists with `userId`, `role` (`standard` | `admin` | `superadmin`), and `status` (`pending` | `approved` | `blocked`).
+- The first superadmin is seeded outside normal API self-service (install / migration / PocketBase admin).
 - `organisations` exists with at least `name` (and optional `description`).
 - `organisationUserPermissions` exists with `userId`, `orgId`, `role` (`standard` | `admin`), `status` (`pending` | `approved` | `blocked`), and a unique `userOrgKey` per user/organisation pair.
-- Consumer collections (or fixtures) use documented PocketBase API rules that query `@collection.globalUserPermissions` and/or `@collection.organisationUserPermissions` (for example, require an approved global admin, or membership / admin for a record's organisation).
+- Consumer collections (or fixtures) use documented PocketBase API rules that query `@collection.globalUserPermissions` and/or `@collection.organisationUserPermissions`, including `status ?= "approved"` and admin-or-superadmin / superadmin-only / org-admin-or-superadmin patterns where applicable. Consumer fixtures do **not** imply superadmin god-mode unless the rule explicitly composes it.
 
 ---
 
@@ -29,7 +30,7 @@ Checks that `globalUserPermissions` exposes `userId` (relation → `users`), `ro
 
 ### GUP-02 — Role values
 
-Checks that only `standard` and `admin` are accepted for `role`, and invalid values are rejected.
+Checks that only `standard`, `admin`, and `superadmin` are accepted for `role`, and invalid values are rejected.
 
 ### GUP-03 — Status values
 
@@ -41,7 +42,7 @@ Checks that `userId` must point at a valid `users` record, and that deleting a u
 
 ### GUP-05 — Assign roles with status lifecycle
 
-Checks that a permission record can be created and updated through the status lifecycle (`pending` → `approved` → `blocked`) while keeping a `standard` or `admin` role.
+Checks that a permission record can be created and updated through the status lifecycle (`pending` → `approved` → `blocked`) while keeping a `standard`, `admin`, or `superadmin` role (as applicable).
 
 ---
 
@@ -55,53 +56,85 @@ Checks that unauthenticated requests cannot list, view, create, update, or delet
 
 Checks that an authenticated user can list/view their own `globalUserPermissions` record when rules allow self-access.
 
-### GUP-08 — Non-admin cannot manage permissions
+### GUP-08 — Non-superadmin cannot manage permissions
 
-Checks that a user with no global admin permission (or only `standard`) cannot create, update, or delete `globalUserPermissions` records for themselves or others.
+Checks that a user with an approved global `standard` or `admin` role (and any user who is not an approved superadmin) cannot create, update, or delete `globalUserPermissions` records for others, and cannot perform privileged self-changes that alter effective power.
 
-### GUP-09 — Global admin can manage permissions
+### GUP-09 — Superadmin can manage others' permissions
 
-Checks that an authenticated user with an approved global `admin` role can create, update, and delete `globalUserPermissions` records.
+Checks that an authenticated user with an approved global `superadmin` role can create, update, and delete other users' `globalUserPermissions` records — including elevating/demoting `role` (`standard` ↔ `admin` ↔ `superadmin`) and managing `status` (approve / block).
 
-### GUP-10 — Global admin can list/view others' permissions
+### GUP-10 — Superadmin can list/view others' permissions
 
-Checks that an approved global admin can list and view permission records belonging to other users.
+Checks that an approved global superadmin can list and view permission records belonging to other users, and that an approved global admin alone cannot.
+
+### GUP-11 — Superadmin cannot demote own role
+
+Checks that an approved superadmin cannot update their own `role` away from `superadmin`.
+
+### GUP-12 — Superadmin cannot delete own record
+
+Checks that an approved superadmin cannot delete their own `globalUserPermissions` record.
+
+### GUP-13 — Superadmin cannot weaken own status
+
+Checks that an approved superadmin cannot set their own `status` to `blocked` or `pending`.
+
+### GUP-14 — Superadmin can change another superadmin
+
+Checks that an approved superadmin can demote, block, or delete a **different** superadmin's `globalUserPermissions` record.
+
+### GUP-15 — Pending or blocked superadmin cannot manage GUP
+
+Checks that a user whose global permission has `role = superadmin` but `status = pending` or `blocked` cannot manage `globalUserPermissions` for anyone.
+
+### GUP-16 — Global admin cannot elevate roles
+
+Checks that an approved global `admin` cannot elevate anyone to `admin` or `superadmin` (or otherwise create/update/delete others' GUP records).
+
+### GUP-17 — First superadmin seeded outside API self-service
+
+Checks that the initial superadmin exists via install / migration / PocketBase admin seeding rather than normal API self-elevation.
 
 ---
 
 ## Rule-based access via global permissions
 
-These tests assume another collection gates CRUD with the documented global-permission rule patterns (auth required; global admin / standard checks via `@collection.globalUserPermissions`).
+These tests assume another collection gates CRUD with the documented global-permission rule patterns (auth required; approved status; admin, admin-or-superadmin, or superadmin-only checks via `@collection.globalUserPermissions`).
 
-### GUP-11 — Unauthenticated CRUD denied
+### GUP-18 — Unauthenticated CRUD denied
 
 Checks that requests without `@request.auth.id` are denied for list, view, create, update, and delete on a collection that requires authentication plus global permissions.
 
-### GUP-12 — No permission record denied
+### GUP-19 — No permission record denied
 
 Checks that an authenticated user with no `globalUserPermissions` row is denied access where rules require a matching global permission.
 
-### GUP-13 — Approved global admin allowed
+### GUP-20 — Approved global admin (or superadmin) allowed
 
-Checks that a user with `role = admin` and `status = approved` is allowed through rules that require a global admin.
+Checks that a user with `role = admin` and `status = approved` is allowed through rules that require a global admin, and that an approved **superadmin** is also allowed when the documented pattern is admin **or** superadmin.
 
-### GUP-14 — Approved global standard role
+### GUP-21 — Superadmin-only rules deny global admin
 
-Checks that a user with `role = standard` and `status = approved` is allowed only where rules require global standard (or any approved global member), and is **denied** where rules require `role = admin`.
+Checks that rules requiring `role = superadmin` (plus approved status) allow an approved superadmin and **deny** an approved global admin.
 
-### GUP-15 — Pending status does not grant access
+### GUP-22 — Approved global standard role
 
-Checks that a user whose global permission has `status = pending` is denied by rules that require an approved permission, regardless of role.
+Checks that a user with `role = standard` and `status = approved` is allowed only where rules require global standard (or any approved global member), and is **denied** where rules require `role = admin` or `role = superadmin`.
 
-### GUP-16 — Blocked status does not grant access
+### GUP-23 — Pending status does not grant access
 
-Checks that a user whose global permission has `status = blocked` is denied by rules that require an approved permission, regardless of role.
+Checks that a user whose global permission has `status = pending` is denied by rules that require an approved permission, regardless of role (including `superadmin`).
 
-### GUP-17 — Admin rule does not match wrong user
+### GUP-24 — Blocked status does not grant access
 
-Checks that a global admin rule only matches when `userId` equals the authenticated user; another user's admin record must not grant the requester access.
+Checks that a user whose global permission has `status = blocked` is denied by rules that require an approved permission, regardless of role (including `superadmin`).
 
-### GUP-18 — CRUD actions covered independently
+### GUP-25 — Admin or superadmin rule does not match wrong user
+
+Checks that a global admin / superadmin rule only matches when `userId` equals the authenticated user; another user's admin or superadmin record must not grant the requester access.
+
+### GUP-26 — CRUD actions covered independently
 
 Checks that list, view, create, update, and delete each enforce the global permission rule attached to that action (a pass on one action does not imply a pass on another).
 
@@ -109,17 +142,61 @@ Checks that list, view, create, update, and delete each enforce the global permi
 
 ## Interaction with `users` (when rules reference global admins)
 
-### GUP-19 — User can access own profile
+### GUP-27 — User can access own profile
 
 Checks that a user can list/view their own `users` record under rules that allow `id = @request.auth.id`.
 
-### GUP-20 — Global admin can access other users
+### GUP-28 — Global admin or superadmin can access other users
 
-Checks that an approved global admin can list/view other users' records when `users` rules allow access via `@collection.globalUserPermissions` with `role = admin`.
+Checks that an approved global admin **or** approved superadmin can list/view other users' records when `users` rules allow access via the documented admin-or-superadmin pattern on `@collection.globalUserPermissions`.
 
-### GUP-21 — Non-admin cannot access other users
+### GUP-29 — Non-admin and non-superadmin cannot access other users
 
-Checks that a user without an approved global admin permission cannot list/view another user's record via that global-admin branch of the rule.
+Checks that a user without an approved global admin or superadmin permission cannot list/view another user's record via that admin-or-superadmin branch of the rule.
+
+---
+
+## Organisations — create, provision, CRUD
+
+### ORG-01 — Unauthenticated access denied
+
+Checks that unauthenticated requests cannot list, view, create, update, or delete `organisations` records.
+
+### ORG-02 — Approved global admin can create an organisation
+
+Checks that an authenticated user with an approved global `admin` role can create an `organisations` record.
+
+### ORG-03 — Create provisions approved org-admin membership
+
+Checks that creating an organisation provisions an `organisationUserPermissions` row for the creator with `role = admin`, `status = approved`, the correct `orgId`, and a unique `userOrgKey`.
+
+### ORG-04 — Creator manages that organisation as org admin
+
+Checks that the creator, as approved organisation admin, can update/delete that organisation and manage its `organisationUserPermissions` records.
+
+### ORG-05 — Foreign global admin denied without membership
+
+Checks that an approved global `admin` without membership in an organisation cannot list, view, update, or delete that organisation or its `organisationUserPermissions` merely because they are a global admin.
+
+### ORG-06 — Later-granted org admin can manage that organisation
+
+Checks that an approved organisation admin who was not the creator (later granted admin membership) can manage that organisation and its memberships.
+
+### ORG-07 — Superadmin can CRUD any organisation
+
+Checks that an approved global `superadmin` can list, view, create, update, and delete any `organisations` record without membership in that organisation.
+
+### ORG-08 — Superadmin can CRUD any organisationUserPermissions
+
+Checks that an approved global `superadmin` can list, view, create, update, and delete any `organisationUserPermissions` record without membership in that organisation.
+
+### ORG-09 — Approved global standard cannot create organisations
+
+Checks that an approved global `standard` user cannot create an `organisations` record.
+
+### ORG-10 — Pending or blocked global admin cannot create organisations
+
+Checks that a global `admin` with `status = pending` or `blocked` cannot create an `organisations` record.
 
 ---
 
@@ -131,7 +208,7 @@ Checks that `organisationUserPermissions` exposes `userId` (relation → `users`
 
 ### OUP-02 — Role values
 
-Checks that only `standard` and `admin` are accepted for `role`, and invalid values are rejected.
+Checks that only `standard` and `admin` are accepted for `role`, and invalid values (including org-level `superadmin`) are rejected.
 
 ### OUP-03 — Status values
 
@@ -167,7 +244,7 @@ Checks that an authenticated user can list/view their own `organisationUserPermi
 
 ### OUP-10 — Non-admin cannot manage memberships
 
-Checks that a user who is not an organisation admin (and not otherwise authorised) cannot create, update, or delete membership records for that organisation.
+Checks that a user who is not an approved organisation admin for that org and not an approved global superadmin cannot create, update, or delete membership records for that organisation (including an approved global admin without membership).
 
 ### OUP-11 — Organisation admin can manage memberships in their org
 
@@ -181,49 +258,57 @@ Checks that an organisation admin's manage access does not extend to membership 
 
 Checks that an approved organisation admin can list and view membership records for other users within the same organisation.
 
+### OUP-14 — Superadmin can manage memberships in any org
+
+Checks that an approved global `superadmin` can create, update, and delete `organisationUserPermissions` records for any organisation without holding membership in that organisation.
+
+### OUP-15 — Global admin without membership cannot manage OUPs
+
+Checks that an approved global `admin` without organisation membership cannot manage that organisation's `organisationUserPermissions` records.
+
 ---
 
 ## Rule-based access via organisation permissions
 
-These tests assume another collection stores (or otherwise references) an organisation id and gates CRUD with the documented organisation-permission rule patterns (auth required; membership / admin checks via `@collection.organisationUserPermissions` matching `userId`, `orgId`, and optionally `role`).
+These tests assume another collection stores (or otherwise references) an organisation id and gates CRUD with the documented organisation-permission rule patterns (auth required; membership / admin checks via `@collection.organisationUserPermissions` matching `userId`, `orgId`, `status`, and optionally `role`). Unless noted, fixtures use **pure OUP** rules without a composed superadmin bypass.
 
-### OUP-14 — Unauthenticated CRUD denied
+### OUP-16 — Unauthenticated CRUD denied
 
 Checks that requests without `@request.auth.id` are denied for list, view, create, update, and delete on a collection that requires authentication plus organisation permissions.
 
-### OUP-15 — No membership record denied
+### OUP-17 — No membership record denied
 
 Checks that an authenticated user with no `organisationUserPermissions` row for the record's organisation is denied access where rules require matching membership.
 
-### OUP-16 — Approved organisation admin allowed
+### OUP-18 — Approved organisation admin allowed
 
 Checks that a user with `role = admin`, `status = approved`, and `orgId` matching the record's organisation is allowed through rules that require an organisation admin.
 
-### OUP-17 — Approved organisation standard role
+### OUP-19 — Approved organisation standard role
 
 Checks that a user with `role = standard` and `status = approved` for the record's organisation is allowed only where rules require organisation membership / standard access, and is **denied** where rules require `role = admin`.
 
-### OUP-18 — Pending status does not grant access
+### OUP-20 — Pending status does not grant access
 
 Checks that a membership with `status = pending` is denied by rules that require an approved permission, regardless of role or matching `orgId`.
 
-### OUP-19 — Blocked status does not grant access
+### OUP-21 — Blocked status does not grant access
 
 Checks that a membership with `status = blocked` is denied by rules that require an approved permission, regardless of role or matching `orgId`.
 
-### OUP-20 — Membership does not cross organisations
+### OUP-22 — Membership does not cross organisations
 
 Checks that an approved membership (standard or admin) for organisation A does not grant access to records belonging to organisation B.
 
-### OUP-21 — Admin rule does not match wrong user
+### OUP-23 — Admin rule does not match wrong user
 
 Checks that an organisation admin rule only matches when `userId` equals the authenticated user; another member's admin record for the same organisation must not grant the requester access.
 
-### OUP-22 — Org rule does not match wrong organisation id on the record
+### OUP-24 — Org rule does not match wrong organisation id on the record
 
 Checks that rules comparing `organisationUserPermissions.orgId` to the record's organisation field deny access when those ids differ, even if the user is an approved admin of some other organisation.
 
-### OUP-23 — CRUD actions covered independently
+### OUP-25 — CRUD actions covered independently
 
 Checks that list, view, create, update, and delete each enforce the organisation permission rule attached to that action (a pass on one action does not imply a pass on another).
 
@@ -231,14 +316,34 @@ Checks that list, view, create, update, and delete each enforce the organisation
 
 ## Global vs organisation scope separation
 
-### OUP-24 — Global admin is not implied by organisation admin
+### OUP-26 — Global admin is not implied by organisation admin
 
-Checks that an approved organisation admin without a matching `globalUserPermissions` admin record is denied where rules require a **global** admin.
+Checks that an approved organisation admin without a matching `globalUserPermissions` admin (or superadmin) record is denied where rules require a **global** admin or superadmin.
 
-### OUP-25 — Global permission is not implied by organisation membership
+### OUP-27 — Global permission is not implied by organisation membership
 
 Checks that an approved organisation membership (standard or admin) alone does not satisfy rules that only query `globalUserPermissions`.
 
-### OUP-26 — Organisation rule is not satisfied by global permission alone
+### OUP-28 — Organisation rule is not satisfied by global admin or standard alone
 
-Checks that an approved global admin (or standard) without membership in the record's organisation is denied where rules require `@collection.organisationUserPermissions` for that organisation—unless a composed rule explicitly also allows global access.
+Checks that an approved global admin or standard without membership in the record's organisation is denied where consumer rules require `@collection.organisationUserPermissions` for that organisation—unless a composed rule explicitly also allows global access.
+
+### OUP-29 — Organisation rule is not satisfied by superadmin alone on pure OUP consumer rules
+
+Checks that an approved global superadmin without membership in the record's organisation is denied on consumer collections that use pure OUP rules (no composed superadmin bypass).
+
+### OUP-30 — Platform org/OUP rules allow superadmin without membership
+
+Checks that on `organisations` and `organisationUserPermissions`, an approved global superadmin satisfies the org-admin-or-superadmin platform management pattern without holding organisation membership.
+
+### OUP-31 — Superadmin-only checks deny global admin
+
+Checks that rules requiring `role = superadmin` deny an approved global `admin`.
+
+### OUP-32 — Superadmin is not implied by organisation admin
+
+Checks that an approved organisation admin without a matching `globalUserPermissions` superadmin record is denied where rules require a **global** superadmin.
+
+### OUP-33 — Tenant control comes from membership, not global admin role alone
+
+Checks that after organisation create, the creator's CRUD on that organisation and its memberships is granted through approved org-admin membership, and that removing or lacking that membership leaves an otherwise approved global admin without tenant control of that org.
