@@ -73,6 +73,18 @@ const config: Config = {
           label: "Tools",
         },
         {
+          type: "docSidebar",
+          sidebarId: "tutorialSidebar",
+          position: "left",
+          label: "Skills",
+        },
+        {
+          type: "docSidebar",
+          sidebarId: "tutorialSidebar",
+          position: "left",
+          label: "Plans",
+        },
+        {
           href: "https://github.com/robMolloy/pokkit-turborepo",
           label: "GitHub",
           position: "right",
@@ -83,15 +95,16 @@ const config: Config = {
       style: "dark",
       links: [
         {
-          title: "Docs",
+          title: "Tools",
           items: [{ label: "Tools", to: "/docs/tools" }],
         },
         {
-          title: "More",
-          items: [
-            { label: "Things here", to: "/blog" },
-            { label: "More things here", to: "/blog" },
-          ],
+          title: "Skills",
+          items: [{ label: "Skills", to: "/docs/skills" }],
+        },
+        {
+          title: "Plans",
+          items: [{ label: "Plans", to: "/docs/plans" }],
         },
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Pokkit Starter, Inc. Built with Docusaurus.`,
