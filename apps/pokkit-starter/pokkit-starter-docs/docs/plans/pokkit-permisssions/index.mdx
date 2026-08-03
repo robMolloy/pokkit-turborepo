@@ -1,0 +1,31 @@
+---
+sidebar_position: 1
+---
+
+# Pokkit Permissions
+
+## Overview
+
+Pokkit permissions is a pocketbase plugin which makes it easier to manage permissions in pocketbase.
+
+It relies on the users table, unedited from the initial pocketbase install plus three other tables;
+
+- globalUserPermissions
+- organisations
+- organisationUserPermissions
+
+### Global User Permissions
+
+Global user permissions are permissions that are applied to all users in the system.
+
+### Organisations
+
+An organisation Allows users from Organisation User Permissions to be grouped together.
+
+### Organisation User Permissions
+
+Organisation user permissions has a userId an OrganisationId and a role of standard or admin;
+
+## How it works
+
+By using a set syntax as provided by pocketbase rules can be added to other collections to make accessing crud actions and who is able to carry them out easier.
