@@ -1,0 +1,115 @@
+# Test Plan
+
+## Scope
+
+This plan covers **required tests for global user permissions** (`globalUserPermissions`). Organisation and organisation-user permission behaviour is out of scope here.
+
+Tests describe what must be verified; they do not prescribe implementation details.
+
+## Setup assumptions
+
+- Stock PocketBase `users` auth collection is unchanged.
+- `globalUserPermissions` exists with `userId`, `role` (`standard` | `admin`), and `status` (`pending` | `approved` | `blocked`).
+- A consumer collection (or fixture) uses documented PocketBase API rules that query `@collection.globalUserPermissions` (for example, require an approved global admin).
+
+---
+
+## Schema and records
+
+### GUP-01 — Collection fields
+
+Checks that `globalUserPermissions` exposes `userId` (relation → `users`), `role`, and `status` with the allowed select values from the spec.
+
+### GUP-02 — Role values
+
+Checks that only `standard` and `admin` are accepted for `role`, and invalid values are rejected.
+
+### GUP-03 — Status values
+
+Checks that only `pending`, `approved`, and `blocked` are accepted for `status`, and invalid values are rejected.
+
+### GUP-04 — Relation to users
+
+Checks that `userId` must point at a valid `users` record, and that deleting a user cascades (or otherwise cleans up) related global permission records as configured.
+
+### GUP-05 — Assign roles with status lifecycle
+
+Checks that a permission record can be created and updated through the status lifecycle (`pending` → `approved` → `blocked`) while keeping a `standard` or `admin` role.
+
+---
+
+## Access to `globalUserPermissions` itself
+
+### GUP-06 — Unauthenticated access denied
+
+Checks that unauthenticated requests cannot list, view, create, update, or delete `globalUserPermissions` records.
+
+### GUP-07 — Owner can read own record
+
+Checks that an authenticated user can list/view their own `globalUserPermissions` record when rules allow self-access.
+
+### GUP-08 — Non-admin cannot manage permissions
+
+Checks that a user with no global admin permission (or only `standard`) cannot create, update, or delete `globalUserPermissions` records for themselves or others.
+
+### GUP-09 — Global admin can manage permissions
+
+Checks that an authenticated user with an approved global `admin` role can create, update, and delete `globalUserPermissions` records.
+
+### GUP-10 — Global admin can list/view others' permissions
+
+Checks that an approved global admin can list and view permission records belonging to other users.
+
+---
+
+## Rule-based access via global permissions
+
+These tests assume another collection gates CRUD with the documented global-permission rule patterns (auth required; global admin / standard checks via `@collection.globalUserPermissions`).
+
+### GUP-11 — Unauthenticated CRUD denied
+
+Checks that requests without `@request.auth.id` are denied for list, view, create, update, and delete on a collection that requires authentication plus global permissions.
+
+### GUP-12 — No permission record denied
+
+Checks that an authenticated user with no `globalUserPermissions` row is denied access where rules require a matching global permission.
+
+### GUP-13 — Approved global admin allowed
+
+Checks that a user with `role = admin` and `status = approved` is allowed through rules that require a global admin.
+
+### GUP-14 — Approved global standard role
+
+Checks that a user with `role = standard` and `status = approved` is allowed only where rules require global standard (or any approved global member), and is **denied** where rules require `role = admin`.
+
+### GUP-15 — Pending status does not grant access
+
+Checks that a user whose global permission has `status = pending` is denied by rules that require an approved permission, regardless of role.
+
+### GUP-16 — Blocked status does not grant access
+
+Checks that a user whose global permission has `status = blocked` is denied by rules that require an approved permission, regardless of role.
+
+### GUP-17 — Admin rule does not match wrong user
+
+Checks that a global admin rule only matches when `userId` equals the authenticated user; another user's admin record must not grant the requester access.
+
+### GUP-18 — CRUD actions covered independently
+
+Checks that list, view, create, update, and delete each enforce the global permission rule attached to that action (a pass on one action does not imply a pass on another).
+
+---
+
+## Interaction with `users` (when rules reference global admins)
+
+### GUP-19 — User can access own profile
+
+Checks that a user can list/view their own `users` record under rules that allow `id = @request.auth.id`.
+
+### GUP-20 — Global admin can access other users
+
+Checks that an approved global admin can list/view other users' records when `users` rules allow access via `@collection.globalUserPermissions` with `role = admin`.
+
+### GUP-21 — Non-admin cannot access other users
+
+Checks that a user without an approved global admin permission cannot list/view another user's record via that global-admin branch of the rule.
