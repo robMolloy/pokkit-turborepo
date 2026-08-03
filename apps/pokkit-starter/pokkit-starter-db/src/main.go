@@ -4,6 +4,7 @@ import (
 	"log"
 
 	pokkitDbConfigSync "github.com/robMolloy/pokkit-turborepo/packages/pokkitDbConfigSync"
+	pokkitDbPermissions "github.com/robMolloy/pokkit-turborepo/packages/pokkitDbPermissions"
 
 	pocketbase "github.com/pocketbase/pocketbase"
 	pbCore "github.com/pocketbase/pocketbase/core"
@@ -11,8 +12,9 @@ import (
 
 func main() {
 	app := pocketbase.New()
-	// asdasdasdasd
+
 	pokkitDbConfigSync.BindFunctions(app)
+	pokkitDbPermissions.BindFunctions(app)
 
 	app.OnServe().BindFunc(func(se *pbCore.ServeEvent) error {
 		return se.Next()
