@@ -8,7 +8,7 @@ sidebar_position: 4
 
 This plan covers **required tests for**:
 
-- Collection bootstrap (`pb_config/collections.json` import vs create-and-write)
+- Collection initialization (`pb_config/collections.json` import vs create-and-write)
 - First-user → approved `superadmin` provisioning (and no auto-elevation for later users)
 - Global user permissions (`globalUserPermissions`), including the `superadmin` role and self-weaken hard rule
 - Organisations (`organisations`) — create by global admin/superadmin, membership provisioning, and CRUD by org admin vs superadmin vs foreign global admin
@@ -30,7 +30,7 @@ Tests describe what must be verified; they do not prescribe implementation detai
 
 ---
 
-## Collection bootstrap
+## Collection initialization
 
 ### BOOT-01 — Missing `collections.json` creates permission collections
 
@@ -46,7 +46,7 @@ Checks that when `pb_config/collections.json` exists, the plugin imports collect
 
 ### BOOT-04 — Users collection unchanged
 
-Checks that bootstrap does not alter the shape or behaviour of the default PocketBase `users` collection.
+Checks that initialization does not alter the shape or behaviour of the default PocketBase `users` collection.
 
 ---
 

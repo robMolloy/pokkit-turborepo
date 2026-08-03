@@ -17,7 +17,7 @@ Pokkit Permissions is a PocketBase plugin that makes it easier to manage who can
   - `globalUserPermissions`
   - `organisations`
   - `organisationUserPermissions`
-- Bootstrap those collections on install: import from `pb_config/collections.json` when present; create them when the file is missing.
+- Initialize those collections on install: import from `pb_config/collections.json` when present; create them when the file is missing.
 - On first `users` create, provision that user as the initial approved `superadmin`.
 - Enable other collections to gate list / view / create / update / delete via PocketBase API rules that query those permission records.
 
@@ -66,7 +66,7 @@ Organisation-scoped roles remain `standard` | `admin` only (no org-level `supera
 
 ## Behaviour
 
-### Collection bootstrap
+### Collection initialization
 
 The plugin must ensure the three permission collections exist before permission behaviour is relied on:
 
@@ -78,7 +78,7 @@ The plugin must ensure the three permission collections exist before permission 
 
 - When the first `users` record is created (empty `users` collection before that create), the plugin must create a matching `globalUserPermissions` row for that user with `role` = `superadmin` and `status` = `approved`.
 - Later user creates must **not** receive automatic `superadmin` (or automatic elevation). Further GUP rows follow normal create / approval rules.
-- This first-user provisioning is the primary bootstrap for the initial superadmin. Additional superadmins may still be seeded via install / migration / PocketBase admin when needed (e.g. recovery), but everyday cold-start behaviour is: first registered user becomes approved superadmin.
+- This first-user provisioning is the primary way to create the initial superadmin. Additional superadmins may still be seeded via install / migration / PocketBase admin when needed (e.g. recovery), but everyday cold-start behaviour is: first registered user becomes approved superadmin.
 - Production should still plan for more than one superadmin because a sole superadmin cannot demote themselves via the API under the hard rule below.
 
 ### Global vs organisation permissions
@@ -92,7 +92,7 @@ The plugin must ensure the three permission collections exist before permission 
 | Role         | Meaning                                                                                                                                 |
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
 | `standard`   | Approved platform member; no platform-admin powers                                                                                      |
-| `admin`      | Platform bootstrap / tenant founder: may create organisations; does not get cross-tenant control by global role alone                   |
+| `admin`      | Platform initializer / tenant founder: may create organisations; does not get cross-tenant control by global role alone                 |
 | `superadmin` | Platform operator: may manage any organisation and any `organisationUserPermissions`; sole role allowed to manage others' GUP records |
 
 ### Organisation create and membership provisioning
@@ -115,7 +115,7 @@ The plugin must ensure the three permission collections exist before permission 
   - No self-set of own `status` to `blocked` or `pending`.
   - Demoting, blocking, or deleting a superadmin always requires a different approved superadmin.
   - Enforce reliably (e.g. before-update / before-delete hook), not from API rules alone.
-- **Bootstrap:** the initial superadmin comes from first-user provisioning (see above). Self-elevation to `superadmin` via the normal GUP API is never allowed; only another approved superadmin (or install / migration / PocketBase admin tooling) may grant `superadmin` after that.
+- **Initialization:** the initial superadmin comes from first-user provisioning (see above). Self-elevation to `superadmin` via the normal GUP API is never allowed; only another approved superadmin (or install / migration / PocketBase admin tooling) may grant `superadmin` after that.
 
 ### Platform collections vs consumer collections
 

@@ -12,6 +12,6 @@ Only `approved` records grant powers. Global and organisation permissions are se
 
 ## How it works
 
-On install the plugin bootstraps the three collections (import from `pb_config/collections.json`, or create them and write the file). The first created user is provisioned as an approved `superadmin`. Approved global admins can create organisations and are provisioned as that org's admin; superadmins can manage any org/membership and others' global permissions.
+On install the plugin initializes the three collections (import from `pb_config/collections.json`, or create them and write the file). The first created user is provisioned as an approved `superadmin`. Approved global admins can create organisations and are provisioned as that org's admin; superadmins can manage any org/membership and others' global permissions.
 
-Other collections gate list / view / create / update / delete with PocketBase API rules that query these permission records via a documented `@collection.*` syntax. See the [spec](./spec) for fields, roles, bootstrap rules, and rule patterns.
+Other collections gate list / view / create / update / delete with PocketBase API rules that query these permission records via a documented `@collection.*` syntax. See the [spec](./spec) for fields, roles, initialization rules, and rule patterns.
