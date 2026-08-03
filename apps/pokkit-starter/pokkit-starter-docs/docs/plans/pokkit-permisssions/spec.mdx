@@ -34,11 +34,11 @@ The stock PocketBase auth collection. Permission records relate to users by `use
 
 System-wide permissions applied to individual users.
 
-| Field    | Type               | Notes                               |
-| -------- | ------------------ | ----------------------------------- |
-| `userId` | relation → `users` | The user this permission applies to |
-| `role`   | select             | `standard` or `admin`               |
-| `status` | select             | `blocked`, `approved`, or `pending` |
+| Field    | Type               | Notes                                          |
+| -------- | ------------------ | ---------------------------------------------- |
+| `userId` | relation → `users` | The user this permission applies to            |
+| `role`   | select             | `standard`, `admin`, or `superadmin`           |
+| `status` | select             | `blocked`, `approved`, or `pending`            |
 
 ### `organisations`
 
@@ -60,25 +60,85 @@ Membership and role of a user within an organisation.
 | `role`   | select                     | `standard` or `admin`               |
 | `status` | select                     | `blocked`, `approved`, or `pending` |
 
+Organisation-scoped roles remain `standard` | `admin` only (no org-level `superadmin`). Membership is unique per user/organisation via `userOrgKey`.
+
 ## Behaviour
 
 ### Global vs organisation permissions
 
-- **Global** — A record in `globalUserPermissions` grants the user a system-level role. Rules on any collection can check for an approved global admin (or standard) without caring about organisation membership.
+- **Global** — A record in `globalUserPermissions` grants the user a system-level role. Organisation admin ≠ global admin ≠ superadmin. Approved org membership alone does not satisfy rules that only query `globalUserPermissions`. Approved global admin alone does not satisfy rules that only query `organisationUserPermissions` for a given org.
 - **Organisation** — A record in `organisationUserPermissions` links a user to an organisation with a role. Rules on organisation-owned data check that the authenticated user belongs to the relevant organisation (and optionally has the required role).
+- **Status** — For both global and organisation permission records, `pending` and `blocked` never grant powers, regardless of role. Only `approved` records are eligible for rule checks that require approval.
+
+### Global role capabilities
+
+| Role         | Meaning                                                                                                                                 |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `standard`   | Approved platform member; no platform-admin powers                                                                                      |
+| `admin`      | Platform bootstrap / tenant founder: may create organisations; does not get cross-tenant control by global role alone                   |
+| `superadmin` | Platform operator: may manage any organisation and any `organisationUserPermissions`; sole role allowed to manage others' GUP records |
+
+### Organisation create and membership provisioning
+
+- An approved global `admin` may create an `organisations` record.
+- On create, the plugin must provision an `organisationUserPermissions` row for the creator: `role` = `admin`, `status` = `approved`, correct `orgId`, unique `userOrgKey`. The same provisioning may apply when a superadmin creates an org (optional but consistent).
+- After that, the creator's CRUD on that organisation and its memberships comes from being an approved organisation admin, not from being a global admin.
+- An approved global admin who is not a member/admin of an organisation must not list, view, update, or delete that organisation or its `organisationUserPermissions` merely because they are a global admin.
+- Access is membership-based, not "creator forever": anyone later granted approved org-admin membership gets org CRUD through that membership.
+
+### Managing `globalUserPermissions`
+
+- Approved `superadmin` is the only global role that may create, update, or delete `globalUserPermissions` in ways that change effective power—especially changing `role` (`standard` ↔ `admin` ↔ `superadmin`) and managing `status` (approve / block) for other users.
+- Global `admin` and `standard` must not manage others' `globalUserPermissions`.
+- Authenticated users may self-read their own GUP row.
+- **Hard rule — superadmin cannot weaken themselves:**
+  - A superadmin may never demote, block, or delete their own `globalUserPermissions` record.
+  - No self-change of `role` away from `superadmin`.
+  - No self-delete of own GUP row.
+  - No self-set of own `status` to `blocked` or `pending`.
+  - Demoting, blocking, or deleting a superadmin always requires a different approved superadmin.
+  - Enforce reliably (e.g. before-update / before-delete hook), not from API rules alone.
+- **Bootstrap:** the first superadmin must be seeded outside normal API self-service (install / migration / PocketBase admin). Production should plan for more than one superadmin because a sole superadmin cannot be demoted via the API under this rule.
+
+### Platform collections vs consumer collections
+
+- On `organisations` and `organisationUserPermissions`, approved global superadmin may perform full CRUD on any record, including orgs they did not create and orgs they have no membership in. Management rules allow approved organisation admin for that org **or** approved global superadmin.
+- For consumer collections: default remains whatever the app attaches (org membership / global role). Superadmin bypass on arbitrary consumer data is optional and must be an explicit composed rule—do not imply god-mode on every collection by default. A superadmin who needs tenant data under pure OUP rules can add themselves via OUP CRUD or use a documented optional superadmin clause.
 
 ### Rule-based access
 
 Other collections express access control with PocketBase API rules (`listRule`, `viewRule`, `createRule`, `updateRule`, `deleteRule`) using a fixed syntax that queries the permission collections via `@collection.*` and the `?=` existence operator.
 
+PocketBase does not infer a role hierarchy. Compose checks explicitly. Treat admin-gated capabilities as a subset of superadmin: either accept both roles in composed rules, or document that superadmin is a strict superset and include both where needed.
+
 Typical patterns:
 
 - Require authentication: `@request.auth.id != ""`
-- Require global admin:
+
+- Require approved global admin (or superadmin, when the capability should include both):
 
   ```
   @collection.globalUserPermissions.userId ?= @request.auth.id &&
-  @collection.globalUserPermissions.role ?= "admin"
+  @collection.globalUserPermissions.status ?= "approved" &&
+  (@collection.globalUserPermissions.role ?= "admin" ||
+   @collection.globalUserPermissions.role ?= "superadmin")
+  ```
+
+- Require approved global superadmin only:
+
+  ```
+  @collection.globalUserPermissions.userId ?= @request.auth.id &&
+  @collection.globalUserPermissions.status ?= "approved" &&
+  @collection.globalUserPermissions.role ?= "superadmin"
+  ```
+
+- Organisation create — approved global admin (and may also allow superadmin):
+
+  ```
+  @collection.globalUserPermissions.userId ?= @request.auth.id &&
+  @collection.globalUserPermissions.status ?= "approved" &&
+  (@collection.globalUserPermissions.role ?= "admin" ||
+   @collection.globalUserPermissions.role ?= "superadmin")
   ```
 
 - Require organisation membership / admin for a record's organisation:
@@ -86,29 +146,57 @@ Typical patterns:
   ```
   @collection.organisationUserPermissions.userId ?= @request.auth.id &&
   @collection.organisationUserPermissions.orgId ?= organisationId &&
+  @collection.organisationUserPermissions.status ?= "approved" &&
   @collection.organisationUserPermissions.role ?= "admin"
+  ```
+
+- Platform management of `organisations` / `organisationUserPermissions` — approved org admin for that org **or** approved global superadmin:
+
+  ```
+  (
+    @collection.organisationUserPermissions.userId ?= @request.auth.id &&
+    @collection.organisationUserPermissions.orgId ?= id &&
+    @collection.organisationUserPermissions.status ?= "approved" &&
+    @collection.organisationUserPermissions.role ?= "admin"
+  ) || (
+    @collection.globalUserPermissions.userId ?= @request.auth.id &&
+    @collection.globalUserPermissions.status ?= "approved" &&
+    @collection.globalUserPermissions.role ?= "superadmin"
+  )
   ```
 
 Consumers of the plugin attach these expressions (or composed variants) to their collections so CRUD is limited to the intended users.
 
 ## Roles
 
-| Role       | Meaning                                                        |
-| ---------- | -------------------------------------------------------------- |
-| `standard` | Normal member access                                           |
-| `admin`    | Elevated access within the same scope (global or organisation) |
+### Global (`globalUserPermissions.role`)
+
+| Role         | Meaning                                                                                          |
+| ------------ | ------------------------------------------------------------------------------------------------ |
+| `standard`   | Approved platform member; no platform-admin powers                                               |
+| `admin`      | May create organisations; no cross-tenant control by global role alone                           |
+| `superadmin` | May manage any org / OUP; sole role that may elevate or decrease others' `globalUserPermissions` |
+
+### Organisation (`organisationUserPermissions.role`)
+
+| Role       | Meaning                                      |
+| ---------- | -------------------------------------------- |
+| `standard` | Normal member access within the organisation |
+| `admin`    | Elevated access within that organisation     |
 
 ## Status values
 
-| Status     | Meaning                                                |
-| ---------- | ------------------------------------------------------ |
-| `pending`  | Membership / permission not yet approved               |
-| `approved` | Active; eligible for rule checks that require approval |
-| `blocked`  | Explicitly denied                                      |
+| Status     | Meaning                                                                  |
+| ---------- | ------------------------------------------------------------------------ |
+| `pending`  | Membership / permission not yet approved; grants no powers               |
+| `approved` | Active; eligible for rule checks that require approval                   |
+| `blocked`  | Explicitly denied; grants no powers                                      |
 
 ## Success criteria
 
 1. The plugin works against an unedited PocketBase `users` collection plus the three permission collections above.
-2. Global and organisation permission records can assign `standard` or `admin` roles with a clear status lifecycle.
-3. Other collections can restrict CRUD using documented PocketBase rule syntax that references `globalUserPermissions` and `organisationUserPermissions`.
-4. Organisation membership is unique per user/organisation (`userOrgKey`).
+2. Global roles include `standard` | `admin` | `superadmin` with a clear status lifecycle; organisation roles remain `standard` | `admin`. Pending and blocked never grant powers.
+3. An approved global admin may create an organisation and is provisioned as that org's approved admin; global admin alone does not grant cross-tenant org or OUP access.
+4. An approved superadmin may manage any organisation and any `organisationUserPermissions`, and may manage others' `globalUserPermissions`; a superadmin cannot demote, block, or delete their own GUP record.
+5. Other collections can restrict CRUD using documented PocketBase rule patterns for auth, global admin, global superadmin, org membership/admin, and org-admin-or-superadmin platform management.
+6. Organisation membership is unique per user/organisation (`userOrgKey`).
