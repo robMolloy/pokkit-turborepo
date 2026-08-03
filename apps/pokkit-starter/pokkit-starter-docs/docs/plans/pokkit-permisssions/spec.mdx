@@ -17,6 +17,8 @@ Pokkit Permissions is a PocketBase plugin that makes it easier to manage who can
   - `globalUserPermissions`
   - `organisations`
   - `organisationUserPermissions`
+- Bootstrap those collections on install: import from `pb_config/collections.json` when present; create them when the file is missing.
+- On first `users` create, provision that user as the initial approved `superadmin`.
 - Enable other collections to gate list / view / create / update / delete via PocketBase API rules that query those permission records.
 
 ### Out of scope
@@ -64,6 +66,21 @@ Organisation-scoped roles remain `standard` | `admin` only (no org-level `supera
 
 ## Behaviour
 
+### Collection bootstrap
+
+The plugin must ensure the three permission collections exist before permission behaviour is relied on:
+
+1. If `pb_config/collections.json` exists, import collections from that file (including the three permission collections and their fields / rules as defined by the plugin).
+2. If `pb_config/collections.json` does **not** exist, create `globalUserPermissions`, `organisations`, and `organisationUserPermissions` programmatically with the schema in this spec, then write the resulting collections out to `pb_config/collections.json` so subsequent starts can import them.
+3. Do not assume the file is always present on a fresh install; missing-file creation is a required path, not an error.
+
+### First user → superadmin
+
+- When the first `users` record is created (empty `users` collection before that create), the plugin must create a matching `globalUserPermissions` row for that user with `role` = `superadmin` and `status` = `approved`.
+- Later user creates must **not** receive automatic `superadmin` (or automatic elevation). Further GUP rows follow normal create / approval rules.
+- This first-user provisioning is the primary bootstrap for the initial superadmin. Additional superadmins may still be seeded via install / migration / PocketBase admin when needed (e.g. recovery), but everyday cold-start behaviour is: first registered user becomes approved superadmin.
+- Production should still plan for more than one superadmin because a sole superadmin cannot demote themselves via the API under the hard rule below.
+
 ### Global vs organisation permissions
 
 - **Global** — A record in `globalUserPermissions` grants the user a system-level role. Organisation admin ≠ global admin ≠ superadmin. Approved org membership alone does not satisfy rules that only query `globalUserPermissions`. Approved global admin alone does not satisfy rules that only query `organisationUserPermissions` for a given org.
@@ -98,7 +115,7 @@ Organisation-scoped roles remain `standard` | `admin` only (no org-level `supera
   - No self-set of own `status` to `blocked` or `pending`.
   - Demoting, blocking, or deleting a superadmin always requires a different approved superadmin.
   - Enforce reliably (e.g. before-update / before-delete hook), not from API rules alone.
-- **Bootstrap:** the first superadmin must be seeded outside normal API self-service (install / migration / PocketBase admin). Production should plan for more than one superadmin because a sole superadmin cannot be demoted via the API under this rule.
+- **Bootstrap:** the initial superadmin comes from first-user provisioning (see above). Self-elevation to `superadmin` via the normal GUP API is never allowed; only another approved superadmin (or install / migration / PocketBase admin tooling) may grant `superadmin` after that.
 
 ### Platform collections vs consumer collections
 
@@ -195,8 +212,10 @@ Consumers of the plugin attach these expressions (or composed variants) to their
 ## Success criteria
 
 1. The plugin works against an unedited PocketBase `users` collection plus the three permission collections above.
-2. Global roles include `standard` | `admin` | `superadmin` with a clear status lifecycle; organisation roles remain `standard` | `admin`. Pending and blocked never grant powers.
-3. An approved global admin may create an organisation and is provisioned as that org's approved admin; global admin alone does not grant cross-tenant org or OUP access.
-4. An approved superadmin may manage any organisation and any `organisationUserPermissions`, and may manage others' `globalUserPermissions`; a superadmin cannot demote, block, or delete their own GUP record.
-5. Other collections can restrict CRUD using documented PocketBase rule patterns for auth, global admin, global superadmin, org membership/admin, and org-admin-or-superadmin platform management.
-6. Organisation membership is unique per user/organisation (`userOrgKey`).
+2. On a fresh install with no `pb_config/collections.json`, the three permission collections are created and written to that file; when the file exists, they are imported from it.
+3. The first created `users` record receives an approved `superadmin` `globalUserPermissions` row; subsequent users do not auto-elevate.
+4. Global roles include `standard` | `admin` | `superadmin` with a clear status lifecycle; organisation roles remain `standard` | `admin`. Pending and blocked never grant powers.
+5. An approved global admin may create an organisation and is provisioned as that org's approved admin; global admin alone does not grant cross-tenant org or OUP access.
+6. An approved superadmin may manage any organisation and any `organisationUserPermissions`, and may manage others' `globalUserPermissions`; a superadmin cannot demote, block, or delete their own GUP record.
+7. Other collections can restrict CRUD using documented PocketBase rule patterns for auth, global admin, global superadmin, org membership/admin, and org-admin-or-superadmin platform management.
+8. Organisation membership is unique per user/organisation (`userOrgKey`).

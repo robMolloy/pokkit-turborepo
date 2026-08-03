@@ -2,26 +2,16 @@
 
 ## Overview
 
-Pokkit permissions is a pocketbase plugin which makes it easier to manage permissions in pocketbase.
+Pokkit Permissions is a PocketBase plugin that makes CRUD access control easier. It keeps the stock `users` collection and adds three supporting collections, plus a reusable PocketBase API rule syntax other collections can reference.
 
-It relies on the users table, unedited from the initial pocketbase install plus three other tables;
+- `globalUserPermissions` — system-wide role and status per user (`standard` | `admin` | `superadmin`; `pending` | `approved` | `blocked`)
+- `organisations` — named groups for organisation-scoped access
+- `organisationUserPermissions` — membership of a user in an organisation (`standard` | `admin`, same status values; unique per user/org)
 
-- globalUserPermissions
-- organisations
-- organisationUserPermissions
-
-### Global User Permissions
-
-Global user permissions are permissions that are applied to all users in the system.
-
-### Organisations
-
-An organisation Allows users from Organisation User Permissions to be grouped together.
-
-### Organisation User Permissions
-
-Organisation user permissions has a userId an OrganisationId and a role of standard or admin;
+Only `approved` records grant powers. Global and organisation permissions are separate: org admin ≠ global admin ≠ superadmin.
 
 ## How it works
 
-By using a set syntax as provided by pocketbase rules can be added to other collections to make accessing crud actions and who is able to carry them out easier.
+On install the plugin bootstraps the three collections (import from `pb_config/collections.json`, or create them and write the file). The first created user is provisioned as an approved `superadmin`. Approved global admins can create organisations and are provisioned as that org's admin; superadmins can manage any org/membership and others' global permissions.
+
+Other collections gate list / view / create / update / delete with PocketBase API rules that query these permission records via a documented `@collection.*` syntax. See the [spec](./spec) for fields, roles, bootstrap rules, and rule patterns.
