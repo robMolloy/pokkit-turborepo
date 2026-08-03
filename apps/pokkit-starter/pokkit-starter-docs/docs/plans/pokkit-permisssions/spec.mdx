@@ -3,3 +3,112 @@ sidebar_position: 2
 ---
 
 # Spec
+
+## Goal
+
+Pokkit Permissions is a PocketBase plugin that makes it easier to manage who can perform CRUD actions across collections. It does this by introducing a small set of permission collections and a reusable rule syntax that other collections can reference.
+
+## Scope
+
+### In scope
+
+- Rely on the default PocketBase `users` auth collection, unchanged from a fresh install.
+- Provide and manage three supporting collections:
+  - `globalUserPermissions`
+  - `organisations`
+  - `organisationUserPermissions`
+- Enable other collections to gate list / view / create / update / delete via PocketBase API rules that query those permission records.
+
+### Out of scope
+
+- Changing the shape or behaviour of the default `users` collection.
+- Replacing PocketBase's native API rules system.
+
+## Data model
+
+### `users`
+
+The stock PocketBase auth collection. Permission records relate to users by `userId`; the plugin does not alter this collection.
+
+### `globalUserPermissions`
+
+System-wide permissions applied to individual users.
+
+| Field    | Type               | Notes                               |
+| -------- | ------------------ | ----------------------------------- |
+| `userId` | relation → `users` | The user this permission applies to |
+| `role`   | select             | `standard` or `admin`               |
+| `status` | select             | `blocked`, `approved`, or `pending` |
+
+### `organisations`
+
+Groups users for organisation-scoped access.
+
+| Field         | Type | Notes                     |
+| ------------- | ---- | ------------------------- |
+| `name`        | text | Organisation display name |
+| `description` | text | Optional description      |
+
+### `organisationUserPermissions`
+
+Membership and role of a user within an organisation.
+
+| Field    | Type                       | Notes                               |
+| -------- | -------------------------- | ----------------------------------- |
+| `userId` | relation → `users`         | The member                          |
+| `orgId`  | relation → `organisations` | The organisation                    |
+| `role`   | select                     | `standard` or `admin`               |
+| `status` | select                     | `blocked`, `approved`, or `pending` |
+
+## Behaviour
+
+### Global vs organisation permissions
+
+- **Global** — A record in `globalUserPermissions` grants the user a system-level role. Rules on any collection can check for an approved global admin (or standard) without caring about organisation membership.
+- **Organisation** — A record in `organisationUserPermissions` links a user to an organisation with a role. Rules on organisation-owned data check that the authenticated user belongs to the relevant organisation (and optionally has the required role).
+
+### Rule-based access
+
+Other collections express access control with PocketBase API rules (`listRule`, `viewRule`, `createRule`, `updateRule`, `deleteRule`) using a fixed syntax that queries the permission collections via `@collection.*` and the `?=` existence operator.
+
+Typical patterns:
+
+- Require authentication: `@request.auth.id != ""`
+- Require global admin:
+
+  ```
+  @collection.globalUserPermissions.userId ?= @request.auth.id &&
+  @collection.globalUserPermissions.role ?= "admin"
+  ```
+
+- Require organisation membership / admin for a record's organisation:
+
+  ```
+  @collection.organisationUserPermissions.userId ?= @request.auth.id &&
+  @collection.organisationUserPermissions.orgId ?= organisationId &&
+  @collection.organisationUserPermissions.role ?= "admin"
+  ```
+
+Consumers of the plugin attach these expressions (or composed variants) to their collections so CRUD is limited to the intended users.
+
+## Roles
+
+| Role       | Meaning                                                        |
+| ---------- | -------------------------------------------------------------- |
+| `standard` | Normal member access                                           |
+| `admin`    | Elevated access within the same scope (global or organisation) |
+
+## Status values
+
+| Status     | Meaning                                                |
+| ---------- | ------------------------------------------------------ |
+| `pending`  | Membership / permission not yet approved               |
+| `approved` | Active; eligible for rule checks that require approval |
+| `blocked`  | Explicitly denied                                      |
+
+## Success criteria
+
+1. The plugin works against an unedited PocketBase `users` collection plus the three permission collections above.
+2. Global and organisation permission records can assign `standard` or `admin` roles with a clear status lifecycle.
+3. Other collections can restrict CRUD using documented PocketBase rule syntax that references `globalUserPermissions` and `organisationUserPermissions`.
+4. Organisation membership is unique per user/organisation (`userOrgKey`).
