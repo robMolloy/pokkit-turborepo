@@ -8,7 +8,7 @@ import (
 
 func BindFunctions(app pbCore.App) {
 	app.OnServe().BindFunc(func(e *pbCore.ServeEvent) error {
-		err := mergePokkitPermissionsDbCollectionsProgrammatically(e.App)
+		err := mergePokkitPermissionsDbCollectionsFromSchema(e.App)
 		if err != nil {
 			log.Fatal("Error merging pokkitPermissionsDbCollectionsFromSchema in BindFunctions: %w", err)
 		}
