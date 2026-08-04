@@ -2,13 +2,10 @@ package pokkitDbPermissions
 
 import (
 	"fmt"
+	"os"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 )
-
-// var globalUserPermissionsCollectionName = "globalUserPermissions"
-// var organisationUserPermissionsCollectionName = "organisationUserPermissions"
-// var organisationsCollectionName = "organisations"
 
 func mergePokkitPermissionsDbCollectionsFromSchema(app pbCore.App) error {
 	err := app.ImportCollectionsByMarshaledJSON([]byte(pokkitPermissionsCollectionsSchema), false)
@@ -19,63 +16,81 @@ func mergePokkitPermissionsDbCollectionsFromSchema(app pbCore.App) error {
 	return nil
 }
 
-// func mergePokkitPermissionsDbCollectionsProgrammatically(app pbCore.App) error {
-// 	globalUserPermissionsCollection, err := app.FindCollectionByNameOrId(globalUserPermissionsCollectionName)
-// 	if err != nil && !os.IsNotExist(err) {
-// 		return fmt.Errorf("Error finding globalUserPermissions collection in mergePokkitPermissionsDbCollections: %w", err)
-// 	}
-// 	organisationUserPermissionsCollection, err := app.FindCollectionByNameOrId(organisationUserPermissionsCollectionName)
-// 	if err != nil && !os.IsNotExist(err) {
-// 		return fmt.Errorf("Error finding organisationUserPermissions collection in mergePokkitPermissionsDbCollections: %w", err)
-// 	}
-// 	organisationsCollection, err := app.FindCollectionByNameOrId(organisationsCollectionName)
-// 	if err != nil && !os.IsNotExist(err) {
-// 		return fmt.Errorf("Error finding organisations collection in mergePokkitPermissionsDbCollections: %w", err)
-// 	}
+func mergePokkitPermissionsDbCollectionsProgrammatically(app pbCore.App) error {
+	globalUserPermissionsCollection, err := app.FindCollectionByNameOrId(globalUserPermissionsCollectionName)
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("Error finding globalUserPermissions collection in mergePokkitPermissionsDbCollectionsProgrammatically: %w", err)
+	}
+	organisationUserPermissionsCollection, err := app.FindCollectionByNameOrId(organisationUserPermissionsCollectionName)
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("Error finding organisationUserPermissions collection in mergePokkitPermissionsDbCollectionsProgrammatically: %w", err)
+	}
+	organisationsCollection, err := app.FindCollectionByNameOrId(organisationsCollectionName)
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("Error finding organisations collection in mergePokkitPermissionsDbCollectionsProgrammatically: %w", err)
+	}
+	usersCollection, err := app.FindCollectionByNameOrId(usersCollectionName)
+	if err != nil {
+		return fmt.Errorf("Error finding users collection in mergePokkitPermissionsDbCollectionsProgrammatically: %w", err)
+	}
 
-// 	usersCollection, err := app.FindCollectionByNameOrId(usersCollectionName)
-// 	if err != nil {
-// 		return fmt.Errorf("Error finding users collection in mergePokkitPermissionsDbCollections: %w", err)
-// 	}
-// 	if globalUserPermissionsCollection == nil {
-// 		globalUserPermissionsCollection = pbCore.NewBaseCollection(globalUserPermissionsCollectionName)
-// 		globalUserPermissionsCollection.Name = globalUserPermissionsCollectionName
-// 		globalUserPermissionsCollection.Fields.Add(&pbCore.RelationField{
-// 			Name:       "userId",
-// 			RelationTo: usersCollectionName,
-// 		})
-// 		globalUserPermissionsCollection.Fields.Add(models.NewRelationField("userId", usersCollectionName))
-// 		globalUserPermissionsCollection.Fields.Add(models.NewSelectField("role", []string{"standard", "admin", "superadmin"}))
-// 		globalUserPermissionsCollection.Fields.Add(models.NewSelectField("status", []string{"pending", "approved", "blocked"}))
-// 		err := app.AddCollection(globalUserPermissionsCollection)
-// 		if err != nil {
-// 			return fmt.Errorf("Error adding globalUserPermissions collection in mergePokkitPermissionsDbCollections: %w", err)
-// 		}
-// 	}
+	if globalUserPermissionsCollection == nil {
+		globalUserPermissionsCollection = pbCore.NewBaseCollection(globalUserPermissionsCollectionName)
+		globalUserPermissionsCollection.Name = globalUserPermissionsCollectionName
+		globalUserPermissionsCollection.Fields.Add(&pbCore.RelationField{
+			Name:         "userId",
+			CollectionId: usersCollection.Id,
+		})
+		globalUserPermissionsCollection.Fields.Add(&pbCore.SelectField{
+			Name:   "role",
+			Values: []string{"standard", "admin", "superadmin"},
+		})
+		globalUserPermissionsCollection.Fields.Add(&pbCore.SelectField{
+			Name:   "status",
+			Values: []string{"pending", "approved", "blocked"},
+		})
+		err := app.Save(globalUserPermissionsCollection)
+		if err != nil {
+			return fmt.Errorf("Error adding globalUserPermissions collection in mergePokkitPermissionsDbCollectionsProgrammatically: %w", err)
+		}
+	}
 
-// 	if organisationsCollection == nil {
-// 		organisationsCollection = app.NewCollection()
-// 		organisationsCollection.Name = organisationsCollectionName
-// 		organisationsCollection.AddField(models.NewIdField("id"))
-// 		organisationsCollection.AddField(models.NewTextField("name"))
-// 		err := app.AddCollection(organisationsCollection)
-// 		if err != nil {
-// 			return fmt.Errorf("Error adding organisations collection in mergePokkitPermissionsDbCollections: %w", err)
-// 		}
-// 	}
+	if organisationUserPermissionsCollection == nil {
+		organisationUserPermissionsCollection = pbCore.NewBaseCollection(organisationUserPermissionsCollectionName)
+		organisationUserPermissionsCollection.Name = organisationUserPermissionsCollectionName
+		organisationUserPermissionsCollection.Fields.Add(&pbCore.RelationField{
+			Name:         "userId",
+			CollectionId: usersCollection.Id,
+		})
+		organisationUserPermissionsCollection.Fields.Add(&pbCore.RelationField{
+			Name:         "organisationId",
+			CollectionId: organisationsCollection.Id,
+		})
+		organisationUserPermissionsCollection.Fields.Add(&pbCore.SelectField{
+			Name:   "role",
+			Values: []string{"standard", "admin"},
+		})
+		organisationUserPermissionsCollection.Fields.Add(&pbCore.SelectField{
+			Name:   "status",
+			Values: []string{"pending", "approved", "blocked"},
+		})
+		err := app.Save(organisationUserPermissionsCollection)
+		if err != nil {
+			return fmt.Errorf("Error adding organisationUserPermissions collection in mergePokkitPermissionsDbCollectionsProgrammatically: %w", err)
+		}
+	}
 
-// 	if organisationUserPermissionsCollection == nil {
-// 		organisationUserPermissionsCollection = app.NewCollection()
-// 		organisationUserPermissionsCollection.Name = organisationUserPermissionsCollectionName
-// 		organisationUserPermissionsCollection.AddField(models.NewIdField("id"))
-// 		organisationUserPermissionsCollection.AddField(models.NewRelationField("userId", usersCollectionName))
-// 		organisationUserPermissionsCollection.AddField(models.NewRelationField("organisationId", organisationsCollectionName))
-// 		organisationUserPermissionsCollection.AddField(models.NewSelectField("role", []string{"standard", "admin"}))
-// 		organisationUserPermissionsCollection.AddField(models.NewSelectField("status", []string{"pending", "approved", "blocked"}))
-// 		err := app.AddCollection(organisationUserPermissionsCollection)
-// 		if err != nil {
-// 			return fmt.Errorf("Error adding organisationUserPermissions collection in mergePokkitPermissionsDbCollections: %w", err)
-// 		}
-// 		return nil
-// 	}
-// }
+	if organisationsCollection == nil {
+		organisationsCollection = pbCore.NewBaseCollection(organisationsCollectionName)
+		organisationsCollection.Name = organisationsCollectionName
+		organisationsCollection.Fields.Add(&pbCore.TextField{
+			Name: "name",
+		})
+		err := app.Save(organisationsCollection)
+		if err != nil {
+			return fmt.Errorf("Error adding organisations collection in mergePokkitPermissionsDbCollectionsProgrammatically: %w", err)
+		}
+	}
+
+	return nil
+}
