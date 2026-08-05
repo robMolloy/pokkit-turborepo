@@ -2,7 +2,6 @@ import {
   clearPb,
   getPbFilePath,
   getPbServeUrl,
-  getPokkitDbCollectionsFilePathh,
   killPbInstance,
   pollLogsUntilNonZeroItems,
   pollLogsUntilNumberOfItemsChange,

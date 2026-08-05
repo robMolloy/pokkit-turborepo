@@ -25,5 +25,4 @@ func BindFunctions(app pbCore.App) {
 
 		return e.Next()
 	})
-
 }
