@@ -24,7 +24,7 @@ func OnCollectionChangeWriteCollectionsToFileHandler(e *pbCore.CollectionEvent) 
 
 	err := WriteCollectionsToCollectionsFile(e.App)
 	if err != nil {
-		e.App.Logger().Error("WriteCollectionsToCollectionsFile in OnCollectionChangeWriteCollectionsToFileHandler", "err", err)
+		log.Fatalf("failed to WriteCollectionsToCollectionsFile in OnCollectionChangeWriteCollectionsToFileHandler: %v", err)
 	}
 
 	return e.Next()

@@ -1,7 +1,9 @@
 package pokkitDbConfigSync
 
 import (
+	"errors"
 	"fmt"
+	"os"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
@@ -111,23 +113,19 @@ func WriteSecretsToSecretsFile(app pbCore.App, secretsCollection *pbCore.Collect
 }
 
 func SyncSecretsWithSecretsFile(app pbCore.App) (err error) {
-	configDirPath := GetConfigDirPath(app)
-	secretsFilePath := configDirPath + "/" + SecretsFileName
-
 	secretsCollection, err := ReplaceSecretsCollection(app)
 
-	secretsFileExists := utils.FileExists(secretsFilePath)
+	err = PopulateSecretsCollectionFromSecretsFile(app, secretsCollection)
+	noSecretsFileExists := errors.Is(err, os.ErrNotExist)
+	if err != nil && !noSecretsFileExists {
+		return fmt.Errorf("error WriteSecretsToSecretsFile in SyncSecretsWithSecretsFile: %w", err)
+	}
 
-	if secretsFileExists {
-		err = PopulateSecretsCollectionFromSecretsFile(app, secretsCollection)
-		if err != nil {
-			return fmt.Errorf("error WriteSecretsToSecretsFile in SyncSecretsWithSecretsFile: %w", err)
-		}
-	} else {
+	if noSecretsFileExists {
 		err = WriteSecretsToSecretsFile(app, secretsCollection)
-		if err != nil {
-			return fmt.Errorf("error WriteSecretsToSecretsFile in SyncSecretsWithSecretsFile: %w", err)
-		}
+	}
+	if err != nil {
+		return fmt.Errorf("error WriteSecretsToSecretsFile in SyncSecretsWithSecretsFile: %w", err)
 	}
 
 	return nil
