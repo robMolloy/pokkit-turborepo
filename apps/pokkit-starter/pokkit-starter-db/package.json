@@ -13,7 +13,7 @@
     "build:any-changed-deps": "go build -o build/app-db ./src/...",
     "build": "pnpm run build:any-changed-deps && pnpm run copy-pbconfig-to-build",
     "serve-build": "./build/app-db serve --http=\"0.0.0.0:8091\"",
-    "build:on-change-to-dev": "npx nodemon --delay 1 --watch ../../../packages --exec \"pnpm run build\" --ext \"go\"",
+    "build:on-change-to-dev": "nodemon --delay 1 --watch ../../../packages --exec \"pnpm run build\" --ext \"go\"",
     "pre-dev": "pnpm run build:on-change-to-dev",
     "test": "go test -v ./...",
     "dev": "pnpm run serve-dev"
