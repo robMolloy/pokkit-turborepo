@@ -44,11 +44,7 @@ describe("pokkit-db permissions no collections file tests", () => {
     await superuserPb
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
-    try {
-      await superuserPb.collections.create(anyCrudActionIfStandardGlobalUserCollectionSchema);
-    } catch (error) {
-      console.log(JSON.stringify(error, null, 2));
-    }
+    await superuserPb.collections.create(anyCrudActionIfStandardGlobalUserCollectionSchema);
   });
 
   afterAll(async () => {
