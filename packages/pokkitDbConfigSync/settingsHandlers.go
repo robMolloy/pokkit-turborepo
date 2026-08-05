@@ -10,7 +10,7 @@ func OnServeSyncSettingsHandler(se *pbCore.ServeEvent) error {
 	err := ImportThenWriteSettingsToSettingsFile(se.App)
 
 	if err != nil {
-		log.Fatal("failed to ImportSettingsFromSettingsFile in ImportThenWriteSettingsToSettingsFile %w", err)
+		log.Fatal("failed to ImportThenWriteSettingsToSettingsFile in OnServeSyncSettingsHandler %w", err)
 	}
 
 	return se.Next()
@@ -22,9 +22,9 @@ func OnSettingsChangeWriteSettingsToSettingsFileHandler(e *pbCore.SettingsUpdate
 		return e.Next()
 	}
 
-	err := WriteContentToSettingsFile(e.App, e.NewSettings)
+	err := WriteToSettingsFileAsJson(e.App, e.NewSettings)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed to WriteToSettingsFileAsJson in OnSettingsChangeWriteSettingsToSettingsFileHandler: %v", err)
 	}
 	return e.Next()
 

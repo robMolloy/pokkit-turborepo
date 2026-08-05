@@ -1,7 +1,9 @@
 package pokkitDbConfigSync
 
 import (
+	"errors"
 	"fmt"
+	"os"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
@@ -20,27 +22,22 @@ func SetIsSettingsSyncSetupComplete(app pbCore.App, isSettingsSyncSetupComplete 
 // ImportCollectionsFromCollectionsFile imports collections from pb_data/collections.json.
 // If successful, true is returned.
 // If this file doesn't exist, a boolean of false is returned.
-func ImportSettingsFromSettingsFile(app pbCore.App) (bool, error) {
+func ImportSettingsFromSettingsFile(app pbCore.App) error {
 	configDirPath := GetConfigDirPath(app)
 	settingsFilePath := configDirPath + "/" + SettingsFileName
-
-	isExist := utils.FileExists(settingsFilePath)
-	if !isExist {
-		return false, nil
-	}
 
 	// File definitely exists, this will only fail with an error that should be logged
 	settingsData, err := utils.ReadJsonFromFileGeneric[*pbCore.Settings](settingsFilePath)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	err = app.Settings().Merge(settingsData)
 	if err != nil {
-		return false, err
+		return err
 	}
 
-	return true, nil
+	return nil
 }
 
 // WriteSettingsToSettingsFile writes settings to pb_data/settings.json.
@@ -59,10 +56,10 @@ func WriteSettingsToSettingsFile(app pbCore.App) error {
 	return err
 }
 
-// WriteContentToSettingsFile writes settings to pb_data/settings.json.
+// WriteToSettingsFileAsJson writes settings to pb_data/settings.json.
 // If successful, true is returned.
 // If this file doesn't exist, a boolean of false is returned.
-func WriteContentToSettingsFile(app pbCore.App, settingsData *pbCore.Settings) error {
+func WriteToSettingsFileAsJson(app pbCore.App, settingsData *pbCore.Settings) error {
 	configDirPath := GetConfigDirPath(app)
 	settingsFilePath := configDirPath + "/" + SettingsFileName
 
@@ -73,28 +70,16 @@ func WriteContentToSettingsFile(app pbCore.App, settingsData *pbCore.Settings) e
 	return err
 }
 
-func SyncSettingsWithSettingsFile(app pbCore.App) error {
-	didImport, err := ImportSettingsFromSettingsFile(app)
-	if err != nil {
-		return fmt.Errorf("failed to ImportSettingsFromSettingsFile %w", err)
-	}
-	if didImport == false {
-		err = WriteSettingsToSettingsFile(app)
-	}
-
-	if err != nil {
-		return fmt.Errorf("failed to SyncCollectionsWithCollectionsFile %w", err)
-	}
-
-	return nil
-}
-
 func ImportThenWriteSettingsToSettingsFile(app pbCore.App) error {
-	_, err := ImportSettingsFromSettingsFile(app)
-	if err != nil {
+	err := ImportSettingsFromSettingsFile(app)
+
+	noSettingsFileExists := errors.Is(err, os.ErrNotExist)
+	if err != nil && !noSettingsFileExists {
 		return fmt.Errorf("failed to ImportSettingsFromSettingsFile in ImportThenWriteSettingsToSettingsFile %w", err)
 	}
-	err = WriteSettingsToSettingsFile(app)
+	if noSettingsFileExists {
+		err = WriteSettingsToSettingsFile(app)
+	}
 	if err != nil {
 		return fmt.Errorf("failed to WriteSettingsToSettingsFile in ImportThenWriteSettingsToSettingsFile %w", err)
 	}
