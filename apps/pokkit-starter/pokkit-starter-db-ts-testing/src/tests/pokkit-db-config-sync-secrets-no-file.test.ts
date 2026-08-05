@@ -11,7 +11,7 @@ import { safeJsonParse } from "@repo/pokkit-utils";
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
-import { sourcePbDirPath, superuserEmail, superuserPassword } from "./_constants";
+import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "./_constants";
 import { testsMetadata } from "./_testsMetadata";
 
 const testMetadata = testsMetadata.pokkitDbConfigSyncSecretsNoFile;
@@ -30,7 +30,7 @@ describe("pokkit-db config writer secrets tests - when secrets file does not exi
     await killPbInstance({ pbPortNumber });
 
     fse.removeSync(pbDirPath);
-    fse.copySync(sourcePbDirPath, pbDirPath);
+    fse.copySync(sourceTestBuildDirPath, pbDirPath);
     fse.removeSync(getPokkitDbSecretsFilePath({ pbDirPath }));
 
     await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });

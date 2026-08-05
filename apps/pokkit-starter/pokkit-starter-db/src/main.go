@@ -3,11 +3,10 @@ package main
 import (
 	"log"
 
-	pokkitDbConfigSync "github.com/robMolloy/pokkit-turborepo/packages/pokkitDbConfigSync"
-	pokkitDbPermissions "github.com/robMolloy/pokkit-turborepo/packages/pokkitDbPermissions"
-
 	pocketbase "github.com/pocketbase/pocketbase"
 	pbCore "github.com/pocketbase/pocketbase/core"
+	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbConfigSync"
+	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbPermissions"
 )
 
 func main() {

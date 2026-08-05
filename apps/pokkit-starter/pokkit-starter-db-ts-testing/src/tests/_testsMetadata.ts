@@ -1,4 +1,5 @@
 export const testsMetadata = {
+  pocketbaseViewLogs: { portNumber: 8119, name: "pocketbaseViewLogs" },
   pocketbaseStandardUser: { portNumber: 8120, name: "pocketbaseStandardUser" },
   pokkitDbConfigSyncCollection: { portNumber: 8121, name: "pokkitDbConfigSyncCollection" },
   pokkitDbConfigSyncSecretsNoFile: { portNumber: 8122, name: "pokkitDbConfigSyncSecretsNoFile" },
@@ -23,4 +24,5 @@ export const testsMetadata = {
     portNumber: 8129,
     name: "pokkitDbPermissionsFirstUserIsSuperadmin",
   },
+  pokkitDbViewLogs: { portNumber: 8130, name: "pokkitDbViewLogs" },
 } as const satisfies { [k: string]: { portNumber: number; name: string } };

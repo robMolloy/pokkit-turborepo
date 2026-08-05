@@ -13,7 +13,7 @@ import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { userPayloadBuilder } from "../utils/pocketbaseUserHelpers";
-import { sourcePbDirPath, superuserEmail, superuserPassword } from "./_constants";
+import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "./_constants";
 import { testsMetadata } from "./_testsMetadata";
 
 const testMetadata = testsMetadata.pokkitDbPermissionsFirstUserIsSuperadmin;
@@ -31,7 +31,7 @@ describe("pokkit-db permissions first user is superadmin tests", () => {
     await killPbInstance({ pbPortNumber });
 
     fse.removeSync(pbDirPath);
-    fse.copySync(sourcePbDirPath, pbDirPath);
+    fse.copySync(sourceTestBuildDirPath, pbDirPath);
 
     await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 

@@ -36,4 +36,4 @@ pocketbase/test-db/*
 
 _sandboxes
 _logs
-source-build/pb_data
+source-test-build

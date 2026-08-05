@@ -14,7 +14,7 @@ import {
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
-import { sourcePbDirPath, superuserEmail, superuserPassword } from "./_constants";
+import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "./_constants";
 import { testsMetadata } from "./_testsMetadata";
 
 const testMetadata = testsMetadata.pokkitDbPermissionsNoCollectionsFile;
@@ -32,7 +32,7 @@ describe("pokkit-db permissions no collections file tests", () => {
     await killPbInstance({ pbPortNumber });
 
     fse.removeSync(pbDirPath);
-    fse.copySync(sourcePbDirPath, pbDirPath);
+    fse.copySync(sourceTestBuildDirPath, pbDirPath);
     fse.removeSync(getPokkitDbCollectionsFilePathh({ pbDirPath }));
 
     await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
