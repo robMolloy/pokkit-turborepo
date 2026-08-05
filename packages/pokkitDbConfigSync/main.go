@@ -11,8 +11,7 @@ func BindFunctions(app pbCore.App) {
 	setIsSecretsSyncSetupComplete(app, false)
 	setIsSettingsSyncSetupComplete(app, false)
 
-	configDirPath := GetConfigDirPath(app)
-	os.MkdirAll(configDirPath, 0755)
+	os.MkdirAll(GetConfigDirPath(app), 0755)
 
 	app.OnServe().BindFunc(onServeSyncCollectionsWithCollectionsFileHandler)
 	app.OnServe().BindFunc(onServeSetIsCollectionsSyncSetupCompleteHandler)
