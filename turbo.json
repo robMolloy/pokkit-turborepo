@@ -14,11 +14,13 @@
     "check-types": {
       "dependsOn": ["^check-types"]
     },
+    "pre-test": {},
     "test": {
+      "dependsOn": ["^pre-test"],
       "cache": false,
       "persistent": true
     },
-    "pre-test": {
+    "test-companion": {
       "cache": false,
       "persistent": true
     },

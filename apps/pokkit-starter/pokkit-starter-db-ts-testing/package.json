@@ -4,6 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "copy-pbconfig-to-source-test-build": "rm -rf ./source-test-build/pb_config && cp -r ../pokkit-starter-db/src/pb_config ./source-test-build/pb_config",
+    "build-source:on-change-to-dev": "node ../../../node_modules/nodemon/bin/nodemon.js --delay 1 --watch ../../../packages --watch ../pokkit-starter-db/src --on-change-only --exec \"pnpm run build-source\" --ext \"go\"",
+    "build-source:no-cache": "go build -a -o ../pokkit-starter-db-ts-testing/source-test-build/app-db ./pokkit-starter-db/src",
+    "build-source:any-changed-deps": "go build -o ../pokkit-starter-db-ts-testing/source-test-build/app-db ../pokkit-starter-db/src/...",
+    "build-source": "pnpm run build-source:any-changed-deps && pnpm run copy-pbconfig-to-source-test-build",
+    "pre-test": "pnpm run build-source",
+    "test-companion": "pnpm run build-source:on-change-to-dev",
     "test": "vitest",
     "test-ui": "vitest --ui",
     "tsc": "node_modules/.bin/tsc --project ./tsconfig.json --noemit --watch",

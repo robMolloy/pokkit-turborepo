@@ -14,7 +14,7 @@
     "build-whisper": "pnpm add -w @tailwindcss/oxide-linux-x64-gnu && pnpm install --no-optional=false && pnpm run build --filter=@repo/pokkit-shadcn && pnpm run build --filter=@repo/pokkit-components && pnpm run build --filter=pokkit-whisper",
     "build-whisper-db": "turbo run build --filter=pokkit-whisper-db",
     "build-pokkit-starter": "turbo run build --filter=pokkit-starter-*",
-    "test-pokkit-starter": "turbo run pre-test test --filter=pokkit-starter-*",
+    "test-pokkit-starter": "turbo run pre-test test-companion test --filter=pokkit-starter-*",
     "dev-pokkit-starter": "turbo run pre-dev dev tsc --filter=pokkit-starter-*",
     "pre-dev-pokkit-deployer": "turbo run pre-dev tsc --filter=pokkit-deployer-*",
     "dev-pokkit-deployer": "turbo run pre-dev dev tsc --filter=pokkit-deployer-*",

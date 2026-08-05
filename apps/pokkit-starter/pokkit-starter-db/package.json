@@ -14,12 +14,6 @@
     "build:any-changed-deps": "go build -o build/app-db ./src/...",
     "build": "pnpm run build:any-changed-deps && pnpm run copy-pbconfig-to-build",
     "serve-build": "./build/app-db serve --http=\"0.0.0.0:8091\"",
-    "build:on-change-to-dev": "node ../../../node_modules/nodemon/bin/nodemon.js --delay 1 --watch ../../../packages  --watch ./src --exec \"pnpm run build\" --ext \"go\"",
-    "build-for-test:no-cache": "go build -a -o ../pokkit-starter-db-ts-testing/source-test-build/app-db ./src",
-    "build-for-test:any-changed-deps": "go build -o ../pokkit-starter-db-ts-testing/source-test-build/app-db ./src/...",
-    "build-for-test": "pnpm run build-for-test:any-changed-deps && pnpm run copy-pbconfig-to-test-build",
-    "build-for-test:on-change-to-dev": "node ../../../node_modules/nodemon/bin/nodemon.js --delay 1 --watch ../../../packages --watch ./src --exec \"pnpm run build-for-test\" --ext \"go\"",
-    "pre-test": "pnpm run build-for-test:on-change-to-dev",
     "test-NOT-SETUP-YET": "go test -v ./...",
     "dev": "pnpm run serve-dev"
   }
