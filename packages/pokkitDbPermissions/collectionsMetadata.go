@@ -1,6 +1,6 @@
 package pokkitDbPermissions
 
-const globalUserPermissionsCollectionName = "globalUserPermissions"
-const organisationUserPermissionsCollectionName = "organisationUserPermissions"
-const organisationsCollectionName = "organisations"
-const usersCollectionName = "users"
+const GlobalUserPermissionsCollectionName = "globalUserPermissions"
+const OrganisationUserPermissionsCollectionName = "organisationUserPermissions"
+const OrganisationsCollectionName = "organisations"
+const UsersCollectionName = "users"

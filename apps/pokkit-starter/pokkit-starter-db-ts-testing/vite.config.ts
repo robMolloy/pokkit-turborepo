@@ -15,6 +15,7 @@ export default (p: { mode: ConfigEnv }) => {
       environment: "node",
       fileParallelism: true,
       forceRerunTriggers: ["**/source-build/**"],
+      silent: false,
     },
   });
 };

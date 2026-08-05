@@ -1,4 +1,5 @@
 import { exec, spawn, type ChildProcessWithoutNullStreams } from "child_process";
+import { delay } from "@repo/pokkit-utils";
 import fse from "fs-extra";
 import { promisify } from "util";
 import PocketBase from "pocketbase";
@@ -142,4 +143,51 @@ export const clearPb = async (p: {
   await Promise.all(deleteSuperuserPromises);
 
   superuserPb.authStore.clear();
+};
+
+export const pollLogsUntilNonZeroItems = async (p: {
+  pb: PocketBase;
+  maxDurationMs: number;
+  delayMs: number;
+}) => {
+  let iterations = 0;
+  const startDateTime = new Date();
+  const endDateTime = new Date(startDateTime.getTime() + p.maxDurationMs);
+
+  while (new Date().getTime() < endDateTime.getTime()) {
+    const logs = await p.pb.logs.getList();
+    iterations += 1;
+    if (logs.items.length > 0) {
+      const timeTakenMs = new Date().getTime() - startDateTime.getTime();
+      return { success: true, data: logs, timeTakenMs, iterations } as const;
+    }
+
+    await delay(p.delayMs);
+  }
+  const timeTakenMs = new Date().getTime() - startDateTime.getTime();
+  return { success: false, error: "No logs found", timeTakenMs, iterations } as const;
+};
+
+export const pollLogsUntilNumberOfItemsChange = async (p: {
+  pb: PocketBase;
+  maxDurationMs: number;
+  delayMs: number;
+}) => {
+  let iterations = 0;
+  const startDateTime = new Date();
+  const endDateTime = new Date(startDateTime.getTime() + p.maxDurationMs);
+
+  const logsBefore = await p.pb.logs.getList();
+
+  while (new Date().getTime() < endDateTime.getTime()) {
+    const logsAfter = await p.pb.logs.getList();
+    iterations += 1;
+    if (logsAfter.totalItems !== logsBefore.totalItems) {
+      const timeTakenMs = new Date().getTime() - startDateTime.getTime();
+      return { success: true, data: logsAfter, timeTakenMs, iterations } as const;
+    }
+
+    await delay(p.delayMs);
+  }
+  return { success: false, error: "No logs found" } as const;
 };

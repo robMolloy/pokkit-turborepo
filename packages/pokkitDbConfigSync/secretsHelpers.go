@@ -136,7 +136,7 @@ func SyncSecretsWithSecretsFile(app pbCore.App) (err error) {
 func OnServeSyncSecretsWithSecretsFileHandler(se *pbCore.ServeEvent) error {
 	err := SyncSecretsWithSecretsFile(se.App)
 	if err != nil {
-		se.App.Logger().Error("SyncSecretsWithSecretsFile in OnServeImportEnvVarsFromSecretsFileHandler", "err", err)
+		se.App.Logger().Error("SyncSecretsWithSecretsFile in OnServeSyncSecretsWithSecretsFileHandler", "err", err)
 	}
 
 	return se.Next()

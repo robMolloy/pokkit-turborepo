@@ -16,7 +16,7 @@ func BindFunctions(app pbCore.App) {
 	})
 
 	// if first user, make approved superadmin
-	app.OnRecordAfterCreateSuccess(usersCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+	app.OnRecordAfterCreateSuccess(UsersCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		err := ElevateFirstUserToAdmin(e.App, e.Record)
 
 		if err != nil {

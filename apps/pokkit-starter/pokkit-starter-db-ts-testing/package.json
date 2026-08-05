@@ -12,9 +12,9 @@
     "get-platform-arch": "node -e \"console.log(process.platform + '_' + process.arch + (process.platform === 'win32' ? '.exe' : ''))\"",
     "copy-source-build": "rm -rf ./source-build && cp -r ../pokkit-starter-db/build ./source-build",
     "build": "pnpm run copy-source-build",
-    "copy-source-build:watch": "npx nodemon --delay 1 --watch ../pokkit-starter-db/build --exec \"pnpm run copy-source-build\" --ext \"*\"",
+    "copy-source-build:watch": "nodemon --delay 1 --watch ../pokkit-starter-db/build --exec \"pnpm run copy-source-build\" --ext \"*\"",
     "pre-dev": "npm run copy-source-build:watch",
-    "dev": "npm run test"
+    "dev": "npm run test --verbose src/tests/pokkit-db-view-logs.test.ts"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",

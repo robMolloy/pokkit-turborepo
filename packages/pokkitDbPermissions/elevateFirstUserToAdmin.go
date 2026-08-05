@@ -8,7 +8,7 @@ import (
 
 func ElevateFirstUserToAdmin(app pbCore.App, record *pbCore.Record) error {
 
-	records, err := app.FindRecordsByFilter(usersCollectionName, "", "", 2, 0)
+	records, err := app.FindRecordsByFilter(UsersCollectionName, "", "", 2, 0)
 	if err != nil {
 		return fmt.Errorf("error finding records in ElevateFirstUserToAdmin: %w", err)
 	}
@@ -18,7 +18,7 @@ func ElevateFirstUserToAdmin(app pbCore.App, record *pbCore.Record) error {
 		return nil
 	}
 
-	globalUserPermissionsCollection, err := app.FindCollectionByNameOrId(globalUserPermissionsCollectionName)
+	globalUserPermissionsCollection, err := app.FindCollectionByNameOrId(GlobalUserPermissionsCollectionName)
 	if err != nil {
 		return fmt.Errorf("error finding globalUserPermissions collection in elevateFirstUserToAdmin: %w", err)
 	}

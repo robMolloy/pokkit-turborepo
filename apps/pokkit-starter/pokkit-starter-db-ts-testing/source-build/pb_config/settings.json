@@ -54,8 +54,8 @@
   },
   "logs": {
     "maxDays": 0,
-    "minLevel": 0,
-    "logIP": false,
-    "logAuthId": false
+    "minLevel": -4,
+    "logIP": true,
+    "logAuthId": true
   }
 }

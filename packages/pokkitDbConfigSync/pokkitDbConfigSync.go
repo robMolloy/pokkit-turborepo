@@ -3,7 +3,6 @@ package pokkitDbConfigSync
 import (
 	"os"
 
-	"github.com/pocketbase/pocketbase/core"
 	pbCore "github.com/pocketbase/pocketbase/core"
 )
 
@@ -24,25 +23,27 @@ func BindFunctions(app pbCore.App) {
 	app.OnCollectionAfterUpdateSuccess().BindFunc(OnCollectionChangeWriteCollectionsToFileHandler)
 	app.OnCollectionAfterDeleteSuccess().BindFunc(OnCollectionChangeWriteCollectionsToFileHandler)
 
-	app.OnServe().BindFunc(OnServeSyncSecretsWithSecretsFileHandler)
-	app.OnServe().BindFunc(func(e *pbCore.ServeEvent) error {
-		SetIsSecretsSyncSetupComplete(e.App, true)
-		return e.Next()
-	})
+	// ////////////////////////////WORKING TIL HERE///////////////////////////////////////////////////////
 
-	app.OnRecordAfterCreateSuccess(secretsCollectionName).BindFunc(func(e *core.RecordEvent) error {
-		secretsCollection, err := e.App.FindCollectionByNameOrId(secretsCollectionName)
-		if err != nil {
-			e.App.Logger().Error("error finding collection _pb_config_secrets in OnRecordAfterCreateSuccess", "err", err)
-			return e.Next()
-		}
-		err = WriteSecretsToSecretsFile(e.App, secretsCollection)
-		if err != nil {
-			e.App.Logger().Error("error WriteSecretsToSecretsFile in OnRecordAfterCreateSuccess", "err", err)
-			return e.Next()
-		}
-		return e.Next()
-	})
+	// app.OnServe().BindFunc(OnServeSyncSecretsWithSecretsFileHandler)
+	// app.OnServe().BindFunc(func(e *pbCore.ServeEvent) error {
+	// 	SetIsSecretsSyncSetupComplete(e.App, true)
+	// 	return e.Next()
+	// })
+
+	// app.OnRecordAfterCreateSuccess(secretsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+	// 	// _, err := e.App.FindCollectionByNameOrId(secretsCollectionName)
+	// 	// if err != nil {
+	// 	// 	e.App.Logger().Error("error finding collection _pb_config_secrets in OnRecordAfterCreateSuccess", "err", err)
+	// 	// 	return e.Next()
+	// 	// }
+	// 	// err = WriteSecretsToSecretsFile(e.App, secretsCollection)
+	// 	// if err != nil {
+	// 	// 	e.App.Logger().Error("error WriteSecretsToSecretsFile in OnRecordAfterCreateSuccess", "err", err)
+	// 	// 	return e.Next()
+	// 	// }
+	// 	return e.Next()
+	// })
 
 	app.OnServe().BindFunc(OnServeSyncSettingsHandler)
 	app.OnServe().BindFunc(func(e *pbCore.ServeEvent) error {
