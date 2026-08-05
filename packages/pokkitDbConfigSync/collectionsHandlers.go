@@ -29,3 +29,8 @@ func onCollectionChangeWriteCollectionsToFileHandler(e *pbCore.CollectionEvent) 
 
 	return e.Next()
 }
+
+func onServeSetIsCollectionsSyncSetupCompleteHandler(e *pbCore.ServeEvent) error {
+	setIsCollectionsSyncSetupComplete(e.App, true)
+	return e.Next()
+}

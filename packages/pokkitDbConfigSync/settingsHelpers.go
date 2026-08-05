@@ -70,18 +70,18 @@ func writeToSettingsFileAsJson(app pbCore.App, settingsData *pbCore.Settings) er
 	return err
 }
 
-func importThenWriteSettingsToSettingsFile(app pbCore.App) error {
+func syncSettingsToSettingsFile(app pbCore.App) error {
 	err := importSettingsFromSettingsFile(app)
 
 	noSettingsFileExists := errors.Is(err, os.ErrNotExist)
 	if err != nil && !noSettingsFileExists {
-		return fmt.Errorf("failed to ImportSettingsFromSettingsFile in ImportThenWriteSettingsToSettingsFile %w", err)
+		return fmt.Errorf("failed to ImportSettingsFromSettingsFile in syncSettingsToSettingsFile %w", err)
 	}
 	if noSettingsFileExists {
 		err = writeSettingsToSettingsFile(app)
 	}
 	if err != nil {
-		return fmt.Errorf("failed to WriteSettingsToSettingsFile in ImportThenWriteSettingsToSettingsFile %w", err)
+		return fmt.Errorf("failed to WriteSettingsToSettingsFile in syncSettingsToSettingsFile %w", err)
 	}
 
 	return nil

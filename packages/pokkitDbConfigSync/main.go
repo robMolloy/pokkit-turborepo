@@ -15,29 +15,19 @@ func BindFunctions(app pbCore.App) {
 	os.MkdirAll(configDirPath, 0755)
 
 	app.OnServe().BindFunc(onServeSyncCollectionsWithCollectionsFileHandler)
-	app.OnServe().BindFunc(func(e *pbCore.ServeEvent) error {
-		setIsCollectionsSyncSetupComplete(e.App, true)
-		return e.Next()
-	})
+	app.OnServe().BindFunc(onServeSetIsCollectionsSyncSetupCompleteHandler)
 	app.OnCollectionAfterCreateSuccess().BindFunc(onCollectionChangeWriteCollectionsToFileHandler)
 	app.OnCollectionAfterUpdateSuccess().BindFunc(onCollectionChangeWriteCollectionsToFileHandler)
 	app.OnCollectionAfterDeleteSuccess().BindFunc(onCollectionChangeWriteCollectionsToFileHandler)
 
 	app.OnServe().BindFunc(onServeSyncSecretsWithSecretsFileHandler)
-	app.OnServe().BindFunc(func(e *pbCore.ServeEvent) error {
-		setIsSecretsSyncSetupComplete(e.App, true)
-		return e.Next()
-	})
-
+	app.OnServe().BindFunc(onServeSetIsSecretsSyncSetupCompleteHandler)
 	app.OnRecordAfterCreateSuccess(secretsCollectionName).BindFunc(onSecretRecordChangeWriteSecretsToSecretsFileHandler)
 	app.OnRecordAfterUpdateSuccess(secretsCollectionName).BindFunc(onSecretRecordChangeWriteSecretsToSecretsFileHandler)
 	app.OnRecordAfterDeleteSuccess(secretsCollectionName).BindFunc(onSecretRecordChangeWriteSecretsToSecretsFileHandler)
 
 	app.OnServe().BindFunc(onServeSyncSettingsHandler)
-	app.OnServe().BindFunc(func(e *pbCore.ServeEvent) error {
-		setIsSettingsSyncSetupComplete(e.App, true)
-		return e.Next()
-	})
+	app.OnServe().BindFunc(onServeSetIsSettingsSyncSetupCompleteHandler)
 	app.OnSettingsUpdateRequest().BindFunc(onSettingsChangeWriteSettingsToSettingsFileHandler)
 
 }

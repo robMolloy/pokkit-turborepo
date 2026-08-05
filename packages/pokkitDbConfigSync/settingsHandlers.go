@@ -7,10 +7,10 @@ import (
 )
 
 func onServeSyncSettingsHandler(se *pbCore.ServeEvent) error {
-	err := importThenWriteSettingsToSettingsFile(se.App)
+	err := syncSettingsToSettingsFile(se.App)
 
 	if err != nil {
-		log.Fatal("failed to ImportThenWriteSettingsToSettingsFile in OnServeSyncSettingsHandler %w", err)
+		log.Fatal("failed to syncSettingsToSettingsFile in OnServeSyncSettingsHandler %w", err)
 	}
 
 	return se.Next()
@@ -26,6 +26,11 @@ func onSettingsChangeWriteSettingsToSettingsFileHandler(e *pbCore.SettingsUpdate
 	if err != nil {
 		log.Fatalf("failed to WriteToSettingsFileAsJson in OnSettingsChangeWriteSettingsToSettingsFileHandler: %v", err)
 	}
-	return e.Next()
 
+	return e.Next()
+}
+
+func onServeSetIsSettingsSyncSetupCompleteHandler(e *pbCore.ServeEvent) error {
+	setIsSettingsSyncSetupComplete(e.App, true)
+	return e.Next()
 }
