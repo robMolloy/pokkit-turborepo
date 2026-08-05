@@ -14,8 +14,12 @@
     "build": "pnpm run build:any-changed-deps && pnpm run copy-pbconfig-to-build",
     "serve-build": "./build/app-db serve --http=\"0.0.0.0:8091\"",
     "build:on-change-to-dev": "npx nodemon --delay 1 --watch ../../../packages --exec \"pnpm run build\" --ext \"go\"",
-    "pre-dev": "pnpm run build:on-change-to-dev",
-    "test": "go test -v ./...",
+    "build-for-test:no-cache": "go build -a -o ../pokkit-starter-db-ts-testing/source-build/app-db ./src",
+    "build-for-test:any-changed-deps": "go build -o ../pokkit-starter-db-ts-testing/source-build/app-db ./src/...",
+    "build-for-test": "pnpm run build-for-test:any-changed-deps",
+    "build-for-test:on-change-to-dev": "npx nodemon --delay 1 --watch ../../../packages --exec \"pnpm run build-for-test\" --ext \"go\"",
+    "pre-test": "pnpm run build-for-test:on-change-to-dev",
+    "test-not-setup-yet": "go test -v ./...",
     "dev": "pnpm run serve-dev"
   }
 }

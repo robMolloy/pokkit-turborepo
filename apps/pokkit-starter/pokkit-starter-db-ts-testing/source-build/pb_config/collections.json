@@ -94,7 +94,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-06-25 20:24:54.568Z",
-    "updated": "2026-08-03 23:04:13.162Z",
+    "updated": "2026-08-05 06:17:51.487Z",
     "system": true
   },
   {
@@ -206,7 +206,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-06-25 20:24:54.572Z",
-    "updated": "2026-08-03 23:04:13.164Z",
+    "updated": "2026-08-05 06:17:51.489Z",
     "system": true
   },
   {
@@ -320,7 +320,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-06-25 20:24:54.575Z",
-    "updated": "2026-08-03 23:04:13.166Z",
+    "updated": "2026-08-05 06:17:51.490Z",
     "system": true
   },
   {
@@ -418,7 +418,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-06-25 20:24:54.579Z",
-    "updated": "2026-08-03 23:04:13.168Z",
+    "updated": "2026-08-05 06:17:51.492Z",
     "system": true
   },
   {
@@ -533,7 +533,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-06-25 20:24:54.581Z",
-    "updated": "2026-08-03 23:04:13.169Z",
+    "updated": "2026-08-05 06:17:51.494Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -750,7 +750,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-06-25 20:24:54.587Z",
-    "updated": "2026-08-03 23:04:13.172Z",
+    "updated": "2026-08-05 06:17:51.496Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -867,7 +867,7 @@
     ],
     "indexes": [],
     "created": "2026-07-31 11:09:03.233Z",
-    "updated": "2026-08-03 23:04:13.173Z",
+    "updated": "2026-08-05 06:17:51.498Z",
     "system": false
   },
   {
@@ -918,7 +918,7 @@
     ],
     "indexes": [],
     "created": "2026-07-31 11:09:03.234Z",
-    "updated": "2026-08-03 23:04:13.176Z",
+    "updated": "2026-08-05 06:17:51.499Z",
     "system": false
   },
   {
@@ -958,7 +958,8 @@
         "type": "select",
         "values": [
           "standard",
-          "admin"
+          "admin",
+          "superadmin"
         ]
       },
       {
@@ -1014,7 +1015,7 @@
     ],
     "indexes": [],
     "created": "2026-08-03 22:12:18.250Z",
-    "updated": "2026-08-03 23:04:13.237Z",
+    "updated": "2026-08-05 06:17:51.607Z",
     "system": false
   },
   {
@@ -1141,7 +1142,7 @@
       "CREATE UNIQUE INDEX `idx_0UWlVOdDqD` ON `organisationUserPermissions` (`userOrgKey`)"
     ],
     "created": "2026-08-03 22:12:18.252Z",
-    "updated": "2026-08-03 23:04:13.239Z",
+    "updated": "2026-08-05 06:17:51.608Z",
     "system": false
   },
   {
@@ -1222,7 +1223,73 @@
     ],
     "indexes": [],
     "created": "2026-08-03 22:12:18.253Z",
-    "updated": "2026-08-03 23:04:13.241Z",
+    "updated": "2026-08-05 06:17:51.610Z",
+    "system": false
+  },
+  {
+    "id": "pbc_3580516180",
+    "listRule": "@request.auth.id != \"\" \u0026\u0026 @collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 @collection.globalUserPermissions.role = \"standard\"",
+    "viewRule": "@request.auth.id != \"\" \u0026\u0026 @collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 @collection.globalUserPermissions.role = \"standard\"",
+    "createRule": "@request.auth.id != \"\" \u0026\u0026 @collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 @collection.globalUserPermissions.role = \"standard\"",
+    "updateRule": "@request.auth.id != \"\" \u0026\u0026 @collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 @collection.globalUserPermissions.role = \"standard\"",
+    "deleteRule": "@request.auth.id != \"\" \u0026\u0026 @collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 @collection.globalUserPermissions.role = \"standard\"",
+    "name": "anyCrudActionIfStandardGlobalUserCollection",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "help": "",
+        "hidden": false,
+        "id": "text1579384326",
+        "max": 0,
+        "min": 0,
+        "name": "name",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "created": "2026-08-04 09:56:02.530Z",
+    "updated": "2026-08-05 06:17:51.503Z",
     "system": false
   },
   {
@@ -1304,8 +1371,8 @@
     "indexes": [
       "CREATE UNIQUE INDEX `idx_secrets_key` ON `_pb_config_secrets` (key)"
     ],
-    "created": "2026-08-03 23:04:13.227Z",
-    "updated": "2026-08-03 23:04:13.227Z",
+    "created": "2026-08-05 06:17:51.583Z",
+    "updated": "2026-08-05 06:17:51.583Z",
     "system": false
   }
 ]
