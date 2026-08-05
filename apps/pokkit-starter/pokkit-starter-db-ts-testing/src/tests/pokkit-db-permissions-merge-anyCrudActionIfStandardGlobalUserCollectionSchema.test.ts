@@ -16,10 +16,16 @@ import { PocketBase } from "../config/pocketbaseConfig";
 import { userPayloadBuilder } from "../utils/pocketbaseUserHelpers";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "./_constants";
 import { testsMetadata } from "./_testsMetadata";
-import { anyCrudActionIfStandardGlobalUserCollectionSchema } from "./mocks/anyCrudActionIfStandardGlobalUserCollectionSchema";
+import { createSimpleBaseCollectionSchema } from "./mocks/createSimpleBaseCollectionSchema";
 
 const anyCrudActionIfStandardGlobalUserCollectionName =
   "anyCrudActionIfStandardGlobalUserCollection";
+export const anyCrudActionIfStandardGlobalUserCollectionSchema = createSimpleBaseCollectionSchema({
+  name: anyCrudActionIfStandardGlobalUserCollectionName,
+  rules:
+    '@request.auth.id != "" && @collection.globalUserPermissions.userId ?= @request.auth.id && @collection.globalUserPermissions.role ?= "standard"',
+});
+
 const testMetadata =
   testsMetadata.pokkitDbPermissionsMergeAnyCrudActionIfStandardGlobalUserCollectionSchema;
 const testSuiteName = testMetadata.name;
@@ -31,7 +37,7 @@ const pbServeUrl = getPbServeUrl({ pbPortNumber });
 
 const createPbConnection = () => new PocketBase(pbServeUrl);
 
-describe("pokkit-db permissions no collections file tests", () => {
+describe(`${testSuiteName} tests`, () => {
   beforeAll(async () => {
     await killPbInstance({ pbPortNumber });
     fse.removeSync(pbDirPath);
