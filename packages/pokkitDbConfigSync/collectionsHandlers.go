@@ -17,8 +17,7 @@ func onServeSyncCollectionsWithCollectionsFileHandler(se *pbCore.ServeEvent) err
 }
 
 func onCollectionChangeWriteCollectionsToFileHandler(e *pbCore.CollectionEvent) error {
-	isCollectionsSyncSetupComplete := getIsCollectionsSyncSetupComplete(e.App)
-	if !isCollectionsSyncSetupComplete {
+	if !getIsSetupComplete(e.App) {
 		return e.Next()
 	}
 
@@ -27,10 +26,5 @@ func onCollectionChangeWriteCollectionsToFileHandler(e *pbCore.CollectionEvent) 
 		log.Fatalf("failed to WriteCollectionsToCollectionsFile in OnCollectionChangeWriteCollectionsToFileHandler: %v", err)
 	}
 
-	return e.Next()
-}
-
-func onServeSetIsCollectionsSyncSetupCompleteHandler(e *pbCore.ServeEvent) error {
-	setIsCollectionsSyncSetupComplete(e.App, true)
 	return e.Next()
 }

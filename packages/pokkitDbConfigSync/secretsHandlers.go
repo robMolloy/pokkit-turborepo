@@ -16,7 +16,7 @@ func onServeSyncSecretsWithSecretsFileHandler(se *pbCore.ServeEvent) error {
 }
 
 func onSecretRecordChangeWriteSecretsToSecretsFileHandler(e *pbCore.RecordEvent) error {
-	if !getIsSecretsSyncSetupComplete(e.App) {
+	if !getIsSetupComplete(e.App) {
 		return e.Next()
 	}
 
@@ -28,10 +28,5 @@ func onSecretRecordChangeWriteSecretsToSecretsFileHandler(e *pbCore.RecordEvent)
 	if err != nil {
 		log.Fatalf("failed to writeSecretsToSecretsFile in onSecretRecordChangeWriteSecretsToSecretsFileHandler: %v", err)
 	}
-	return e.Next()
-}
-
-func onServeSetIsSecretsSyncSetupCompleteHandler(e *pbCore.ServeEvent) error {
-	setIsSecretsSyncSetupComplete(e.App, true)
 	return e.Next()
 }

@@ -17,8 +17,7 @@ func onServeSyncSettingsHandler(se *pbCore.ServeEvent) error {
 }
 
 func onSettingsChangeWriteSettingsToSettingsFileHandler(e *pbCore.SettingsUpdateRequestEvent) error {
-	isSettingsSyncSetupComplete := getIsSettingsSyncSetupComplete(e.App)
-	if !isSettingsSyncSetupComplete {
+	if !getIsSetupComplete(e.App) {
 		return e.Next()
 	}
 
@@ -27,10 +26,5 @@ func onSettingsChangeWriteSettingsToSettingsFileHandler(e *pbCore.SettingsUpdate
 		log.Fatalf("failed to WriteToSettingsFileAsJson in OnSettingsChangeWriteSettingsToSettingsFileHandler: %v", err)
 	}
 
-	return e.Next()
-}
-
-func onServeSetIsSettingsSyncSetupCompleteHandler(e *pbCore.ServeEvent) error {
-	setIsSettingsSyncSetupComplete(e.App, true)
 	return e.Next()
 }

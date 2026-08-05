@@ -9,15 +9,6 @@ import (
 	pokkitDbUtils "github.com/robMolloy/pokkit-turborepo/packages/pokkit-db-utils"
 )
 
-var isCollectionsSyncSetupCompleteStoreKey = "isCollectionsSyncSetupComplete"
-
-func getIsCollectionsSyncSetupComplete(app pbCore.App) bool {
-	return app.Store().Get(isCollectionsSyncSetupCompleteStoreKey).(bool)
-}
-func setIsCollectionsSyncSetupComplete(app pbCore.App, isCollectionsSyncSetupComplete bool) {
-	app.Store().Set(isCollectionsSyncSetupCompleteStoreKey, isCollectionsSyncSetupComplete)
-}
-
 // importCollectionsFromCollectionsFile imports collections from pb_data/collections.json.
 // If successful, true is returned.
 // If this file doesn't exist, a boolean of false is returned.

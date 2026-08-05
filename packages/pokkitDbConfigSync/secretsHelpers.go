@@ -11,15 +11,6 @@ import (
 
 const secretsCollectionName = "_pb_config_secrets"
 
-var isSecretsSyncSetupCompleteStoreKey = "isSecretsSyncSetupComplete"
-
-func getIsSecretsSyncSetupComplete(app pbCore.App) bool {
-	return app.Store().Get(isSecretsSyncSetupCompleteStoreKey).(bool)
-}
-func setIsSecretsSyncSetupComplete(app pbCore.App, isSecretsSyncSetupComplete bool) {
-	app.Store().Set(isSecretsSyncSetupCompleteStoreKey, isSecretsSyncSetupComplete)
-}
-
 func replaceSecretsCollection(app pbCore.App) (*pbCore.Collection, error) {
 	existingSecretsCollection, err := app.FindCollectionByNameOrId(secretsCollectionName)
 	if existingSecretsCollection != nil {
