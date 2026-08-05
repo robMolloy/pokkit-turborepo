@@ -29,4 +29,8 @@ export const testsMetadata = {
     portNumber: 8131,
     name: "pokkitDbPermissionsMergeAnyCrudActionIfStandardGlobalUserCollectionSchema",
   },
+  pokkitDbPermissionsBootTests: {
+    portNumber: 8133,
+    name: "pokkitDbPermissionsBootTests",
+  },
 } as const satisfies { [k: string]: { portNumber: number; name: string } };
