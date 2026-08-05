@@ -1,11 +1,11 @@
 package pokkitDbConfigSync
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
-	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
 	pokkitDbUtils "github.com/robMolloy/pokkit-turborepo/packages/pokkit-db-utils"
 )
 
@@ -21,27 +21,21 @@ func SetIsCollectionsSyncSetupComplete(app pbCore.App, isCollectionsSyncSetupCom
 // ImportCollectionsFromCollectionsFile imports collections from pb_data/collections.json.
 // If successful, true is returned.
 // If this file doesn't exist, a boolean of false is returned.
-func ImportCollectionsFromCollectionsFile(app pbCore.App) (bool, error) {
+func ImportCollectionsFromCollectionsFile(app pbCore.App) error {
 	configDirPath := GetConfigDirPath(app)
 	collectionsFilePath := configDirPath + "/" + CollectionsFileName
 
-	isExist := utils.FileExists(collectionsFilePath)
-	if !isExist {
-		return false, nil
-	}
-
-	// File definitely exists, this will only fail with an error that should be logged
 	collectionsData, err := os.ReadFile(collectionsFilePath)
 	if err != nil {
-		return false, err
+		return fmt.Errorf("failed to os.ReadFile in ImportCollectionsFromCollectionsFile: %w", err)
 	}
 
-	err = app.ImportCollectionsByMarshaledJSON(collectionsData, false)
+	err = app.ImportCollectionsByMarshaledJSON(collectionsData, true)
 	if err != nil {
-		return false, err
+		return fmt.Errorf("failed to app.ImportCollectionsByMarshaledJSON in ImportCollectionsFromCollectionsFile: %w", err)
 	}
 
-	return true, nil
+	return nil
 }
 
 // WriteCollectionsToCollectionsFile writes collections to pb_data/collections.json.
@@ -60,17 +54,27 @@ func WriteCollectionsToCollectionsFile(app pbCore.App) error {
 	if err != nil {
 		return fmt.Errorf("failed to WriteDataToFileAsJson: %w", err)
 	}
-	return err
+	return nil
 }
 
+// SyncCollectionsWithCollectionsFile syncs collections with the collections file.
+// If valid collections file is found, collections are imported and (for ease) written to the file.
+// If this file doesn't exist, a boolean of false is returned.
 func SyncCollectionsWithCollectionsFile(app pbCore.App) error {
-	didImport, err := ImportCollectionsFromCollectionsFile(app)
-	if didImport == false && err == nil {
+	err := ImportCollectionsFromCollectionsFile(app)
+
+	noCollectionsFileExists := errors.Is(err, os.ErrNotExist)
+
+	if err != nil && !noCollectionsFileExists {
+		return fmt.Errorf("failed to ImportCollectionsFromCollectionsFile in SyncCollectionsWithCollectionsFile: %w", err)
+	}
+
+	if noCollectionsFileExists {
 		err = WriteCollectionsToCollectionsFile(app)
 	}
 
 	if err != nil {
-		return fmt.Errorf("failed to SyncCollectionsWithCollectionsFile %w", err)
+		return fmt.Errorf("failed to WriteCollectionsToCollectionsFile in SyncCollectionsWithCollectionsFile: %w", err)
 	}
 
 	return nil

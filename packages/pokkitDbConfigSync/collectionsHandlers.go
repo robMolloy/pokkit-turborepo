@@ -1,6 +1,8 @@
 package pokkitDbConfigSync
 
 import (
+	"log"
+
 	pbCore "github.com/pocketbase/pocketbase/core"
 )
 
@@ -8,7 +10,7 @@ func OnServeSyncCollectionsWithCollectionsFileHandler(se *pbCore.ServeEvent) err
 	err := SyncCollectionsWithCollectionsFile(se.App)
 
 	if err != nil {
-		se.App.Logger().Error("OnServeSyncCollectionsWithCollectionsFileHandler", "err", err)
+		log.Fatalf("failed to SyncCollectionsWithCollectionsFile in OnServeSyncCollectionsWithCollectionsFileHandler: %v", err)
 	}
 
 	return se.Next()

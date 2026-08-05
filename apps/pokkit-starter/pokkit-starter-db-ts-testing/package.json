@@ -9,7 +9,7 @@
     "copy-pbconfig-to-staging": "rm -rf ./staging-test-build/pb_config && cp -r ../pokkit-starter-db/src/pb_config ./staging-test-build/pb_config",
     "copy-staging-to-source": "rm -rf ./source-test-build && cp -r ./staging-test-build ./source-test-build",
     "remove-staging": "rm -rf ./staging-test-build",
-    "build-source": "pnpm run build-source-in-staging && pnpm run copy-pbconfig-to-staging && pnpm run remove-staging",
+    "build-source": "pnpm run build-source-in-staging && pnpm run copy-pbconfig-to-staging && pnpm run copy-staging-to-source && pnpm run remove-staging",
     "build-source:on-change-to-dev": "node ../../../node_modules/nodemon/bin/nodemon.js --watch ../../../packages --watch ../pokkit-starter-db/src --on-change-only --exec \"pnpm run build-source\" --ext \"go\"",
     "pre-test": "pnpm run build-source",
     "test-companion": "pnpm run build-source:on-change-to-dev",
