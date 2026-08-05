@@ -12,7 +12,7 @@
     "db:build": "go build",
     "build": "go build",
     "db:serve-build": "./app-db serve --http=\"0.0.0.0:8090\"",
-    "db:build:on-change-to-dev": "npx nodemon --delay 1 --watch pocketbase/app-db/main.go --exec \"npm run db:build\"",
+    "db:build:on-change-to-dev": "node ../../../node_modules/nodemon/bin/nodemon.js --delay 1 --watch pocketbase/app-db/main.go --exec \"npm run db:build\"",
     "pre-dev": "stripe listen -l --forward-to localhost:8090/stripe-webhook",
     "test": "go test -v ./...",
     "dev": "go run . serve --http=\"0.0.0.0:8090\""
