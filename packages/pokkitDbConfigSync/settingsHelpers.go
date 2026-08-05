@@ -12,17 +12,17 @@ import (
 
 var isSettingsSyncSetupCompleteStoreKey = "isSettingsSyncSetupComplete"
 
-func GetIsSettingsSyncSetupComplete(app pbCore.App) bool {
+func getIsSettingsSyncSetupComplete(app pbCore.App) bool {
 	return app.Store().Get(isSettingsSyncSetupCompleteStoreKey).(bool)
 }
-func SetIsSettingsSyncSetupComplete(app pbCore.App, isSettingsSyncSetupComplete bool) {
+func setIsSettingsSyncSetupComplete(app pbCore.App, isSettingsSyncSetupComplete bool) {
 	app.Store().Set(isSettingsSyncSetupCompleteStoreKey, isSettingsSyncSetupComplete)
 }
 
-// ImportCollectionsFromCollectionsFile imports collections from pb_data/collections.json.
+// importCollectionsFromCollectionsFile imports collections from pb_data/collections.json.
 // If successful, true is returned.
 // If this file doesn't exist, a boolean of false is returned.
-func ImportSettingsFromSettingsFile(app pbCore.App) error {
+func importSettingsFromSettingsFile(app pbCore.App) error {
 	configDirPath := GetConfigDirPath(app)
 	settingsFilePath := configDirPath + "/" + SettingsFileName
 
@@ -40,10 +40,10 @@ func ImportSettingsFromSettingsFile(app pbCore.App) error {
 	return nil
 }
 
-// WriteSettingsToSettingsFile writes settings to pb_data/settings.json.
+// writeSettingsToSettingsFile writes settings to pb_data/settings.json.
 // If successful, true is returned.
 // If this file doesn't exist, a boolean of false is returned.
-func WriteSettingsToSettingsFile(app pbCore.App) error {
+func writeSettingsToSettingsFile(app pbCore.App) error {
 	configDirPath := GetConfigDirPath(app)
 	settingsFilePath := configDirPath + "/" + SettingsFileName
 
@@ -56,10 +56,10 @@ func WriteSettingsToSettingsFile(app pbCore.App) error {
 	return err
 }
 
-// WriteToSettingsFileAsJson writes settings to pb_data/settings.json.
+// writeToSettingsFileAsJson writes settings to pb_data/settings.json.
 // If successful, true is returned.
 // If this file doesn't exist, a boolean of false is returned.
-func WriteToSettingsFileAsJson(app pbCore.App, settingsData *pbCore.Settings) error {
+func writeToSettingsFileAsJson(app pbCore.App, settingsData *pbCore.Settings) error {
 	configDirPath := GetConfigDirPath(app)
 	settingsFilePath := configDirPath + "/" + SettingsFileName
 
@@ -70,15 +70,15 @@ func WriteToSettingsFileAsJson(app pbCore.App, settingsData *pbCore.Settings) er
 	return err
 }
 
-func ImportThenWriteSettingsToSettingsFile(app pbCore.App) error {
-	err := ImportSettingsFromSettingsFile(app)
+func importThenWriteSettingsToSettingsFile(app pbCore.App) error {
+	err := importSettingsFromSettingsFile(app)
 
 	noSettingsFileExists := errors.Is(err, os.ErrNotExist)
 	if err != nil && !noSettingsFileExists {
 		return fmt.Errorf("failed to ImportSettingsFromSettingsFile in ImportThenWriteSettingsToSettingsFile %w", err)
 	}
 	if noSettingsFileExists {
-		err = WriteSettingsToSettingsFile(app)
+		err = writeSettingsToSettingsFile(app)
 	}
 	if err != nil {
 		return fmt.Errorf("failed to WriteSettingsToSettingsFile in ImportThenWriteSettingsToSettingsFile %w", err)

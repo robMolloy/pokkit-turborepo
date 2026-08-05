@@ -3,52 +3,41 @@ package pokkitDbConfigSync
 import (
 	"os"
 
-	"github.com/pocketbase/pocketbase/core"
 	pbCore "github.com/pocketbase/pocketbase/core"
 )
 
 func BindFunctions(app pbCore.App) {
-	SetIsCollectionsSyncSetupComplete(app, false)
-	SetIsSecretsSyncSetupComplete(app, false)
-	SetIsSettingsSyncSetupComplete(app, false)
+	setIsCollectionsSyncSetupComplete(app, false)
+	setIsSecretsSyncSetupComplete(app, false)
+	setIsSettingsSyncSetupComplete(app, false)
 
 	configDirPath := GetConfigDirPath(app)
 	os.MkdirAll(configDirPath, 0755)
 
-	app.OnServe().BindFunc(OnServeSyncCollectionsWithCollectionsFileHandler)
+	app.OnServe().BindFunc(onServeSyncCollectionsWithCollectionsFileHandler)
 	app.OnServe().BindFunc(func(e *pbCore.ServeEvent) error {
-		SetIsCollectionsSyncSetupComplete(e.App, true)
+		setIsCollectionsSyncSetupComplete(e.App, true)
 		return e.Next()
 	})
-	app.OnCollectionAfterCreateSuccess().BindFunc(OnCollectionChangeWriteCollectionsToFileHandler)
-	app.OnCollectionAfterUpdateSuccess().BindFunc(OnCollectionChangeWriteCollectionsToFileHandler)
-	app.OnCollectionAfterDeleteSuccess().BindFunc(OnCollectionChangeWriteCollectionsToFileHandler)
+	app.OnCollectionAfterCreateSuccess().BindFunc(onCollectionChangeWriteCollectionsToFileHandler)
+	app.OnCollectionAfterUpdateSuccess().BindFunc(onCollectionChangeWriteCollectionsToFileHandler)
+	app.OnCollectionAfterDeleteSuccess().BindFunc(onCollectionChangeWriteCollectionsToFileHandler)
 
-	app.OnServe().BindFunc(OnServeSyncSecretsWithSecretsFileHandler)
+	app.OnServe().BindFunc(onServeSyncSecretsWithSecretsFileHandler)
 	app.OnServe().BindFunc(func(e *pbCore.ServeEvent) error {
-		SetIsSecretsSyncSetupComplete(e.App, true)
-		return e.Next()
-	})
-
-	app.OnRecordAfterCreateSuccess(secretsCollectionName).BindFunc(func(e *core.RecordEvent) error {
-		secretsCollection, err := e.App.FindCollectionByNameOrId(secretsCollectionName)
-		if err != nil {
-			e.App.Logger().Error("error finding collection _pb_config_secrets in OnRecordAfterCreateSuccess", "err", err)
-			return e.Next()
-		}
-		err = WriteSecretsToSecretsFile(e.App, secretsCollection)
-		if err != nil {
-			e.App.Logger().Error("error WriteSecretsToSecretsFile in OnRecordAfterCreateSuccess", "err", err)
-			return e.Next()
-		}
+		setIsSecretsSyncSetupComplete(e.App, true)
 		return e.Next()
 	})
 
-	app.OnServe().BindFunc(OnServeSyncSettingsHandler)
+	app.OnRecordAfterCreateSuccess(secretsCollectionName).BindFunc(onSecretRecordChangeWriteSecretsToSecretsFileHandler)
+	app.OnRecordAfterUpdateSuccess(secretsCollectionName).BindFunc(onSecretRecordChangeWriteSecretsToSecretsFileHandler)
+	app.OnRecordAfterDeleteSuccess(secretsCollectionName).BindFunc(onSecretRecordChangeWriteSecretsToSecretsFileHandler)
+
+	app.OnServe().BindFunc(onServeSyncSettingsHandler)
 	app.OnServe().BindFunc(func(e *pbCore.ServeEvent) error {
-		SetIsSettingsSyncSetupComplete(e.App, true)
+		setIsSettingsSyncSetupComplete(e.App, true)
 		return e.Next()
 	})
-	app.OnSettingsUpdateRequest().BindFunc(OnSettingsChangeWriteSettingsToSettingsFileHandler)
+	app.OnSettingsUpdateRequest().BindFunc(onSettingsChangeWriteSettingsToSettingsFileHandler)
 
 }

@@ -11,17 +11,17 @@ import (
 
 var isCollectionsSyncSetupCompleteStoreKey = "isCollectionsSyncSetupComplete"
 
-func GetIsCollectionsSyncSetupComplete(app pbCore.App) bool {
+func getIsCollectionsSyncSetupComplete(app pbCore.App) bool {
 	return app.Store().Get(isCollectionsSyncSetupCompleteStoreKey).(bool)
 }
-func SetIsCollectionsSyncSetupComplete(app pbCore.App, isCollectionsSyncSetupComplete bool) {
+func setIsCollectionsSyncSetupComplete(app pbCore.App, isCollectionsSyncSetupComplete bool) {
 	app.Store().Set(isCollectionsSyncSetupCompleteStoreKey, isCollectionsSyncSetupComplete)
 }
 
-// ImportCollectionsFromCollectionsFile imports collections from pb_data/collections.json.
+// importCollectionsFromCollectionsFile imports collections from pb_data/collections.json.
 // If successful, true is returned.
 // If this file doesn't exist, a boolean of false is returned.
-func ImportCollectionsFromCollectionsFile(app pbCore.App) error {
+func importCollectionsFromCollectionsFile(app pbCore.App) error {
 	configDirPath := GetConfigDirPath(app)
 	collectionsFilePath := configDirPath + "/" + CollectionsFileName
 
@@ -38,10 +38,10 @@ func ImportCollectionsFromCollectionsFile(app pbCore.App) error {
 	return nil
 }
 
-// WriteCollectionsToCollectionsFile writes collections to pb_data/collections.json.
+// writeCollectionsToCollectionsFile writes collections to pb_data/collections.json.
 // If successful, true is returned.
 // If this file doesn't exist, a boolean of false is returned.
-func WriteCollectionsToCollectionsFile(app pbCore.App) error {
+func writeCollectionsToCollectionsFile(app pbCore.App) error {
 	configDirPath := GetConfigDirPath(app)
 	collectionsFilePath := configDirPath + "/" + CollectionsFileName
 
@@ -57,11 +57,11 @@ func WriteCollectionsToCollectionsFile(app pbCore.App) error {
 	return nil
 }
 
-// SyncCollectionsWithCollectionsFile syncs collections with the collections file.
+// syncCollectionsWithCollectionsFile syncs collections with the collections file.
 // If valid collections file is found, collections are imported and (for ease) written to the file.
 // If this file doesn't exist, a boolean of false is returned.
-func SyncCollectionsWithCollectionsFile(app pbCore.App) error {
-	err := ImportCollectionsFromCollectionsFile(app)
+func syncCollectionsWithCollectionsFile(app pbCore.App) error {
+	err := importCollectionsFromCollectionsFile(app)
 
 	noCollectionsFileExists := errors.Is(err, os.ErrNotExist)
 
@@ -70,7 +70,7 @@ func SyncCollectionsWithCollectionsFile(app pbCore.App) error {
 	}
 
 	if noCollectionsFileExists {
-		err = WriteCollectionsToCollectionsFile(app)
+		err = writeCollectionsToCollectionsFile(app)
 	}
 
 	if err != nil {

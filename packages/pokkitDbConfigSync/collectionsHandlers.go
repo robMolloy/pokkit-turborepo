@@ -6,8 +6,8 @@ import (
 	pbCore "github.com/pocketbase/pocketbase/core"
 )
 
-func OnServeSyncCollectionsWithCollectionsFileHandler(se *pbCore.ServeEvent) error {
-	err := SyncCollectionsWithCollectionsFile(se.App)
+func onServeSyncCollectionsWithCollectionsFileHandler(se *pbCore.ServeEvent) error {
+	err := syncCollectionsWithCollectionsFile(se.App)
 
 	if err != nil {
 		log.Fatalf("failed to SyncCollectionsWithCollectionsFile in OnServeSyncCollectionsWithCollectionsFileHandler: %v", err)
@@ -16,13 +16,13 @@ func OnServeSyncCollectionsWithCollectionsFileHandler(se *pbCore.ServeEvent) err
 	return se.Next()
 }
 
-func OnCollectionChangeWriteCollectionsToFileHandler(e *pbCore.CollectionEvent) error {
-	isCollectionsSyncSetupComplete := GetIsCollectionsSyncSetupComplete(e.App)
+func onCollectionChangeWriteCollectionsToFileHandler(e *pbCore.CollectionEvent) error {
+	isCollectionsSyncSetupComplete := getIsCollectionsSyncSetupComplete(e.App)
 	if !isCollectionsSyncSetupComplete {
 		return e.Next()
 	}
 
-	err := WriteCollectionsToCollectionsFile(e.App)
+	err := writeCollectionsToCollectionsFile(e.App)
 	if err != nil {
 		log.Fatalf("failed to WriteCollectionsToCollectionsFile in OnCollectionChangeWriteCollectionsToFileHandler: %v", err)
 	}

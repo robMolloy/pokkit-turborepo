@@ -6,8 +6,8 @@ import (
 	pbCore "github.com/pocketbase/pocketbase/core"
 )
 
-func OnServeSyncSettingsHandler(se *pbCore.ServeEvent) error {
-	err := ImportThenWriteSettingsToSettingsFile(se.App)
+func onServeSyncSettingsHandler(se *pbCore.ServeEvent) error {
+	err := importThenWriteSettingsToSettingsFile(se.App)
 
 	if err != nil {
 		log.Fatal("failed to ImportThenWriteSettingsToSettingsFile in OnServeSyncSettingsHandler %w", err)
@@ -16,13 +16,13 @@ func OnServeSyncSettingsHandler(se *pbCore.ServeEvent) error {
 	return se.Next()
 }
 
-func OnSettingsChangeWriteSettingsToSettingsFileHandler(e *pbCore.SettingsUpdateRequestEvent) error {
-	isSettingsSyncSetupComplete := GetIsSettingsSyncSetupComplete(e.App)
+func onSettingsChangeWriteSettingsToSettingsFileHandler(e *pbCore.SettingsUpdateRequestEvent) error {
+	isSettingsSyncSetupComplete := getIsSettingsSyncSetupComplete(e.App)
 	if !isSettingsSyncSetupComplete {
 		return e.Next()
 	}
 
-	err := WriteToSettingsFileAsJson(e.App, e.NewSettings)
+	err := writeToSettingsFileAsJson(e.App, e.NewSettings)
 	if err != nil {
 		log.Fatalf("failed to WriteToSettingsFileAsJson in OnSettingsChangeWriteSettingsToSettingsFileHandler: %v", err)
 	}

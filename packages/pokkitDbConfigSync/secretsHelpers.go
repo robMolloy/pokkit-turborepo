@@ -13,14 +13,14 @@ const secretsCollectionName = "_pb_config_secrets"
 
 var isSecretsSyncSetupCompleteStoreKey = "isSecretsSyncSetupComplete"
 
-func GetIsSecretsSyncSetupComplete(app pbCore.App) bool {
+func getIsSecretsSyncSetupComplete(app pbCore.App) bool {
 	return app.Store().Get(isSecretsSyncSetupCompleteStoreKey).(bool)
 }
-func SetIsSecretsSyncSetupComplete(app pbCore.App, isSecretsSyncSetupComplete bool) {
+func setIsSecretsSyncSetupComplete(app pbCore.App, isSecretsSyncSetupComplete bool) {
 	app.Store().Set(isSecretsSyncSetupCompleteStoreKey, isSecretsSyncSetupComplete)
 }
 
-func ReplaceSecretsCollection(app pbCore.App) (*pbCore.Collection, error) {
+func replaceSecretsCollection(app pbCore.App) (*pbCore.Collection, error) {
 	existingSecretsCollection, err := app.FindCollectionByNameOrId(secretsCollectionName)
 	if existingSecretsCollection != nil {
 		err = app.Delete(existingSecretsCollection)
@@ -29,7 +29,7 @@ func ReplaceSecretsCollection(app pbCore.App) (*pbCore.Collection, error) {
 		}
 	}
 
-	secretsCollection, err := CreateSecretsCollection(app)
+	secretsCollection, err := createSecretsCollection(app)
 	if err != nil {
 		return nil, fmt.Errorf("error creating collection _pb_config_secrets in ReplaceSecretsCollectionFromSecretsFile: %w", err)
 	}
@@ -37,7 +37,7 @@ func ReplaceSecretsCollection(app pbCore.App) (*pbCore.Collection, error) {
 	return secretsCollection, nil
 }
 
-func CreateSecretsCollection(app pbCore.App) (*pbCore.Collection, error) {
+func createSecretsCollection(app pbCore.App) (*pbCore.Collection, error) {
 	collection := pbCore.NewBaseCollection(secretsCollectionName)
 	collection.Fields.Add(&pbCore.TextField{
 		Name:     "key",
@@ -66,7 +66,7 @@ func CreateSecretsCollection(app pbCore.App) (*pbCore.Collection, error) {
 	return collection, nil
 }
 
-func PopulateSecretsCollectionFromSecretsFile(app pbCore.App, secretsCollection *pbCore.Collection) (err error) {
+func populateSecretsCollectionFromSecretsFile(app pbCore.App, secretsCollection *pbCore.Collection) (err error) {
 	configDirPath := GetConfigDirPath(app)
 	secretsFilePath := configDirPath + "/" + SecretsFileName
 
@@ -90,7 +90,7 @@ func PopulateSecretsCollectionFromSecretsFile(app pbCore.App, secretsCollection 
 	return nil
 }
 
-func WriteSecretsToSecretsFile(app pbCore.App, secretsCollection *pbCore.Collection) error {
+func writeSecretsToSecretsFile(app pbCore.App, secretsCollection *pbCore.Collection) error {
 	configDirPath := GetConfigDirPath(app)
 	secretsFilePath := configDirPath + "/" + SecretsFileName
 
@@ -112,17 +112,17 @@ func WriteSecretsToSecretsFile(app pbCore.App, secretsCollection *pbCore.Collect
 	return nil
 }
 
-func SyncSecretsWithSecretsFile(app pbCore.App) (err error) {
-	secretsCollection, err := ReplaceSecretsCollection(app)
+func syncSecretsWithSecretsFile(app pbCore.App) (err error) {
+	secretsCollection, err := replaceSecretsCollection(app)
 
-	err = PopulateSecretsCollectionFromSecretsFile(app, secretsCollection)
+	err = populateSecretsCollectionFromSecretsFile(app, secretsCollection)
 	noSecretsFileExists := errors.Is(err, os.ErrNotExist)
 	if err != nil && !noSecretsFileExists {
 		return fmt.Errorf("error WriteSecretsToSecretsFile in SyncSecretsWithSecretsFile: %w", err)
 	}
 
 	if noSecretsFileExists {
-		err = WriteSecretsToSecretsFile(app, secretsCollection)
+		err = writeSecretsToSecretsFile(app, secretsCollection)
 	}
 	if err != nil {
 		return fmt.Errorf("error WriteSecretsToSecretsFile in SyncSecretsWithSecretsFile: %w", err)
