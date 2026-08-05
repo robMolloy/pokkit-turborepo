@@ -47,8 +47,6 @@ describe("pokkit-db permissions no collections file tests", () => {
 
   beforeEach(async () => {
     await clearPb({ pbPortNumber, superuserEmail, superuserPassword });
-
-    await upsertPbAdminCredentialsFromCli({ pbFilePath, superuserEmail, superuserPassword });
   });
 
   it("is connection healthy", async () => {

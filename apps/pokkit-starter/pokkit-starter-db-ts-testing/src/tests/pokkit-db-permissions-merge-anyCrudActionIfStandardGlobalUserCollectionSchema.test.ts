@@ -20,7 +20,8 @@ import { anyCrudActionIfStandardGlobalUserCollectionSchema } from "./mocks/anyCr
 
 const anyCrudActionIfStandardGlobalUserCollectionName =
   "anyCrudActionIfStandardGlobalUserCollection";
-const testMetadata = testsMetadata.pokkitDbPermissionsNoCollectionsFile;
+const testMetadata =
+  testsMetadata.pokkitDbPermissionsMergeAnyCrudActionIfStandardGlobalUserCollectionSchema;
 const testSuiteName = testMetadata.name;
 
 const pbPortNumber = testMetadata.portNumber;
