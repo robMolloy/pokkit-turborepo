@@ -14,7 +14,9 @@
     "check-types": {
       "dependsOn": ["^check-types"]
     },
-    "pre-test": {},
+    "pre-test": {
+      "cache": false
+    },
     "test": {
       "dependsOn": ["^pre-test"],
       "cache": false,
@@ -24,8 +26,12 @@
       "cache": false,
       "persistent": true
     },
-    "tsc": {},
-    "pre-dev": {},
+    "tsc": {
+      "cache": false
+    },
+    "pre-dev": {
+      "cache": false
+    },
     "css-build": {
       "persistent": true
     },

@@ -13,6 +13,7 @@
     "build:no-cache": "go build -a -o build/app-db ./src",
     "build:any-changed-deps": "go build -o build/app-db ./src/...",
     "build": "pnpm run build:any-changed-deps && pnpm run copy-pbconfig-to-build",
+    "build-only": "pnpm run build:any-changed-deps",
     "serve-build": "./build/app-db serve --http=\"0.0.0.0:8091\"",
     "test-NOT-SETUP-YET": "go test -v ./...",
     "dev": "pnpm run serve-dev"
