@@ -51,11 +51,7 @@ export const servePb = async (p: {
   pbFilePath: string;
   pbPortNumber: number;
   logFilePath?: string;
-}): Promise<{
-  pbProcess: ChildProcessWithoutNullStreams;
-  dbServeUrl: string;
-  dbUrl: string;
-}> => {
+}) => {
   const portNumber = p.pbPortNumber;
   const dbServeUrl = getPbServeAddress({ portNumber });
   const dbUrl = getPbServeUrl({ pbPortNumber: portNumber });
@@ -69,28 +65,39 @@ export const servePb = async (p: {
   const logStream = p.logFilePath
     ? fse.createWriteStream(p.logFilePath, { flags: "a" })
     : undefined;
+  try {
+    await new Promise((resolve, reject) => {
+      pbProcess.stdout.on("data", (data) => {
+        const strData = data.toString();
+        logStream?.write(`[stdout] ${strData}\n`);
 
-  await new Promise((resolve) => {
-    pbProcess.stdout.on("data", (data) => {
-      const strData = data.toString();
-      logStream?.write(`[stdout] ${strData}\n`);
+        if (strData.includes("Server started at")) resolve(pbProcess);
+      });
 
-      if (strData.includes("Server started at")) resolve(pbProcess);
+      pbProcess.stderr.on("data", (data) => {
+        logStream?.end();
+        reject(data.toString());
+        return {
+          success: false,
+          error: new Error(`servePb: error starting pb process: ${data.toString()}`),
+        } as const;
+        logStream?.write(`[stderr] ${data.toString()}\n`);
+      });
+
+      pbProcess.on("error", (error) => {
+        logStream?.write(`[error] ${error.message}\n`);
+        logStream?.end();
+        reject(error);
+        return {
+          success: false,
+          error: new Error(`servePb: error starting pb process: ${error}`),
+        } as const;
+      });
     });
-
-    pbProcess.stderr.on("data", (data) => {
-      logStream?.write(`[stderr] ${data.toString()}\n`);
-      resolve(pbProcess);
-    });
-
-    pbProcess.on("error", (error) => {
-      logStream?.write(`[error] ${error.message}\n`);
-      logStream?.end();
-      resolve(pbProcess);
-    });
-  });
-
-  return { pbProcess, dbUrl, dbServeUrl };
+    return { success: true, data: { pbProcess, dbUrl, dbServeUrl } } as const;
+  } catch (error) {
+    return { success: false, error } as const;
+  }
 };
 
 /**
