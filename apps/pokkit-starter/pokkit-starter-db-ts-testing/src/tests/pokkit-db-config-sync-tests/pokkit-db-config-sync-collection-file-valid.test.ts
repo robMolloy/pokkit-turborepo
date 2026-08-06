@@ -82,24 +82,6 @@ describe(`${testSuiteName} tests`, () => {
     });
     expect(collectionsWithoutDateTimes).toEqual(validCollectionFileDataWithoutDateTimes);
   });
-  it("PDBCS-COL-01 — Valid collections file imports on startup", async () => {
-    const superuserPb = createPbConnection();
-    await superuserPb
-      .collection(superusersCollectionName)
-      .authWithPassword(superuserEmail, superuserPassword);
-
-    const collections = await superuserPb.collections.getFullList();
-
-    const collectionsWithoutDateTimes = collections.map((collection) => {
-      const { created: _created, updated: _updated, ...rest } = collection;
-      return rest;
-    });
-    const validCollectionFileDataWithoutDateTimes = validCollectionFileData.map((collection) => {
-      const { created: _created, updated: _updated, ...rest } = collection;
-      return rest;
-    });
-    expect(collectionsWithoutDateTimes).toEqual(validCollectionFileDataWithoutDateTimes);
-  });
 
   it("PDBCS-COL-02 - Valid collections file unchanged when already in sync", async () => {
     const collectionsFileContentsAtEnd = fse.readFileSync(
