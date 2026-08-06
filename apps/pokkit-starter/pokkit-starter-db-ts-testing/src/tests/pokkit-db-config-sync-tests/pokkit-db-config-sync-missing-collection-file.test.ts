@@ -53,7 +53,7 @@ describe(`${testSuiteName} tests`, () => {
     expect(isHealthy.code).toBe(200);
   });
 
-  it("PDBCS-COL-03 — Missing collections file exists once onServe finishes", async () => {
+  it("PDBCS-COL-04 — Missing collections file exists once onServe finishes", async () => {
     const superuserPb = createPbConnection();
     await superuserPb
       .collection(superusersCollectionName)
@@ -62,7 +62,7 @@ describe(`${testSuiteName} tests`, () => {
     expect(fse.existsSync(getPokkitDbCollectionsFilePath({ pbDirPath }))).toBe(true);
   });
 
-  it("PDBCS-COL-04 - Missing collections file leaves DB collections in default state", async () => {
+  it("PDBCS-COL-05 - Missing collections file leaves DB collections in default state", async () => {
     const superuserPb = createPbConnection();
     await superuserPb
       .collection(superusersCollectionName)

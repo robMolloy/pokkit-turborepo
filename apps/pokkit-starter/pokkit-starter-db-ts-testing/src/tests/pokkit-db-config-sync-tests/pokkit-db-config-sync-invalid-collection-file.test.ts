@@ -39,7 +39,7 @@ describe(`${testSuiteName} tests`, () => {
     fse.removeSync(pbDirPath);
   });
 
-  it("is connection unhealthy", async () => {
+  it("PDBCS-COL-03 — Invalid collections file fails on startup", async () => {
     const pb = createPbConnection();
     try {
       await pb.health.check();

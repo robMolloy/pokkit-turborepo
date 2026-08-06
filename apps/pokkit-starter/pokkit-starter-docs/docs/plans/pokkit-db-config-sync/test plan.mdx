@@ -16,29 +16,25 @@ Required tests for syncing PocketBase config with:
 
 Checks that when `pb_config/collections.json` exists and is valid, collections are imported from the collections file.
 
-### PDBCS-COL-02 — Invalid collections file fails on startup
+### PDBCS-COL-02 — Valid collections file unchanged when already in sync
+
+Checks that when `pb_config/collections.json` exists, is valid, and matches the database, the collections file is left unchanged.
+
+### PDBCS-COL-03 — Invalid collections file fails on startup
 
 Checks that when `pb_config/collections.json` exists but is not valid collection data, startup throws an error.
 
-### PDBCS-COL-03 — Missing collections file exists once onServe finishes
+### PDBCS-COL-04 — Missing collections file exists once onServe finishes
 
 Checks that when `pb_config/collections.json` does not exist, the plugin creates it when onServe finishes.
 
-### PDBCS-COL-04 — Missing collections file matches database collections once onServe finishes
+### PDBCS-COL-05 — Missing collections file matches database collections once onServe finishes
 
 Checks that when `pb_config/collections.json` does not exist, database collections are left as is - in the state that existed before the plugin was installed (plus \_pb_config_secrets collection) .
-
-### PDBCS-COL-05 — onServe writes collections file when DB differs
-
-Checks that before onServe finishes, if database collections differ from the collections file, the collections file is updated from the database.
 
 ### PDBCS-COL-06 — Runtime collection change updates collections file
 
 Checks that a collection create/update/delete after setup writes the current database collections to `pb_config/collections.json`.
-
-### PDBCS-COL-07 — Valid collections file unchanged when already in sync
-
-Checks that when `pb_config/collections.json` exists, is valid, and matches the database, the collections file is left unchanged.
 
 ---
 
