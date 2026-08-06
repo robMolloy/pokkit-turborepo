@@ -12,7 +12,7 @@ func BindFunctions(app pbCore.App) {
 
 	os.MkdirAll(GetConfigDirPath(app), 0755)
 
-	app.OnServe().BindFunc(onServeSyncCollectionsWithCollectionsFileHandler)
+	app.OnServe().BindFunc(onServeImportCollectionsFromCollectionsFileHandler)
 	app.OnCollectionAfterCreateSuccess().BindFunc(onCollectionChangeWriteCollectionsToFileHandler)
 	app.OnCollectionAfterUpdateSuccess().BindFunc(onCollectionChangeWriteCollectionsToFileHandler)
 	app.OnCollectionAfterDeleteSuccess().BindFunc(onCollectionChangeWriteCollectionsToFileHandler)
