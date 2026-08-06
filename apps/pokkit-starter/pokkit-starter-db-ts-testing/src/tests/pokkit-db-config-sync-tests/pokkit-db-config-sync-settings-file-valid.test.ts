@@ -5,6 +5,7 @@ import {
   getPokkitDbSettingsFilePath,
   killPbInstance,
   servePb,
+  superusersCollectionName,
   upsertPbAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
 import fse from "fs-extra";
@@ -60,5 +61,14 @@ describe(`${testSuiteName} tests`, () => {
     const pb = createPbConnection();
     const isHealthy = await pb.health.check();
     expect(isHealthy.code).toBe(200);
+  });
+
+  it("PDBCS-SET-01 — Valid settings file imports on startup", async () => {
+    const superuserPb = createPbConnection();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+    const settings = await superuserPb.settings.getAll();
+    expect(settings).toEqual(validSettingsFileData);
   });
 });

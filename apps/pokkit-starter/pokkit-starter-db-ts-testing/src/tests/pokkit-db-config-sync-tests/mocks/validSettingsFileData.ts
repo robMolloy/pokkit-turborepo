@@ -31,7 +31,7 @@ export const validSettingsFileData = {
   },
   meta: {
     accentColor: "#1055c9",
-    appName: "Acme",
+    appName: "Acme123",
     appURL: "http://localhost:8090",
     senderName: "Support",
     senderAddress: "support@example.com",
