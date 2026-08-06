@@ -1,9 +1,73 @@
 ---
-sidebar_position: 2
+sidebar_position: 1
 ---
 
 # Spec
 
+## Overview
+
+The overview can be found [here](./index.mdx).
+
 ## Goal
 
-Pokkit Db Config Sync is a PocketBase plugin that makes it easier to manage the configuration of a PocketBase database. It does this by introducing a small set of config collections and a reusable rule syntax that other collections can reference.
+### Collections
+
+- On startup
+  - if collections.json file exists
+    - and is valid collection data
+      - import collections from collections.json file
+        -if not valid collection data
+      - throw error
+  - if collections.json file does not exist
+    - leave database collections as is
+
+- Before onServe command finishes
+  - if collections in database are the same as collections file
+    - update file with collections from database
+  - if collections in database are not the same as collections file
+    - leave file as is
+
+- if collections are changed at runtime
+  - update file with collections from database
+
+### Settings
+
+- On startup
+  - if file exists
+    - and is valid settings data
+      - import settings from file
+    - if not valid settings data
+      - throw error
+  - if file does not exist
+    - leave settings as is
+
+- Before onServe command finishes
+  - if settings in database are the same as settings in file
+    - leave as is
+  - if settings in database are not the same as settings in file
+    - update file with settings from database
+
+- When settings are changed at runtime
+  - update file with settings from database
+
+### Secrets
+
+- On startup
+  - merge \_pb_secrets collection into database
+    - then remove contents of \_pb_secrets collection
+  - if secrets file exists
+    - and is valid secrets data
+      - import secrets from file into \_pb_secrets collection
+    - if not valid secrets data
+      - throw error
+  - if secrets file does not exist
+    - leave \_pb_secrets collection as is
+
+- Before onServe command finishes
+  - if secrets in database are the same as secrets in file
+    - leave \_pb_secrets collection as is
+  - if secrets in database are not the same as secrets in file
+    - update \_pb_secrets collection with secrets from file
+
+- When secrets are changed at runtime
+  - update `pb_config/secrets.json` file with secrets from database

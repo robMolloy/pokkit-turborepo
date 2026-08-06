@@ -1,3 +1,17 @@
 # Pokkit Db Config Sync
 
 ## Overview
+
+Pokkit Db Config Sync is a PocketBase plugin that syncs the database configuration with the relevant file as follows;
+
+- Collections syncs with `pb_config/collections.json`
+- Settings sync with `pb_config/settings.json`
+- Secrets sync with `pb_config/secrets.json`.
+
+## How it works
+
+When the app is started, the plugin will check if the relevant file exists. If it does, the plugin will import the values from the file. If the file does not exist, the plugin will leave the values as is.
+
+Just before the onServe command finishes, the plugin will check each file to make sure they correspond exactly to the current status of the database. If there are any differences, the plugin will update the file with the current status of the database.
+
+If changes are made at runtime, the plugin will update the relevant file with the current status of the database.
