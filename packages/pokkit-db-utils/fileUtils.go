@@ -32,6 +32,18 @@ func ReadJsonFromFile(filePath string) (map[string]any, error) {
 	return result, err
 }
 
+func ReadJsonFromFileGeneric[T any](filePath string) (T, error) {
+	var result T
+
+	jsonBytes, err := os.ReadFile(filePath)
+	if err != nil {
+		return result, err
+	}
+
+	err = json.Unmarshal(jsonBytes, &result)
+	return result, err
+}
+
 func WriteStringToFile(contentBodyString string, filePath string) error {
 	return os.WriteFile(filePath, []byte(contentBodyString), 0644)
 }

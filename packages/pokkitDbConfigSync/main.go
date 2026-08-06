@@ -27,4 +27,5 @@ func BindFunctions(app pbCore.App) {
 
 	// Set is setup complete flag after all other handlers have run.
 	app.OnServe().Bind(&hook.Handler[*pbCore.ServeEvent]{Func: onServeSetIsSetupCompleteHandler, Priority: 1001})
+	app.OnServe().Bind(&hook.Handler[*pbCore.ServeEvent]{Func: onServeWriteCollectionsToCollectionsFileIfNotSameHandler, Priority: 1002})
 }

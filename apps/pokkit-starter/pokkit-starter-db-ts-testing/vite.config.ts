@@ -13,7 +13,7 @@ export default (p: { mode: ConfigEnv }) => {
     test: {
       globals: true,
       environment: "node",
-      fileParallelism: true,
+      // fileParallelism: true,
       forceRerunTriggers: ["**/source-test-build/**"],
     },
   });

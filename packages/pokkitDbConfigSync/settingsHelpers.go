@@ -6,7 +6,6 @@ import (
 	"os"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
-	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
 	pokkitDbUtils "github.com/robMolloy/pokkit-turborepo/packages/pokkit-db-utils"
 )
 
@@ -18,7 +17,7 @@ func importSettingsFromSettingsFile(app pbCore.App) error {
 	settingsFilePath := configDirPath + "/" + SettingsFileName
 
 	// File definitely exists, this will only fail with an error that should be logged
-	settingsData, err := utils.ReadJsonFromFileGeneric[*pbCore.Settings](settingsFilePath)
+	settingsData, err := pokkitDbUtils.ReadJsonFromFileGeneric[*pbCore.Settings](settingsFilePath)
 	if err != nil {
 		return err
 	}

@@ -28,3 +28,19 @@ func onCollectionChangeWriteCollectionsToFileHandler(e *pbCore.CollectionEvent) 
 
 	return e.Next()
 }
+
+func onServeWriteCollectionsToCollectionsFileIfNotSameHandler(e *pbCore.ServeEvent) error {
+	isCollectionsSame, err := isCollectionsSameAsCollectionsFile(e.App)
+	if err != nil {
+		log.Fatalf("failed to isCollectionsSameAsCollectionsFile in onServeCheckCollectionsHandler: %v", err)
+	}
+
+	if !isCollectionsSame {
+		err = writeCollectionsToCollectionsFile(e.App)
+		if err != nil {
+			log.Fatalf("failed to WriteCollectionsToCollectionsFile in onServeSyncCollectionsIfNotSameHandler: %v", err)
+		}
+	}
+
+	return e.Next()
+}
