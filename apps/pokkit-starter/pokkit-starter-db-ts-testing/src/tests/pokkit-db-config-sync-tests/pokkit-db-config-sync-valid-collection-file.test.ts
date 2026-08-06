@@ -2,7 +2,7 @@ import {
   clearPb,
   getPbFilePath,
   getPbServeUrl,
-  getPokkitDbCollectionsFilePathh,
+  getPokkitDbCollectionsFilePath,
   killPbInstance,
   servePb,
   superusersCollectionName,
@@ -31,9 +31,9 @@ describe(`${testSuiteName} tests`, () => {
     await killPbInstance({ pbPortNumber });
     fse.removeSync(pbDirPath);
     fse.copySync(sourceTestBuildDirPath, pbDirPath);
-    fse.removeSync(getPokkitDbCollectionsFilePathh({ pbDirPath }));
+    fse.removeSync(getPokkitDbCollectionsFilePath({ pbDirPath }));
     fse.writeFileSync(
-      getPokkitDbCollectionsFilePathh({ pbDirPath }),
+      getPokkitDbCollectionsFilePath({ pbDirPath }),
       JSON.stringify(validCollectionFileData, null, 2),
     );
 

@@ -2,7 +2,7 @@ import {
   clearPb,
   getPbFilePath,
   getPbServeUrl,
-  getPokkitDbCollectionsFilePathh,
+  getPokkitDbCollectionsFilePath,
   killPbInstance,
   servePb,
   upsertPbAdminCredentialsFromCli,
@@ -110,7 +110,7 @@ describe("pokkit-db config writer collection tests", () => {
 
     await expect(await superuserPb.collection(newCollectionName).getFullList()).toEqual([]);
 
-    const collectionsFileBuffer = fse.readFileSync(getPokkitDbCollectionsFilePathh({ pbDirPath }));
+    const collectionsFileBuffer = fse.readFileSync(getPokkitDbCollectionsFilePath({ pbDirPath }));
     const collectionsFileStr = collectionsFileBuffer.toString();
 
     expect(collectionsFileStr.includes(`"name": "${newCollectionName}"`)).toBe(true);

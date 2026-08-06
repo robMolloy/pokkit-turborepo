@@ -2,7 +2,7 @@ import {
   clearPb,
   getPbFilePath,
   getPbServeUrl,
-  getPokkitDbCollectionsFilePathh,
+  getPokkitDbCollectionsFilePath,
   killPbInstance,
   servePb,
   superusersCollectionName,
@@ -30,9 +30,9 @@ describe(`${testSuiteName} tests`, () => {
     await killPbInstance({ pbPortNumber });
     fse.removeSync(pbDirPath);
     fse.copySync(sourceTestBuildDirPath, pbDirPath);
-    fse.removeSync(getPokkitDbCollectionsFilePathh({ pbDirPath }));
+    fse.removeSync(getPokkitDbCollectionsFilePath({ pbDirPath }));
 
-    expect(fse.existsSync(getPokkitDbCollectionsFilePathh({ pbDirPath }))).toBe(false);
+    expect(fse.existsSync(getPokkitDbCollectionsFilePath({ pbDirPath }))).toBe(false);
 
     await servePb({ pbFilePath, pbPortNumber, logFilePath });
     await upsertPbAdminCredentialsFromCli({ pbFilePath, superuserEmail, superuserPassword });
@@ -59,7 +59,7 @@ describe(`${testSuiteName} tests`, () => {
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
 
-    expect(fse.existsSync(getPokkitDbCollectionsFilePathh({ pbDirPath }))).toBe(true);
+    expect(fse.existsSync(getPokkitDbCollectionsFilePath({ pbDirPath }))).toBe(true);
   });
 
   it("PDBCS-COL-04 - Missing collections file leaves DB collections in default state", async () => {
@@ -68,7 +68,7 @@ describe(`${testSuiteName} tests`, () => {
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
     const collections = await superuserPb.collections.getFullList();
-    const collectionsFromFile = await fse.readJson(getPokkitDbCollectionsFilePathh({ pbDirPath }));
+    const collectionsFromFile = await fse.readJson(getPokkitDbCollectionsFilePath({ pbDirPath }));
 
     expect(collectionsFromFile).toEqual(collections);
   });

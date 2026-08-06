@@ -1,7 +1,7 @@
 import {
   getPbFilePath,
   getPbServeUrl,
-  getPokkitDbCollectionsFilePathh,
+  getPokkitDbCollectionsFilePath,
   killPbInstance,
   servePb,
 } from "@repo/pokkit-testing";
@@ -27,8 +27,8 @@ describe(`${testSuiteName} tests`, () => {
     await killPbInstance({ pbPortNumber });
     fse.removeSync(pbDirPath);
     fse.copySync(sourceTestBuildDirPath, pbDirPath);
-    fse.removeSync(getPokkitDbCollectionsFilePathh({ pbDirPath }));
-    fse.writeFileSync(getPokkitDbCollectionsFilePathh({ pbDirPath }), "some invalid JSON");
+    fse.removeSync(getPokkitDbCollectionsFilePath({ pbDirPath }));
+    fse.writeFileSync(getPokkitDbCollectionsFilePath({ pbDirPath }), "some invalid JSON");
 
     const servePbResult = await servePb({ pbFilePath, pbPortNumber, logFilePath });
     expect(servePbResult.success).toBe(false);

@@ -2,7 +2,7 @@ import {
   clearPb,
   getPbFilePath,
   getPbServeUrl,
-  getPokkitDbCollectionsFilePathh,
+  getPokkitDbCollectionsFilePath,
   globalUserPermissionsCollectionName,
   killPbInstance,
   organisationsCollectionName,
@@ -27,7 +27,7 @@ const pbPortNumber = testMetadata.portNumber;
 const pbDirPath = `_sandboxes/${testSuiteName}`;
 const pbFilePath = getPbFilePath({ pbDirPath });
 const pbServeUrl = getPbServeUrl({ pbPortNumber });
-const collectionsFilePath = getPokkitDbCollectionsFilePathh({ pbDirPath });
+const collectionsFilePath = getPokkitDbCollectionsFilePath({ pbDirPath });
 
 const permissionCollectionNames = [
   globalUserPermissionsCollectionName,

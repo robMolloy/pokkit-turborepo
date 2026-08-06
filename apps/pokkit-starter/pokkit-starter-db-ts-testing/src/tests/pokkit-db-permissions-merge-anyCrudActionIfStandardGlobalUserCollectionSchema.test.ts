@@ -2,7 +2,7 @@ import {
   clearPb,
   getPbFilePath,
   getPbServeUrl,
-  getPokkitDbCollectionsFilePathh,
+  getPokkitDbCollectionsFilePath,
   globalUserPermissionsCollectionName,
   killPbInstance,
   servePb,
@@ -42,7 +42,7 @@ describe(`${testSuiteName} tests`, () => {
     await killPbInstance({ pbPortNumber });
     fse.removeSync(pbDirPath);
     fse.copySync(sourceTestBuildDirPath, pbDirPath);
-    fse.removeSync(getPokkitDbCollectionsFilePathh({ pbDirPath }));
+    fse.removeSync(getPokkitDbCollectionsFilePath({ pbDirPath }));
 
     await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
     await upsertPbAdminCredentialsFromCli({ pbFilePath, superuserEmail, superuserPassword });

@@ -2,7 +2,7 @@ import {
   clearPb,
   getPbFilePath,
   getPbServeUrl,
-  getPokkitDbCollectionsFilePathh,
+  getPokkitDbCollectionsFilePath,
   globalUserPermissionsCollectionName,
   killPbInstance,
   organisationsCollectionName,
@@ -33,7 +33,7 @@ describe("pokkit-db permissions no collections file tests", () => {
 
     fse.removeSync(pbDirPath);
     fse.copySync(sourceTestBuildDirPath, pbDirPath);
-    fse.removeSync(getPokkitDbCollectionsFilePathh({ pbDirPath }));
+    fse.removeSync(getPokkitDbCollectionsFilePath({ pbDirPath }));
 
     await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
 
