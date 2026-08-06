@@ -6,3 +6,5 @@ export const getPokkitDbCollectionsFilePath = (p: { pbDirPath: string }) =>
 
 export const getPokkitDbSecretsFilePath = (p: { pbDirPath: string }) =>
   p.pbDirPath + "/pb_config/secrets.json";
+
+export const pbConfigSecretsCollectionName = "_pb_config_secrets";
