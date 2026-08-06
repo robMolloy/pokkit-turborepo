@@ -18,6 +18,7 @@ func BindFunctions(app pbCore.App) {
 	app.OnCollectionAfterDeleteSuccess().BindFunc(onCollectionChangeWriteCollectionsToFileHandler)
 
 	app.OnServe().BindFunc(onServeSyncSecretsWithSecretsFileHandler)
+	// app.OnServe().BindFunc(onServePopulateSecretsCollectionWithSecretsFileHandler)
 	app.OnRecordAfterCreateSuccess(secretsCollectionName).BindFunc(onSecretRecordChangeWriteSecretsToSecretsFileHandler)
 	app.OnRecordAfterUpdateSuccess(secretsCollectionName).BindFunc(onSecretRecordChangeWriteSecretsToSecretsFileHandler)
 	app.OnRecordAfterDeleteSuccess(secretsCollectionName).BindFunc(onSecretRecordChangeWriteSecretsToSecretsFileHandler)
@@ -27,5 +28,8 @@ func BindFunctions(app pbCore.App) {
 
 	// Set is setup complete flag after all other handlers have run.
 	app.OnServe().Bind(&hook.Handler[*pbCore.ServeEvent]{Func: onServeSetIsSetupCompleteHandler, Priority: 1001})
+
 	app.OnServe().Bind(&hook.Handler[*pbCore.ServeEvent]{Func: onServeWriteCollectionsToCollectionsFileIfNotSameHandler, Priority: 1002})
+	app.OnServe().Bind(&hook.Handler[*pbCore.ServeEvent]{Func: onServeWriteSettingsToSettingsFileHandler, Priority: 1003})
+	// app.OnServe().Bind(&hook.Handler[*pbCore.ServeEvent]{Func: onServeWriteSecretsToSecretsFileHandler, Priority: 1004})
 }

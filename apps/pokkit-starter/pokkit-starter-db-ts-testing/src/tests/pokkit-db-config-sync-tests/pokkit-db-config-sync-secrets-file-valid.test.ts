@@ -4,7 +4,9 @@ import {
   getPbServeUrl,
   getPokkitDbSecretsFilePath,
   killPbInstance,
+  pbConfigSecretsCollectionName,
   servePb,
+  superusersCollectionName,
   upsertPbAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
 import fse from "fs-extra";
@@ -53,5 +55,29 @@ describe(`${testSuiteName} tests`, () => {
     const pb = createPbConnection();
     const isHealthy = await pb.health.check();
     expect(isHealthy.code).toBe(200);
+  });
+
+  it("PDBCS-SEC-01 — Startup merges `_pb_config_secrets` collection into the database then removes all", async () => {
+    const superuserPb = createPbConnection();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+    const collections = await superuserPb.collections.getFullList();
+    expect(
+      collections.some((collection) => collection.name === pbConfigSecretsCollectionName),
+    ).toBe(true);
+  });
+
+  it("PDBCS-SEC-02 — Valid secrets file imports into `_pb_config_secrets` collection", async () => {
+    const superuserPb = createPbConnection();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+    const secrets = await superuserPb.collection(pbConfigSecretsCollectionName).getFullList();
+    const indexedSecrets: { [key: string]: string } = {};
+    for (const secret of secrets) {
+      indexedSecrets[secret.id] = secret.value;
+    }
+    expect(indexedSecrets).toEqual(validSecretsFileData);
   });
 });

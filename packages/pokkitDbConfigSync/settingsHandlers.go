@@ -28,3 +28,11 @@ func onSettingsChangeWriteSettingsToSettingsFileHandler(e *pbCore.SettingsUpdate
 
 	return e.Next()
 }
+
+func onServeWriteSettingsToSettingsFileHandler(se *pbCore.ServeEvent) error {
+	err := writeSettingsToSettingsFile(se.App)
+	if err != nil {
+		log.Fatalf("failed to writeSettingsToSettingsFile in onServeWriteSettingsToSettingsFileHandler: %v", err)
+	}
+	return se.Next()
+}
