@@ -1,3 +1,87 @@
 # Test Plan
 
 ## Scope
+
+Required tests for syncing PocketBase config with:
+
+- Collections ↔ `pb_config/collections.json`
+- Settings ↔ `pb_config/settings.json`
+- Secrets ↔ `pb_config/secrets.json`
+
+Each test checks one behaviour. No-op “already in sync” paths are omitted.
+
+---
+
+## Collections
+
+### PDBCS-COL-01 — Valid file imports on startup
+
+Checks that when `pb_config/collections.json` exists and is valid, collections are imported from the file.
+
+### PDBCS-COL-02 — Invalid file fails on startup
+
+Checks that when `pb_config/collections.json` exists but is not valid collection data, startup throws an error.
+
+### PDBCS-COL-03 — Missing file leaves DB collections unchanged
+
+Checks that when `pb_config/collections.json` does not exist, database collections are left as is.
+
+### PDBCS-COL-04 — onServe writes file when DB differs
+
+Checks that before onServe finishes, if database collections differ from the file, the file is updated from the database.
+
+### PDBCS-COL-05 — Runtime collection change updates file
+
+Checks that a collection create/update/delete after setup writes the current database collections to `pb_config/collections.json`.
+
+---
+
+## Settings
+
+### PDBCS-SET-01 — Valid file imports on startup
+
+Checks that when `pb_config/settings.json` exists and is valid, settings are imported from the file.
+
+### PDBCS-SET-02 — Invalid file fails on startup
+
+Checks that when `pb_config/settings.json` exists but is not valid settings data, startup throws an error.
+
+### PDBCS-SET-03 — Missing file leaves settings unchanged
+
+Checks that when `pb_config/settings.json` does not exist, settings are left as is.
+
+### PDBCS-SET-04 — onServe writes file when DB differs
+
+Checks that before onServe finishes, if database settings differ from the file, the file is updated from the database.
+
+### PDBCS-SET-05 — Runtime settings change updates file
+
+Checks that a settings change after setup writes the current database settings to `pb_config/settings.json`.
+
+---
+
+## Secrets
+
+### PDBCS-SEC-01 — Startup merges then clears `_pb_secrets`
+
+Checks that on startup the plugin merges `_pb_secrets` into the database, then removes the contents of `_pb_secrets`.
+
+### PDBCS-SEC-02 — Valid file imports into `_pb_secrets`
+
+Checks that when `pb_config/secrets.json` exists and is valid, secrets are imported from the file into `_pb_secrets`.
+
+### PDBCS-SEC-03 — Invalid file fails on startup
+
+Checks that when `pb_config/secrets.json` exists but is not valid secrets data, startup throws an error.
+
+### PDBCS-SEC-04 — Missing file leaves `_pb_secrets` unchanged
+
+Checks that when `pb_config/secrets.json` does not exist, `_pb_secrets` is left as is (after the merge/clear in SEC-01).
+
+### PDBCS-SEC-05 — onServe updates collection from file when they differ
+
+Checks that before onServe finishes, if database secrets differ from the file, `_pb_secrets` is updated from the file.
+
+### PDBCS-SEC-06 — Runtime secrets change updates file
+
+Checks that a `_pb_secrets` create/update/delete after setup writes the current database secrets to `pb_config/secrets.json`.
