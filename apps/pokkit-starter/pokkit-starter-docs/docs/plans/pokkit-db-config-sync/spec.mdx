@@ -8,66 +8,72 @@ sidebar_position: 1
 
 The overview can be found [here](./index.mdx).
 
-## Goal
+## Collections
 
-### Collections
+### On startup
 
-- On startup
-  - if collections.json file exists
-    - and is valid collection data
-      - import collections from collections.json file
-        -if not valid collection data
-      - throw error
-  - if collections.json file does not exist
-    - leave database collections as is
+| Condition                  | Action                               |
+| -------------------------- | ------------------------------------ |
+| File exists and is valid   | Import collections from file         |
+| File exists and is invalid | Throw error                          |
+| File does not exist        | Leave database collections unchanged |
 
-- Before onServe command finishes
-  - if collections in database are the same as collections file
-    - update file with collections from database
-  - if collections in database are not the same as collections file
-    - leave file as is
+### Before onServe finishes
 
-- if collections are changed at runtime
-  - update file with collections from database
+| Condition                             | Action                             |
+| ------------------------------------- | ---------------------------------- |
+| Database collections match file       | Leave file unchanged               |
+| Database collections differ from file | Write database collections to file |
 
-### Settings
+### At runtime
 
-- On startup
-  - if file exists
-    - and is valid settings data
-      - import settings from file
-    - if not valid settings data
-      - throw error
-  - if file does not exist
-    - leave settings as is
+| Condition                          | Action                             |
+| ---------------------------------- | ---------------------------------- |
+| Collections change in the database | Write database collections to file |
 
-- Before onServe command finishes
-  - if settings in database are the same as settings in file
-    - leave as is
-  - if settings in database are not the same as settings in file
-    - update file with settings from database
+## Settings
 
-- When settings are changed at runtime
-  - update file with settings from database
+### On startup
 
-### Secrets
+| Condition                  | Action                            |
+| -------------------------- | --------------------------------- |
+| File exists and is valid   | Import settings from file         |
+| File exists and is invalid | Throw error                       |
+| File does not exist        | Leave database settings unchanged |
 
-- On startup
-  - merge \_pb_config_secrets collection into database
-    - then remove contents of \_pb_config_secrets collection
-  - if secrets file exists
-    - and is valid secrets data
-      - import secrets from file into \_pb_config_secrets collection
-    - if not valid secrets data
-      - throw error
-  - if secrets file does not exist
-    - leave \_pb_config_secrets collection as is
+### Before onServe finishes
 
-- Before onServe command finishes
-  - if secrets in database are the same as secrets in file
-    - leave \_pb_config_secrets collection as is
-  - if secrets in database are not the same as secrets in file
-    - update \_pb_config_secrets collection with secrets from file
+| Condition                          | Action                          |
+| ---------------------------------- | ------------------------------- |
+| Database settings match file       | Leave file unchanged            |
+| Database settings differ from file | Write database settings to file |
 
-- When secrets are changed at runtime
-  - update `pb_config/secrets.json` file with secrets from database
+### At runtime
+
+| Condition                       | Action                          |
+| ------------------------------- | ------------------------------- |
+| Settings change in the database | Write database settings to file |
+
+## Secrets
+
+### On startup
+
+| Condition                  | Action                                                                        |
+| -------------------------- | ----------------------------------------------------------------------------- |
+| Always                     | Merge `_pb_config_secrets` into the database, then clear `_pb_config_secrets` |
+| File exists and is valid   | Import secrets from file into `_pb_config_secrets`                            |
+| File exists and is invalid | Throw error                                                                   |
+| File does not exist        | Leave `_pb_config_secrets` unchanged                                          |
+
+### Before onServe finishes
+
+| Condition                         | Action                                |
+| --------------------------------- | ------------------------------------- |
+| Database secrets match file       | Leave `_pb_config_secrets` unchanged  |
+| Database secrets differ from file | Update `_pb_config_secrets` from file |
+
+### At runtime
+
+| Condition                      | Action                                             |
+| ------------------------------ | -------------------------------------------------- |
+| Secrets change in the database | Write database secrets to `pb_config/secrets.json` |
