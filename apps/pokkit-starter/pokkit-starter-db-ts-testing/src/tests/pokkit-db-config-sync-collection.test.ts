@@ -110,8 +110,10 @@ describe("pokkit-db config writer collection tests", () => {
 
     await expect(await superuserPb.collection(newCollectionName).getFullList()).toEqual([]);
 
-    const collectionsFileBuffer = fse.readFileSync(getPokkitDbCollectionsFilePath({ pbDirPath }));
-    const collectionsFileStr = collectionsFileBuffer.toString();
+    const collectionsFileStr = fse.readFileSync(
+      getPokkitDbCollectionsFilePath({ pbDirPath }),
+      "utf8",
+    );
 
     expect(collectionsFileStr.includes(`"name": "${newCollectionName}"`)).toBe(true);
   });

@@ -14,6 +14,7 @@ import { PocketBase } from "../../config/pocketbaseConfig";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_constants";
 import { pokkitDbConfigSyncTestsMetadata } from "./_pokkitDbConfigSyncTestsMetadata";
 import { validCollectionFileData } from "./mocks/validCollectionFileData";
+import { delay, safeJsonParse } from "@repo/pokkit-utils";
 
 const testMetadata = pokkitDbConfigSyncTestsMetadata.validCollectionFile;
 const testSuiteName = testMetadata.name;
@@ -106,5 +107,47 @@ describe(`${testSuiteName} tests`, () => {
       "utf8",
     );
     expect(collectionsFileContentsAtEnd).toEqual(collectionsFileContentsAtStart);
+  });
+  it("PDBCS-COL-06 — Runtime collection change CRUD changes to collections file", async () => {
+    const collectionName = "exampleCollection";
+    const superuserPb = createPbConnection();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+
+    await superuserPb.collections.create({ name: collectionName, type: "base" });
+    const collections = await superuserPb.collections.getFullList();
+
+    expect(collections.some((collection) => collection.name === collectionName)).toEqual(true);
+
+    const afterCreate = fse.readFileSync(getPokkitDbCollectionsFilePath({ pbDirPath }), "utf8");
+    const afterCreateParsedResp = safeJsonParse(afterCreate);
+    expect(
+      (afterCreateParsedResp.data as { name: string }[]).some(
+        (collection) => collection.name === collectionName,
+      ),
+    ).toEqual(true);
+
+    await superuserPb.collections.update(collectionName, {
+      fields: [{ name: "status", type: "bool" }],
+    });
+
+    const afterUpdate = fse.readFileSync(getPokkitDbCollectionsFilePath({ pbDirPath }), "utf8");
+    const afterUpdateParsedResp = safeJsonParse(afterUpdate);
+    expect(
+      (afterUpdateParsedResp.data as { name: string; fields: { name: string }[] }[])
+        .find((collection) => collection.name === collectionName)
+        ?.fields.some((field) => field.name === "status"),
+    ).toEqual(true);
+
+    await superuserPb.collections.delete(collectionName);
+
+    const afterDelete = fse.readFileSync(getPokkitDbCollectionsFilePath({ pbDirPath }), "utf8");
+    const afterDeleteParsedResp = safeJsonParse(afterDelete);
+    expect(
+      (afterDeleteParsedResp.data as { name: string }[]).some(
+        (collection) => collection.name === collectionName,
+      ),
+    ).toEqual(false);
   });
 });
