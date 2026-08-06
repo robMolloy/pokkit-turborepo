@@ -48,19 +48,15 @@ Checks that when `pb_config/settings.json` exists and is valid, settings are imp
 
 Checks that when `pb_config/settings.json` exists but is not valid settings data, startup throws an error.
 
-### PDBCS-SET-03 — Missing settings file leaves settings unchanged
+### PDBCS-SET-03 — Missing settings file exists and matches database once onServe finishes
 
-Checks that when `pb_config/settings.json` does not exist, settings are left as is.
+Checks that when `pb_config/settings.json` does not exist, the plugin creates it when onServe finishes and it matches the database settings.
 
-### PDBCS-SET-04 — onServe writes settings file when DB differs
-
-Checks that before onServe finishes, if database settings differ from the settings file, the settings file is updated from the database.
-
-### PDBCS-SET-05 — Runtime settings change updates settings file
+### PDBCS-SET-04 — When settings are changed at runtime, the settings file is updated
 
 Checks that a settings change after setup writes the current database settings to `pb_config/settings.json`.
 
-### PDBCS-SET-06 — Valid settings file unchanged when already in sync
+### PDBCS-SET-05 — Valid settings file unchanged when already in sync
 
 Checks that when `pb_config/settings.json` exists, is valid, and matches the database, the settings file is left unchanged.
 
