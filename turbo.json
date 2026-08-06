@@ -18,11 +18,12 @@
       "cache": false
     },
     "test": {
-      "dependsOn": ["^pre-test"],
+      "dependsOn": ["pre-test"],
       "cache": false,
       "persistent": true
     },
     "test-companion": {
+      "dependsOn": ["pre-test"],
       "cache": false,
       "persistent": true
     },

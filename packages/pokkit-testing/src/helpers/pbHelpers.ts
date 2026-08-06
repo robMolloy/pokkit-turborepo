@@ -75,23 +75,15 @@ export const servePb = async (p: {
       });
 
       pbProcess.stderr.on("data", (data) => {
+        logStream?.write(`[stderr] ${data.toString()}\n`);
         logStream?.end();
         reject(data.toString());
-        return {
-          success: false,
-          error: new Error(`servePb: error starting pb process: ${data.toString()}`),
-        } as const;
-        logStream?.write(`[stderr] ${data.toString()}\n`);
       });
 
       pbProcess.on("error", (error) => {
         logStream?.write(`[error] ${error.message}\n`);
         logStream?.end();
         reject(error);
-        return {
-          success: false,
-          error: new Error(`servePb: error starting pb process: ${error}`),
-        } as const;
       });
     });
     return { success: true, data: { pbProcess, dbUrl, dbServeUrl } } as const;
