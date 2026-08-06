@@ -57,13 +57,18 @@ func createSecretsCollection(app pbCore.App) (*pbCore.Collection, error) {
 	return collection, nil
 }
 
-func populateSecretsCollectionFromSecretsFile(app pbCore.App, secretsCollection *pbCore.Collection) (err error) {
+func populateSecretsCollectionWithSecretsFile(app pbCore.App) (err error) {
 	configDirPath := GetConfigDirPath(app)
 	secretsFilePath := configDirPath + "/" + SecretsFileName
 
+	secretsCollection, err := app.FindCollectionByNameOrId(secretsCollectionName)
+	if err != nil {
+		return fmt.Errorf("error finding collection _pb_config_secrets in PopulateSecretsCollectionWithSecretsFile: %w", err)
+	}
+
 	obj, err := utils.ReadJsonFromFile(secretsFilePath)
 	if err != nil {
-		return fmt.Errorf("cannot read json from %s: %w", secretsFilePath, err)
+		return fmt.Errorf("cannot read json from %s in populateSecretsCollectionWithSecretsFile: %w", secretsFilePath, err)
 	}
 
 	for key, value := range obj {
@@ -81,9 +86,14 @@ func populateSecretsCollectionFromSecretsFile(app pbCore.App, secretsCollection 
 	return nil
 }
 
-func writeSecretsToSecretsFile(app pbCore.App, secretsCollection *pbCore.Collection) error {
+func writeSecretsCollectionToSecretsFile(app pbCore.App) error {
 	configDirPath := GetConfigDirPath(app)
 	secretsFilePath := configDirPath + "/" + SecretsFileName
+
+	secretsCollection, err := app.FindCollectionByNameOrId(secretsCollectionName)
+	if err != nil {
+		return fmt.Errorf("error finding collection _pb_config_secrets in WriteSecretsCollectionToSecretsFile: %w", err)
+	}
 
 	records, err := app.FindAllRecords(secretsCollection)
 	if err != nil {
@@ -104,19 +114,15 @@ func writeSecretsToSecretsFile(app pbCore.App, secretsCollection *pbCore.Collect
 }
 
 func syncSecretsWithSecretsFile(app pbCore.App) (err error) {
-	secretsCollection, err := replaceSecretsCollection(app)
+	_, err = replaceSecretsCollection(app)
+	if err != nil {
+		return fmt.Errorf("error replaceSecretsCollection in SyncSecretsWithSecretsFile: %w", err)
+	}
 
-	err = populateSecretsCollectionFromSecretsFile(app, secretsCollection)
+	err = populateSecretsCollectionWithSecretsFile(app)
 	noSecretsFileExists := errors.Is(err, os.ErrNotExist)
 	if err != nil && !noSecretsFileExists {
-		return fmt.Errorf("error WriteSecretsToSecretsFile in SyncSecretsWithSecretsFile: %w", err)
-	}
-
-	if noSecretsFileExists {
-		err = writeSecretsToSecretsFile(app, secretsCollection)
-	}
-	if err != nil {
-		return fmt.Errorf("error WriteSecretsToSecretsFile in SyncSecretsWithSecretsFile: %w", err)
+		return fmt.Errorf("error populateSecretsCollectionWithSecretsFile in SyncSecretsWithSecretsFile: %w", err)
 	}
 
 	return nil

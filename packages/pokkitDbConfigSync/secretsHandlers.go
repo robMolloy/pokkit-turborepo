@@ -20,13 +20,17 @@ func onSecretRecordChangeWriteSecretsToSecretsFileHandler(e *pbCore.RecordEvent)
 		return e.Next()
 	}
 
-	secretsCollection, err := e.App.FindCollectionByNameOrId(secretsCollectionName)
+	err := writeSecretsCollectionToSecretsFile(e.App)
 	if err != nil {
-		log.Fatalf("failed to e.App.FindCollectionByNameOrId(secretsCollectionName) in onSecretRecordChangeWriteSecretsToSecretsFileHandler: %v", err)
-	}
-	err = writeSecretsToSecretsFile(e.App, secretsCollection)
-	if err != nil {
-		log.Fatalf("failed to writeSecretsToSecretsFile in onSecretRecordChangeWriteSecretsToSecretsFileHandler: %v", err)
+		log.Fatalf("failed to writeSecretsCollectionToSecretsFile in onSecretRecordChangeWriteSecretsToSecretsFileHandler: %v", err)
 	}
 	return e.Next()
+}
+
+func onServeWriteSecretsCollectionToSecretsFileHandler(se *pbCore.ServeEvent) error {
+	err := writeSecretsCollectionToSecretsFile(se.App)
+	if err != nil {
+		log.Fatalf("failed to writeSecretsCollectionToSecretsFile in onServeWriteSecretsCollectionToSecretsFileHandler: %v", err)
+	}
+	return se.Next()
 }

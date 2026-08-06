@@ -31,5 +31,5 @@ func BindFunctions(app pbCore.App) {
 
 	app.OnServe().Bind(&hook.Handler[*pbCore.ServeEvent]{Func: onServeWriteCollectionsToCollectionsFileIfNotSameHandler, Priority: 1002})
 	app.OnServe().Bind(&hook.Handler[*pbCore.ServeEvent]{Func: onServeWriteSettingsToSettingsFileHandler, Priority: 1003})
-	// app.OnServe().Bind(&hook.Handler[*pbCore.ServeEvent]{Func: onServeWriteSecretsToSecretsFileHandler, Priority: 1004})
+	app.OnServe().Bind(&hook.Handler[*pbCore.ServeEvent]{Func: onServeWriteSecretsCollectionToSecretsFileHandler, Priority: 1004})
 }
