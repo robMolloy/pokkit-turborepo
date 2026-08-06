@@ -11,7 +11,7 @@ import { PocketBase } from "../../config/pocketbaseConfig";
 import { sourceTestBuildDirPath } from "../_constants";
 import { pokkitDbConfigSyncTestsMetadata } from "./_pokkitDbConfigSyncTestsMetadata";
 
-const testMetadata = pokkitDbConfigSyncTestsMetadata.invalidCollectionFile;
+const testMetadata = pokkitDbConfigSyncTestsMetadata.collectionFileInvalid;
 const testSuiteName = testMetadata.name;
 
 const pbPortNumber = testMetadata.portNumber;

@@ -8,15 +8,15 @@ import {
   superusersCollectionName,
   upsertPbAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
+import { safeJsonParse } from "@repo/pokkit-utils";
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../../config/pocketbaseConfig";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_constants";
 import { pokkitDbConfigSyncTestsMetadata } from "./_pokkitDbConfigSyncTestsMetadata";
 import { validCollectionFileData } from "./mocks/validCollectionFileData";
-import { delay, safeJsonParse } from "@repo/pokkit-utils";
 
-const testMetadata = pokkitDbConfigSyncTestsMetadata.validCollectionFile;
+const testMetadata = pokkitDbConfigSyncTestsMetadata.collectionFileValid;
 const testSuiteName = testMetadata.name;
 
 const pbPortNumber = testMetadata.portNumber;
