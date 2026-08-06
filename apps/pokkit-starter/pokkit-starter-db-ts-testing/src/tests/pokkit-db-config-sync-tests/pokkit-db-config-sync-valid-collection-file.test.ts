@@ -22,6 +22,7 @@ const pbPortNumber = testMetadata.portNumber;
 const pbDirPath = `_sandboxes/${testSuiteName}`;
 const pbFilePath = getPbFilePath({ pbDirPath });
 const pbServeUrl = getPbServeUrl({ pbPortNumber });
+const logFilePath = `_logs/${testSuiteName}`;
 
 const createPbConnection = () => new PocketBase(pbServeUrl);
 
@@ -36,7 +37,7 @@ describe(`${testSuiteName} tests`, () => {
       JSON.stringify(validCollectionFileData, null, 2),
     );
 
-    await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
+    await servePb({ pbFilePath, pbPortNumber, logFilePath });
     await upsertPbAdminCredentialsFromCli({ pbFilePath, superuserEmail, superuserPassword });
   });
 

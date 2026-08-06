@@ -53,21 +53,21 @@ The overview can be found [here](./index.mdx).
 ### Secrets
 
 - On startup
-  - merge \_pb_secrets collection into database
-    - then remove contents of \_pb_secrets collection
+  - merge \_pb_config_secrets collection into database
+    - then remove contents of \_pb_config_secrets collection
   - if secrets file exists
     - and is valid secrets data
-      - import secrets from file into \_pb_secrets collection
+      - import secrets from file into \_pb_config_secrets collection
     - if not valid secrets data
       - throw error
   - if secrets file does not exist
-    - leave \_pb_secrets collection as is
+    - leave \_pb_config_secrets collection as is
 
 - Before onServe command finishes
   - if secrets in database are the same as secrets in file
-    - leave \_pb_secrets collection as is
+    - leave \_pb_config_secrets collection as is
   - if secrets in database are not the same as secrets in file
-    - update \_pb_secrets collection with secrets from file
+    - update \_pb_config_secrets collection with secrets from file
 
 - When secrets are changed at runtime
   - update `pb_config/secrets.json` file with secrets from database

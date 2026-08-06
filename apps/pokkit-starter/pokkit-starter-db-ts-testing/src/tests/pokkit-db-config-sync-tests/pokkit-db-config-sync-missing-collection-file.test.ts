@@ -1,14 +1,3 @@
-# Pokkit DB TS Testing Setup Guide
-
-The following is a template for a Pokkit DB TS Testing test suite.
-
-## Prerequisites
-
-You will need to add to the `testsMetadata` object in the `_testsMetadata.ts` file, with a unique key for your test suite and a unique portNumber.
-
-## Template
-
-```ts
 import {
   clearPb,
   getPbFilePath,
@@ -16,15 +5,16 @@ import {
   getPokkitDbCollectionsFilePathh,
   killPbInstance,
   servePb,
+  superusersCollectionName,
   upsertPbAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../../config/pocketbaseConfig";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_constants";
-import { testsMetadata } from "../_testsMetadata";
+import { pokkitDbConfigSyncTestsMetadata } from "./_pokkitDbConfigSyncTestsMetadata";
 
-const testMetadata = testsMetadata["someTestSuiteName"];
+const testMetadata = pokkitDbConfigSyncTestsMetadata.missingCollectionFile;
 const testSuiteName = testMetadata.name;
 
 const pbPortNumber = testMetadata.portNumber;
@@ -41,6 +31,8 @@ describe(`${testSuiteName} tests`, () => {
     fse.removeSync(pbDirPath);
     fse.copySync(sourceTestBuildDirPath, pbDirPath);
     fse.removeSync(getPokkitDbCollectionsFilePathh({ pbDirPath }));
+
+    expect(fse.existsSync(getPokkitDbCollectionsFilePathh({ pbDirPath }))).toBe(false);
 
     await servePb({ pbFilePath, pbPortNumber, logFilePath });
     await upsertPbAdminCredentialsFromCli({ pbFilePath, superuserEmail, superuserPassword });
@@ -60,5 +52,24 @@ describe(`${testSuiteName} tests`, () => {
     const isHealthy = await pb.health.check();
     expect(isHealthy.code).toBe(200);
   });
+
+  it("PDBCS-COL-03 — Missing collections file exists once onServe finishes", async () => {
+    const superuserPb = createPbConnection();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+
+    expect(fse.existsSync(getPokkitDbCollectionsFilePathh({ pbDirPath }))).toBe(true);
+  });
+
+  it("PDBCS-COL-04 - Missing collections file leaves DB collections in default state", async () => {
+    const superuserPb = createPbConnection();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+    const collections = await superuserPb.collections.getFullList();
+    const collectionsFromFile = await fse.readJson(getPokkitDbCollectionsFilePathh({ pbDirPath }));
+
+    expect(collectionsFromFile).toEqual(collections);
+  });
 });
-```
