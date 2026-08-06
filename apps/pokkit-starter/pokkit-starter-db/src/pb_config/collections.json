@@ -94,7 +94,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-08-05 11:37:50.401Z",
-    "updated": "2026-08-05 11:54:48.762Z",
+    "updated": "2026-08-06 10:20:51.927Z",
     "system": true
   },
   {
@@ -206,7 +206,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-08-05 11:37:50.403Z",
-    "updated": "2026-08-05 11:54:48.763Z",
+    "updated": "2026-08-06 10:20:51.930Z",
     "system": true
   },
   {
@@ -320,7 +320,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-08-05 11:37:50.404Z",
-    "updated": "2026-08-05 11:54:48.764Z",
+    "updated": "2026-08-06 10:20:51.932Z",
     "system": true
   },
   {
@@ -418,7 +418,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-08-05 11:37:50.407Z",
-    "updated": "2026-08-05 11:54:48.766Z",
+    "updated": "2026-08-06 10:20:51.934Z",
     "system": true
   },
   {
@@ -533,7 +533,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-08-05 11:37:50.409Z",
-    "updated": "2026-08-05 11:54:48.767Z",
+    "updated": "2026-08-06 10:20:51.935Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -750,7 +750,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-08-05 11:37:50.412Z",
-    "updated": "2026-08-05 11:54:48.769Z",
+    "updated": "2026-08-06 10:20:51.937Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -818,89 +818,6 @@
       "subject": "Confirm your {APP_NAME} new email address",
       "body": "\u003cp\u003eHello,\u003c/p\u003e\n\u003cp\u003eClick on the button below to confirm your new email address.\u003c/p\u003e\n\u003cp\u003e\n  \u003ca class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\"\u003eConfirm new email\u003c/a\u003e\n\u003c/p\u003e\n\u003cp\u003e\u003ci\u003eIf you didn't ask to change your email address, please ignore this email.\u003c/i\u003e\u003c/p\u003e\n\u003cp\u003e\n  Thanks,\u003cbr/\u003e\n  {APP_NAME} team\n\u003c/p\u003e"
     }
-  },
-  {
-    "id": "pbc_11938476",
-    "listRule": null,
-    "viewRule": null,
-    "createRule": null,
-    "updateRule": null,
-    "deleteRule": null,
-    "name": "_pb_config_secrets",
-    "type": "base",
-    "fields": [
-      {
-        "autogeneratePattern": "[a-z0-9]{15}",
-        "help": "",
-        "hidden": false,
-        "id": "text3208210256",
-        "max": 15,
-        "min": 15,
-        "name": "id",
-        "pattern": "^[a-z0-9]+$",
-        "presentable": false,
-        "primaryKey": true,
-        "required": true,
-        "system": true,
-        "type": "text"
-      },
-      {
-        "autogeneratePattern": "",
-        "help": "",
-        "hidden": false,
-        "id": "text2324736937",
-        "max": 0,
-        "min": 0,
-        "name": "key",
-        "pattern": "",
-        "presentable": false,
-        "primaryKey": false,
-        "required": true,
-        "system": false,
-        "type": "text"
-      },
-      {
-        "autogeneratePattern": "",
-        "help": "",
-        "hidden": false,
-        "id": "text494360628",
-        "max": 0,
-        "min": 0,
-        "name": "value",
-        "pattern": "",
-        "presentable": false,
-        "primaryKey": false,
-        "required": true,
-        "system": false,
-        "type": "text"
-      },
-      {
-        "hidden": false,
-        "id": "autodate2990389176",
-        "name": "created",
-        "onCreate": true,
-        "onUpdate": true,
-        "presentable": false,
-        "system": false,
-        "type": "autodate"
-      },
-      {
-        "hidden": false,
-        "id": "autodate3332085495",
-        "name": "updated",
-        "onCreate": false,
-        "onUpdate": true,
-        "presentable": false,
-        "system": false,
-        "type": "autodate"
-      }
-    ],
-    "indexes": [
-      "CREATE UNIQUE INDEX `idx_secrets_key` ON `_pb_config_secrets` (key)"
-    ],
-    "created": "2026-08-05 11:54:48.786Z",
-    "updated": "2026-08-05 11:54:48.786Z",
-    "system": false
   },
   {
     "id": "pbc_2680520508",
@@ -996,7 +913,7 @@
     ],
     "indexes": [],
     "created": "2026-08-05 11:54:48.792Z",
-    "updated": "2026-08-05 11:54:48.792Z",
+    "updated": "2026-08-06 10:20:51.981Z",
     "system": false
   },
   {
@@ -1123,7 +1040,7 @@
       "CREATE UNIQUE INDEX `idx_0UWlVOdDqD` ON `organisationUserPermissions` (`userOrgKey`)"
     ],
     "created": "2026-08-05 11:54:48.793Z",
-    "updated": "2026-08-05 11:54:48.793Z",
+    "updated": "2026-08-06 10:20:51.983Z",
     "system": false
   },
   {
@@ -1204,7 +1121,7 @@
     ],
     "indexes": [],
     "created": "2026-08-05 11:54:48.795Z",
-    "updated": "2026-08-05 11:54:48.795Z",
+    "updated": "2026-08-06 10:20:51.985Z",
     "system": false
   },
   {
@@ -1255,7 +1172,90 @@
     ],
     "indexes": [],
     "created": "2026-08-05 11:55:38.975Z",
-    "updated": "2026-08-05 11:55:38.975Z",
+    "updated": "2026-08-06 10:20:51.944Z",
+    "system": false
+  },
+  {
+    "id": "pbc_11938476",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "_pb_config_secrets",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "help": "",
+        "hidden": false,
+        "id": "text2324736937",
+        "max": 0,
+        "min": 0,
+        "name": "key",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": true,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "help": "",
+        "hidden": false,
+        "id": "text494360628",
+        "max": 0,
+        "min": 0,
+        "name": "value",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": true,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": false,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX `idx_secrets_key` ON `_pb_config_secrets` (key)"
+    ],
+    "created": "2026-08-06 10:20:51.971Z",
+    "updated": "2026-08-06 10:20:51.971Z",
     "system": false
   }
 ]
