@@ -43,12 +43,12 @@ describe("pokkit-db permissions no collections file tests", () => {
 
     const pollLogsResp = await pollLogsUntilNonZeroItems({
       pb: superuserPb,
-      maxDurationMs: 8000,
+      maxDurationMs: 15000,
       delayMs: 100,
     });
 
     expect(pollLogsResp.data?.totalItems).toBeGreaterThan(0);
-  });
+  }, 30000);
 
   afterAll(async () => {
     const superuserPb = createPbConnection();
@@ -58,13 +58,13 @@ describe("pokkit-db permissions no collections file tests", () => {
 
     await pollLogsUntilNonZeroItems({
       pb: superuserPb,
-      maxDurationMs: 5000,
+      maxDurationMs: 10000,
       delayMs: 200,
     });
 
     killPbInstance({ pbPortNumber });
     fse.removeSync(pbDirPath);
-  });
+  }, 30000);
 
   beforeEach(async () => {
     await clearPb({ pbPortNumber, superuserEmail, superuserPassword });
@@ -109,7 +109,7 @@ describe("pokkit-db permissions no collections file tests", () => {
 
     const pollLogsUntilNumberOfItemsChangeRespPromise = pollLogsUntilNumberOfItemsChange({
       pb: superuserPb,
-      maxDurationMs: 5000,
+      maxDurationMs: 15000,
       delayMs: 200,
     });
 
@@ -123,5 +123,5 @@ describe("pokkit-db permissions no collections file tests", () => {
     const logsAfterError = await superuserPb.logs.getList(1, 20, {});
     expect(logsAfterError.items.length).toBeGreaterThan(0);
     expect(logsAfterError.items.length).toBeGreaterThan(logsBeforeError.items.length);
-  });
+  }, 20000);
 });

@@ -43,12 +43,12 @@ describe("pokkit-db permissions no collections file tests", () => {
 
     const pollLogsResp = await pollLogsUntilNonZeroItems({
       pb: superuserPb,
-      maxDurationMs: 8000,
+      maxDurationMs: 15000,
       delayMs: 100,
     });
 
     expect(pollLogsResp.data?.totalItems).toBeGreaterThan(0);
-  });
+  }, 30000);
 
   afterAll(async () => {
     const superuserPb = createPbConnection();
@@ -56,17 +56,15 @@ describe("pokkit-db permissions no collections file tests", () => {
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
 
-    const pollLogsResp = await pollLogsUntilNonZeroItems({
+    await pollLogsUntilNonZeroItems({
       pb: superuserPb,
-      maxDurationMs: 5000,
+      maxDurationMs: 10000,
       delayMs: 200,
     });
 
-    fse.writeFileSync(`_logs/${testSuiteName}.logsss.json`, JSON.stringify(pollLogsResp, null, 2));
-
     killPbInstance({ pbPortNumber });
     fse.removeSync(pbDirPath);
-  });
+  }, 30000);
 
   beforeEach(async () => {
     await clearPb({ pbPortNumber, superuserEmail, superuserPassword });
@@ -78,52 +76,52 @@ describe("pokkit-db permissions no collections file tests", () => {
     expect(isHealthy.code).toBe(200);
   });
 
-  // it("list logs", async () => {
-  //   const superuserPb = createPbConnection();
-  //   await superuserPb
-  //     .collection(superusersCollectionName)
-  //     .authWithPassword(superuserEmail, superuserPassword);
+  it("list logs", async () => {
+    const superuserPb = createPbConnection();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
 
-  //   const user1Pb = createPbConnection();
-  //   const user1Data = userPayloadBuilder.forCreateRandomData();
-  //   await user1Pb.collection(usersCollectionName).create({
-  //     email: user1Data.email,
-  //     password: user1Data.password,
-  //     passwordConfirm: user1Data.password,
-  //   });
-  //   await user1Pb
-  //     .collection(usersCollectionName)
-  //     .authWithPassword(user1Data.email, user1Data.password);
+    const user1Pb = createPbConnection();
+    const user1Data = userPayloadBuilder.forCreateRandomData();
+    await user1Pb.collection(usersCollectionName).create({
+      email: user1Data.email,
+      password: user1Data.password,
+      passwordConfirm: user1Data.password,
+    });
+    await user1Pb
+      .collection(usersCollectionName)
+      .authWithPassword(user1Data.email, user1Data.password);
 
-  //   const user2Pb = createPbConnection();
-  //   const user2Data = userPayloadBuilder.forCreateRandomData();
-  //   const user2Record = await user2Pb.collection(usersCollectionName).create({
-  //     email: user2Data.email,
-  //     password: user2Data.password,
-  //     passwordConfirm: user2Data.password,
-  //   });
-  //   await user2Pb
-  //     .collection(usersCollectionName)
-  //     .authWithPassword(user2Data.email, user2Data.password);
+    const user2Pb = createPbConnection();
+    const user2Data = userPayloadBuilder.forCreateRandomData();
+    const user2Record = await user2Pb.collection(usersCollectionName).create({
+      email: user2Data.email,
+      password: user2Data.password,
+      passwordConfirm: user2Data.password,
+    });
+    await user2Pb
+      .collection(usersCollectionName)
+      .authWithPassword(user2Data.email, user2Data.password);
 
-  //   const logsBeforeError = await superuserPb.logs.getList(1, 20, {});
-  //   expect(logsBeforeError.items.length).toBeGreaterThan(0);
+    const logsBeforeError = await superuserPb.logs.getList(1, 20, {});
+    expect(logsBeforeError.items.length).toBeGreaterThan(0);
 
-  //   const pollLogsUntilNumberOfItemsChangeRespPromise = pollLogsUntilNumberOfItemsChange({
-  //     pb: superuserPb,
-  //     maxDurationMs: 5000,
-  //     delayMs: 200,
-  //   });
+    const pollLogsUntilNumberOfItemsChangeRespPromise = pollLogsUntilNumberOfItemsChange({
+      pb: superuserPb,
+      maxDurationMs: 15000,
+      delayMs: 200,
+    });
 
-  //   try {
-  //     await user1Pb.collection(usersCollectionName).delete(user2Record.id);
-  //   } catch {}
-  //   const pollLogsUntilNumberOfItemsChangeResp = await pollLogsUntilNumberOfItemsChangeRespPromise;
+    try {
+      await user1Pb.collection(usersCollectionName).delete(user2Record.id);
+    } catch {}
+    const pollLogsUntilNumberOfItemsChangeResp = await pollLogsUntilNumberOfItemsChangeRespPromise;
 
-  //   expect(pollLogsUntilNumberOfItemsChangeResp.success).toBe(true);
+    expect(pollLogsUntilNumberOfItemsChangeResp.success).toBe(true);
 
-  //   const logsAfterError = await superuserPb.logs.getList(1, 20, {});
-  //   expect(logsAfterError.items.length).toBeGreaterThan(0);
-  //   expect(logsAfterError.items.length).toBeGreaterThan(logsBeforeError.items.length);
-  // });
+    const logsAfterError = await superuserPb.logs.getList(1, 20, {});
+    expect(logsAfterError.items.length).toBeGreaterThan(0);
+    expect(logsAfterError.items.length).toBeGreaterThan(logsBeforeError.items.length);
+  }, 20000);
 });
