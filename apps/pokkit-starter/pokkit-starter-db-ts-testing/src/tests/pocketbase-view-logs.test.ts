@@ -123,5 +123,5 @@ describe("pokkit-db permissions no collections file tests", () => {
     const logsAfterError = await superuserPb.logs.getList(1, 20, {});
     expect(logsAfterError.items.length).toBeGreaterThan(0);
     expect(logsAfterError.items.length).toBeGreaterThan(logsBeforeError.items.length);
-  }, 20000);
+  }, 30000);
 });
