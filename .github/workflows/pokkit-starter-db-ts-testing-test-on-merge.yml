@@ -20,4 +20,10 @@ jobs:
           node-version: 22
           cache: "pnpm"
 
+      # Needed by pre-test (go build of pokkit-starter-db)
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.0"
+
+      - run: pnpm i
       - run: pnpm run test-once --filter=pokkit-starter-db-ts-testing
