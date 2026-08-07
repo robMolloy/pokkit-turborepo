@@ -1,1 +1,3 @@
-# Hello World\n\nHello from a Cursor cloud agent PR.
+# Hello World
+
+Hello from a Cursor cloud agent PR.
