@@ -8,10 +8,28 @@ Pokkit Db Permissions is a PocketBase plugin that makes CRUD access control easi
 - `organisations` — named groups for organisation-scoped access
 - `organisationUserPermissions` — membership of a user in an organisation (`standard` | `admin`, same status values; unique per user/org)
 
-Only `approved` records grant powers. Global and organisation permissions are separate: org admin ≠ global admin ≠ superadmin.
 
 ## How it works
 
-On install the plugin initializes the three collections (import from `pb_config/collections.json`, or create them and write the file). The first created user is provisioned as an approved `superadmin`. Approved global admins can create organisations and are provisioned as that org's admin; superadmins can manage any org/membership and others' global permissions.
+For the three supporting collections, that are initialized on install, only superadmins can manage global, organisation, and organisation user permissions.
 
-Other collections gate list / view / create / update / delete with PocketBase API rules that query these permission records via a documented `@collection.*` syntax. See the [spec](./spec) for fields, roles, initialization rules, and rule patterns.
+## Using pokkit db permissions
+
+Once set up a simple rule template is available to use in other collections as follows;
+
+```
+// Approved global superadmins only
+@request.auth.id != "" 
+&& @collection.globalUserPermissions.userId ?= @request.auth.id 
+&& @collection.globalUserPermissions.role ?= "superadmin" 
+&& @collection.globalUserPermissions.status ?= "approved"
+
+// Approved global superadmins or admins only
+@request.auth.id != "" 
+&& @collection.globalUserPermissions.userId ?= @request.auth.id 
+&& (
+  @collection.globalUserPermissions.role ?= "superadmin" 
+  || @collection.globalUserPermissions.role ?= "admin"
+) 
+&& @collection.globalUserPermissions.status ?= "approved"
+```
