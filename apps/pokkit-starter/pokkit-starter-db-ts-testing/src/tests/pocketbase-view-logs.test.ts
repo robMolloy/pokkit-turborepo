@@ -39,7 +39,13 @@ describe("pokkit-db permissions no collections file tests", () => {
     fse.removeSync(pbDirPath);
     fse.copySync(source, pbDirPath);
 
-    await servePb({ pbFilePath, pbPortNumber, logFilePath: `_logs/${testSuiteName}` });
+    const servePbResp = await servePb({
+      pbFilePath,
+      pbPortNumber,
+      logFilePath: `_logs/${testSuiteName}`,
+    });
+    if (!servePbResp.success)
+      throw new Error(`Failed to serve PocketBase: ${JSON.stringify(servePbResp.error, null, 2)}`);
     await upsertPbAdminCredentialsFromCli({ pbFilePath, superuserEmail, superuserPassword });
 
     const superuserPb = createPbConnection();
