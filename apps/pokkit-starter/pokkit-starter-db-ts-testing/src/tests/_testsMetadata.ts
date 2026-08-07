@@ -1,5 +1,5 @@
 export const testsMetadata = {
-  pocketbaseViewLogs: { portNumber: 8119, name: "pocketbaseViewLogs" },
+  pocketbaseViewLogs: { portNumber: 8118, name: "pocketbaseViewLogs" },
   pocketbaseStandardUser: { portNumber: 8120, name: "pocketbaseStandardUser" },
   pokkitDbConfigSyncCollection: { portNumber: 8121, name: "pokkitDbConfigSyncCollection" },
   pokkitDbConfigSyncSecretsNoFile: { portNumber: 8122, name: "pokkitDbConfigSyncSecretsNoFile" },
