@@ -21,8 +21,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
+          cache: "pnpm"
 
+      - run: pnpm i
       - run: pnpm run build-whisper
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
