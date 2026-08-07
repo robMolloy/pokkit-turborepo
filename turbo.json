@@ -17,6 +17,10 @@
     "pre-test": {
       "cache": false
     },
+    "test-once": {
+      "dependsOn": ["pre-test"],
+      "cache": false
+    },
     "test": {
       "dependsOn": ["pre-test"],
       "cache": false,
