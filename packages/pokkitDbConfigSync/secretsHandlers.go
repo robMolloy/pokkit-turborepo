@@ -6,10 +6,10 @@ import (
 	pbCore "github.com/pocketbase/pocketbase/core"
 )
 
-func onServeSyncSecretsWithSecretsFileHandler(se *pbCore.ServeEvent) error {
-	err := syncSecretsWithSecretsFile(se.App)
+func onServeReplaceThenPopulateSecretsCollectionWithSecretsFile(se *pbCore.ServeEvent) error {
+	err := replaceThenPopulateSecretsCollectionWithSecretsFile(se.App)
 	if err != nil {
-		log.Fatalf("failed to SyncSecretsWithSecretsFile in OnServeImportEnvVarsFromSecretsFileHandler: %v", err)
+		log.Fatalf("failed to replaceThenPopulateSecretsCollectionWithSecretsFile in onServeReplaceThenPopulateSecretsCollectionWithSecretsFile: %v", err)
 	}
 
 	return se.Next()

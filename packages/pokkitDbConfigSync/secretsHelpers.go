@@ -7,6 +7,7 @@ import (
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
+	pokkitDbUtils "github.com/robMolloy/pokkit-turborepo/packages/pokkit-db-utils"
 )
 
 const secretsCollectionName = "_pb_config_secrets"
@@ -66,20 +67,28 @@ func populateSecretsCollectionWithSecretsFile(app pbCore.App) (err error) {
 		return fmt.Errorf("error finding collection _pb_config_secrets in PopulateSecretsCollectionWithSecretsFile: %w", err)
 	}
 
-	obj, err := utils.ReadJsonFromFile(secretsFilePath)
+	obj, err := pokkitDbUtils.ReadJsonFromFileGeneric[map[string]string](secretsFilePath)
 	if err != nil {
 		return fmt.Errorf("cannot read json from %s in populateSecretsCollectionWithSecretsFile: %w", secretsFilePath, err)
 	}
 
+	// objLength := len(obj)
+	// if objLength == 1 {
+	// 	return fmt.Errorf("no secrets found in %s in populateSecretsCollectionWithSecretsFile: %v", secretsFilePath, obj)
+	// }
+
 	for key, value := range obj {
+		// return fmt.Errorf("just throw")
 		strValue := fmt.Sprintf("%v", value)
 		newRecord := pbCore.NewRecord(secretsCollection)
 		newRecord.Set("key", key)
 		newRecord.Set("value", strValue)
 
+		// return fmt.Errorf("key: %s, value: %s", key, value)
+
 		err = app.Save(newRecord)
 		if err != nil {
-			return fmt.Errorf("error saving record in PopulateSecretsCollectionFromSecretsFile: %w", err)
+			return fmt.Errorf("error saving secretsCollection record in PopulateSecretsCollectionFromSecretsFile: %w", err)
 		}
 	}
 
@@ -113,10 +122,10 @@ func writeSecretsCollectionToSecretsFile(app pbCore.App) error {
 	return nil
 }
 
-func syncSecretsWithSecretsFile(app pbCore.App) (err error) {
+func replaceThenPopulateSecretsCollectionWithSecretsFile(app pbCore.App) (err error) {
 	_, err = replaceSecretsCollection(app)
 	if err != nil {
-		return fmt.Errorf("error replaceSecretsCollection in SyncSecretsWithSecretsFile: %w", err)
+		return fmt.Errorf("error replaceSecretsCollection in populateSecretsWithSecretsFile: %w", err)
 	}
 
 	err = populateSecretsCollectionWithSecretsFile(app)

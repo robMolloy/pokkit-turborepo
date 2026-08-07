@@ -17,8 +17,7 @@ func BindFunctions(app pbCore.App) {
 	app.OnCollectionAfterUpdateSuccess().BindFunc(onCollectionChangeWriteCollectionsToFileHandler)
 	app.OnCollectionAfterDeleteSuccess().BindFunc(onCollectionChangeWriteCollectionsToFileHandler)
 
-	app.OnServe().BindFunc(onServeSyncSecretsWithSecretsFileHandler)
-	// app.OnServe().BindFunc(onServePopulateSecretsCollectionWithSecretsFileHandler)
+	app.OnServe().BindFunc(onServeReplaceThenPopulateSecretsCollectionWithSecretsFile)
 	app.OnRecordAfterCreateSuccess(secretsCollectionName).BindFunc(onSecretRecordChangeWriteSecretsToSecretsFileHandler)
 	app.OnRecordAfterUpdateSuccess(secretsCollectionName).BindFunc(onSecretRecordChangeWriteSecretsToSecretsFileHandler)
 	app.OnRecordAfterDeleteSuccess(secretsCollectionName).BindFunc(onSecretRecordChangeWriteSecretsToSecretsFileHandler)

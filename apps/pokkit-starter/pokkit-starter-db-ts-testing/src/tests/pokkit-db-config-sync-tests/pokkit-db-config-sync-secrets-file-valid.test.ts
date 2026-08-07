@@ -47,10 +47,6 @@ describe(`${testSuiteName} tests`, () => {
     fse.removeSync(pbDirPath);
   });
 
-  beforeEach(async () => {
-    await clearPb({ pbPortNumber, superuserEmail, superuserPassword });
-  });
-
   it("is connection healthy", async () => {
     const pb = createPbConnection();
     const isHealthy = await pb.health.check();
@@ -76,7 +72,7 @@ describe(`${testSuiteName} tests`, () => {
     const secrets = await superuserPb.collection(pbConfigSecretsCollectionName).getFullList();
     const indexedSecrets: { [key: string]: string } = {};
     for (const secret of secrets) {
-      indexedSecrets[secret.id] = secret.value;
+      indexedSecrets[secret.key] = secret.value;
     }
     expect(indexedSecrets).toEqual(validSecretsFileData);
   });
