@@ -23,8 +23,8 @@ jobs:
           node-version: 22
           cache: "pnpm"
 
-      - run: pnpm add -g turbo
       - run: pnpm i
+      - run: pnpm add -g turbo
       - run: pnpm run build-whisper
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
