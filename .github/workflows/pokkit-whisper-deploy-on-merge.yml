@@ -7,32 +7,7 @@ on:
     branches:
       - main
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      whisper: ${{ steps.filter.outputs.whisper }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            whisper:
-              - 'apps/pokkit-whisper/**'
-              - 'packages/pokkit-shadcn/**'
-              - 'packages/pokkit-components/**'
-              - 'packages/ui/**'
-              - 'firebase.json'
-              - 'package.json'
-              - 'pnpm-lock.yaml'
-              - 'pnpm-workspace.yaml'
-              - 'turbo.json'
-              - '.github/workflows/pokkit-whisper-deploy-on-merge.yml'
-
   build_and_deploy:
-    needs: changes
-    if: ${{ needs.changes.outputs.whisper == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,9 +26,43 @@ jobs:
       - run: pnpm i
       - run: pnpm add -g turbo
       - run: pnpm run build-whisper
+
+      - name: Hash build output
+        id: build_hash
+        run: |
+          HASH=$(find apps/pokkit-whisper/dist -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)
+          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+          echo "Build hash: $HASH"
+
+      - name: Check if build matches a previous deploy
+        id: previous_build
+        uses: actions/cache/restore@v4
+        with:
+          path: .whisper-deploy-marker
+          key: pokkit-whisper-dist-${{ steps.build_hash.outputs.hash }}
+
+      - name: Skip deploy
+        if: steps.previous_build.outputs.cache-hit == 'true'
+        run: echo "Build output unchanged — skipping Firebase deploy."
+
       - uses: FirebaseExtended/action-hosting-deploy@v0
+        if: steps.previous_build.outputs.cache-hit != 'true'
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_POKKIT_WHISPA }}
           channelId: live
           projectId: pokkit-whispa
+
+      - name: Record deployed build hash
+        if: steps.previous_build.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p .whisper-deploy-marker
+          echo "${{ steps.build_hash.outputs.hash }}" > .whisper-deploy-marker/hash
+          date -u +%Y-%m-%dT%H:%M:%SZ > .whisper-deploy-marker/deployed-at
+
+      - name: Save deployed build hash
+        if: steps.previous_build.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .whisper-deploy-marker
+          key: pokkit-whisper-dist-${{ steps.build_hash.outputs.hash }}
