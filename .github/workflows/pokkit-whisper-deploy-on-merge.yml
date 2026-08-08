@@ -34,19 +34,37 @@ jobs:
           echo "hash=$HASH" >> "$GITHUB_OUTPUT"
           echo "Build hash: $HASH"
 
-      - name: Check if build matches a previous deploy
-        id: previous_build
+      # Restore only the most recent deploy marker (unique key always misses;
+      # restore-keys picks the newest pokkit-whisper-latest-* entry).
+      - name: Restore most recent deploy hash
         uses: actions/cache/restore@v4
         with:
           path: .whisper-deploy-marker
-          key: pokkit-whisper-dist-${{ steps.build_hash.outputs.hash }}
+          key: pokkit-whisper-latest-${{ github.sha }}
+          restore-keys: |
+            pokkit-whisper-latest-
 
-      - name: Skip deploy
-        if: steps.previous_build.outputs.cache-hit == 'true'
-        run: echo "Build output unchanged — skipping Firebase deploy."
+      - name: Compare with most recent deploy
+        id: compare
+        run: |
+          NEW_HASH="${{ steps.build_hash.outputs.hash }}"
+          if [ -f .whisper-deploy-marker/hash ]; then
+            OLD_HASH=$(cat .whisper-deploy-marker/hash)
+            echo "Most recent deploy hash: $OLD_HASH"
+            if [ "$NEW_HASH" = "$OLD_HASH" ]; then
+              echo "changed=false" >> "$GITHUB_OUTPUT"
+              echo "Build matches the most recent deploy — skipping Firebase deploy."
+            else
+              echo "changed=true" >> "$GITHUB_OUTPUT"
+              echo "Build differs from the most recent deploy — deploying."
+            fi
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "No previous deploy hash found — deploying."
+          fi
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
-        if: steps.previous_build.outputs.cache-hit != 'true'
+        if: steps.compare.outputs.changed == 'true'
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_POKKIT_WHISPA }}
@@ -54,15 +72,16 @@ jobs:
           projectId: pokkit-whispa
 
       - name: Record deployed build hash
-        if: steps.previous_build.outputs.cache-hit != 'true'
+        if: steps.compare.outputs.changed == 'true'
         run: |
+          rm -rf .whisper-deploy-marker
           mkdir -p .whisper-deploy-marker
           echo "${{ steps.build_hash.outputs.hash }}" > .whisper-deploy-marker/hash
           date -u +%Y-%m-%dT%H:%M:%SZ > .whisper-deploy-marker/deployed-at
 
-      - name: Save deployed build hash
-        if: steps.previous_build.outputs.cache-hit != 'true'
+      - name: Save most recent deploy hash
+        if: steps.compare.outputs.changed == 'true'
         uses: actions/cache/save@v4
         with:
           path: .whisper-deploy-marker
-          key: pokkit-whisper-dist-${{ steps.build_hash.outputs.hash }}
+          key: pokkit-whisper-latest-${{ github.sha }}
