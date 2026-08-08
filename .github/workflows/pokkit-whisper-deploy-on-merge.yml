@@ -7,7 +7,7 @@ on:
     branches:
       - main
 jobs:
-  build_and_deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,40 +27,79 @@ jobs:
       - run: pnpm add -g turbo
       - run: pnpm run build-whisper
 
-      - name: Hash build output
-        id: build_hash
-        run: |
-          HASH=$(find apps/pokkit-whisper/dist -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)
-          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
-          echo "Build hash: $HASH"
-
-      # Restore only the most recent deploy marker (unique key always misses;
-      # restore-keys picks the newest pokkit-whisper-latest-* entry).
-      - name: Restore most recent deploy hash
-        uses: actions/cache/restore@v4
+      - name: Upload build to recent artifacts
+        uses: actions/upload-artifact@v4
         with:
-          path: .whisper-deploy-marker
-          key: pokkit-whisper-latest-${{ github.sha }}
-          restore-keys: |
-            pokkit-whisper-latest-
+          name: pokkit-whisper-dist
+          path: apps/pokkit-whisper/dist
+          retention-days: 30
 
-      - name: Compare with most recent deploy
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      checks: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download most recent build
+        uses: actions/download-artifact@v4
+        with:
+          name: pokkit-whisper-dist
+          path: apps/pokkit-whisper/dist
+
+      - name: Download second most recent build
+        id: previous
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          PREV_ID=$(gh api --paginate "repos/${{ github.repository }}/actions/artifacts" \
+            --jq '.artifacts[] | select(.name == "pokkit-whisper-dist" and .expired == false and .workflow_run.id != ${{ github.run_id }}) | .id' \
+            | head -n1)
+
+          if [ -z "$PREV_ID" ]; then
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "No second-most-recent build found."
+            exit 0
+          fi
+
+          echo "exists=true" >> "$GITHUB_OUTPUT"
+          echo "Second most recent artifact id: $PREV_ID"
+          mkdir -p previous-dist
+          gh api "repos/${{ github.repository }}/actions/artifacts/${PREV_ID}/zip" > previous-dist.zip
+          unzip -q previous-dist.zip -d previous-dist
+
+      - name: Compare most recent two builds
         id: compare
         run: |
-          NEW_HASH="${{ steps.build_hash.outputs.hash }}"
-          if [ -f .whisper-deploy-marker/hash ]; then
-            OLD_HASH=$(cat .whisper-deploy-marker/hash)
-            echo "Most recent deploy hash: $OLD_HASH"
-            if [ "$NEW_HASH" = "$OLD_HASH" ]; then
-              echo "changed=false" >> "$GITHUB_OUTPUT"
-              echo "Build matches the most recent deploy — skipping Firebase deploy."
-            else
-              echo "changed=true" >> "$GITHUB_OUTPUT"
-              echo "Build differs from the most recent deploy — deploying."
-            fi
+          set -euo pipefail
+
+          hash_dir() {
+            find "$1" -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1
+          }
+
+          NEW_HASH=$(hash_dir apps/pokkit-whisper/dist)
+          echo "Most recent build hash: $NEW_HASH"
+
+          if [ "${{ steps.previous.outputs.exists }}" != "true" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "No second-most-recent build — deploying most recent."
+            exit 0
+          fi
+
+          OLD_HASH=$(hash_dir previous-dist)
+          echo "Second most recent build hash: $OLD_HASH"
+
+          if [ "$NEW_HASH" = "$OLD_HASH" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Most recent build matches second most recent — skipping deploy."
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "No previous deploy hash found — deploying."
+            echo "Most recent build differs from second most recent — deploying."
           fi
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
@@ -70,18 +109,3 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_POKKIT_WHISPA }}
           channelId: live
           projectId: pokkit-whispa
-
-      - name: Record deployed build hash
-        if: steps.compare.outputs.changed == 'true'
-        run: |
-          rm -rf .whisper-deploy-marker
-          mkdir -p .whisper-deploy-marker
-          echo "${{ steps.build_hash.outputs.hash }}" > .whisper-deploy-marker/hash
-          date -u +%Y-%m-%dT%H:%M:%SZ > .whisper-deploy-marker/deployed-at
-
-      - name: Save most recent deploy hash
-        if: steps.compare.outputs.changed == 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: .whisper-deploy-marker
-          key: pokkit-whisper-latest-${{ github.sha }}
