@@ -10,4 +10,18 @@ This plan covers required tests for the Pokkit Db Permissions initialization plu
 
 ### PDBP-USERS-01 — Verify collection presence and validity is setup correctly
 
-Checks that the default `users` collection from the database after plugin initialization is present and set up correctly.\
+Checks that the default `users` collection from the database after plugin initialization is present and set up correctly.
+
+## Users permissions matrix — Create
+
+### PDBP-USERS-02 — Global Superadmin can CREATE
+
+Checks that a user with global user permissions role `superadmin` can CREATE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
+### PDBP-USERS-03 — Global Admin cannot CREATE
+
+Checks that a user with global user permissions role `admin` cannot CREATE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
+### PDBP-USERS-04 — Global Standard cannot CREATE
+
+Checks that a user with global user permissions role `standard` cannot CREATE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
