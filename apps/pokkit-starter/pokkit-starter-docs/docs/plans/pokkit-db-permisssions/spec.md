@@ -16,7 +16,7 @@ This uses the default PocketBase `users` collection, but with new rules added to
 | --------- | --------------------------------------------------------------- |
 | Superuser | Verifies the collection is in the database and set up correctly |
 
-## Users collection rule
+## Users permissions matrix
 
 | Global Role     | Status   | Create | View | List | Update | Delete | Create Own | View Own | List Own | Update Own | Delete Own |
 | --------------- | -------- | :----: | :--: | :--: | :----: | :----: | :--------: | :------: | :------: | :--------: | :--------: |
