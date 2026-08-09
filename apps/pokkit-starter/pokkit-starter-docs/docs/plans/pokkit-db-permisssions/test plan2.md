@@ -25,3 +25,17 @@ Checks that a user with global user permissions role `admin` cannot CREATE a rec
 ### PDBP-USERS-04 — Global Standard cannot CREATE
 
 Checks that a user with global user permissions role `standard` cannot CREATE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
+## Users permissions matrix — Update
+
+### PDBP-USERS-05 — Global Superadmin can UPDATE
+
+Checks that a user with global user permissions role `superadmin` can UPDATE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
+### PDBP-USERS-06 — Global Admin cannot UPDATE
+
+Checks that a user with global user permissions role `admin` cannot UPDATE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
+### PDBP-USERS-07 — Global Standard cannot UPDATE
+
+Checks that a user with global user permissions role `standard` cannot UPDATE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
