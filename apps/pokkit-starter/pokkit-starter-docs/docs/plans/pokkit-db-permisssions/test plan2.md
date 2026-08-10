@@ -129,3 +129,39 @@ Checks that a user with global user permissions role `admin` cannot UPDATE a rec
 ### PDBP-USERS-UPDATE-03 — Global Standard cannot UPDATE
 
 Checks that a user with global user permissions role `standard` cannot UPDATE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
+## Users permissions matrix — Delete
+
+### PDBP-USERS-DELETE-01 — Global Superadmin can DELETE
+
+Checks that a user with global user permissions role `superadmin` can DELETE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
+### PDBP-USERS-DELETE-02 — Global Admin cannot DELETE
+
+Checks that a user with global user permissions role `admin` cannot DELETE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
+### PDBP-USERS-DELETE-03 — Global Standard cannot DELETE
+
+Checks that a user with global user permissions role `standard` cannot DELETE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
+## Users permissions matrix — Delete Own
+
+### PDBP-USERS-DELETE-OWN-01 — Global Superadmin cannot DELETE Own
+
+Checks that a user with global user permissions role `superadmin` cannot DELETE their own record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
+### PDBP-USERS-DELETE-OWN-02 — Global Admin (approved) can DELETE Own
+
+Checks that a user with global user permissions role `admin` and status `approved` can DELETE their own record in the `users` collection.
+
+### PDBP-USERS-DELETE-OWN-03 — Global Admin (pending or blocked) cannot DELETE Own
+
+Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot DELETE their own record in the `users` collection.
+
+### PDBP-USERS-DELETE-OWN-04 — Global Standard (approved) can DELETE Own
+
+Checks that a user with global user permissions role `standard` and status `approved` can DELETE their own record in the `users` collection.
+
+### PDBP-USERS-DELETE-OWN-05 — Global Standard (pending or blocked) cannot DELETE Own
+
+Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot DELETE their own record in the `users` collection.
