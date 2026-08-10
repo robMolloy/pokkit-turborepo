@@ -1,4 +1,4 @@
-# Test Plan 2
+# Users collection test plan
 
 ## Scope
 
@@ -8,13 +8,13 @@ Each test is given a tag in the following format. PDBP-USERS-{ACTION}-{NN} In or
 
 ---
 
-## Users collection test plan
+## Collection setup tests
 
 ### PDBP-USERS-SETUP-01 — Verify collection presence and validity is setup correctly
 
 Checks that the default `users` collection from the database after plugin initialization is present and set up correctly.
 
-## Users permissions matrix test plan -
+## User permissions tests
 
 ### PDBP-USERS-CREATE-01 — Global Superadmin can CREATE
 
