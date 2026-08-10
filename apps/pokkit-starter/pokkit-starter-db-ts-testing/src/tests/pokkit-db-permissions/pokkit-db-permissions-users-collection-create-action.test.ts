@@ -1,14 +1,3 @@
-# Pokkit DB TS Testing Setup Guide
-
-The following is a template for a Pokkit DB TS Testing test suite.
-
-## Prerequisites
-
-You will need to add to the `testsMetadata` object in the `_testsMetadata.ts` file, with a unique key for your test suite and a unique portNumber.
-
-## Template
-
-```ts
 import {
   getPbFilePath,
   getPbServeUrl,
@@ -22,9 +11,9 @@ import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../../config/pocketbaseConfig";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_constants";
-import { pokkitDbConfigSyncTestsMetadata } from "./_pokkitDbConfigSyncTestsMetadata";
+import { pokkitDbPermissionsTestsMetadata } from "./_pokkitDbConfigSyncTestsMetadata";
 
-const testMetadata = pokkitDbConfigSyncTestsMetadata.usersCollectionCreateAction;
+const testMetadata = pokkitDbPermissionsTestsMetadata.usersCollectionCreateAction;
 const testSuiteName = testMetadata.name;
 
 const pbPortNumber = testMetadata.portNumber;
@@ -65,4 +54,3 @@ describe(`${testSuiteName} tests`, () => {
     expect(isHealthy.code).toBe(200);
   });
 });
-```
