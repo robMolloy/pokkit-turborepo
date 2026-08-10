@@ -132,6 +132,18 @@ Checks that a user with global user permissions role `admin` cannot UPDATE a rec
 
 Checks that a user with global user permissions role `standard` cannot UPDATE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
+### PDBP-USERS-UPDATE-OWN-01 — Global Superadmin cannot UPDATE Own
+
+Checks that a user with global user permissions role `superadmin` cannot UPDATE their own record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
+### PDBP-USERS-UPDATE-OWN-02 — Global Admin cannot UPDATE Own
+
+Checks that a user with global user permissions role `admin` cannot UPDATE their own record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
+### PDBP-USERS-UPDATE-OWN-03 — Global Standard cannot UPDATE Own
+
+Checks that a user with global user permissions role `standard` cannot UPDATE their own record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
 ### PDBP-USERS-DELETE-01 — Global Superadmin can DELETE
 
 Checks that a user with global user permissions role `superadmin` can DELETE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
