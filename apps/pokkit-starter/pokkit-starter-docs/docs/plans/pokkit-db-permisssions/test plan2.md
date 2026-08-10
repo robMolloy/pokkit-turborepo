@@ -8,13 +8,13 @@ Each test is given a tag in the following format. PDBP-USERS-{ACTION}-{NN} In or
 
 ---
 
-## Users collection
+## Users collection test plan
 
 ### PDBP-USERS-SETUP-01 — Verify collection presence and validity is setup correctly
 
 Checks that the default `users` collection from the database after plugin initialization is present and set up correctly.
 
-## Users permissions matrix — Create
+## Users permissions matrix test plan -
 
 ### PDBP-USERS-CREATE-01 — Global Superadmin can CREATE
 
@@ -28,7 +28,17 @@ Checks that a user with global user permissions role `admin` cannot CREATE a rec
 
 Checks that a user with global user permissions role `standard` cannot CREATE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-## Users permissions matrix — View
+### PDBP-USERS-CREATE-OWN-01 — Global Superadmin cannot CREATE Own
+
+Checks that a user with global user permissions role `superadmin` cannot CREATE their own record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
+### PDBP-USERS-CREATE-OWN-02 — Global Admin cannot CREATE Own
+
+Checks that a user with global user permissions role `admin` cannot CREATE their own record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
+### PDBP-USERS-CREATE-OWN-03 — Global Standard cannot CREATE Own
+
+Checks that a user with global user permissions role `standard` cannot CREATE their own record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
 ### PDBP-USERS-VIEW-01 — Global Superadmin can VIEW
 
@@ -50,8 +60,6 @@ Checks that a user with global user permissions role `standard` and status `appr
 
 Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot VIEW a record in the `users` collection.
 
-## Users permissions matrix — View Own
-
 ### PDBP-USERS-VIEW-OWN-01 — Global Superadmin can VIEW Own
 
 Checks that a user with global user permissions role `superadmin` can VIEW their own record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
@@ -71,8 +79,6 @@ Checks that a user with global user permissions role `standard` and status `appr
 ### PDBP-USERS-VIEW-OWN-05 — Global Standard (pending or blocked) cannot VIEW Own
 
 Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot VIEW their own record in the `users` collection.
-
-## Users permissions matrix — List
 
 ### PDBP-USERS-LIST-01 — Global Superadmin can LIST
 
@@ -94,8 +100,6 @@ Checks that a user with global user permissions role `standard` and status `appr
 
 Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot LIST records in the `users` collection.
 
-## Users permissions matrix — List Own
-
 ### PDBP-USERS-LIST-OWN-01 — Global Superadmin can LIST Own
 
 Checks that a user with global user permissions role `superadmin` can LIST their own record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
@@ -116,8 +120,6 @@ Checks that a user with global user permissions role `standard` and status `appr
 
 Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot LIST their own record in the `users` collection.
 
-## Users permissions matrix — Update
-
 ### PDBP-USERS-UPDATE-01 — Global Superadmin can UPDATE
 
 Checks that a user with global user permissions role `superadmin` can UPDATE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
@@ -130,8 +132,6 @@ Checks that a user with global user permissions role `admin` cannot UPDATE a rec
 
 Checks that a user with global user permissions role `standard` cannot UPDATE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-## Users permissions matrix — Delete
-
 ### PDBP-USERS-DELETE-01 — Global Superadmin can DELETE
 
 Checks that a user with global user permissions role `superadmin` can DELETE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
@@ -143,8 +143,6 @@ Checks that a user with global user permissions role `admin` cannot DELETE a rec
 ### PDBP-USERS-DELETE-03 — Global Standard cannot DELETE
 
 Checks that a user with global user permissions role `standard` cannot DELETE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
-## Users permissions matrix — Delete Own
 
 ### PDBP-USERS-DELETE-OWN-01 — Global Superadmin cannot DELETE Own
 

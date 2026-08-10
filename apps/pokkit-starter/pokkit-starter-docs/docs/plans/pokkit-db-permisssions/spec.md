@@ -20,9 +20,9 @@ This uses the default PocketBase `users` collection, but with new rules added to
 
 | Global Role     | Status   | Create | View | List | Update | Delete | Create Own | View Own | List Own | Update Own | Delete Own |
 | --------------- | -------- | :----: | :--: | :--: | :----: | :----: | :--------: | :------: | :------: | :--------: | :--------: |
-| **Super Admin** | Pending  |   ✅   |  ✅  |  ✅  |   ✅   |   ✅   |     ⊖      |    ✅    |    ✅    |     ❌     |     ❌     |
-| _"_             | Approved |   ✅   |  ✅  |  ✅  |   ✅   |   ✅   |     ⊖      |    ✅    |    ✅    |     ❌     |     ❌     |
-| _"_             | Blocked  |   ✅   |  ✅  |  ✅  |   ✅   |   ✅   |     ⊖      |    ✅    |    ✅    |     ❌     |     ❌     |
+| **Super Admin** | Pending  |   ✅   |  ✅  |  ✅  |   ✅   |   ✅   |     ❌     |    ✅    |    ✅    |     ❌     |     ❌     |
+| _"_             | Approved |   ✅   |  ✅  |  ✅  |   ✅   |   ✅   |     ❌     |    ✅    |    ✅    |     ❌     |     ❌     |
+| _"_             | Blocked  |   ✅   |  ✅  |  ✅  |   ✅   |   ✅   |     ❌     |    ✅    |    ✅    |     ❌     |     ❌     |
 | **Admin**       | Pending  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |     ❌     |    ❌    |    ❌    |     ❌     |     ❌     |
 | _"_             | Approved |   ❌   |  ✅  |  ✅  |   ❌   |   ❌   |     ❌     |    ✅    |    ✅    |     ❌     |     ✅     |
 | _"_             | Blocked  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |     ❌     |    ❌    |    ❌    |     ❌     |     ❌     |
