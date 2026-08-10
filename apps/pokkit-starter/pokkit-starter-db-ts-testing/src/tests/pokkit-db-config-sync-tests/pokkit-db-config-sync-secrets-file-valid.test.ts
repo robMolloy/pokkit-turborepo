@@ -1,5 +1,4 @@
 import {
-  clearPb,
   getPbFilePath,
   getPbServeUrl,
   getPokkitDbSecretsFilePath,
@@ -10,7 +9,7 @@ import {
   upsertPbAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
 import fse from "fs-extra";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { PocketBase } from "../../config/pocketbaseConfig";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_constants";
 import { pokkitDbConfigSyncTestsMetadata } from "./_pokkitDbConfigSyncTestsMetadata";

@@ -1,5 +1,5 @@
 import {
-  clearPb,
+  truncatePbCollections,
   getPbFilePath,
   getPbServeUrl,
   getPokkitDbCollectionsFilePath,
@@ -46,7 +46,12 @@ describe("pokkit-db permissions no collections file tests", () => {
   });
 
   beforeEach(async () => {
-    await clearPb({ pbPortNumber, superuserEmail, superuserPassword });
+    await truncatePbCollections({
+      pbPortNumber,
+      superuserEmail,
+      superuserPassword,
+      ignoreCollections: [superusersCollectionName],
+    });
   });
 
   it("is connection healthy", async () => {

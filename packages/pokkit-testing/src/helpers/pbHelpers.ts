@@ -118,10 +118,11 @@ export const upsertPbAdminCredentialsFromCli = async (p: {
   });
 };
 
-export const clearPb = async (p: {
+export const truncatePbCollections = async (p: {
   pbPortNumber: number;
   superuserEmail: string;
   superuserPassword: string;
+  ignoreCollections: string[];
 }) => {
   const superuserPb = new PocketBase(getPbServeUrl({ pbPortNumber: p.pbPortNumber }));
   await superuserPb
@@ -131,20 +132,14 @@ export const clearPb = async (p: {
   const collections = await superuserPb.collections.getFullList();
 
   const truncationPromises = collections
-    .filter((coll) => coll.name !== superusersCollectionName)
+    .filter((coll) => !p.ignoreCollections.includes(coll.name))
     .map((coll) => superuserPb.collections.truncate(coll.name));
   await Promise.all(truncationPromises);
-
-  const superuserRecords = await superuserPb.collection(superusersCollectionName).getFullList();
-  const deleteSuperuserPromises = superuserRecords
-    .filter((record) => record.email !== p.superuserEmail)
-    .map((record) => superuserPb.collection(superusersCollectionName).delete(record.id));
-  await Promise.all(deleteSuperuserPromises);
 
   superuserPb.authStore.clear();
 };
 
-export const pollLogsUntilNonZeroItems = async (p: {
+export const pollPbLogsUntilNonZeroItems = async (p: {
   pb: PocketBase;
   maxDurationMs: number;
   delayMs: number;
@@ -167,7 +162,7 @@ export const pollLogsUntilNonZeroItems = async (p: {
   return { success: false, error: "No logs found", timeTakenMs, iterations } as const;
 };
 
-export const pollLogsUntilNumberOfItemsChange = async (p: {
+export const pollPbLogsUntilNumberOfItemsChange = async (p: {
   pb: PocketBase;
   maxDurationMs: number;
   delayMs: number;

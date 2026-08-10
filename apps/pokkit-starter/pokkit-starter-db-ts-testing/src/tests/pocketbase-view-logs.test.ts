@@ -1,10 +1,10 @@
 import {
-  clearPb,
+  truncatePbCollections,
   getPbFilePath,
   getPbServeUrl,
   killPbInstance,
-  pollLogsUntilNonZeroItems,
-  pollLogsUntilNumberOfItemsChange,
+  pollPbLogsUntilNonZeroItems,
+  pollPbLogsUntilNumberOfItemsChange,
   servePb,
   superusersCollectionName,
   upsertPbAdminCredentialsFromCli,
@@ -53,7 +53,7 @@ describe("pokkit-db permissions no collections file tests", () => {
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
 
-    const pollLogsResp = await pollLogsUntilNonZeroItems({
+    const pollLogsResp = await pollPbLogsUntilNonZeroItems({
       pb: superuserPb,
       maxDurationMs: 15000,
       delayMs: 100,
@@ -68,7 +68,7 @@ describe("pokkit-db permissions no collections file tests", () => {
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
 
-    await pollLogsUntilNonZeroItems({
+    await pollPbLogsUntilNonZeroItems({
       pb: superuserPb,
       maxDurationMs: 10000,
       delayMs: 200,
@@ -79,7 +79,12 @@ describe("pokkit-db permissions no collections file tests", () => {
   }, 30000);
 
   beforeEach(async () => {
-    await clearPb({ pbPortNumber, superuserEmail, superuserPassword });
+    await truncatePbCollections({
+      pbPortNumber,
+      superuserEmail,
+      superuserPassword,
+      ignoreCollections: [superusersCollectionName],
+    });
   });
 
   it("is connection healthy", async () => {
@@ -119,7 +124,7 @@ describe("pokkit-db permissions no collections file tests", () => {
     const logsBeforeError = await superuserPb.logs.getList(1, 20, {});
     expect(logsBeforeError.items.length).toBeGreaterThan(0);
 
-    const pollLogsUntilNumberOfItemsChangeRespPromise = pollLogsUntilNumberOfItemsChange({
+    const pollLogsUntilNumberOfItemsChangeRespPromise = pollPbLogsUntilNumberOfItemsChange({
       pb: superuserPb,
       maxDurationMs: 15000,
       delayMs: 200,

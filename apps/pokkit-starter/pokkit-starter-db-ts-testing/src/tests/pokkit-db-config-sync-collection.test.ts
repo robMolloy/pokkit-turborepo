@@ -1,5 +1,5 @@
 import {
-  clearPb,
+  truncatePbCollections,
   getPbFilePath,
   getPbServeUrl,
   getPokkitDbCollectionsFilePath,
@@ -43,9 +43,12 @@ describe("pokkit-db config writer collection tests", () => {
   });
 
   beforeEach(async () => {
-    await clearPb({ pbPortNumber, superuserEmail, superuserPassword });
-
-    await upsertPbAdminCredentialsFromCli({ pbFilePath, superuserEmail, superuserPassword });
+    await truncatePbCollections({
+      pbPortNumber,
+      superuserEmail,
+      superuserPassword,
+      ignoreCollections: [superusersCollectionName],
+    });
   });
 
   it("is connection healthy", async () => {

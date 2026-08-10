@@ -1,10 +1,11 @@
 import {
-  clearPb,
+  truncatePbCollections,
   getPbFilePath,
   getPbServeUrl,
   getPokkitDbSecretsFilePath,
   killPbInstance,
   servePb,
+  superusersCollectionName,
   upsertPbAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
 import { safeJsonParse } from "@repo/pokkit-utils";
@@ -44,7 +45,12 @@ describe("pokkit-db config writer secrets tests - when secrets file does not exi
   });
 
   beforeEach(async () => {
-    await clearPb({ pbPortNumber, superuserEmail, superuserPassword });
+    await truncatePbCollections({
+      pbPortNumber,
+      superuserEmail,
+      superuserPassword,
+      ignoreCollections: [superusersCollectionName],
+    });
   });
 
   it("is connection healthy", async () => {

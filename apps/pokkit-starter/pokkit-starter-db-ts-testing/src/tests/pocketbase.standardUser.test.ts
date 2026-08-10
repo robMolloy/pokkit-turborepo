@@ -1,9 +1,10 @@
 import {
-  clearPb,
+  truncatePbCollections,
   getPbFilePath,
   getPbServeUrl,
   killPbInstance,
   servePb,
+  superusersCollectionName,
   upsertPbAdminCredentialsFromCli,
 } from "@repo/pokkit-testing";
 import fse from "fs-extra";
@@ -43,7 +44,12 @@ describe("test rules", () => {
   });
 
   beforeEach(async () => {
-    await clearPb({ pbPortNumber, superuserEmail, superuserPassword });
+    await truncatePbCollections({
+      pbPortNumber,
+      superuserEmail,
+      superuserPassword,
+      ignoreCollections: [superusersCollectionName],
+    });
   });
 
   it("is connection healthy", async () => {

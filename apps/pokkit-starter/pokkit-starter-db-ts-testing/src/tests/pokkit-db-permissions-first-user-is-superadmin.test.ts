@@ -1,5 +1,5 @@
 import {
-  clearPb,
+  truncatePbCollections,
   getPbFilePath,
   getPbServeUrl,
   globalUserPermissionsCollectionName,
@@ -44,7 +44,12 @@ describe("pokkit-db permissions first user is superadmin tests", () => {
   });
 
   beforeEach(async () => {
-    await clearPb({ pbPortNumber, superuserEmail, superuserPassword });
+    await truncatePbCollections({
+      pbPortNumber,
+      superuserEmail,
+      superuserPassword,
+      ignoreCollections: [superusersCollectionName],
+    });
 
     await upsertPbAdminCredentialsFromCli({ pbFilePath, superuserEmail, superuserPassword });
   });
