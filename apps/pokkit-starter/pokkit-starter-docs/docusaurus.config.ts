@@ -15,7 +15,7 @@ const config: Config = {
   },
 
   // Set the production url of your site here
-  url: "https://localhost:3000",
+  url: "https://pokkit-docs.web.app",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: "/",
@@ -23,7 +23,7 @@ const config: Config = {
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: "pokkit", // Usually your GitHub org/user name.
-  projectName: "pokkit-starter", // Usually your repo name.
+  projectName: "pokkit-docs", // Usually your repo name.
 
   onBrokenLinks: "throw",
 

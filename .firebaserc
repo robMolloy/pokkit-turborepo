@@ -1,5 +1,18 @@
 {
   "projects": {
-    "default": "pokkit-whispa"
+    "default": "pokkit-whispa",
+    "docs": "pokkit-docs"
+  },
+  "targets": {
+    "pokkit-whispa": {
+      "hosting": {
+        "pokkit-whisper": ["pokkit-whispa"]
+      }
+    },
+    "pokkit-docs": {
+      "hosting": {
+        "pokkit-docs": ["pokkit-docs"]
+      }
+    }
   }
 }
