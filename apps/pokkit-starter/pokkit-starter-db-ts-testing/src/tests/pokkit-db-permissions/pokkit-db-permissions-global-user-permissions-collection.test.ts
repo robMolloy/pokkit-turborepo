@@ -14,6 +14,7 @@ import { PocketBase } from "../../config/pocketbaseConfig";
 import { userPayloadBuilder } from "../../utils/pocketbaseUserHelpers";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_constants";
 import { pokkitDbPermissionsTestsMetadata } from "./_pokkitDbConfigSyncTestsMetadata";
+import { globalUserPermissionsPayloadBuilder } from "@repo/pokkit-db-permissions-ts-helpers";
 
 const globalUserPermissionsCollectionName = "globalUserPermissions";
 
@@ -126,45 +127,122 @@ describe(`${testSuiteName} tests`, () => {
       .collection(usersCollectionName)
       .authWithPassword(standardUserPayload.email, standardUserPayload.passwordConfirm);
 
-    const createGlobalUserPermissionsRecord = await superadminUserPb
-      .collection(globalUserPermissionsCollectionName)
-      .create({
-        userId: standardUserRecord.record.id,
-        role: "standard",
-        status: "approved",
-      });
-    expect(createGlobalUserPermissionsRecord).toMatchObject({
+    const globalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
       userId: standardUserRecord.record.id,
       role: "standard",
       status: "approved",
     });
+    const createdGlobalUserPermissionsRecord = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(globalUserPermissionsPayload);
+
+    expect(createdGlobalUserPermissionsRecord).toMatchObject(globalUserPermissionsPayload);
   });
 
-  // it.todo("PDBP-GUP-CREATE-02 — Global Admin cannot CREATE", async () => {
+  it("PDBP-GUP-CREATE-02 — Global Admin cannot CREATE", async () => {
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+
+    const adminUserPb = createPbConnection();
+    const adminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await adminUserPb.collection(usersCollectionName).create(adminUserPayload);
+    const adminUserRecord = await adminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(adminUserPayload.email, adminUserPayload.passwordConfirm);
+
+    await superadminUserPb.collection(globalUserPermissionsCollectionName).create(
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: adminUserRecord.record.id,
+        role: "admin",
+        status: "approved",
+      }),
+    );
+
+    const user1Pb = createPbConnection();
+    const user1Payload = userPayloadBuilder.forCreateRandomData();
+    await user1Pb.collection(usersCollectionName).create(user1Payload);
+    const user1Record = await user1Pb
+      .collection(usersCollectionName)
+      .authWithPassword(user1Payload.email, user1Payload.passwordConfirm);
+
+    await expect(
+      adminUserPb.collection(globalUserPermissionsCollectionName).create(
+        globalUserPermissionsPayloadBuilder.forCreateData({
+          userId: user1Record.record.id,
+          role: "standard",
+          status: "approved",
+        }),
+      ),
+    ).rejects.toThrow();
+  });
+
+  it("PDBP-GUP-CREATE-03 — Global Standard cannot CREATE", async () => {
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+
+    const standardUserPb = createPbConnection();
+    const standardUserPayload = userPayloadBuilder.forCreateRandomData();
+    await standardUserPb.collection(usersCollectionName).create(standardUserPayload);
+    const standardUserRecord = await standardUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(standardUserPayload.email, standardUserPayload.passwordConfirm);
+
+    await superadminUserPb.collection(globalUserPermissionsCollectionName).create(
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: standardUserRecord.record.id,
+        role: "standard",
+        status: "approved",
+      }),
+    );
+
+    const user1Pb = createPbConnection();
+    const user1Payload = userPayloadBuilder.forCreateRandomData();
+    await user1Pb.collection(usersCollectionName).create(user1Payload);
+    const user1Record = await user1Pb
+      .collection(usersCollectionName)
+      .authWithPassword(user1Payload.email, user1Payload.passwordConfirm);
+
+    await expect(
+      standardUserPb.collection(globalUserPermissionsCollectionName).create(
+        globalUserPermissionsPayloadBuilder.forCreateData({
+          userId: user1Record.record.id,
+          role: "standard",
+          status: "approved",
+        }),
+      ),
+    ).rejects.toThrow();
+  });
+
+  // it.only("PDBP-GUP-CREATE-OWN-01 — Global Superadmin cannot CREATE OWN", async () => {
   //   const superadminUserPb = createPbConnection();
   //   const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
-  //   await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
   //   const superadminUserRecord = await superadminUserPb
+  //     .collection(usersCollectionName)
+  //     .create(superadminUserPayload);
+  //   await superadminUserPb
   //     .collection(usersCollectionName)
   //     .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
 
-  //   const standardUserPb = createPbConnection();
-  //   const standardUserPayload = userPayloadBuilder.forCreateRandomData();
-  //   await standardUserPb.collection(usersCollectionName).create(standardUserPayload);
-  //   const standardUserRecord = await standardUserPb
-  //     .collection(usersCollectionName)
-  //     .authWithPassword(standardUserPayload.email, standardUserPayload.passwordConfirm);
-
-  //   superadminUserPb.collection(globalUserPermissionsCollectionName).create({
-  //     userId: standardUserRecord.record.id,
-  //     role: "standard",
-  //     status: "approved",
-  //   });
+  //   await expect(
+  //     superadminUserPb
+  //       .collection(globalUserPermissionsCollectionName)
+  //       .create(
+  //         globalUserPermissionsPayloadBuilder.forCreateData({
+  //           userId: superadminUserRecord.id,
+  //           role: "admin",
+  //           status: "approved",
+  //         }),
+  //       ),
+  //   ).rejects.toThrow();
   // });
-
-  // it("PDBP-GUP-CREATE-03 — Global Standard cannot CREATE", async () => {});
-
-  // it.todo("PDBP-GUP-CREATE-OWN-01 — Global Superadmin cannot CREATE OWN", async () => {});
 
   // it.todo("PDBP-GUP-CREATE-OWN-02 — Global Admin cannot CREATE OWN", async () => {});
 
