@@ -1,13 +1,17 @@
 package pokkitDbPermissions
 
 import (
+	_ "embed"
 	"fmt"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 )
 
+//go:embed collectionsSchema.json
+var pokkitPermissionsCollectionsSchema []byte
+
 func mergePokkitPermissionsDbCollectionsFromSchema(app pbCore.App) error {
-	err := app.ImportCollectionsByMarshaledJSON([]byte(pokkitPermissionsCollectionsSchema), false)
+	err := app.ImportCollectionsByMarshaledJSON(pokkitPermissionsCollectionsSchema, false)
 	if err != nil {
 		return fmt.Errorf("Error importing pokkitPermissionsCollectionsSchema in mergePokkitPermissionsDbCollectionsFromSchema: %w", err)
 	}
