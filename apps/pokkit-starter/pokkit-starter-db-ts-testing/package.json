@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@repo/pokkit-testing": "workspace:^",
+    "@repo/pokkit-db-permissions-ts-helpers": "workspace:^",
     "@repo/pokkit-utils": "workspace:^",
     "pocketbase": "^0.26.6",
     "zod": "^4.3.6"

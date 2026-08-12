@@ -5,6 +5,8 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
+    "attempt-kill-port": "kill -9 $(lsof -ti :\"$PORT\" 2>/dev/null | head -n 1) 2>/dev/null || true",
+    "kill-port": "PORT=$PORT npm run attempt-kill-port",
     "tsc:web-ui": "turbo run tsc --filter=web --filter=@repo/ui",
     "tsc": "turbo run tsc",
     "css-build": "turbo run css-build",
