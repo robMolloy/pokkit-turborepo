@@ -6,7 +6,7 @@ import (
 	pbCore "github.com/pocketbase/pocketbase/core"
 )
 
-func ElevateFirstUserToAdmin(app pbCore.App, record *pbCore.Record) error {
+func ElevateFirstUserToApprovedSuperadmin(app pbCore.App, record *pbCore.Record) error {
 
 	records, err := app.FindRecordsByFilter(usersCollectionName, "", "", 2, 0)
 	if err != nil {

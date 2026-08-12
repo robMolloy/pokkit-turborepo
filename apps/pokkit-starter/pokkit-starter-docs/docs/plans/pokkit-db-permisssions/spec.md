@@ -12,11 +12,43 @@ The overview can be found [here](./index.mdx).
 
 This uses the default PocketBase `users` collection, but with new rules added to enable superadmins to manage users.
 
+### Users collection setup
+
 | Condition | Action                                                          |
 | --------- | --------------------------------------------------------------- |
 | Superuser | Verifies the collection is in the database and set up correctly |
 
-## Users permissions matrix
+### First User Behaviour
+
+The first user created is provisioned as an approved superadmin in the `globalUserPermissions` collection.
+
+| Condition          | Action                                                                    |
+| ------------------ | ------------------------------------------------------------------------- |
+| First user created | Is given approved superadmin record in `globalUserPermissions` collection |
+
+| Condition | Action                                                          |
+| --------- | --------------------------------------------------------------- |
+| Superuser | Verifies the collection is in the database and set up correctly |
+
+### User collection permissions matrix
+
+⊝ = No change from default behaviour
+
+| Global Role     | Status   | Create | View | List | Update | Delete | Create Own | View Own | List Own | Update Own | Delete Own |
+| --------------- | -------- | :----: | :--: | :--: | :----: | :----: | :--------: | :------: | :------: | :--------: | :--------: |
+| **Super Admin** | Pending  |   ✅   |  ⊝   |  ⊝   |   ✅   |   ✅   |     ❌     |    ⊝     |    ⊝     |     ❌     |     ❌     |
+| _"_             | Approved |   ✅   |  ⊝   |  ⊝   |   ✅   |   ✅   |     ❌     |    ⊝     |    ⊝     |     ❌     |     ❌     |
+| _"_             | Blocked  |   ✅   |  ⊝   |  ⊝   |   ✅   |   ✅   |     ❌     |    ⊝     |    ⊝     |     ❌     |     ❌     |
+| **Admin**       | Pending  |   ⊝    |  ⊝   |  ⊝   |   ⊝    |   ⊝    |     ⊝      |    ⊝     |    ⊝     |     ⊝      |     ⊝      |
+| _"_             | Approved |   ⊝    |  ⊝   |  ⊝   |   ⊝    |   ⊝    |     ⊝      |    ⊝     |    ⊝     |     ⊝      |     ⊝      |
+| _"_             | Blocked  |   ⊝    |  ⊝   |  ⊝   |   ⊝    |   ⊝    |     ⊝      |    ⊝     |    ⊝     |     ⊝      |     ⊝      |
+| **Standard**    | Pending  |   ⊝    |  ⊝   |  ⊝   |   ⊝    |   ⊝    |     ⊝      |    ⊝     |    ⊝     |     ⊝      |     ⊝      |
+| _"_             | Approved |   ⊝    |  ⊝   |  ⊝   |   ⊝    |   ⊝    |     ⊝      |    ⊝     |    ⊝     |     ⊝      |     ⊝      |
+| _"_             | Blocked  |   ⊝    |  ⊝   |  ⊝   |   ⊝    |   ⊝    |     ⊝      |    ⊝     |    ⊝     |     ⊝      |     ⊝      |
+
+## Global User Permissions collection
+
+### Global User Permissions collection permissions matrix
 
 | Global Role     | Status   | Create | View | List | Update | Delete | Create Own | View Own | List Own | Update Own | Delete Own |
 | --------------- | -------- | :----: | :--: | :--: | :----: | :----: | :--------: | :------: | :------: | :--------: | :--------: |
@@ -29,20 +61,6 @@ This uses the default PocketBase `users` collection, but with new rules added to
 | **Standard**    | Pending  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |     ❌     |    ❌    |    ❌    |     ❌     |     ❌     |
 | _"_             | Approved |   ❌   |  ✅  |  ✅  |   ❌   |   ❌   |     ❌     |    ✅    |    ✅    |     ❌     |     ✅     |
 | _"_             | Blocked  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |     ❌     |    ❌    |    ❌    |     ❌     |     ❌     |
-
-_Authentication actions such as verify user, change email, reset password, etc. are not addressed in this spec._
-
-### First User
-
-The first user created is provisioned as an approved superadmin in the `globalUserPermissions` collection.
-
-| Condition          | Action                                                                    |
-| ------------------ | ------------------------------------------------------------------------- |
-| First user created | Is given approved superadmin record in `globalUserPermissions` collection |
-
-| Condition | Action                                                          |
-| --------- | --------------------------------------------------------------- |
-| Superuser | Verifies the collection is in the database and set up correctly |
 
 ## Organisation collections
 

@@ -56,11 +56,13 @@ describe("pokkit-db permissions no collections file tests", () => {
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
 
-    await pollPbLogsUntilNonZeroItems({
+    const pollLogsResp = await pollPbLogsUntilNonZeroItems({
       pb: superuserPb,
       maxDurationMs: 10000,
       delayMs: 200,
     });
+
+    expect(pollLogsResp.success).toBe(true);
 
     killPbInstance({ pbPortNumber });
     fse.removeSync(pbDirPath);
