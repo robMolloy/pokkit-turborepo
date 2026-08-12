@@ -3,11 +3,11 @@ package pokkitDbPermissions
 const pokkitPermissionsCollectionsSchema = `[
   {
     "id": "pbc_2680520508",
-    "listRule": "@request.auth.id != \"\" && (\n  @request.auth.id = id || \n  @collection.globalUserPermissions.id ?= @request.auth.id && @collection.globalUserPermissions.role ?= \"admin\"\n)",
-    "viewRule": "@request.auth.id != \"\" && @request.auth.id = id || @collection.globalUserPermissions.id ?= @request.auth.id && @collection.globalUserPermissions.role ?= \"admin\"",
-    "createRule": "@request.auth.id != \"\" && \n@collection.globalUserPermissions.id ?= @request.auth.id && \n@collection.globalUserPermissions.role ?= \"admin\"",
-    "updateRule": "@request.auth.id != \"\" && \n@collection.globalUserPermissions.id ?= @request.auth.id && \n@collection.globalUserPermissions.role ?= \"admin\"",
-    "deleteRule": "@request.auth.id != \"\" && \n@collection.globalUserPermissions.id ?= @request.auth.id && \n@collection.globalUserPermissions.role ?= \"admin\"",
+    "listRule": "@request.auth.id != \"\" && (\n  @request.auth.id = id || \n  @collection.globalUserPermissions.userId ?= @request.auth.id && @collection.globalUserPermissions.role ?= \"superadmin\"\n)",
+    "viewRule": "@request.auth.id != \"\" && @request.auth.id = id || @collection.globalUserPermissions.userId ?= @request.auth.id && @collection.globalUserPermissions.role ?= \"superadmin\"",
+    "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id && \n@collection.globalUserPermissions.role ?= \"superadmin\"",
+    "updateRule": "@request.auth.id != \"\" && \n@collection.globalUserPermissions.userId ?= @request.auth.id && \n@collection.globalUserPermissions.role ?= \"superadmin\"",
+    "deleteRule": "@request.auth.id != \"\" && \n@collection.globalUserPermissions.userId ?= @request.auth.id && \n@collection.globalUserPermissions.role ?= \"superadmin\"",
     "name": "globalUserPermissions",
     "type": "base",
     "fields": [

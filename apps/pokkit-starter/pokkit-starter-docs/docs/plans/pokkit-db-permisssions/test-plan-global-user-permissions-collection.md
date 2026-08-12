@@ -4,178 +4,178 @@
 
 This plan covers required tests for the Pokkit Db Permissions initialization plugin:
 
-Each test is given a tag in the following format. PDBP-USERS-{ACTION}-{NN} In order to track the tests more easily.
+Each test is given a tag in the following format. PDBP-{COLLECTION}-{ACTION}-{NN} In order to track the tests more easily.
 
 ---
 
-## Collection setup tests
+## Global User Permissions collection setup tests
 
-### PDBP-USERS-SETUP-01 — Verify collection presence and validity is setup correctly
+### PDBP-GUP-SETUP-01 — Verify collection presence and validity is setup correctly
 
-Checks that the default `users` collection from the database after plugin initialization is present and set up correctly.
+Checks that the default `globalUserPermissions` collection from the database after plugin initialization is present and set up correctly.
 
-### PDBP-USERS-SETUP-02 — First user created is a global superadmin
+### PDBP-GUP-SETUP-02 — First user created is a global superadmin
 
 Checks that the first user created is a global superadmin.
 
 ## User permissions tests
 
-### PDBP-USERS-CREATE-01 — Global Superadmin can CREATE
+### PDBP-GUP-CREATE-01 — Global Superadmin can CREATE
 
-Checks that a user with global user permissions role `superadmin` can CREATE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `superadmin` can CREATE a record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-CREATE-02 — Global Admin cannot CREATE
+### PDBP-GUP-CREATE-02 — Global Admin cannot CREATE
 
-Checks that a user with global user permissions role `admin` cannot CREATE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `admin` cannot CREATE a record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-CREATE-03 — Global Standard cannot CREATE
+### PDBP-GUP-CREATE-03 — Global Standard cannot CREATE
 
-Checks that a user with global user permissions role `standard` cannot CREATE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `standard` cannot CREATE a record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-CREATE-OWN-01 — Global Superadmin cannot CREATE OWN
+### PDBP-GUP-CREATE-OWN-01 — Global Superadmin cannot CREATE OWN
 
-Checks that a user with global user permissions role `superadmin` cannot CREATE their own record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `superadmin` cannot CREATE their own record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-CREATE-OWN-02 — Global Admin cannot CREATE OWN
+### PDBP-GUP-CREATE-OWN-02 — Global Admin cannot CREATE OWN
 
-Checks that a user with global user permissions role `admin` cannot CREATE their own record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `admin` cannot CREATE their own record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-CREATE-OWN-03 — Global Standard cannot CREATE OWN
+### PDBP-GUP-CREATE-OWN-03 — Global Standard cannot CREATE OWN
 
-Checks that a user with global user permissions role `standard` cannot CREATE their own record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `standard` cannot CREATE their own record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-VIEW-01 — Global Superadmin can VIEW
+### PDBP-GUP-VIEW-01 — Global Superadmin can VIEW
 
-Checks that a user with global user permissions role `superadmin` can VIEW a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `superadmin` can VIEW a record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-VIEW-02 — Global Admin (approved) can VIEW
+### PDBP-GUP-VIEW-02 — Global Admin (approved) can VIEW
 
-Checks that a user with global user permissions role `admin` and status `approved` can VIEW a record in the `users` collection.
+Checks that a user with global user permissions role `admin` and status `approved` can VIEW a record in the `globalUserPermissions` collection.
 
-### PDBP-USERS-VIEW-03 — Global Admin (pending or blocked) cannot VIEW
+### PDBP-GUP-VIEW-03 — Global Admin (pending or blocked) cannot VIEW
 
-Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot VIEW a record in the `users` collection.
+Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot VIEW a record in the `globalUserPermissions` collection.
 
-### PDBP-USERS-VIEW-04 — Global Standard (approved) can VIEW
+### PDBP-GUP-VIEW-04 — Global Standard (approved) can VIEW
 
-Checks that a user with global user permissions role `standard` and status `approved` can VIEW a record in the `users` collection.
+Checks that a user with global user permissions role `standard` and status `approved` can VIEW a record in the `globalUserPermissions` collection.
 
-### PDBP-USERS-VIEW-05 — Global Standard (pending or blocked) cannot VIEW
+### PDBP-GUP-VIEW-05 — Global Standard (pending or blocked) cannot VIEW
 
-Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot VIEW a record in the `users` collection.
+Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot VIEW a record in the `globalUserPermissions` collection.
 
-### PDBP-USERS-VIEW-OWN-01 — Global Superadmin can VIEW OWN
+### PDBP-GUP-VIEW-OWN-01 — Global Superadmin can VIEW OWN
 
-Checks that a user with global user permissions role `superadmin` can VIEW their own record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `superadmin` can VIEW their own record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-VIEW-OWN-02 — Global Admin (approved) can VIEW OWN
+### PDBP-GUP-VIEW-OWN-02 — Global Admin (approved) can VIEW OWN
 
-Checks that a user with global user permissions role `admin` and status `approved` can VIEW their own record in the `users` collection.
+Checks that a user with global user permissions role `admin` and status `approved` can VIEW their own record in the `globalUserPermissions` collection.
 
-### PDBP-USERS-VIEW-OWN-03 — Global Admin (pending or blocked) cannot VIEW OWN
+### PDBP-GUP-VIEW-OWN-03 — Global Admin (pending or blocked) cannot VIEW OWN
 
-Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot VIEW their own record in the `users` collection.
+Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot VIEW their own record in the `globalUserPermissions` collection.
 
-### PDBP-USERS-VIEW-OWN-04 — Global Standard (approved) can VIEW OWN
+### PDBP-GUP-VIEW-OWN-04 — Global Standard (approved) can VIEW OWN
 
-Checks that a user with global user permissions role `standard` and status `approved` can VIEW their own record in the `users` collection.
+Checks that a user with global user permissions role `standard` and status `approved` can VIEW their own record in the `globalUserPermissions` collection.
 
-### PDBP-USERS-VIEW-OWN-05 — Global Standard (pending or blocked) cannot VIEW OWN
+### PDBP-GUP-VIEW-OWN-05 — Global Standard (pending or blocked) cannot VIEW OWN
 
-Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot VIEW their own record in the `users` collection.
+Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot VIEW their own record in the `globalUserPermissions` collection.
 
-### PDBP-USERS-LIST-01 — Global Superadmin can LIST
+### PDBP-GUP-LIST-01 — Global Superadmin can LIST
 
-Checks that a user with global user permissions role `superadmin` can LIST records in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `superadmin` can LIST records in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-LIST-02 — Global Admin (approved) can LIST
+### PDBP-GUP-LIST-02 — Global Admin (approved) can LIST
 
-Checks that a user with global user permissions role `admin` and status `approved` can LIST records in the `users` collection.
+Checks that a user with global user permissions role `admin` and status `approved` can LIST records in the `globalUserPermissions` collection.
 
-### PDBP-USERS-LIST-03 — Global Admin (pending or blocked) cannot LIST
+### PDBP-GUP-LIST-03 — Global Admin (pending or blocked) cannot LIST
 
-Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot LIST records in the `users` collection.
+Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot LIST records in the `globalUserPermissions` collection.
 
-### PDBP-USERS-LIST-04 — Global Standard (approved) can LIST
+### PDBP-GUP-LIST-04 — Global Standard (approved) can LIST
 
-Checks that a user with global user permissions role `standard` and status `approved` can LIST records in the `users` collection.
+Checks that a user with global user permissions role `standard` and status `approved` can LIST records in the `globalUserPermissions` collection.
 
-### PDBP-USERS-LIST-05 — Global Standard (pending or blocked) cannot LIST
+### PDBP-GUP-LIST-05 — Global Standard (pending or blocked) cannot LIST
 
-Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot LIST records in the `users` collection.
+Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot LIST records in the `globalUserPermissions` collection.
 
-### PDBP-USERS-LIST-OWN-01 — Global Superadmin can LIST OWN
+### PDBP-GUP-LIST-OWN-01 — Global Superadmin can LIST OWN
 
-Checks that a user with global user permissions role `superadmin` can LIST their own record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `superadmin` can LIST their own record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-LIST-OWN-02 — Global Admin (approved) can LIST OWN
+### PDBP-GUP-LIST-OWN-02 — Global Admin (approved) can LIST OWN
 
-Checks that a user with global user permissions role `admin` and status `approved` can LIST their own record in the `users` collection.
+Checks that a user with global user permissions role `admin` and status `approved` can LIST their own record in the `globalUserPermissions` collection.
 
-### PDBP-USERS-LIST-OWN-03 — Global Admin (pending or blocked) cannot LIST OWN
+### PDBP-GUP-LIST-OWN-03 — Global Admin (pending or blocked) cannot LIST OWN
 
-Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot LIST their own record in the `users` collection.
+Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot LIST their own record in the `globalUserPermissions` collection.
 
-### PDBP-USERS-LIST-OWN-04 — Global Standard (approved) can LIST OWN
+### PDBP-GUP-LIST-OWN-04 — Global Standard (approved) can LIST OWN
 
-Checks that a user with global user permissions role `standard` and status `approved` can LIST their own record in the `users` collection.
+Checks that a user with global user permissions role `standard` and status `approved` can LIST their own record in the `globalUserPermissions` collection.
 
-### PDBP-USERS-LIST-OWN-05 — Global Standard (pending or blocked) cannot LIST OWN
+### PDBP-GUP-LIST-OWN-05 — Global Standard (pending or blocked) cannot LIST OWN
 
-Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot LIST their own record in the `users` collection.
+Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot LIST their own record in the `globalUserPermissions` collection.
 
-### PDBP-USERS-UPDATE-01 — Global Superadmin can UPDATE
+### PDBP-GUP-UPDATE-01 — Global Superadmin can UPDATE
 
-Checks that a user with global user permissions role `superadmin` can UPDATE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `superadmin` can UPDATE a record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-UPDATE-02 — Global Admin cannot UPDATE
+### PDBP-GUP-UPDATE-02 — Global Admin cannot UPDATE
 
-Checks that a user with global user permissions role `admin` cannot UPDATE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `admin` cannot UPDATE a record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-UPDATE-03 — Global Standard cannot UPDATE
+### PDBP-GUP-UPDATE-03 — Global Standard cannot UPDATE
 
-Checks that a user with global user permissions role `standard` cannot UPDATE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `standard` cannot UPDATE a record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-UPDATE-OWN-01 — Global Superadmin cannot UPDATE OWN
+### PDBP-GUP-UPDATE-OWN-01 — Global Superadmin cannot UPDATE OWN
 
-Checks that a user with global user permissions role `superadmin` cannot UPDATE their own record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `superadmin` cannot UPDATE their own record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-UPDATE-OWN-02 — Global Admin cannot UPDATE OWN
+### PDBP-GUP-UPDATE-OWN-02 — Global Admin cannot UPDATE OWN
 
-Checks that a user with global user permissions role `admin` cannot UPDATE their own record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `admin` cannot UPDATE their own record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-UPDATE-OWN-03 — Global Standard cannot UPDATE OWN
+### PDBP-GUP-UPDATE-OWN-03 — Global Standard cannot UPDATE OWN
 
-Checks that a user with global user permissions role `standard` cannot UPDATE their own record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `standard` cannot UPDATE their own record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-DELETE-01 — Global Superadmin can DELETE
+### PDBP-GUP-DELETE-01 — Global Superadmin can DELETE
 
-Checks that a user with global user permissions role `superadmin` can DELETE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `superadmin` can DELETE a record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-DELETE-02 — Global Admin cannot DELETE
+### PDBP-GUP-DELETE-02 — Global Admin cannot DELETE
 
-Checks that a user with global user permissions role `admin` cannot DELETE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `admin` cannot DELETE a record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-DELETE-03 — Global Standard cannot DELETE
+### PDBP-GUP-DELETE-03 — Global Standard cannot DELETE
 
-Checks that a user with global user permissions role `standard` cannot DELETE a record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `standard` cannot DELETE a record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-DELETE-OWN-01 — Global Superadmin cannot DELETE OWN
+### PDBP-GUP-DELETE-OWN-01 — Global Superadmin cannot DELETE OWN
 
-Checks that a user with global user permissions role `superadmin` cannot DELETE their own record in the `users` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `superadmin` cannot DELETE their own record in the `globalUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-USERS-DELETE-OWN-02 — Global Admin (approved) can DELETE OWN
+### PDBP-GUP-DELETE-OWN-02 — Global Admin (approved) can DELETE OWN
 
-Checks that a user with global user permissions role `admin` and status `approved` can DELETE their own record in the `users` collection.
+Checks that a user with global user permissions role `admin` and status `approved` can DELETE their own record in the `globalUserPermissions` collection.
 
-### PDBP-USERS-DELETE-OWN-03 — Global Admin (pending or blocked) cannot DELETE OWN
+### PDBP-GUP-DELETE-OWN-03 — Global Admin (pending or blocked) cannot DELETE OWN
 
-Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot DELETE their own record in the `users` collection.
+Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot DELETE their own record in the `globalUserPermissions` collection.
 
-### PDBP-USERS-DELETE-OWN-04 — Global Standard (approved) can DELETE OWN
+### PDBP-GUP-DELETE-OWN-04 — Global Standard (approved) can DELETE OWN
 
-Checks that a user with global user permissions role `standard` and status `approved` can DELETE their own record in the `users` collection.
+Checks that a user with global user permissions role `standard` and status `approved` can DELETE their own record in the `globalUserPermissions` collection.
 
-### PDBP-USERS-DELETE-OWN-05 — Global Standard (pending or blocked) cannot DELETE OWN
+### PDBP-GUP-DELETE-OWN-05 — Global Standard (pending or blocked) cannot DELETE OWN
 
-Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot DELETE their own record in the `users` collection.
+Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot DELETE their own record in the `globalUserPermissions` collection.

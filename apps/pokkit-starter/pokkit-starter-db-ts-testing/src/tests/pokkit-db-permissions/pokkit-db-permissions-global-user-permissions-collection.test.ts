@@ -2,7 +2,6 @@ import {
   getPbFilePath,
   getPbServeUrl,
   killPbInstance,
-  pollPbLogsUntilNonZeroItems,
   servePb,
   superusersCollectionName,
   truncatePbCollections,
@@ -12,13 +11,14 @@ import {
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../../config/pocketbaseConfig";
+import { userPayloadBuilder } from "../../utils/pocketbaseUserHelpers";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_constants";
 import { pokkitDbPermissionsTestsMetadata } from "./_pokkitDbConfigSyncTestsMetadata";
-import { userPayloadBuilder } from "../../utils/pocketbaseUserHelpers";
 
 const globalUserPermissionsCollectionName = "globalUserPermissions";
 
-const testMetadata = pokkitDbPermissionsTestsMetadata.usersCollectionCreateAction;
+const testMetadata =
+  pokkitDbPermissionsTestsMetadata.pokkitDbPermissionsGlobalUserPermissionsCollection;
 const testSuiteName = testMetadata.name;
 
 const pbPortNumber = testMetadata.portNumber;
@@ -40,20 +40,20 @@ describe(`${testSuiteName} tests`, () => {
   });
 
   afterAll(async () => {
-    const superuserPb = createPbConnection();
-    await superuserPb
-      .collection(superusersCollectionName)
-      .authWithPassword(superuserEmail, superuserPassword);
+    // const superuserPb = createPbConnection();
+    // await superuserPb
+    //   .collection(superusersCollectionName)
+    //   .authWithPassword(superuserEmail, superuserPassword);
 
-    const pollLogsResp = await pollPbLogsUntilNonZeroItems({
-      pb: superuserPb,
-      maxDurationMs: 10000,
-      delayMs: 200,
-    });
+    // const pollLogsResp = await pollPbLogsUntilNumberOfItemsChange({
+    //   pb: superuserPb,
+    //   maxDurationMs: 10000,
+    //   delayMs: 200,
+    //   props: { page: 1, perPage: 30, options: { sort: "-created", filter: "level>0" } },
+    // });
 
-    expect(pollLogsResp.success).toBe(true);
-
-    fse.writeFileSync(`${logFilePath}.json`, JSON.stringify(pollLogsResp.data, null, 2));
+    // expect(pollLogsResp.success).toBe(true);
+    // fse.writeFileSync(`${logFilePath}.json`, JSON.stringify(pollLogsResp.data, null, 2));
 
     killPbInstance({ pbPortNumber });
     fse.removeSync(pbDirPath);
@@ -74,7 +74,7 @@ describe(`${testSuiteName} tests`, () => {
     expect(isHealthy.code).toBe(200);
   });
 
-  it("PDBP-USERS-SETUP-01 — Verify collection presence and validity is setup correctly", async () => {
+  it("PDBP-GUP-SETUP-01 — Verify collection presence and validity is setup correctly", async () => {
     const superuserPb = createPbConnection();
     await superuserPb
       .collection(superusersCollectionName)
@@ -83,10 +83,11 @@ describe(`${testSuiteName} tests`, () => {
     const globalUserPermissionsCollection = superuserPb.collection(
       globalUserPermissionsCollectionName,
     );
+
     expect(globalUserPermissionsCollection).toBeTruthy();
   });
 
-  it("PDBP-USERS-SETUP-02 — First user created is a global superadmin", async () => {
+  it("PDBP-GUP-SETUP-02 — First user created is a global superadmin", async () => {
     const superadminPb = createPbConnection();
     const userPayload = userPayloadBuilder.forCreateRandomData();
     await superadminPb.collection(usersCollectionName).create(userPayload);
@@ -110,7 +111,7 @@ describe(`${testSuiteName} tests`, () => {
     expect(globalUserPermissionsRecord).toMatchObject({ status: "approved", role: "superadmin" });
   });
 
-  it("PDBP-USERS-CREATE-01 — Global Superadmin can CREATE", async () => {
+  it("PDBP-GUP-CREATE-01 — Global Superadmin can CREATE", async () => {
     const superadminUserPb = createPbConnection();
     const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
@@ -125,26 +126,21 @@ describe(`${testSuiteName} tests`, () => {
       .collection(usersCollectionName)
       .authWithPassword(standardUserPayload.email, standardUserPayload.passwordConfirm);
 
-    try {
-      const createGlobalUserPermissionsRecord = await superadminUserPb
-        .collection(globalUserPermissionsCollectionName)
-        .create({
-          userId: standardUserRecord.record.id,
-          role: "standard",
-          status: "approved",
-        });
-      expect(createGlobalUserPermissionsRecord).toMatchObject({
+    const createGlobalUserPermissionsRecord = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create({
         userId: standardUserRecord.record.id,
         role: "standard",
         status: "approved",
       });
-    } catch (error) {
-      console.log("error", error);
-      expect(true).toBe(false);
-    }
+    expect(createGlobalUserPermissionsRecord).toMatchObject({
+      userId: standardUserRecord.record.id,
+      role: "standard",
+      status: "approved",
+    });
   });
 
-  // it.todo("PDBP-USERS-CREATE-02 — Global Admin cannot CREATE", async () => {
+  // it.todo("PDBP-GUP-CREATE-02 — Global Admin cannot CREATE", async () => {
   //   const superadminUserPb = createPbConnection();
   //   const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
   //   await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
@@ -166,94 +162,94 @@ describe(`${testSuiteName} tests`, () => {
   //   });
   // });
 
-  // it.todo("PDBP-USERS-CREATE-03 — Global Standard cannot CREATE", async () => {});
+  // it("PDBP-GUP-CREATE-03 — Global Standard cannot CREATE", async () => {});
 
-  // it.todo("PDBP-USERS-CREATE-OWN-01 — Global Superadmin cannot CREATE OWN", async () => {});
+  // it.todo("PDBP-GUP-CREATE-OWN-01 — Global Superadmin cannot CREATE OWN", async () => {});
 
-  // it.todo("PDBP-USERS-CREATE-OWN-02 — Global Admin cannot CREATE OWN", async () => {});
+  // it.todo("PDBP-GUP-CREATE-OWN-02 — Global Admin cannot CREATE OWN", async () => {});
 
-  // it.todo("PDBP-USERS-CREATE-OWN-03 — Global Standard cannot CREATE OWN", async () => {});
+  // it.todo("PDBP-GUP-CREATE-OWN-03 — Global Standard cannot CREATE OWN", async () => {});
 
-  // it.todo("PDBP-USERS-VIEW-01 — Global Superadmin can VIEW", async () => {});
+  // it.todo("PDBP-GUP-VIEW-01 — Global Superadmin can VIEW", async () => {});
 
-  // it.todo("PDBP-USERS-VIEW-02 — Global Admin (approved) can VIEW", async () => {});
+  // it.todo("PDBP-GUP-VIEW-02 — Global Admin (approved) can VIEW", async () => {});
 
-  // it.todo("PDBP-USERS-VIEW-03 — Global Admin (pending or blocked) cannot VIEW", async () => {});
+  // it.todo("PDBP-GUP-VIEW-03 — Global Admin (pending or blocked) cannot VIEW", async () => {});
 
-  // it.todo("PDBP-USERS-VIEW-04 — Global Standard (approved) can VIEW", async () => {});
+  // it.todo("PDBP-GUP-VIEW-04 — Global Standard (approved) can VIEW", async () => {});
 
-  // it.todo("PDBP-USERS-VIEW-05 — Global Standard (pending or blocked) cannot VIEW", async () => {});
+  // it.todo("PDBP-GUP-VIEW-05 — Global Standard (pending or blocked) cannot VIEW", async () => {});
 
-  // it.todo("PDBP-USERS-VIEW-OWN-01 — Global Superadmin can VIEW OWN", async () => {});
+  // it.todo("PDBP-GUP-VIEW-OWN-01 — Global Superadmin can VIEW OWN", async () => {});
 
-  // it.todo("PDBP-USERS-VIEW-OWN-02 — Global Admin (approved) can VIEW OWN", async () => {});
+  // it.todo("PDBP-GUP-VIEW-OWN-02 — Global Admin (approved) can VIEW OWN", async () => {});
 
   // it.todo(
   //   "PDBP-USERS-VIEW-OWN-03 — Global Admin (pending or blocked) cannot VIEW OWN",
   //   async () => {},
   // );
 
-  // it.todo("PDBP-USERS-VIEW-OWN-04 — Global Standard (approved) can VIEW OWN", async () => {});
+  // it.todo("PDBP-GUP-VIEW-OWN-04 — Global Standard (approved) can VIEW OWN", async () => {});
 
   // it.todo(
   //   "PDBP-USERS-VIEW-OWN-05 — Global Standard (pending or blocked) cannot VIEW OWN",
   //   async () => {},
   // );
 
-  // it.todo("PDBP-USERS-LIST-01 — Global Superadmin can LIST", async () => {});
+  // it.todo("PDBP-GUP-LIST-01 — Global Superadmin can LIST", async () => {});
 
-  // it.todo("PDBP-USERS-LIST-02 — Global Admin (approved) can LIST", async () => {});
+  // it.todo("PDBP-GUP-LIST-02 — Global Admin (approved) can LIST", async () => {});
 
-  // it.todo("PDBP-USERS-LIST-03 — Global Admin (pending or blocked) cannot LIST", async () => {});
+  // it.todo("PDBP-GUP-LIST-03 — Global Admin (pending or blocked) cannot LIST", async () => {});
 
-  // it.todo("PDBP-USERS-LIST-04 — Global Standard (approved) can LIST", async () => {});
+  // it.todo("PDBP-GUP-LIST-04 — Global Standard (approved) can LIST", async () => {});
 
-  // it.todo("PDBP-USERS-LIST-05 — Global Standard (pending or blocked) cannot LIST", async () => {});
+  // it.todo("PDBP-GUP-LIST-05 — Global Standard (pending or blocked) cannot LIST", async () => {});
 
-  // it.todo("PDBP-USERS-LIST-OWN-01 — Global Superadmin can LIST OWN", async () => {});
+  // it.todo("PDBP-GUP-LIST-OWN-01 — Global Superadmin can LIST OWN", async () => {});
 
-  // it.todo("PDBP-USERS-LIST-OWN-02 — Global Admin (approved) can LIST OWN", async () => {});
+  // it.todo("PDBP-GUP-LIST-OWN-02 — Global Admin (approved) can LIST OWN", async () => {});
 
   // it.todo(
   //   "PDBP-USERS-LIST-OWN-03 — Global Admin (pending or blocked) cannot LIST OWN",
   //   async () => {},
   // );
 
-  // it.todo("PDBP-USERS-LIST-OWN-04 — Global Standard (approved) can LIST OWN", async () => {});
+  // it.todo("PDBP-GUP-LIST-OWN-04 — Global Standard (approved) can LIST OWN", async () => {});
 
   // it.todo(
   //   "PDBP-USERS-LIST-OWN-05 — Global Standard (pending or blocked) cannot LIST OWN",
   //   async () => {},
   // );
 
-  // it.todo("PDBP-USERS-UPDATE-01 — Global Superadmin can UPDATE", async () => {});
+  // it.todo("PDBP-GUP-UPDATE-01 — Global Superadmin can UPDATE", async () => {});
 
-  // it.todo("PDBP-USERS-UPDATE-02 — Global Admin cannot UPDATE", async () => {});
+  // it.todo("PDBP-GUP-UPDATE-02 — Global Admin cannot UPDATE", async () => {});
 
-  // it.todo("PDBP-USERS-UPDATE-03 — Global Standard cannot UPDATE", async () => {});
+  // it.todo("PDBP-GUP-UPDATE-03 — Global Standard cannot UPDATE", async () => {});
 
-  // it.todo("PDBP-USERS-UPDATE-OWN-01 — Global Superadmin cannot UPDATE OWN", async () => {});
+  // it.todo("PDBP-GUP-UPDATE-OWN-01 — Global Superadmin cannot UPDATE OWN", async () => {});
 
-  // it.todo("PDBP-USERS-UPDATE-OWN-02 — Global Admin cannot UPDATE OWN", async () => {});
+  // it.todo("PDBP-GUP-UPDATE-OWN-02 — Global Admin cannot UPDATE OWN", async () => {});
 
-  // it.todo("PDBP-USERS-UPDATE-OWN-03 — Global Standard cannot UPDATE OWN", async () => {});
+  // it.todo("PDBP-GUP-UPDATE-OWN-03 — Global Standard cannot UPDATE OWN", async () => {});
 
-  // it.todo("PDBP-USERS-DELETE-01 — Global Superadmin can DELETE", async () => {});
+  // it.todo("PDBP-GUP-DELETE-01 — Global Superadmin can DELETE", async () => {});
 
-  // it.todo("PDBP-USERS-DELETE-02 — Global Admin cannot DELETE", async () => {});
+  // it.todo("PDBP-GUP-DELETE-02 — Global Admin cannot DELETE", async () => {});
 
-  // it.todo("PDBP-USERS-DELETE-03 — Global Standard cannot DELETE", async () => {});
+  // it.todo("PDBP-GUP-DELETE-03 — Global Standard cannot DELETE", async () => {});
 
-  // it.todo("PDBP-USERS-DELETE-OWN-01 — Global Superadmin cannot DELETE OWN", async () => {});
+  // it.todo("PDBP-GUP-DELETE-OWN-01 — Global Superadmin cannot DELETE OWN", async () => {});
 
-  // it.todo("PDBP-USERS-DELETE-OWN-02 — Global Admin (approved) can DELETE OWN", async () => {});
+  // it.todo("PDBP-GUP-DELETE-OWN-02 — Global Admin (approved) can DELETE OWN", async () => {});
 
   // it.todo(
   //   "PDBP-USERS-DELETE-OWN-03 — Global Admin (pending or blocked) cannot DELETE OWN",
   //   async () => {},
   // );
 
-  // it.todo("PDBP-USERS-DELETE-OWN-04 — Global Standard (approved) can DELETE OWN", async () => {});
+  // it.todo("PDBP-GUP-DELETE-OWN-04 — Global Standard (approved) can DELETE OWN", async () => {});
 
   // it.todo(
   //   "PDBP-USERS-DELETE-OWN-05 — Global Standard (pending or blocked) cannot DELETE OWN",

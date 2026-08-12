@@ -2,6 +2,7 @@ import { exec, spawn, type ChildProcessWithoutNullStreams } from "child_process"
 import fse from "fs-extra";
 import { promisify } from "util";
 import PocketBase from "pocketbase";
+import type { ListOptions } from "pocketbase";
 import { superusersCollectionName } from "../helpers/pbMetadata";
 import { delay } from "@repo/pokkit-utils";
 
@@ -151,7 +152,7 @@ export const pollPbLogsUntilNonZeroItems = async (p: {
   while (new Date().getTime() < endDateTime.getTime()) {
     const logs = await p.pb.logs.getList();
     iterations += 1;
-    if (logs.items.length > 0) {
+    if (logs.totalItems > 0) {
       const timeTakenMs = new Date().getTime() - startDateTime.getTime();
       return { success: true, data: logs, timeTakenMs, iterations } as const;
     }
@@ -166,15 +167,16 @@ export const pollPbLogsUntilNumberOfItemsChange = async (p: {
   pb: PocketBase;
   maxDurationMs: number;
   delayMs: number;
+  props?: { page: number; perPage: number; options: ListOptions };
 }) => {
+  const normalisedProps = [p.props?.page, p.props?.perPage, p.props?.options] as const;
   let iterations = 0;
   const startDateTime = new Date();
   const endDateTime = new Date(startDateTime.getTime() + p.maxDurationMs);
 
-  const logsBefore = await p.pb.logs.getList();
-
+  const logsBefore = await p.pb.logs.getList(...normalisedProps);
   while (new Date().getTime() < endDateTime.getTime()) {
-    const logsAfter = await p.pb.logs.getList();
+    const logsAfter = await p.pb.logs.getList(...normalisedProps);
     iterations += 1;
     if (logsAfter.totalItems !== logsBefore.totalItems) {
       const timeTakenMs = new Date().getTime() - startDateTime.getTime();
