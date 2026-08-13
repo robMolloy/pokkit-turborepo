@@ -122,13 +122,15 @@ describe(`${testSuiteName} tests`, () => {
 
     const standardUserPb = createPbConnection();
     const standardUserPayload = userPayloadBuilder.forCreateRandomData();
-    await standardUserPb.collection(usersCollectionName).create(standardUserPayload);
     const standardUserRecord = await standardUserPb
+      .collection(usersCollectionName)
+      .create(standardUserPayload);
+    await standardUserPb
       .collection(usersCollectionName)
       .authWithPassword(standardUserPayload.email, standardUserPayload.passwordConfirm);
 
     const standardGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
-      userId: standardUserRecord.record.id,
+      userId: standardUserRecord.id,
       role: "standard",
       status: "approved",
     });
@@ -149,14 +151,16 @@ describe(`${testSuiteName} tests`, () => {
 
     const adminUserPb = createPbConnection();
     const adminUserPayload = userPayloadBuilder.forCreateRandomData();
-    await adminUserPb.collection(usersCollectionName).create(adminUserPayload);
     const adminUserRecord = await adminUserPb
+      .collection(usersCollectionName)
+      .create(adminUserPayload);
+    await adminUserPb
       .collection(usersCollectionName)
       .authWithPassword(adminUserPayload.email, adminUserPayload.passwordConfirm);
 
     const approvedAdminGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
-        userId: adminUserRecord.record.id,
+        userId: adminUserRecord.id,
         role: "admin",
         status: "approved",
       });
@@ -166,15 +170,15 @@ describe(`${testSuiteName} tests`, () => {
 
     const user1Pb = createPbConnection();
     const user1Payload = userPayloadBuilder.forCreateRandomData();
-    await user1Pb.collection(usersCollectionName).create(user1Payload);
-    const user1Record = await user1Pb
+    const user1Record = await user1Pb.collection(usersCollectionName).create(user1Payload);
+    await user1Pb
       .collection(usersCollectionName)
       .authWithPassword(user1Payload.email, user1Payload.passwordConfirm);
 
     await expect(
       adminUserPb.collection(globalUserPermissionsCollectionName).create(
         globalUserPermissionsPayloadBuilder.forCreateData({
-          userId: user1Record.record.id,
+          userId: user1Record.id,
           role: "standard",
           status: "approved",
         }),
@@ -192,14 +196,16 @@ describe(`${testSuiteName} tests`, () => {
 
     const standardUserPb = createPbConnection();
     const standardUserPayload = userPayloadBuilder.forCreateRandomData();
-    await standardUserPb.collection(usersCollectionName).create(standardUserPayload);
     const standardUserRecord = await standardUserPb
+      .collection(usersCollectionName)
+      .create(standardUserPayload);
+    await standardUserPb
       .collection(usersCollectionName)
       .authWithPassword(standardUserPayload.email, standardUserPayload.passwordConfirm);
 
     await superadminUserPb.collection(globalUserPermissionsCollectionName).create(
       globalUserPermissionsPayloadBuilder.forCreateData({
-        userId: standardUserRecord.record.id,
+        userId: standardUserRecord.id,
         role: "standard",
         status: "approved",
       }),
@@ -1195,21 +1201,225 @@ describe(`${testSuiteName} tests`, () => {
     expect(blockedStandardUserGlobalUserPermissionsList.length).toBe(1);
   });
 
-  // it("PDBP-GUP-LIST-OWN-01 — Global Superadmin can LIST OWN", async () => {});
+  it("PDBP-GUP-LIST-OWN-01 — Global Superadmin can LIST OWN", async () => {
+    const superuserPb = createPbConnection();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
 
-  // it("PDBP-GUP-LIST-OWN-02 — Global Admin (approved) can LIST OWN", async () => {});
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
 
-  // it(
-  //   "PDBP-USERS-LIST-OWN-03 — Global Admin (pending or blocked) can LIST only OWN",
-  //   async () => {},
-  // );
+    const superadminUserGlobalUserPermissionsList = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .getFullList();
+    expect(superadminUserGlobalUserPermissionsList.length).toBe(1);
+  });
 
-  // it("PDBP-GUP-LIST-OWN-04 — Global Standard (approved) can LIST OWN", async () => {});
+  it("PDBP-GUP-LIST-OWN-02 — Global Admin (approved) can LIST OWN", async () => {
+    const superuserPb = createPbConnection();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
 
-  // it(
-  //   "PDBP-USERS-LIST-OWN-05 — Global Standard (pending or blocked) can LIST only OWN",
-  //   async () => {},
-  // );
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+
+    const adminUserPb = createPbConnection();
+    const adminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const adminUserRecord = await adminUserPb
+      .collection(usersCollectionName)
+      .create(adminUserPayload);
+    await adminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(adminUserPayload.email, adminUserPayload.passwordConfirm);
+
+    const adminGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
+      userId: adminUserRecord.id,
+      role: "admin",
+      status: "approved",
+    });
+    await superuserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(adminGlobalUserPermissionsPayload);
+
+    const adminUserGlobalUserPermissionsList = await adminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .getFullList({ filter: `userId = "${adminUserRecord.id}"` });
+    expect(adminUserGlobalUserPermissionsList.length).toBe(1);
+  });
+
+  it("PDBP-USERS-LIST-OWN-03 — Global Admin (pending or blocked) can LIST only OWN", async () => {
+    const superuserPb = createPbConnection();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+
+    const pendingAdminUserPb = createPbConnection();
+    const pendingAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const pendingAdminUserRecord = await pendingAdminUserPb
+      .collection(usersCollectionName)
+      .create(pendingAdminUserPayload);
+    await pendingAdminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(pendingAdminUserPayload.email, pendingAdminUserPayload.passwordConfirm);
+
+    const blockedAdminUserPb = createPbConnection();
+    const blockedAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const blockedAdminUserRecord = await blockedAdminUserPb
+      .collection(usersCollectionName)
+      .create(blockedAdminUserPayload);
+    await blockedAdminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(blockedAdminUserPayload.email, blockedAdminUserPayload.passwordConfirm);
+
+    const pendingAdminGlobalUserPermissionsPayload =
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: pendingAdminUserRecord.id,
+        role: "admin",
+        status: "pending",
+      });
+    const blockedAdminGlobalUserPermissionsPayload =
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: blockedAdminUserRecord.id,
+        role: "admin",
+        status: "blocked",
+      });
+    await superuserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(pendingAdminGlobalUserPermissionsPayload);
+    await superuserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(blockedAdminGlobalUserPermissionsPayload);
+
+    const pendingAdminUserGlobalUserPermissionsList = await pendingAdminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .getFullList();
+    expect(pendingAdminUserGlobalUserPermissionsList.length).toBe(1);
+
+    const blockedAdminUserGlobalUserPermissionsList = await blockedAdminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .getFullList();
+    expect(blockedAdminUserGlobalUserPermissionsList.length).toBe(1);
+  });
+
+  it("PDBP-GUP-LIST-OWN-04 — Global Standard (approved) can LIST OWN", async () => {
+    const superuserPb = createPbConnection();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+
+    const standardUserPb = createPbConnection();
+    const standardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const standardUserRecord = await standardUserPb
+      .collection(usersCollectionName)
+      .create(standardUserPayload);
+    await standardUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(standardUserPayload.email, standardUserPayload.passwordConfirm);
+
+    const standardGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
+      userId: standardUserRecord.id,
+      role: "standard",
+      status: "approved",
+    });
+    await superuserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(standardGlobalUserPermissionsPayload);
+
+    const standardUserGlobalUserPermissionsList = await standardUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .getFullList({ filter: `userId = "${standardUserRecord.id}"` });
+    expect(standardUserGlobalUserPermissionsList.length).toBe(1);
+  });
+
+  it("PDBP-USERS-LIST-OWN-05 — Global Standard (pending or blocked) can LIST only OWN", async () => {
+    const superuserPb = createPbConnection();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+
+    const pendingStandardUserPb = createPbConnection();
+    const pendingStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const pendingStandardUserRecord = await pendingStandardUserPb
+      .collection(usersCollectionName)
+      .create(pendingStandardUserPayload);
+    await pendingStandardUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(
+        pendingStandardUserPayload.email,
+        pendingStandardUserPayload.passwordConfirm,
+      );
+
+    const blockedStandardUserPb = createPbConnection();
+    const blockedStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const blockedStandardUserRecord = await blockedStandardUserPb
+      .collection(usersCollectionName)
+      .create(blockedStandardUserPayload);
+    await blockedStandardUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(
+        blockedStandardUserPayload.email,
+        blockedStandardUserPayload.passwordConfirm,
+      );
+
+    const pendingStandardGlobalUserPermissionsPayload =
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: pendingStandardUserRecord.id,
+        role: "standard",
+        status: "pending",
+      });
+    const blockedStandardGlobalUserPermissionsPayload =
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: blockedStandardUserRecord.id,
+        role: "standard",
+        status: "blocked",
+      });
+    await superuserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(pendingStandardGlobalUserPermissionsPayload);
+    await superuserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(blockedStandardGlobalUserPermissionsPayload);
+
+    const pendingStandardUserGlobalUserPermissionsList = await pendingStandardUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .getFullList();
+    expect(pendingStandardUserGlobalUserPermissionsList.length).toBe(1);
+    const blockedStandardUserGlobalUserPermissionsList = await blockedStandardUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .getFullList();
+    expect(blockedStandardUserGlobalUserPermissionsList.length).toBe(1);
+  });
 
   // it("PDBP-GUP-UPDATE-01 — Global Superadmin can UPDATE", async () => {});
 
