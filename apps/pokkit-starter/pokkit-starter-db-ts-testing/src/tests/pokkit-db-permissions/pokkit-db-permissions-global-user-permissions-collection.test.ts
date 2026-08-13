@@ -94,7 +94,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminPb.collection(usersCollectionName).create(userPayload);
     await superadminPb
       .collection(usersCollectionName)
-      .authWithPassword(userPayload.email, userPayload.passwordConfirm);
+      .authWithPassword(userPayload.email, userPayload.password);
 
     const superuserPb = createPbConnection();
     await superuserPb
@@ -118,7 +118,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const standardUserPb = createPbConnection();
     const standardUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -127,7 +127,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(standardUserPayload);
     await standardUserPb
       .collection(usersCollectionName)
-      .authWithPassword(standardUserPayload.email, standardUserPayload.passwordConfirm);
+      .authWithPassword(standardUserPayload.email, standardUserPayload.password);
 
     const standardGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
       userId: standardUserRecord.id,
@@ -147,7 +147,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const adminUserPb = createPbConnection();
     const adminUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -156,7 +156,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(adminUserPayload);
     await adminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(adminUserPayload.email, adminUserPayload.passwordConfirm);
+      .authWithPassword(adminUserPayload.email, adminUserPayload.password);
 
     const approvedAdminGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
@@ -173,7 +173,7 @@ describe(`${testSuiteName} tests`, () => {
     const user1Record = await user1Pb.collection(usersCollectionName).create(user1Payload);
     await user1Pb
       .collection(usersCollectionName)
-      .authWithPassword(user1Payload.email, user1Payload.passwordConfirm);
+      .authWithPassword(user1Payload.email, user1Payload.password);
 
     await expect(
       adminUserPb.collection(globalUserPermissionsCollectionName).create(
@@ -192,7 +192,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const standardUserPb = createPbConnection();
     const standardUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -201,7 +201,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(standardUserPayload);
     await standardUserPb
       .collection(usersCollectionName)
-      .authWithPassword(standardUserPayload.email, standardUserPayload.passwordConfirm);
+      .authWithPassword(standardUserPayload.email, standardUserPayload.password);
 
     await superadminUserPb.collection(globalUserPermissionsCollectionName).create(
       globalUserPermissionsPayloadBuilder.forCreateData({
@@ -216,7 +216,7 @@ describe(`${testSuiteName} tests`, () => {
     const user1Record = await user1Pb.collection(usersCollectionName).create(user1Payload);
     await user1Pb
       .collection(usersCollectionName)
-      .authWithPassword(user1Payload.email, user1Payload.passwordConfirm);
+      .authWithPassword(user1Payload.email, user1Payload.password);
 
     await expect(
       standardUserPb.collection(globalUserPermissionsCollectionName).create(
@@ -237,7 +237,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     await expect(
       superadminUserPb.collection(globalUserPermissionsCollectionName).create(
@@ -256,7 +256,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const adminUserPb = createPbConnection();
     const adminUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -265,7 +265,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(adminUserPayload);
     await adminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(adminUserPayload.email, adminUserPayload.passwordConfirm);
+      .authWithPassword(adminUserPayload.email, adminUserPayload.password);
 
     await superadminUserPb.collection(globalUserPermissionsCollectionName).create(
       globalUserPermissionsPayloadBuilder.forCreateData({
@@ -282,7 +282,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(exampleUserPayload);
     await exampleUserPb
       .collection(usersCollectionName)
-      .authWithPassword(exampleUserPayload.email, exampleUserPayload.passwordConfirm);
+      .authWithPassword(exampleUserPayload.email, exampleUserPayload.password);
 
     await expect(
       exampleUserPb.collection(globalUserPermissionsCollectionName).create(
@@ -301,7 +301,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const standardUserPb = createPbConnection();
     const standardUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -310,7 +310,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(standardUserPayload);
     await standardUserPb
       .collection(usersCollectionName)
-      .authWithPassword(standardUserPayload.email, standardUserPayload.passwordConfirm);
+      .authWithPassword(standardUserPayload.email, standardUserPayload.password);
 
     await superadminUserPb.collection(globalUserPermissionsCollectionName).create(
       globalUserPermissionsPayloadBuilder.forCreateData({
@@ -327,7 +327,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(exampleUserPayload);
     await exampleUserPb
       .collection(usersCollectionName)
-      .authWithPassword(exampleUserPayload.email, exampleUserPayload.passwordConfirm);
+      .authWithPassword(exampleUserPayload.email, exampleUserPayload.password);
 
     await expect(
       exampleUserPb.collection(globalUserPermissionsCollectionName).create(
@@ -353,7 +353,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const exampleUserPb = createPbConnection();
     const exampleUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -362,7 +362,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(exampleUserPayload);
     await exampleUserPb
       .collection(usersCollectionName)
-      .authWithPassword(exampleUserPayload.email, exampleUserPayload.passwordConfirm);
+      .authWithPassword(exampleUserPayload.email, exampleUserPayload.password);
 
     const exampleUserGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
@@ -421,7 +421,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const adminUserPb = createPbConnection();
     const adminUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -430,7 +430,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(adminUserPayload);
     await adminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(adminUserPayload.email, adminUserPayload.passwordConfirm);
+      .authWithPassword(adminUserPayload.email, adminUserPayload.password);
 
     // no need to add this as first user is auto-elevated to superadmin
     const superadminGlobalUserPermissionsPayload =
@@ -491,7 +491,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const pendingAdminUserPb = createPbConnection();
     const pendingAdminUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -500,7 +500,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(pendingAdminUserPayload);
     await pendingAdminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(pendingAdminUserPayload.email, pendingAdminUserPayload.passwordConfirm);
+      .authWithPassword(pendingAdminUserPayload.email, pendingAdminUserPayload.password);
 
     const pendingAdminGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
@@ -519,7 +519,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(blockedAdminUserPayload);
     await blockedAdminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(blockedAdminUserPayload.email, blockedAdminUserPayload.passwordConfirm);
+      .authWithPassword(blockedAdminUserPayload.email, blockedAdminUserPayload.password);
     const blockedAdminGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
         userId: blockedAdminUserRecord.id,
@@ -576,7 +576,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const standardUserPb = createPbConnection();
     const standardUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -585,7 +585,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(standardUserPayload);
     await standardUserPb
       .collection(usersCollectionName)
-      .authWithPassword(standardUserPayload.email, standardUserPayload.passwordConfirm);
+      .authWithPassword(standardUserPayload.email, standardUserPayload.password);
 
     // no need to add this as first user is auto-elevated to superadmin
     const superadminGlobalUserPermissionsPayload =
@@ -649,7 +649,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const pendingUserPb = createPbConnection();
     const pendingUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -658,7 +658,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(pendingUserPayload);
     await pendingUserPb
       .collection(usersCollectionName)
-      .authWithPassword(pendingUserPayload.email, pendingUserPayload.passwordConfirm);
+      .authWithPassword(pendingUserPayload.email, pendingUserPayload.password);
 
     const blockedUserPb = createPbConnection();
     const blockedUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -667,7 +667,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(blockedUserPayload);
     await blockedUserPb
       .collection(usersCollectionName)
-      .authWithPassword(blockedUserPayload.email, blockedUserPayload.passwordConfirm);
+      .authWithPassword(blockedUserPayload.email, blockedUserPayload.password);
 
     const pendingStandardGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
@@ -726,7 +726,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     // no need to add this as first user is auto-elevated to superadmin
     const superadminGlobalUserPermissionsPayload =
@@ -766,7 +766,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const adminUserPb = createPbConnection();
     const adminUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -775,7 +775,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(adminUserPayload);
     await adminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(adminUserPayload.email, adminUserPayload.passwordConfirm);
+      .authWithPassword(adminUserPayload.email, adminUserPayload.password);
 
     const adminGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
       userId: adminUserRecord.id,
@@ -816,7 +816,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const pendingAdminUserPb = createPbConnection();
     const pendingAdminUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -825,7 +825,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(pendingAdminUserPayload);
     await pendingAdminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(pendingAdminUserPayload.email, pendingAdminUserPayload.passwordConfirm);
+      .authWithPassword(pendingAdminUserPayload.email, pendingAdminUserPayload.password);
 
     const blockedAdminUserPb = createPbConnection();
     const blockedAdminUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -834,7 +834,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(blockedAdminUserPayload);
     await blockedAdminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(blockedAdminUserPayload.email, blockedAdminUserPayload.passwordConfirm);
+      .authWithPassword(blockedAdminUserPayload.email, blockedAdminUserPayload.password);
 
     const pendingAdminGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
@@ -902,7 +902,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const standardUserPb = createPbConnection();
     const standardUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -911,7 +911,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(standardUserPayload);
     await standardUserPb
       .collection(usersCollectionName)
-      .authWithPassword(standardUserPayload.email, standardUserPayload.passwordConfirm);
+      .authWithPassword(standardUserPayload.email, standardUserPayload.password);
 
     const standardGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
       userId: standardUserRecord.id,
@@ -952,7 +952,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const pendingStandardUserPb = createPbConnection();
     const pendingStandardUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -961,10 +961,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(pendingStandardUserPayload);
     await pendingStandardUserPb
       .collection(usersCollectionName)
-      .authWithPassword(
-        pendingStandardUserPayload.email,
-        pendingStandardUserPayload.passwordConfirm,
-      );
+      .authWithPassword(pendingStandardUserPayload.email, pendingStandardUserPayload.password);
 
     const blockedStandardUserPb = createPbConnection();
     const blockedStandardUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -973,10 +970,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(blockedStandardUserPayload);
     await blockedStandardUserPb
       .collection(usersCollectionName)
-      .authWithPassword(
-        blockedStandardUserPayload.email,
-        blockedStandardUserPayload.passwordConfirm,
-      );
+      .authWithPassword(blockedStandardUserPayload.email, blockedStandardUserPayload.password);
 
     const pendingStandardGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
@@ -1037,7 +1031,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const superadminUserGlobalUserPermissionsList = await superadminUserPb
       .collection(globalUserPermissionsCollectionName)
@@ -1056,7 +1050,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const adminUserPb = createPbConnection();
     const adminUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -1065,7 +1059,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(adminUserPayload);
     await adminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(adminUserPayload.email, adminUserPayload.passwordConfirm);
+      .authWithPassword(adminUserPayload.email, adminUserPayload.password);
 
     const adminGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
       userId: adminUserRecord.id,
@@ -1093,7 +1087,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const pendingAdminUserPb = createPbConnection();
     const pendingAdminUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -1102,7 +1096,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(pendingAdminUserPayload);
     await pendingAdminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(pendingAdminUserPayload.email, pendingAdminUserPayload.passwordConfirm);
+      .authWithPassword(pendingAdminUserPayload.email, pendingAdminUserPayload.password);
 
     const blockedAdminUserPb = createPbConnection();
     const blockedAdminUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -1111,7 +1105,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(blockedAdminUserPayload);
     await blockedAdminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(blockedAdminUserPayload.email, blockedAdminUserPayload.passwordConfirm);
+      .authWithPassword(blockedAdminUserPayload.email, blockedAdminUserPayload.password);
 
     const pendingAdminGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
@@ -1159,7 +1153,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const standardUserPb = createPbConnection();
     const standardUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -1168,7 +1162,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(standardUserPayload);
     await standardUserPb
       .collection(usersCollectionName)
-      .authWithPassword(standardUserPayload.email, standardUserPayload.passwordConfirm);
+      .authWithPassword(standardUserPayload.email, standardUserPayload.password);
 
     const standardGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
       userId: standardUserRecord.id,
@@ -1196,7 +1190,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const pendingStandardUserPb = createPbConnection();
     const pendingStandardUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -1205,10 +1199,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(pendingStandardUserPayload);
     await pendingStandardUserPb
       .collection(usersCollectionName)
-      .authWithPassword(
-        pendingStandardUserPayload.email,
-        pendingStandardUserPayload.passwordConfirm,
-      );
+      .authWithPassword(pendingStandardUserPayload.email, pendingStandardUserPayload.password);
 
     const blockedStandardUserPb = createPbConnection();
     const blockedStandardUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -1217,10 +1208,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(blockedStandardUserPayload);
     await blockedStandardUserPb
       .collection(usersCollectionName)
-      .authWithPassword(
-        blockedStandardUserPayload.email,
-        blockedStandardUserPayload.passwordConfirm,
-      );
+      .authWithPassword(blockedStandardUserPayload.email, blockedStandardUserPayload.password);
 
     const pendingStandardGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
@@ -1273,7 +1261,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const superadminUserGlobalUserPermissionsList = await superadminUserPb
       .collection(globalUserPermissionsCollectionName)
@@ -1292,7 +1280,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const adminUserPb = createPbConnection();
     const adminUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -1301,7 +1289,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(adminUserPayload);
     await adminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(adminUserPayload.email, adminUserPayload.passwordConfirm);
+      .authWithPassword(adminUserPayload.email, adminUserPayload.password);
 
     const adminGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
       userId: adminUserRecord.id,
@@ -1329,7 +1317,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const pendingAdminUserPb = createPbConnection();
     const pendingAdminUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -1338,7 +1326,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(pendingAdminUserPayload);
     await pendingAdminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(pendingAdminUserPayload.email, pendingAdminUserPayload.passwordConfirm);
+      .authWithPassword(pendingAdminUserPayload.email, pendingAdminUserPayload.password);
 
     const blockedAdminUserPb = createPbConnection();
     const blockedAdminUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -1347,7 +1335,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(blockedAdminUserPayload);
     await blockedAdminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(blockedAdminUserPayload.email, blockedAdminUserPayload.passwordConfirm);
+      .authWithPassword(blockedAdminUserPayload.email, blockedAdminUserPayload.password);
 
     const pendingAdminGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
@@ -1390,7 +1378,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const standardUserPb = createPbConnection();
     const standardUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -1399,7 +1387,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(standardUserPayload);
     await standardUserPb
       .collection(usersCollectionName)
-      .authWithPassword(standardUserPayload.email, standardUserPayload.passwordConfirm);
+      .authWithPassword(standardUserPayload.email, standardUserPayload.password);
 
     const standardGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
       userId: standardUserRecord.id,
@@ -1427,7 +1415,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
     const pendingStandardUserPb = createPbConnection();
     const pendingStandardUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -1436,10 +1424,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(pendingStandardUserPayload);
     await pendingStandardUserPb
       .collection(usersCollectionName)
-      .authWithPassword(
-        pendingStandardUserPayload.email,
-        pendingStandardUserPayload.passwordConfirm,
-      );
+      .authWithPassword(pendingStandardUserPayload.email, pendingStandardUserPayload.password);
 
     const blockedStandardUserPb = createPbConnection();
     const blockedStandardUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -1448,10 +1433,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(blockedStandardUserPayload);
     await blockedStandardUserPb
       .collection(usersCollectionName)
-      .authWithPassword(
-        blockedStandardUserPayload.email,
-        blockedStandardUserPayload.passwordConfirm,
-      );
+      .authWithPassword(blockedStandardUserPayload.email, blockedStandardUserPayload.password);
 
     const pendingStandardGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
@@ -1482,7 +1464,27 @@ describe(`${testSuiteName} tests`, () => {
     expect(blockedStandardUserGlobalUserPermissionsList.length).toBe(1);
   });
 
-  // it("PDBP-GUP-UPDATE-01 — Global Superadmin can UPDATE", async () => {});
+  // it("PDBP-GUP-UPDATE-01 — Global Superadmin can UPDATE", async () => {
+  //   const superadminUserPb = createPbConnection();
+  //   const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+  //   await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+  //   await superadminUserPb
+  //     .collection(usersCollectionName)
+  //     .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+  //   const superadminUserGlobalUserPermissionsList = await superadminUserPb
+  //     .collection(globalUserPermissionsCollectionName)
+  //     .getFullList();
+
+  //   const pendingStandardUserPb = createPbConnection();
+  //   const pendingStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+  //   const pendingStandardUserRecord = await pendingStandardUserPb
+  //     .collection(usersCollectionName)
+  //     .create(pendingStandardUserPayload);
+  //   await pendingStandardUserPb
+  //     .collection(usersCollectionName)
+  //     .authWithPassword(pendingStandardUserPayload.email, pendingStandardUserPayload.password);
+  // });
 
   // it("PDBP-GUP-UPDATE-02 — Global Admin cannot UPDATE", async () => {});
 
