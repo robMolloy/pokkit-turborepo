@@ -72,17 +72,17 @@ Checks that a user with global user permissions role `superadmin` can VIEW their
 
 Checks that a user with global user permissions role `admin` and status `approved` can VIEW their own record in the `users` collection.
 
-### PDBP-USERS-VIEW-OWN-03 — Global Admin (pending or blocked) cannot VIEW OWN
+### PDBP-USERS-VIEW-OWN-03 — Global Admin (pending or blocked) can VIEW only OWN
 
-Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot VIEW their own record in the `users` collection.
+Checks that a user with global user permissions role `admin` and status `pending` or `blocked` can VIEW only their own record in the `users` collection.
 
 ### PDBP-USERS-VIEW-OWN-04 — Global Standard (approved) can VIEW OWN
 
 Checks that a user with global user permissions role `standard` and status `approved` can VIEW their own record in the `users` collection.
 
-### PDBP-USERS-VIEW-OWN-05 — Global Standard (pending or blocked) cannot VIEW OWN
+### PDBP-USERS-VIEW-OWN-05 — Global Standard (pending or blocked) can VIEW only OWN
 
-Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot VIEW their own record in the `users` collection.
+Checks that a user with global user permissions role `standard` and status `pending` or `blocked` can VIEW only their own record in the `users` collection.
 
 ### PDBP-USERS-LIST-01 — Global Superadmin can LIST
 
@@ -112,17 +112,17 @@ Checks that a user with global user permissions role `superadmin` can LIST their
 
 Checks that a user with global user permissions role `admin` and status `approved` can LIST their own record in the `users` collection.
 
-### PDBP-USERS-LIST-OWN-03 — Global Admin (pending or blocked) cannot LIST OWN
+### PDBP-USERS-LIST-OWN-03 — Global Admin (pending or blocked) can LIST only OWN
 
-Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot LIST their own record in the `users` collection.
+Checks that a user with global user permissions role `admin` and status `pending` or `blocked` can LIST only their own record in the `users` collection.
 
 ### PDBP-USERS-LIST-OWN-04 — Global Standard (approved) can LIST OWN
 
 Checks that a user with global user permissions role `standard` and status `approved` can LIST their own record in the `users` collection.
 
-### PDBP-USERS-LIST-OWN-05 — Global Standard (pending or blocked) cannot LIST OWN
+### PDBP-USERS-LIST-OWN-05 — Global Standard (pending or blocked) can LIST only OWN
 
-Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot LIST their own record in the `users` collection.
+Checks that a user with global user permissions role `standard` and status `pending` or `blocked` can LIST only their own record in the `users` collection.
 
 ### PDBP-USERS-UPDATE-01 — Global Superadmin can UPDATE
 

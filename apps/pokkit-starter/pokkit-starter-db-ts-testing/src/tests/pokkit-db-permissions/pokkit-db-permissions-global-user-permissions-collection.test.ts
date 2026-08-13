@@ -515,10 +515,10 @@ describe(`${testSuiteName} tests`, () => {
     ).rejects.toThrow();
 
     await expect(
-      adminUserPb
+      await adminUserPb
         .collection(globalUserPermissionsCollectionName)
         .getOne(adminGlobalUserPermissionsRecord.id),
-    ).rejects.toThrow();
+    ).toMatchObject(adminGlobalUserPermissionsPayload);
   });
 
   it("PDBP-GUP-VIEW-04 — Global Standard (approved) can VIEW", async () => {
@@ -753,7 +753,7 @@ describe(`${testSuiteName} tests`, () => {
     expect(adminGlobalUserPermissionsRecordTest).toMatchObject(adminGlobalUserPermissionsPayload);
   });
 
-  it("PDBP-USERS-VIEW-OWN-03 — Global Admin (pending or blocked) cannot VIEW OWN", async () => {
+  it("PDBP-USERS-VIEW-OWN-03 — Global Admin (pending or blocked) can VIEW only OWN", async () => {
     const superuserPb = createPbConnection();
     await superuserPb
       .collection(superusersCollectionName)
@@ -761,7 +761,9 @@ describe(`${testSuiteName} tests`, () => {
 
     const superadminUserPb = createPbConnection();
     const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
-    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    const superadminUserRecord = await superadminUserPb
+      .collection(usersCollectionName)
+      .create(superadminUserPayload);
     await superadminUserPb
       .collection(usersCollectionName)
       .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
@@ -769,7 +771,7 @@ describe(`${testSuiteName} tests`, () => {
     const pendingAdminUserPb = createPbConnection();
     const pendingAdminUserPayload = userPayloadBuilder.forCreateRandomData();
     await pendingAdminUserPb.collection(usersCollectionName).create(pendingAdminUserPayload);
-    const pendingAdminUserRecord = await pendingAdminUserPb
+    const pendingUserRecord = await pendingAdminUserPb
       .collection(usersCollectionName)
       .authWithPassword(pendingAdminUserPayload.email, pendingAdminUserPayload.passwordConfirm);
 
@@ -782,7 +784,7 @@ describe(`${testSuiteName} tests`, () => {
 
     const pendingAdminGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
-        userId: pendingAdminUserRecord.record.id,
+        userId: pendingUserRecord.record.id,
         role: "admin",
         status: "pending",
       });
@@ -792,10 +794,10 @@ describe(`${testSuiteName} tests`, () => {
         role: "admin",
         status: "blocked",
       });
-    await superuserPb
+    const pendingAdminGlobalUserPermissionsRecord = await superuserPb
       .collection(globalUserPermissionsCollectionName)
       .create(pendingAdminGlobalUserPermissionsPayload);
-    await superuserPb
+    const blockedAdminGlobalUserPermissionsRecord = await superuserPb
       .collection(globalUserPermissionsCollectionName)
       .create(blockedAdminGlobalUserPermissionsPayload);
 
@@ -804,23 +806,35 @@ describe(`${testSuiteName} tests`, () => {
       .getFullList();
     expect(globalUserPermissionsFullList.length).toBe(3);
 
-    const adminGlobalUserPermissionsRecord = globalUserPermissionsFullList.find(
-      (record) => record.userId === pendingAdminUserRecord.record.id,
+    const superadminGlobalUserPermissionsRecord = globalUserPermissionsFullList.find(
+      (record) => record.userId === superadminUserRecord.id,
     );
-    if (!adminGlobalUserPermissionsRecord)
-      return expect(adminGlobalUserPermissionsRecord).toBeTruthy();
+    if (!superadminGlobalUserPermissionsRecord)
+      return expect(superadminGlobalUserPermissionsRecord).toBeTruthy();
 
     await expect(
       pendingAdminUserPb
         .collection(globalUserPermissionsCollectionName)
-        .getOne(adminGlobalUserPermissionsRecord.id),
+        .getOne(superadminGlobalUserPermissionsRecord.id),
     ).rejects.toThrow();
+
+    expect(
+      await pendingAdminUserPb
+        .collection(globalUserPermissionsCollectionName)
+        .getOne(pendingAdminGlobalUserPermissionsRecord.id),
+    ).toMatchObject(pendingAdminGlobalUserPermissionsPayload);
 
     await expect(
       pendingAdminUserPb
         .collection(globalUserPermissionsCollectionName)
-        .getOne(adminGlobalUserPermissionsRecord.id),
+        .getOne(superadminGlobalUserPermissionsRecord.id),
     ).rejects.toThrow();
+
+    expect(
+      await blockedAdminUserPb
+        .collection(globalUserPermissionsCollectionName)
+        .getOne(blockedAdminGlobalUserPermissionsRecord.id),
+    ).toMatchObject(blockedAdminGlobalUserPermissionsPayload);
   });
 
   it("PDBP-GUP-VIEW-OWN-04 — Global Standard (approved) can VIEW OWN", async () => {
@@ -871,7 +885,7 @@ describe(`${testSuiteName} tests`, () => {
     );
   });
 
-  it("PDBP-USERS-VIEW-OWN-05 — Global Standard (pending or blocked) cannot VIEW OWN", async () => {
+  it("PDBP-USERS-VIEW-OWN-05 — Global Standard (pending or blocked) can VIEW only OWN", async () => {
     const superuserPb = createPbConnection();
     await superuserPb
       .collection(superusersCollectionName)
@@ -916,10 +930,10 @@ describe(`${testSuiteName} tests`, () => {
         role: "standard",
         status: "blocked",
       });
-    await superuserPb
+    const pendingStandardGlobalUserPermissionsRecord = await superuserPb
       .collection(globalUserPermissionsCollectionName)
       .create(pendingStandardGlobalUserPermissionsPayload);
-    await superuserPb
+    const blockedStandardGlobalUserPermissionsRecord = await superuserPb
       .collection(globalUserPermissionsCollectionName)
       .create(blockedStandardGlobalUserPermissionsPayload);
 
@@ -928,22 +942,27 @@ describe(`${testSuiteName} tests`, () => {
       .getFullList();
     expect(globalUserPermissionsFullList.length).toBe(3);
 
-    const standardGlobalUserPermissionsRecord = globalUserPermissionsFullList.find(
-      (record) => record.userId === pendingStandardUserRecord.record.id,
-    );
-    if (!standardGlobalUserPermissionsRecord)
-      return expect(standardGlobalUserPermissionsRecord).toBeTruthy();
+    await expect(
+      await pendingStandardUserPb
+        .collection(globalUserPermissionsCollectionName)
+        .getOne(pendingStandardGlobalUserPermissionsRecord.id),
+    ).toMatchObject(pendingStandardGlobalUserPermissionsPayload);
 
     await expect(
       pendingStandardUserPb
         .collection(globalUserPermissionsCollectionName)
-        .getOne(standardGlobalUserPermissionsRecord.id),
+        .getOne(blockedStandardGlobalUserPermissionsRecord.id),
     ).rejects.toThrow();
 
     await expect(
+      await blockedStandardUserPb
+        .collection(globalUserPermissionsCollectionName)
+        .getOne(blockedStandardGlobalUserPermissionsRecord.id),
+    ).toMatchObject(blockedStandardGlobalUserPermissionsPayload);
+    await expect(
       blockedStandardUserPb
         .collection(globalUserPermissionsCollectionName)
-        .getOne(standardGlobalUserPermissionsRecord.id),
+        .getOne(pendingStandardGlobalUserPermissionsRecord.id),
     ).rejects.toThrow();
   });
 
@@ -1061,11 +1080,11 @@ describe(`${testSuiteName} tests`, () => {
     const pendingAdminUserGlobalUserPermissionsList = await pendingAdminUserPb
       .collection(globalUserPermissionsCollectionName)
       .getFullList();
-    expect(pendingAdminUserGlobalUserPermissionsList.length).toBe(0);
+    expect(pendingAdminUserGlobalUserPermissionsList.length).toBe(1);
     const blockedAdminUserGlobalUserPermissionsList = await blockedAdminUserPb
       .collection(globalUserPermissionsCollectionName)
       .getFullList();
-    expect(blockedAdminUserGlobalUserPermissionsList.length).toBe(0);
+    expect(blockedAdminUserGlobalUserPermissionsList.length).toBe(1);
   });
 
   it("PDBP-GUP-LIST-04 — Global Standard (approved) can LIST", async () => {
@@ -1169,11 +1188,11 @@ describe(`${testSuiteName} tests`, () => {
     const pendingStandardUserGlobalUserPermissionsList = await pendingStandardUserPb
       .collection(globalUserPermissionsCollectionName)
       .getFullList();
-    expect(pendingStandardUserGlobalUserPermissionsList.length).toBe(0);
+    expect(pendingStandardUserGlobalUserPermissionsList.length).toBe(1);
     const blockedStandardUserGlobalUserPermissionsList = await blockedStandardUserPb
       .collection(globalUserPermissionsCollectionName)
       .getFullList();
-    expect(blockedStandardUserGlobalUserPermissionsList.length).toBe(0);
+    expect(blockedStandardUserGlobalUserPermissionsList.length).toBe(1);
   });
 
   // it("PDBP-GUP-LIST-OWN-01 — Global Superadmin can LIST OWN", async () => {});
@@ -1181,14 +1200,14 @@ describe(`${testSuiteName} tests`, () => {
   // it("PDBP-GUP-LIST-OWN-02 — Global Admin (approved) can LIST OWN", async () => {});
 
   // it(
-  //   "PDBP-USERS-LIST-OWN-03 — Global Admin (pending or blocked) cannot LIST OWN",
+  //   "PDBP-USERS-LIST-OWN-03 — Global Admin (pending or blocked) can LIST only OWN",
   //   async () => {},
   // );
 
   // it("PDBP-GUP-LIST-OWN-04 — Global Standard (approved) can LIST OWN", async () => {});
 
   // it(
-  //   "PDBP-USERS-LIST-OWN-05 — Global Standard (pending or blocked) cannot LIST OWN",
+  //   "PDBP-USERS-LIST-OWN-05 — Global Standard (pending or blocked) can LIST only OWN",
   //   async () => {},
   // );
 
