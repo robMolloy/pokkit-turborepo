@@ -4,7 +4,7 @@
 
 This plan covers required tests for the Pokkit Db Permissions initialization plugin:
 
-Each test is given a tag in the following format. PDBP-USERS-{ACTION}-{NN} In order to track the tests more easily.
+Each test is given a tag in the following format. `PDBP-USERS-{ACTION}-{NN}` In order to track the tests more easily.
 
 ---
 

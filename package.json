@@ -15,6 +15,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "build-whisper": "pnpm add -w @tailwindcss/oxide-linux-x64-gnu && pnpm install --no-optional=false && pnpm run build --filter=@repo/pokkit-shadcn && pnpm run build --filter=@repo/pokkit-components && pnpm run build --filter=pokkit-whisper",
+    "build-docs": "pnpm run build --filter=pokkit-starter-docs",
     "build-whisper-db": "turbo run build --filter=pokkit-whisper-db",
     "build-pokkit-starter": "turbo run build --filter=pokkit-starter-*",
     "test-pokkit-starter": "turbo run pre-test test-companion test --filter=pokkit-starter-*",
