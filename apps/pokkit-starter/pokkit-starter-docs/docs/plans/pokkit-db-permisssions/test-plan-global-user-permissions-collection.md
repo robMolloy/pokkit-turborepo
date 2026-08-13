@@ -2,7 +2,7 @@
 
 ## Scope
 
-This plan covers required tests for the Pokkit Db Permissions initialization plugin:
+This plan covers required tests for the Pokkit Db Permissions plugin:
 
 Each test is given a tag in the following format. PDBP-{COLLECTION}-{ACTION}-{NN} In order to track the tests more easily.
 
