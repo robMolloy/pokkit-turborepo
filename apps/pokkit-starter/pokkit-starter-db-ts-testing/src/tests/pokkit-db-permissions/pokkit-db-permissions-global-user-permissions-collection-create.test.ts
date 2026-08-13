@@ -14,9 +14,10 @@ import { PocketBase } from "../../config/pocketbaseConfig";
 import { userPayloadBuilder } from "../../utils/pocketbaseUserHelpers";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_constants";
 import { pokkitDbPermissionsTestsMetadata } from "./_pokkitDbConfigSyncTestsMetadata";
-import { globalUserPermissionsPayloadBuilder } from "@repo/pokkit-db-permissions-ts-helpers";
-
-const globalUserPermissionsCollectionName = "globalUserPermissions";
+import {
+  globalUserPermissionsCollectionName,
+  globalUserPermissionsPayloadBuilder,
+} from "@repo/pokkit-db-permissions-ts-helpers";
 
 const testMetadata =
   pokkitDbPermissionsTestsMetadata.pokkitDbPermissionsGlobalUserPermissionsCollectionCreate;
@@ -58,19 +59,6 @@ describe(`${testSuiteName} tests`, () => {
     const pb = createPbConnection();
     const isHealthy = await pb.health.check();
     expect(isHealthy.code).toBe(200);
-  });
-
-  it("PDBP-GUP-SETUP-01 — Verify collection presence and validity is setup correctly", async () => {
-    const superuserPb = createPbConnection();
-    await superuserPb
-      .collection(superusersCollectionName)
-      .authWithPassword(superuserEmail, superuserPassword);
-
-    const globalUserPermissionsCollection = superuserPb.collection(
-      globalUserPermissionsCollectionName,
-    );
-
-    expect(globalUserPermissionsCollection).toBeTruthy();
   });
 
   it("PDBP-GUP-CREATE-01 — Global Superadmin can CREATE", async () => {

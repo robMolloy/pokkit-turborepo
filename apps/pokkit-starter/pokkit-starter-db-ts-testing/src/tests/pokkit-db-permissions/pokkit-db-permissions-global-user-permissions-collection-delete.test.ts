@@ -14,9 +14,10 @@ import { PocketBase } from "../../config/pocketbaseConfig";
 import { userPayloadBuilder } from "../../utils/pocketbaseUserHelpers";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_constants";
 import { pokkitDbPermissionsTestsMetadata } from "./_pokkitDbConfigSyncTestsMetadata";
-import { globalUserPermissionsPayloadBuilder } from "@repo/pokkit-db-permissions-ts-helpers";
-
-const globalUserPermissionsCollectionName = "globalUserPermissions";
+import {
+  globalUserPermissionsCollectionName,
+  globalUserPermissionsPayloadBuilder,
+} from "@repo/pokkit-db-permissions-ts-helpers";
 
 const testMetadata =
   pokkitDbPermissionsTestsMetadata.pokkitDbPermissionsGlobalUserPermissionsCollectionDelete;
