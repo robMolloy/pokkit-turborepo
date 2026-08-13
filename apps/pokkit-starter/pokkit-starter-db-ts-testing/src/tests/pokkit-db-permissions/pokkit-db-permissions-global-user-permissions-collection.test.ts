@@ -1707,25 +1707,332 @@ describe(`${testSuiteName} tests`, () => {
     ).rejects.toThrow();
   });
 
-  // it("PDBP-GUP-DELETE-01 — Global Superadmin can DELETE", async () => {});
+  it("PDBP-GUP-DELETE-01 — Global Superadmin can DELETE", async () => {
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
-  // it("PDBP-GUP-DELETE-02 — Global Admin cannot DELETE", async () => {});
+    const testUserPb = createPbConnection();
+    const testUserPayload = userPayloadBuilder.forCreateRandomData();
+    const testUserRecord = await testUserPb.collection(usersCollectionName).create(testUserPayload);
+    await testUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(testUserPayload.email, testUserPayload.password);
 
-  // it("PDBP-GUP-DELETE-03 — Global Standard cannot DELETE", async () => {});
+    const testGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
+      userId: testUserRecord.id,
+      role: "standard",
+      status: "pending",
+    });
+    const testGlobalUserPermissionsRecord = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(testGlobalUserPermissionsPayload);
 
-  // it("PDBP-GUP-DELETE-OWN-01 — Global Superadmin cannot DELETE OWN", async () => {});
+    const deleteResp = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .delete(testGlobalUserPermissionsRecord.id);
 
-  // it("PDBP-GUP-DELETE-OWN-02 — Global Admin (approved) can DELETE OWN", async () => {});
+    expect(deleteResp).toBe(true);
+  });
 
-  // it(
-  //   "PDBP-USERS-DELETE-OWN-03 — Global Admin (pending or blocked) cannot DELETE OWN",
-  //   async () => {},
-  // );
+  it("PDBP-GUP-DELETE-02 — Global Admin cannot DELETE", async () => {
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
-  // it("PDBP-GUP-DELETE-OWN-04 — Global Standard (approved) can DELETE OWN", async () => {});
+    const adminUserPb = createPbConnection();
+    const adminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const adminUserRecord = await adminUserPb
+      .collection(usersCollectionName)
+      .create(adminUserPayload);
+    await adminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(adminUserPayload.email, adminUserPayload.password);
 
-  // it(
-  //   "PDBP-USERS-DELETE-OWN-05 — Global Standard (pending or blocked) cannot DELETE OWN",
-  //   async () => {},
-  // );
+    const adminGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
+      userId: adminUserRecord.id,
+      role: "admin",
+      status: "approved",
+    });
+    await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(adminGlobalUserPermissionsPayload);
+
+    const testUserPb = createPbConnection();
+    const testUserPayload = userPayloadBuilder.forCreateRandomData();
+    const testUserRecord = await testUserPb.collection(usersCollectionName).create(testUserPayload);
+    await testUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(testUserPayload.email, testUserPayload.password);
+
+    const testGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
+      userId: testUserRecord.id,
+      role: "standard",
+      status: "pending",
+    });
+    const testGlobalUserPermissionsRecord = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(testGlobalUserPermissionsPayload);
+
+    await expect(
+      adminUserPb
+        .collection(globalUserPermissionsCollectionName)
+        .delete(testGlobalUserPermissionsRecord.id),
+    ).rejects.toThrow();
+  });
+
+  it("PDBP-GUP-DELETE-03 — Global Standard cannot DELETE", async () => {
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const standardUserPb = createPbConnection();
+    const standardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const standardUserRecord = await standardUserPb
+      .collection(usersCollectionName)
+      .create(standardUserPayload);
+    await standardUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(standardUserPayload.email, standardUserPayload.password);
+
+    const standardGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
+      userId: standardUserRecord.id,
+      role: "standard",
+      status: "approved",
+    });
+    await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(standardGlobalUserPermissionsPayload);
+
+    const testUserPb = createPbConnection();
+    const testUserPayload = userPayloadBuilder.forCreateRandomData();
+    const testUserRecord = await testUserPb.collection(usersCollectionName).create(testUserPayload);
+    await testUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(testUserPayload.email, testUserPayload.password);
+
+    const testGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
+      userId: testUserRecord.id,
+      role: "standard",
+      status: "pending",
+    });
+    const testGlobalUserPermissionsRecord = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(testGlobalUserPermissionsPayload);
+
+    await expect(
+      standardUserPb
+        .collection(globalUserPermissionsCollectionName)
+        .delete(testGlobalUserPermissionsRecord.id),
+    ).rejects.toThrow();
+  });
+
+  it("PDBP-GUP-DELETE-OWN-01 — Global Superadmin cannot DELETE OWN", async () => {
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const superadminUserRecord = await superadminUserPb
+      .collection(usersCollectionName)
+      .create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    await expect(
+      superadminUserPb
+        .collection(globalUserPermissionsCollectionName)
+        .delete(superadminUserRecord.id),
+    ).rejects.toThrow();
+  });
+
+  it("PDBP-GUP-DELETE-OWN-02 — Global Admin (approved) can DELETE OWN", async () => {
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const adminUserPb = createPbConnection();
+    const adminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const adminUserRecord = await adminUserPb
+      .collection(usersCollectionName)
+      .create(adminUserPayload);
+    await adminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(adminUserPayload.email, adminUserPayload.password);
+
+    const adminGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
+      userId: adminUserRecord.id,
+      role: "admin",
+      status: "approved",
+    });
+    const adminGlobalUserPermissionsRecord = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(adminGlobalUserPermissionsPayload);
+
+    const deleteResp = await adminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .delete(adminGlobalUserPermissionsRecord.id);
+    expect(deleteResp).toBe(true);
+  });
+
+  it("PDBP-USERS-DELETE-OWN-03 — Global Admin (pending or blocked) cannot DELETE OWN", async () => {
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const pendingAdminUserPb = createPbConnection();
+    const pendingAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const pendingAdminUserRecord = await pendingAdminUserPb
+      .collection(usersCollectionName)
+      .create(pendingAdminUserPayload);
+    await pendingAdminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(pendingAdminUserPayload.email, pendingAdminUserPayload.password);
+
+    const pendingAdminGlobalUserPermissionsPayload =
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: pendingAdminUserRecord.id,
+        role: "admin",
+        status: "pending",
+      });
+    const pendingAdminGlobalUserPermissionsRecord = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(pendingAdminGlobalUserPermissionsPayload);
+
+    await expect(
+      pendingAdminUserPb
+        .collection(globalUserPermissionsCollectionName)
+        .delete(pendingAdminGlobalUserPermissionsRecord.id),
+    ).rejects.toThrow();
+
+    const blockedAdminUserPb = createPbConnection();
+    const blockedAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const blockedAdminUserRecord = await blockedAdminUserPb
+      .collection(usersCollectionName)
+      .create(blockedAdminUserPayload);
+    await blockedAdminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(blockedAdminUserPayload.email, blockedAdminUserPayload.password);
+
+    const blockedAdminGlobalUserPermissionsPayload =
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: blockedAdminUserRecord.id,
+        role: "admin",
+        status: "blocked",
+      });
+    const blockedAdminGlobalUserPermissionsRecord = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(blockedAdminGlobalUserPermissionsPayload);
+
+    await expect(
+      blockedAdminUserPb
+        .collection(globalUserPermissionsCollectionName)
+        .delete(blockedAdminGlobalUserPermissionsRecord.id),
+    ).rejects.toThrow();
+  });
+
+  it("PDBP-GUP-DELETE-OWN-04 — Global Standard (approved) can DELETE OWN", async () => {
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const standardUserPb = createPbConnection();
+    const standardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const standardUserRecord = await standardUserPb
+      .collection(usersCollectionName)
+      .create(standardUserPayload);
+    await standardUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(standardUserPayload.email, standardUserPayload.password);
+
+    const standardGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
+      userId: standardUserRecord.id,
+      role: "standard",
+      status: "approved",
+    });
+    const standardGlobalUserPermissionsRecord = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(standardGlobalUserPermissionsPayload);
+
+    const deleteResp = await standardUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .delete(standardGlobalUserPermissionsRecord.id);
+
+    expect(deleteResp).toBe(true);
+  });
+
+  it("PDBP-USERS-DELETE-OWN-05 — Global Standard (pending or blocked) cannot DELETE OWN", async () => {
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const pendingStandardUserPb = createPbConnection();
+    const pendingStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const pendingStandardUserRecord = await pendingStandardUserPb
+      .collection(usersCollectionName)
+      .create(pendingStandardUserPayload);
+    await pendingStandardUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(pendingStandardUserPayload.email, pendingStandardUserPayload.password);
+
+    const pendingStandardGlobalUserPermissionsPayload =
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: pendingStandardUserRecord.id,
+        role: "standard",
+        status: "pending",
+      });
+    const pendingStandardGlobalUserPermissionsRecord = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(pendingStandardGlobalUserPermissionsPayload);
+
+    await expect(
+      pendingStandardUserPb
+        .collection(globalUserPermissionsCollectionName)
+        .delete(pendingStandardGlobalUserPermissionsRecord.id),
+    ).rejects.toThrow();
+
+    const blockedStandardUserPb = createPbConnection();
+    const blockedStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const blockedStandardUserRecord = await blockedStandardUserPb
+      .collection(usersCollectionName)
+      .create(blockedStandardUserPayload);
+    await blockedStandardUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(blockedStandardUserPayload.email, blockedStandardUserPayload.password);
+
+    const blockedStandardGlobalUserPermissionsPayload =
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: blockedStandardUserRecord.id,
+        role: "standard",
+        status: "blocked",
+      });
+    const blockedStandardGlobalUserPermissionsRecord = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(blockedStandardGlobalUserPermissionsPayload);
+
+    await expect(
+      blockedStandardUserPb
+        .collection(globalUserPermissionsCollectionName)
+        .delete(blockedStandardGlobalUserPermissionsRecord.id),
+    ).rejects.toThrow();
+  });
 });

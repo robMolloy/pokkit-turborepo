@@ -825,7 +825,7 @@
     "viewRule": "@request.auth.id = userId\n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\" \n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"",
     "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"superadmin\"",
     "updateRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"superadmin\"",
-    "deleteRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"superadmin\"",
+    "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\t\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\t\u0026\u0026 userId ?!= @request.auth.id \n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t\u0026\u0026 @collection.globalUserPermissions.role ?!= \"superadmin\"\n\t\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t\u0026\u0026 userId ?= @request.auth.id \t\n",
     "name": "globalUserPermissions",
     "type": "base",
     "fields": [
@@ -851,7 +851,7 @@
         "maxSelect": 1,
         "name": "role",
         "presentable": false,
-        "required": false,
+        "required": true,
         "system": false,
         "type": "select",
         "values": [
@@ -867,7 +867,7 @@
         "maxSelect": 1,
         "name": "status",
         "presentable": false,
-        "required": false,
+        "required": true,
         "system": false,
         "type": "select",
         "values": [
@@ -886,7 +886,7 @@
         "minSelect": 0,
         "name": "userId",
         "presentable": false,
-        "required": false,
+        "required": true,
         "system": false,
         "type": "relation"
       },
@@ -915,7 +915,7 @@
       "CREATE UNIQUE INDEX `idx_djyvvpjhe1` ON `globalUserPermissions` (`userId`)"
     ],
     "created": "2026-08-12 11:07:59.725Z",
-    "updated": "2026-08-13 06:09:21.456Z",
+    "updated": "2026-08-13 10:56:08.389Z",
     "system": false
   },
   {
