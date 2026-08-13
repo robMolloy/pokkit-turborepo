@@ -213,15 +213,15 @@ describe(`${testSuiteName} tests`, () => {
 
     const user1Pb = createPbConnection();
     const user1Payload = userPayloadBuilder.forCreateRandomData();
-    await user1Pb.collection(usersCollectionName).create(user1Payload);
-    const user1Record = await user1Pb
+    const user1Record = await user1Pb.collection(usersCollectionName).create(user1Payload);
+    await user1Pb
       .collection(usersCollectionName)
       .authWithPassword(user1Payload.email, user1Payload.passwordConfirm);
 
     await expect(
       standardUserPb.collection(globalUserPermissionsCollectionName).create(
         globalUserPermissionsPayloadBuilder.forCreateData({
-          userId: user1Record.record.id,
+          userId: user1Record.id,
           role: "standard",
           status: "approved",
         }),
@@ -260,14 +260,16 @@ describe(`${testSuiteName} tests`, () => {
 
     const adminUserPb = createPbConnection();
     const adminUserPayload = userPayloadBuilder.forCreateRandomData();
-    await adminUserPb.collection(usersCollectionName).create(adminUserPayload);
     const adminUserRecord = await adminUserPb
+      .collection(usersCollectionName)
+      .create(adminUserPayload);
+    await adminUserPb
       .collection(usersCollectionName)
       .authWithPassword(adminUserPayload.email, adminUserPayload.passwordConfirm);
 
     await superadminUserPb.collection(globalUserPermissionsCollectionName).create(
       globalUserPermissionsPayloadBuilder.forCreateData({
-        userId: adminUserRecord.record.id,
+        userId: adminUserRecord.id,
         role: "admin",
         status: "approved",
       }),
@@ -275,15 +277,17 @@ describe(`${testSuiteName} tests`, () => {
 
     const exampleUserPb = createPbConnection();
     const exampleUserPayload = userPayloadBuilder.forCreateRandomData();
-    await exampleUserPb.collection(usersCollectionName).create(exampleUserPayload);
     const exampleUserRecord = await exampleUserPb
+      .collection(usersCollectionName)
+      .create(exampleUserPayload);
+    await exampleUserPb
       .collection(usersCollectionName)
       .authWithPassword(exampleUserPayload.email, exampleUserPayload.passwordConfirm);
 
     await expect(
       exampleUserPb.collection(globalUserPermissionsCollectionName).create(
         globalUserPermissionsPayloadBuilder.forCreateData({
-          userId: exampleUserRecord.record.id,
+          userId: exampleUserRecord.id,
           role: "standard",
           status: "approved",
         }),
@@ -301,14 +305,16 @@ describe(`${testSuiteName} tests`, () => {
 
     const standardUserPb = createPbConnection();
     const standardUserPayload = userPayloadBuilder.forCreateRandomData();
-    await standardUserPb.collection(usersCollectionName).create(standardUserPayload);
     const standardUserRecord = await standardUserPb
+      .collection(usersCollectionName)
+      .create(standardUserPayload);
+    await standardUserPb
       .collection(usersCollectionName)
       .authWithPassword(standardUserPayload.email, standardUserPayload.passwordConfirm);
 
     await superadminUserPb.collection(globalUserPermissionsCollectionName).create(
       globalUserPermissionsPayloadBuilder.forCreateData({
-        userId: standardUserRecord.record.id,
+        userId: standardUserRecord.id,
         role: "standard",
         status: "approved",
       }),
@@ -316,15 +322,17 @@ describe(`${testSuiteName} tests`, () => {
 
     const exampleUserPb = createPbConnection();
     const exampleUserPayload = userPayloadBuilder.forCreateRandomData();
-    await exampleUserPb.collection(usersCollectionName).create(exampleUserPayload);
     const exampleUserRecord = await exampleUserPb
+      .collection(usersCollectionName)
+      .create(exampleUserPayload);
+    await exampleUserPb
       .collection(usersCollectionName)
       .authWithPassword(exampleUserPayload.email, exampleUserPayload.passwordConfirm);
 
     await expect(
       exampleUserPb.collection(globalUserPermissionsCollectionName).create(
         globalUserPermissionsPayloadBuilder.forCreateData({
-          userId: exampleUserRecord.record.id,
+          userId: exampleUserRecord.id,
           role: "standard",
           status: "approved",
         }),
@@ -349,18 +357,22 @@ describe(`${testSuiteName} tests`, () => {
 
     const exampleUserPb = createPbConnection();
     const exampleUserPayload = userPayloadBuilder.forCreateRandomData();
-    await exampleUserPb.collection(usersCollectionName).create(exampleUserPayload);
     const exampleUserRecord = await exampleUserPb
+      .collection(usersCollectionName)
+      .create(exampleUserPayload);
+    await exampleUserPb
       .collection(usersCollectionName)
       .authWithPassword(exampleUserPayload.email, exampleUserPayload.passwordConfirm);
 
-    await superuserPb.collection(globalUserPermissionsCollectionName).create(
+    const exampleUserGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
-        userId: exampleUserRecord.record.id,
+        userId: exampleUserRecord.id,
         role: "admin",
         status: "approved",
-      }),
-    );
+      });
+    await superuserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(exampleUserGlobalUserPermissionsPayload);
 
     const globalUserPermissionsFullList = await superuserPb
       .collection(globalUserPermissionsCollectionName)
@@ -371,7 +383,7 @@ describe(`${testSuiteName} tests`, () => {
       (record) => record.userId === superadminUserRecord.id,
     );
     const exampleUserGlobalUserPermissionsRecord = globalUserPermissionsFullList.find(
-      (record) => record.userId === exampleUserRecord.record.id,
+      (record) => record.userId === exampleUserRecord.id,
     );
     if (!superadminGlobalUserPermissionsRecord)
       return expect(superadminGlobalUserPermissionsRecord).toBeTruthy();
@@ -391,11 +403,9 @@ describe(`${testSuiteName} tests`, () => {
       .collection(globalUserPermissionsCollectionName)
       .getOne(exampleUserGlobalUserPermissionsRecord.id);
 
-    expect(exampleUserGlobalUserPermissionsRecordTest).toMatchObject({
-      userId: exampleUserRecord.record.id,
-      status: "approved",
-      role: "admin",
-    });
+    expect(exampleUserGlobalUserPermissionsRecordTest).toMatchObject(
+      exampleUserGlobalUserPermissionsPayload,
+    );
   });
 
   it("PDBP-GUP-VIEW-02 — Global Admin (approved) can VIEW", async () => {
@@ -415,8 +425,10 @@ describe(`${testSuiteName} tests`, () => {
 
     const adminUserPb = createPbConnection();
     const adminUserPayload = userPayloadBuilder.forCreateRandomData();
-    await adminUserPb.collection(usersCollectionName).create(adminUserPayload);
     const adminUserRecord = await adminUserPb
+      .collection(usersCollectionName)
+      .create(adminUserPayload);
+    await adminUserPb
       .collection(usersCollectionName)
       .authWithPassword(adminUserPayload.email, adminUserPayload.passwordConfirm);
 
@@ -428,7 +440,7 @@ describe(`${testSuiteName} tests`, () => {
         status: "approved",
       });
     const adminGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
-      userId: adminUserRecord.record.id,
+      userId: adminUserRecord.id,
       role: "admin",
       status: "approved",
     });
@@ -448,7 +460,7 @@ describe(`${testSuiteName} tests`, () => {
       return expect(superadminGlobalUserPermissionsRecord).toBeTruthy();
 
     const adminGlobalUserPermissionsRecord = globalUserPermissionsFullList.find(
-      (record) => record.userId === adminUserRecord.record.id,
+      (record) => record.userId === adminUserRecord.id,
     );
     if (!adminGlobalUserPermissionsRecord)
       return expect(adminGlobalUserPermissionsRecord).toBeTruthy();
@@ -481,50 +493,74 @@ describe(`${testSuiteName} tests`, () => {
       .collection(usersCollectionName)
       .authWithPassword(superadminUserPayload.email, superadminUserPayload.passwordConfirm);
 
-    const adminUserPb = createPbConnection();
-    const adminUserPayload = userPayloadBuilder.forCreateRandomData();
-    await adminUserPb.collection(usersCollectionName).create(adminUserPayload);
-    const adminUserRecord = await adminUserPb
+    const pendingAdminUserPb = createPbConnection();
+    const pendingAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const pendingAdminUserRecord = await pendingAdminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(adminUserPayload.email, adminUserPayload.passwordConfirm);
+      .create(pendingAdminUserPayload);
+    await pendingAdminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(pendingAdminUserPayload.email, pendingAdminUserPayload.passwordConfirm);
 
-    const adminGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
-      userId: adminUserRecord.record.id,
-      role: "admin",
-      status: "pending",
-    });
-    await superuserPb
+    const pendingAdminGlobalUserPermissionsPayload =
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: pendingAdminUserRecord.id,
+        role: "admin",
+        status: "pending",
+      });
+    const pendingAdminGlobalUserPermissionsRecord = await superuserPb
       .collection(globalUserPermissionsCollectionName)
-      .create(adminGlobalUserPermissionsPayload);
+      .create(pendingAdminGlobalUserPermissionsPayload);
 
-    const globalUserPermissionsFullList = await superuserPb
+    const blockedAdminUserPb = createPbConnection();
+    const blockedAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const blockedAdminUserRecord = await blockedAdminUserPb
+      .collection(usersCollectionName)
+      .create(blockedAdminUserPayload);
+    await blockedAdminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(blockedAdminUserPayload.email, blockedAdminUserPayload.passwordConfirm);
+    const blockedAdminGlobalUserPermissionsPayload =
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: blockedAdminUserRecord.id,
+        role: "admin",
+        status: "blocked",
+      });
+    const blockedAdminGlobalUserPermissionsRecord = await superuserPb
       .collection(globalUserPermissionsCollectionName)
-      .getFullList();
-    expect(globalUserPermissionsFullList.length).toBe(2);
+      .create(blockedAdminGlobalUserPermissionsPayload);
 
-    const superadminGlobalUserPermissionsRecord = globalUserPermissionsFullList.find(
-      (record) => record.userId === superadminUserRecord.id,
-    );
+    const globalUserPermissionsList = await superuserPb
+      .collection(globalUserPermissionsCollectionName)
+      .getFullList({ filter: `userId = "${superadminUserRecord.id}"` });
+    const superadminGlobalUserPermissionsRecord = globalUserPermissionsList[0];
     if (!superadminGlobalUserPermissionsRecord)
       return expect(superadminGlobalUserPermissionsRecord).toBeTruthy();
-
-    const adminGlobalUserPermissionsRecord = globalUserPermissionsFullList.find(
-      (record) => record.userId === adminUserRecord.record.id,
-    );
-    if (!adminGlobalUserPermissionsRecord)
-      return expect(adminGlobalUserPermissionsRecord).toBeTruthy();
+    expect(superadminGlobalUserPermissionsRecord).toMatchObject({ role: "superadmin" });
 
     await expect(
-      adminUserPb
+      pendingAdminUserPb
         .collection(globalUserPermissionsCollectionName)
         .getOne(superadminGlobalUserPermissionsRecord.id),
     ).rejects.toThrow();
 
     await expect(
-      await adminUserPb
+      await pendingAdminUserPb
         .collection(globalUserPermissionsCollectionName)
-        .getOne(adminGlobalUserPermissionsRecord.id),
-    ).toMatchObject(adminGlobalUserPermissionsPayload);
+        .getOne(pendingAdminGlobalUserPermissionsRecord.id),
+    ).toMatchObject(pendingAdminGlobalUserPermissionsPayload);
+
+    await expect(
+      blockedAdminUserPb
+        .collection(globalUserPermissionsCollectionName)
+        .getOne(superadminGlobalUserPermissionsRecord.id),
+    ).rejects.toThrow();
+
+    await expect(
+      await blockedAdminUserPb
+        .collection(globalUserPermissionsCollectionName)
+        .getOne(blockedAdminGlobalUserPermissionsRecord.id),
+    ).toMatchObject(blockedAdminGlobalUserPermissionsPayload);
   });
 
   it("PDBP-GUP-VIEW-04 — Global Standard (approved) can VIEW", async () => {
@@ -544,8 +580,10 @@ describe(`${testSuiteName} tests`, () => {
 
     const standardUserPb = createPbConnection();
     const standardUserPayload = userPayloadBuilder.forCreateRandomData();
-    await standardUserPb.collection(usersCollectionName).create(standardUserPayload);
     const standardUserRecord = await standardUserPb
+      .collection(usersCollectionName)
+      .create(standardUserPayload);
+    await standardUserPb
       .collection(usersCollectionName)
       .authWithPassword(standardUserPayload.email, standardUserPayload.passwordConfirm);
 
@@ -557,7 +595,7 @@ describe(`${testSuiteName} tests`, () => {
         status: "approved",
       });
     const standardGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
-      userId: standardUserRecord.record.id,
+      userId: standardUserRecord.id,
       role: "standard",
       status: "approved",
     });
@@ -585,7 +623,7 @@ describe(`${testSuiteName} tests`, () => {
     );
 
     const standardGlobalUserPermissionsRecord = globalUserPermissionsFullList.find(
-      (record) => record.userId === standardUserRecord.record.id,
+      (record) => record.userId === standardUserRecord.id,
     );
     if (!standardGlobalUserPermissionsRecord)
       return expect(standardGlobalUserPermissionsRecord).toBeTruthy();
@@ -615,27 +653,31 @@ describe(`${testSuiteName} tests`, () => {
 
     const pendingUserPb = createPbConnection();
     const pendingUserPayload = userPayloadBuilder.forCreateRandomData();
-    await pendingUserPb.collection(usersCollectionName).create(pendingUserPayload);
     const pendingUserRecord = await pendingUserPb
+      .collection(usersCollectionName)
+      .create(pendingUserPayload);
+    await pendingUserPb
       .collection(usersCollectionName)
       .authWithPassword(pendingUserPayload.email, pendingUserPayload.passwordConfirm);
 
     const blockedUserPb = createPbConnection();
     const blockedUserPayload = userPayloadBuilder.forCreateRandomData();
-    await blockedUserPb.collection(usersCollectionName).create(blockedUserPayload);
     const blockedUserRecord = await blockedUserPb
+      .collection(usersCollectionName)
+      .create(blockedUserPayload);
+    await blockedUserPb
       .collection(usersCollectionName)
       .authWithPassword(blockedUserPayload.email, blockedUserPayload.passwordConfirm);
 
     const pendingStandardGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
-        userId: pendingUserRecord.record.id,
+        userId: pendingUserRecord.id,
         role: "standard",
         status: "pending",
       });
     const blockedStandardGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
-        userId: blockedUserRecord.record.id,
+        userId: blockedUserRecord.id,
         role: "standard",
         status: "blocked",
       });
@@ -728,13 +770,15 @@ describe(`${testSuiteName} tests`, () => {
 
     const adminUserPb = createPbConnection();
     const adminUserPayload = userPayloadBuilder.forCreateRandomData();
-    await adminUserPb.collection(usersCollectionName).create(adminUserPayload);
     const adminUserRecord = await adminUserPb
+      .collection(usersCollectionName)
+      .create(adminUserPayload);
+    await adminUserPb
       .collection(usersCollectionName)
       .authWithPassword(adminUserPayload.email, adminUserPayload.passwordConfirm);
 
     const adminGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
-      userId: adminUserRecord.record.id,
+      userId: adminUserRecord.id,
       role: "admin",
       status: "approved",
     });
@@ -748,7 +792,7 @@ describe(`${testSuiteName} tests`, () => {
     expect(globalUserPermissionsFullList.length).toBe(2);
 
     const adminGlobalUserPermissionsRecord = globalUserPermissionsFullList.find(
-      (record) => record.userId === adminUserRecord.record.id,
+      (record) => record.userId === adminUserRecord.id,
     );
     if (!adminGlobalUserPermissionsRecord)
       return expect(adminGlobalUserPermissionsRecord).toBeTruthy();
@@ -776,27 +820,31 @@ describe(`${testSuiteName} tests`, () => {
 
     const pendingAdminUserPb = createPbConnection();
     const pendingAdminUserPayload = userPayloadBuilder.forCreateRandomData();
-    await pendingAdminUserPb.collection(usersCollectionName).create(pendingAdminUserPayload);
-    const pendingUserRecord = await pendingAdminUserPb
+    const pendingAdminUserRecord = await pendingAdminUserPb
+      .collection(usersCollectionName)
+      .create(pendingAdminUserPayload);
+    await pendingAdminUserPb
       .collection(usersCollectionName)
       .authWithPassword(pendingAdminUserPayload.email, pendingAdminUserPayload.passwordConfirm);
 
     const blockedAdminUserPb = createPbConnection();
     const blockedAdminUserPayload = userPayloadBuilder.forCreateRandomData();
-    await blockedAdminUserPb.collection(usersCollectionName).create(blockedAdminUserPayload);
     const blockedAdminUserRecord = await blockedAdminUserPb
+      .collection(usersCollectionName)
+      .create(blockedAdminUserPayload);
+    await blockedAdminUserPb
       .collection(usersCollectionName)
       .authWithPassword(blockedAdminUserPayload.email, blockedAdminUserPayload.passwordConfirm);
 
     const pendingAdminGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
-        userId: pendingUserRecord.record.id,
+        userId: pendingAdminUserRecord.id,
         role: "admin",
         status: "pending",
       });
     const blockedAdminGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
-        userId: blockedAdminUserRecord.record.id,
+        userId: blockedAdminUserRecord.id,
         role: "admin",
         status: "blocked",
       });
@@ -858,13 +906,15 @@ describe(`${testSuiteName} tests`, () => {
 
     const standardUserPb = createPbConnection();
     const standardUserPayload = userPayloadBuilder.forCreateRandomData();
-    await standardUserPb.collection(usersCollectionName).create(standardUserPayload);
     const standardUserRecord = await standardUserPb
+      .collection(usersCollectionName)
+      .create(standardUserPayload);
+    await standardUserPb
       .collection(usersCollectionName)
       .authWithPassword(standardUserPayload.email, standardUserPayload.passwordConfirm);
 
     const standardGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
-      userId: standardUserRecord.record.id,
+      userId: standardUserRecord.id,
       role: "standard",
       status: "approved",
     });
@@ -878,7 +928,7 @@ describe(`${testSuiteName} tests`, () => {
     expect(globalUserPermissionsFullList.length).toBe(2);
 
     const standardGlobalUserPermissionsRecord = globalUserPermissionsFullList.find(
-      (record) => record.userId === standardUserRecord.record.id,
+      (record) => record.userId === standardUserRecord.id,
     );
     if (!standardGlobalUserPermissionsRecord)
       return expect(standardGlobalUserPermissionsRecord).toBeTruthy();
@@ -906,8 +956,10 @@ describe(`${testSuiteName} tests`, () => {
 
     const pendingStandardUserPb = createPbConnection();
     const pendingStandardUserPayload = userPayloadBuilder.forCreateRandomData();
-    await pendingStandardUserPb.collection(usersCollectionName).create(pendingStandardUserPayload);
     const pendingStandardUserRecord = await pendingStandardUserPb
+      .collection(usersCollectionName)
+      .create(pendingStandardUserPayload);
+    await pendingStandardUserPb
       .collection(usersCollectionName)
       .authWithPassword(
         pendingStandardUserPayload.email,
@@ -916,8 +968,10 @@ describe(`${testSuiteName} tests`, () => {
 
     const blockedStandardUserPb = createPbConnection();
     const blockedStandardUserPayload = userPayloadBuilder.forCreateRandomData();
-    await blockedStandardUserPb.collection(usersCollectionName).create(blockedStandardUserPayload);
     const blockedStandardUserRecord = await blockedStandardUserPb
+      .collection(usersCollectionName)
+      .create(blockedStandardUserPayload);
+    await blockedStandardUserPb
       .collection(usersCollectionName)
       .authWithPassword(
         blockedStandardUserPayload.email,
@@ -926,13 +980,13 @@ describe(`${testSuiteName} tests`, () => {
 
     const pendingStandardGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
-        userId: pendingStandardUserRecord.record.id,
+        userId: pendingStandardUserRecord.id,
         role: "standard",
         status: "pending",
       });
     const blockedStandardGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
-        userId: blockedStandardUserRecord.record.id,
+        userId: blockedStandardUserRecord.id,
         role: "standard",
         status: "blocked",
       });
@@ -1006,13 +1060,15 @@ describe(`${testSuiteName} tests`, () => {
 
     const adminUserPb = createPbConnection();
     const adminUserPayload = userPayloadBuilder.forCreateRandomData();
-    await adminUserPb.collection(usersCollectionName).create(adminUserPayload);
     const adminUserRecord = await adminUserPb
+      .collection(usersCollectionName)
+      .create(adminUserPayload);
+    await adminUserPb
       .collection(usersCollectionName)
       .authWithPassword(adminUserPayload.email, adminUserPayload.passwordConfirm);
 
     const adminGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
-      userId: adminUserRecord.record.id,
+      userId: adminUserRecord.id,
       role: "admin",
       status: "approved",
     });
@@ -1041,56 +1097,55 @@ describe(`${testSuiteName} tests`, () => {
 
     const pendingAdminUserPb = createPbConnection();
     const pendingAdminUserPayload = userPayloadBuilder.forCreateRandomData();
-    await pendingAdminUserPb.collection(usersCollectionName).create(pendingAdminUserPayload);
     const pendingAdminUserRecord = await pendingAdminUserPb
+      .collection(usersCollectionName)
+      .create(pendingAdminUserPayload);
+    await pendingAdminUserPb
       .collection(usersCollectionName)
       .authWithPassword(pendingAdminUserPayload.email, pendingAdminUserPayload.passwordConfirm);
 
     const blockedAdminUserPb = createPbConnection();
     const blockedAdminUserPayload = userPayloadBuilder.forCreateRandomData();
-    await blockedAdminUserPb.collection(usersCollectionName).create(blockedAdminUserPayload);
     const blockedAdminUserRecord = await blockedAdminUserPb
+      .collection(usersCollectionName)
+      .create(blockedAdminUserPayload);
+    await blockedAdminUserPb
       .collection(usersCollectionName)
       .authWithPassword(blockedAdminUserPayload.email, blockedAdminUserPayload.passwordConfirm);
 
     const pendingAdminGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
-        userId: pendingAdminUserRecord.record.id,
+        userId: pendingAdminUserRecord.id,
         role: "admin",
         status: "pending",
       });
     const blockedAdminGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
-        userId: blockedAdminUserRecord.record.id,
+        userId: blockedAdminUserRecord.id,
         role: "admin",
         status: "blocked",
       });
-    await superuserPb
+    const pendingAdminGlobalUserPermissionsRecord = await superuserPb
       .collection(globalUserPermissionsCollectionName)
       .create(pendingAdminGlobalUserPermissionsPayload);
-    await superuserPb
+    const blockedAdminGlobalUserPermissionsRecord = await superuserPb
       .collection(globalUserPermissionsCollectionName)
       .create(blockedAdminGlobalUserPermissionsPayload);
-
-    const globalUserPermissionsFullList = await superuserPb
-      .collection(globalUserPermissionsCollectionName)
-      .getFullList();
-    expect(globalUserPermissionsFullList.length).toBe(3);
-
-    const adminGlobalUserPermissionsRecord = globalUserPermissionsFullList.find(
-      (record) => record.userId === pendingAdminUserRecord.record.id,
-    );
-    if (!adminGlobalUserPermissionsRecord)
-      return expect(adminGlobalUserPermissionsRecord).toBeTruthy();
 
     const pendingAdminUserGlobalUserPermissionsList = await pendingAdminUserPb
       .collection(globalUserPermissionsCollectionName)
       .getFullList();
     expect(pendingAdminUserGlobalUserPermissionsList.length).toBe(1);
+    expect(pendingAdminUserGlobalUserPermissionsList[0]).toMatchObject(
+      pendingAdminGlobalUserPermissionsRecord,
+    );
     const blockedAdminUserGlobalUserPermissionsList = await blockedAdminUserPb
       .collection(globalUserPermissionsCollectionName)
       .getFullList();
     expect(blockedAdminUserGlobalUserPermissionsList.length).toBe(1);
+    expect(blockedAdminUserGlobalUserPermissionsList[0]).toMatchObject(
+      blockedAdminGlobalUserPermissionsRecord,
+    );
   });
 
   it("PDBP-GUP-LIST-04 — Global Standard (approved) can LIST", async () => {
@@ -1108,13 +1163,15 @@ describe(`${testSuiteName} tests`, () => {
 
     const standardUserPb = createPbConnection();
     const standardUserPayload = userPayloadBuilder.forCreateRandomData();
-    await standardUserPb.collection(usersCollectionName).create(standardUserPayload);
     const standardUserRecord = await standardUserPb
+      .collection(usersCollectionName)
+      .create(standardUserPayload);
+    await standardUserPb
       .collection(usersCollectionName)
       .authWithPassword(standardUserPayload.email, standardUserPayload.passwordConfirm);
 
     const standardGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
-      userId: standardUserRecord.record.id,
+      userId: standardUserRecord.id,
       role: "standard",
       status: "approved",
     });
@@ -1143,8 +1200,10 @@ describe(`${testSuiteName} tests`, () => {
 
     const pendingStandardUserPb = createPbConnection();
     const pendingStandardUserPayload = userPayloadBuilder.forCreateRandomData();
-    await pendingStandardUserPb.collection(usersCollectionName).create(pendingStandardUserPayload);
     const pendingStandardUserRecord = await pendingStandardUserPb
+      .collection(usersCollectionName)
+      .create(pendingStandardUserPayload);
+    await pendingStandardUserPb
       .collection(usersCollectionName)
       .authWithPassword(
         pendingStandardUserPayload.email,
@@ -1153,8 +1212,10 @@ describe(`${testSuiteName} tests`, () => {
 
     const blockedStandardUserPb = createPbConnection();
     const blockedStandardUserPayload = userPayloadBuilder.forCreateRandomData();
-    await blockedStandardUserPb.collection(usersCollectionName).create(blockedStandardUserPayload);
     const blockedStandardUserRecord = await blockedStandardUserPb
+      .collection(usersCollectionName)
+      .create(blockedStandardUserPayload);
+    await blockedStandardUserPb
       .collection(usersCollectionName)
       .authWithPassword(
         blockedStandardUserPayload.email,
@@ -1163,13 +1224,13 @@ describe(`${testSuiteName} tests`, () => {
 
     const pendingStandardGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
-        userId: pendingStandardUserRecord.record.id,
+        userId: pendingStandardUserRecord.id,
         role: "standard",
         status: "pending",
       });
     const blockedStandardGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
-        userId: blockedStandardUserRecord.record.id,
+        userId: blockedStandardUserRecord.id,
         role: "standard",
         status: "blocked",
       });
@@ -1186,7 +1247,7 @@ describe(`${testSuiteName} tests`, () => {
     expect(globalUserPermissionsFullList.length).toBe(3);
 
     const standardGlobalUserPermissionsRecord = globalUserPermissionsFullList.find(
-      (record) => record.userId === pendingStandardUserRecord.record.id,
+      (record) => record.userId === pendingStandardUserRecord.id,
     );
     if (!standardGlobalUserPermissionsRecord)
       return expect(standardGlobalUserPermissionsRecord).toBeTruthy();
