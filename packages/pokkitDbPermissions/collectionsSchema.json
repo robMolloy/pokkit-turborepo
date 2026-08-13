@@ -207,8 +207,8 @@
   },
   {
     "id": "pbc_2680520508",
-    "listRule": "@request.auth.id != \"\" && (\n  @request.auth.id = id || \n  @collection.globalUserPermissions.userId ?= @request.auth.id && @collection.globalUserPermissions.role ?= \"superadmin\"\n)",
-    "viewRule": "@request.auth.id = id || @collection.globalUserPermissions.userId ?= @request.auth.id && @collection.globalUserPermissions.status ?= \"approved\" || @collection.globalUserPermissions.userId ?= @request.auth.id && @collection.globalUserPermissions.role ?= \"superadmin\"",
+    "listRule": "@request.auth.id = id \n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t&& @collection.globalUserPermissions.status ?= \"approved\" \n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t&& @collection.globalUserPermissions.role ?= \"superadmin\"",
+    "viewRule": "@request.auth.id = id \n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t&& @collection.globalUserPermissions.status ?= \"approved\" \n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t&& @collection.globalUserPermissions.role ?= \"superadmin\"",
     "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id && \n@collection.globalUserPermissions.role ?= \"superadmin\"",
     "updateRule": "@request.auth.id != \"\" && \n@collection.globalUserPermissions.userId ?= @request.auth.id && \n@collection.globalUserPermissions.role ?= \"superadmin\"",
     "deleteRule": "@request.auth.id != \"\" && \n@collection.globalUserPermissions.userId ?= @request.auth.id && \n@collection.globalUserPermissions.role ?= \"superadmin\"",

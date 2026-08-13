@@ -821,8 +821,8 @@
   },
   {
     "id": "pbc_2680520508",
-    "listRule": "@request.auth.id != \"\" \u0026\u0026 (\n  @request.auth.id = id || \n  @collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n)",
-    "viewRule": "@request.auth.id = id || @collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\" || @collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"",
+    "listRule": "@request.auth.id = id \n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\" \n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"",
+    "viewRule": "@request.auth.id = id \n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\" \n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"",
     "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"superadmin\"",
     "updateRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"superadmin\"",
     "deleteRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"superadmin\"",
@@ -915,7 +915,7 @@
       "CREATE UNIQUE INDEX `idx_djyvvpjhe1` ON `globalUserPermissions` (`userId`)"
     ],
     "created": "2026-08-12 11:07:59.725Z",
-    "updated": "2026-08-12 19:54:42.899Z",
+    "updated": "2026-08-12 21:20:52.098Z",
     "system": false
   },
   {
