@@ -414,7 +414,7 @@
     "id": "pbc_1053844701",
     "listRule": null,
     "viewRule": null,
-    "createRule": null,
+    "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id && \n@collection.globalUserPermissions.role ?= \"superadmin\"",
     "updateRule": null,
     "deleteRule": null,
     "name": "organisations",
