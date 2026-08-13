@@ -1464,37 +1464,248 @@ describe(`${testSuiteName} tests`, () => {
     expect(blockedStandardUserGlobalUserPermissionsList.length).toBe(1);
   });
 
-  // it("PDBP-GUP-UPDATE-01 — Global Superadmin can UPDATE", async () => {
-  //   const superadminUserPb = createPbConnection();
-  //   const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
-  //   await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
-  //   await superadminUserPb
-  //     .collection(usersCollectionName)
-  //     .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+  it("PDBP-GUP-UPDATE-01 — Global Superadmin can UPDATE", async () => {
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
-  //   const superadminUserGlobalUserPermissionsList = await superadminUserPb
-  //     .collection(globalUserPermissionsCollectionName)
-  //     .getFullList();
+    const superadminUserGlobalUserPermissionsList = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .getFullList();
 
-  //   const pendingStandardUserPb = createPbConnection();
-  //   const pendingStandardUserPayload = userPayloadBuilder.forCreateRandomData();
-  //   const pendingStandardUserRecord = await pendingStandardUserPb
-  //     .collection(usersCollectionName)
-  //     .create(pendingStandardUserPayload);
-  //   await pendingStandardUserPb
-  //     .collection(usersCollectionName)
-  //     .authWithPassword(pendingStandardUserPayload.email, pendingStandardUserPayload.password);
-  // });
+    const testUserPb = createPbConnection();
+    const testUserPayload = userPayloadBuilder.forCreateRandomData();
+    const testUserRecord = await testUserPb.collection(usersCollectionName).create(testUserPayload);
+    await testUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(testUserPayload.email, testUserPayload.password);
 
-  // it("PDBP-GUP-UPDATE-02 — Global Admin cannot UPDATE", async () => {});
+    const testGlobalUserPermissionsPayload1 = globalUserPermissionsPayloadBuilder.forCreateData({
+      userId: testUserRecord.id,
+      role: "standard",
+      status: "pending",
+    });
+    const testGlobalUserPermissionsPayload2 = globalUserPermissionsPayloadBuilder.forCreateData({
+      userId: testUserRecord.id,
+      role: "admin",
+      status: "approved",
+    });
+    const testGlobalUserPermissionsRecord1 = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(testGlobalUserPermissionsPayload1);
+    expect(testGlobalUserPermissionsRecord1).toMatchObject(testGlobalUserPermissionsPayload1);
 
-  // it("PDBP-GUP-UPDATE-03 — Global Standard cannot UPDATE", async () => {});
+    const testGlobalUserPermissionsRecord2 = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .update(testGlobalUserPermissionsRecord1.id, testGlobalUserPermissionsPayload2);
+    expect(testGlobalUserPermissionsRecord2).toMatchObject(testGlobalUserPermissionsPayload2);
+  });
 
-  // it("PDBP-GUP-UPDATE-OWN-01 — Global Superadmin cannot UPDATE OWN", async () => {});
+  it("PDBP-GUP-UPDATE-02 — Global Admin cannot UPDATE", async () => {
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
-  // it("PDBP-GUP-UPDATE-OWN-02 — Global Admin cannot UPDATE OWN", async () => {});
+    const adminUserPb = createPbConnection();
+    const adminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const adminUserRecord = await adminUserPb
+      .collection(usersCollectionName)
+      .create(adminUserPayload);
+    await adminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(adminUserPayload.email, adminUserPayload.password);
 
-  // it("PDBP-GUP-UPDATE-OWN-03 — Global Standard cannot UPDATE OWN", async () => {});
+    const adminGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
+      userId: adminUserRecord.id,
+      role: "admin",
+      status: "approved",
+    });
+    await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(adminGlobalUserPermissionsPayload);
+
+    const testUserPb = createPbConnection();
+    const testUserPayload = userPayloadBuilder.forCreateRandomData();
+    const testUserRecord = await testUserPb.collection(usersCollectionName).create(testUserPayload);
+    await testUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(testUserPayload.email, testUserPayload.password);
+
+    const testGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
+      userId: testUserRecord.id,
+      role: "standard",
+      status: "pending",
+    });
+    const testGlobalUserPermissionsRecord = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(testGlobalUserPermissionsPayload);
+    expect(testGlobalUserPermissionsRecord).toMatchObject(testGlobalUserPermissionsPayload);
+
+    await expect(
+      adminUserPb
+        .collection(globalUserPermissionsCollectionName)
+        .update(testGlobalUserPermissionsRecord.id, testGlobalUserPermissionsPayload),
+    ).rejects.toThrow();
+  });
+
+  it("PDBP-GUP-UPDATE-03 — Global Standard cannot UPDATE", async () => {
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const standardUserPb = createPbConnection();
+    const standardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const standardUserRecord = await standardUserPb
+      .collection(usersCollectionName)
+      .create(standardUserPayload);
+    await standardUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(standardUserPayload.email, standardUserPayload.password);
+
+    const standardGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
+      userId: standardUserRecord.id,
+      role: "standard",
+      status: "approved",
+    });
+    await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(standardGlobalUserPermissionsPayload);
+
+    const testUserPb = createPbConnection();
+    const testUserPayload = userPayloadBuilder.forCreateRandomData();
+    const testUserRecord = await testUserPb.collection(usersCollectionName).create(testUserPayload);
+    await testUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(testUserPayload.email, testUserPayload.password);
+
+    const testGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
+      userId: testUserRecord.id,
+      role: "standard",
+      status: "pending",
+    });
+    const testGlobalUserPermissionsRecord = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(testGlobalUserPermissionsPayload);
+    expect(testGlobalUserPermissionsRecord).toMatchObject(testGlobalUserPermissionsPayload);
+
+    await expect(
+      standardUserPb
+        .collection(globalUserPermissionsCollectionName)
+        .update(testGlobalUserPermissionsRecord.id, testGlobalUserPermissionsPayload),
+    ).rejects.toThrow();
+  });
+
+  it("PDBP-GUP-UPDATE-OWN-01 — Global Superadmin cannot UPDATE OWN", async () => {
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const superadminUserRecord = await superadminUserPb
+      .collection(usersCollectionName)
+      .create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const newSuperadminGlobalUserPermissionsPayload =
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: superadminUserRecord.id,
+        role: "standard",
+        status: "pending",
+      });
+
+    await expect(
+      superadminUserPb
+        .collection(globalUserPermissionsCollectionName)
+        .update(superadminUserRecord.id, newSuperadminGlobalUserPermissionsPayload),
+    ).rejects.toThrow();
+  });
+
+  it("PDBP-GUP-UPDATE-OWN-02 — Global Admin cannot UPDATE OWN", async () => {
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const adminUserPb = createPbConnection();
+    const adminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const adminUserRecord = await adminUserPb
+      .collection(usersCollectionName)
+      .create(adminUserPayload);
+    await adminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(adminUserPayload.email, adminUserPayload.password);
+
+    const adminGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
+      userId: adminUserRecord.id,
+      role: "admin",
+      status: "approved",
+    });
+    const adminGlobalUserPermissionsRecord = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(adminGlobalUserPermissionsPayload);
+
+    const newAdminGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
+      userId: adminUserRecord.id,
+      role: "admin",
+      status: "pending",
+    });
+
+    await expect(
+      adminUserPb
+        .collection(globalUserPermissionsCollectionName)
+        .update(adminGlobalUserPermissionsRecord.id, newAdminGlobalUserPermissionsPayload),
+    ).rejects.toThrow();
+  });
+
+  it("PDBP-GUP-UPDATE-OWN-03 — Global Standard cannot UPDATE OWN", async () => {
+    const superadminUserPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminUserPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const standardUserPb = createPbConnection();
+    const standardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const standardUserRecord = await standardUserPb
+      .collection(usersCollectionName)
+      .create(standardUserPayload);
+    await standardUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(standardUserPayload.email, standardUserPayload.password);
+
+    const standardGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
+      userId: standardUserRecord.id,
+      role: "standard",
+      status: "approved",
+    });
+    const standardGlobalUserPermissionsRecord = await superadminUserPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(standardGlobalUserPermissionsPayload);
+
+    const newStandardGlobalUserPermissionsPayload =
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: standardUserRecord.id,
+        role: "standard",
+        status: "pending",
+      });
+
+    await expect(
+      standardUserPb
+        .collection(globalUserPermissionsCollectionName)
+        .update(standardGlobalUserPermissionsRecord.id, newStandardGlobalUserPermissionsPayload),
+    ).rejects.toThrow();
+  });
 
   // it("PDBP-GUP-DELETE-01 — Global Superadmin can DELETE", async () => {});
 
