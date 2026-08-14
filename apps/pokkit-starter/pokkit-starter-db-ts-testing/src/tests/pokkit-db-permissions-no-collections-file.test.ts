@@ -3,10 +3,7 @@ import {
   getPbFilePath,
   getPbServeUrl,
   getPokkitDbCollectionsFilePath,
-  globalUserPermissionsCollectionName,
   killPbInstance,
-  organisationsCollectionName,
-  organisationUserPermissionsCollectionName,
   servePb,
   superusersCollectionName,
   upsertPbAdminCredentialsFromCli,
@@ -16,6 +13,11 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../config/pocketbaseConfig";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "./_constants";
 import { testsMetadata } from "./_testsMetadata";
+import {
+  globalUserPermissionsCollectionName,
+  organisationsCollectionName,
+  organisationUserPermissionsCollectionName,
+} from "@repo/pokkit-db-permissions-ts-helpers";
 
 const testMetadata = testsMetadata.pokkitDbPermissionsNoCollectionsFile;
 const testSuiteName = testMetadata.name;

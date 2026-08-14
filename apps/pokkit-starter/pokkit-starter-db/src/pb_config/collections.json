@@ -920,11 +920,11 @@
   },
   {
     "id": "pbc_230240349",
-    "listRule": null,
-    "viewRule": null,
-    "createRule": null,
-    "updateRule": null,
-    "deleteRule": null,
+    "listRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"superadmin\"",
+    "viewRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"superadmin\"",
+    "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"superadmin\"",
+    "updateRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"superadmin\"",
+    "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"superadmin\"\n",
     "name": "organisationUserPermissions",
     "type": "base",
     "fields": [
@@ -942,6 +942,20 @@
         "required": true,
         "system": true,
         "type": "text"
+      },
+      {
+        "cascadeDelete": false,
+        "collectionId": "_pb_users_auth_",
+        "help": "",
+        "hidden": false,
+        "id": "relation1689669068",
+        "maxSelect": 1,
+        "minSelect": 0,
+        "name": "userId",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "relation"
       },
       {
         "cascadeDelete": false,
@@ -989,35 +1003,6 @@
         ]
       },
       {
-        "cascadeDelete": false,
-        "collectionId": "_pb_users_auth_",
-        "help": "",
-        "hidden": false,
-        "id": "relation1689669068",
-        "maxSelect": 1,
-        "minSelect": 0,
-        "name": "userId",
-        "presentable": false,
-        "required": false,
-        "system": false,
-        "type": "relation"
-      },
-      {
-        "autogeneratePattern": "",
-        "help": "",
-        "hidden": false,
-        "id": "text1330202256",
-        "max": 0,
-        "min": 0,
-        "name": "userOrgKey",
-        "pattern": "",
-        "presentable": false,
-        "primaryKey": false,
-        "required": false,
-        "system": false,
-        "type": "text"
-      },
-      {
         "hidden": false,
         "id": "autodate2990389176",
         "name": "created",
@@ -1039,10 +1024,10 @@
       }
     ],
     "indexes": [
-      "CREATE UNIQUE INDEX `idx_0UWlVOdDqD` ON `organisationUserPermissions` (`userOrgKey`)"
+      "CREATE UNIQUE INDEX `idx_2ag063yzee` ON `organisationUserPermissions` (\n  `orgId`,\n  `userId`\n)"
     ],
     "created": "2026-08-12 11:07:59.729Z",
-    "updated": "2026-08-13 15:14:12.006Z",
+    "updated": "2026-08-14 14:52:08.750Z",
     "system": false
   },
   {
@@ -1051,7 +1036,7 @@
     "viewRule": null,
     "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"superadmin\"",
     "updateRule": null,
-    "deleteRule": null,
+    "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\n",
     "name": "organisations",
     "type": "base",
     "fields": [
@@ -1123,7 +1108,7 @@
     ],
     "indexes": [],
     "created": "2026-08-12 11:07:59.731Z",
-    "updated": "2026-08-13 15:57:03.726Z",
+    "updated": "2026-08-14 14:22:34.760Z",
     "system": false
   },
   {

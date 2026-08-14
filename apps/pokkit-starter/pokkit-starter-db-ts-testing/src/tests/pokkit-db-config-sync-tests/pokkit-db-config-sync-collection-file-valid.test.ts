@@ -1,15 +1,13 @@
+import { pokkitDbPermissionsCollectionNames } from "@repo/pokkit-db-permissions-ts-helpers";
 import {
-  truncatePbCollections,
   getPbFilePath,
   getPbServeUrl,
   getPokkitDbCollectionsFilePath,
   killPbInstance,
   servePb,
   superusersCollectionName,
+  truncatePbCollections,
   upsertPbAdminCredentialsFromCli,
-  usersCollectionName,
-  globalUserPermissionsCollectionName,
-  organisationsCollectionName,
 } from "@repo/pokkit-testing";
 import { safeJsonParse } from "@repo/pokkit-utils";
 import fse from "fs-extra";
@@ -31,13 +29,6 @@ const logFilePath = `_logs/${testSuiteName}`;
 const createPbConnection = () => new PocketBase(pbServeUrl);
 
 let collectionsFileContentsAtStart = "";
-
-const pokkitDbPermissionsCollectionNames = [
-  usersCollectionName,
-  globalUserPermissionsCollectionName,
-  organisationsCollectionName,
-  organisationsCollectionName,
-];
 
 describe(`${testSuiteName} tests`, () => {
   beforeAll(async () => {

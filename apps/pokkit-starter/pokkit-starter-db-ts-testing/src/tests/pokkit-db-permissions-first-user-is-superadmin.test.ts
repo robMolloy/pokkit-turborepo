@@ -2,7 +2,6 @@ import {
   truncatePbCollections,
   getPbFilePath,
   getPbServeUrl,
-  globalUserPermissionsCollectionName,
   killPbInstance,
   servePb,
   superusersCollectionName,
@@ -15,6 +14,7 @@ import { PocketBase } from "../config/pocketbaseConfig";
 import { userPayloadBuilder } from "../utils/pocketbaseUserHelpers";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "./_constants";
 import { testsMetadata } from "./_testsMetadata";
+import { globalUserPermissionsCollectionName } from "@repo/pokkit-db-permissions-ts-helpers";
 
 const testMetadata = testsMetadata.pokkitDbPermissionsFirstUserIsSuperadmin;
 const testSuiteName = testMetadata.name;
