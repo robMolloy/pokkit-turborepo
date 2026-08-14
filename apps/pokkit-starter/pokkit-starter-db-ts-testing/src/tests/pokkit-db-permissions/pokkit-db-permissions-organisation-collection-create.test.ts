@@ -98,11 +98,13 @@ describe(`${testSuiteName} tests`, () => {
       description: "Test Description",
     });
 
-    const testFn = async (p: { pb: PocketBase }) => {
-      return p.pb.collection(organisationsCollectionName).create(organisationPayload);
-    };
-    await expect(testFn({ pb: adminPb })).rejects.toThrow();
-    await expect(await testFn({ pb: superadminPb })).toBeTruthy();
+    const createOrganisationTestFn = (p: { pb: PocketBase }) =>
+      p.pb.collection(organisationsCollectionName).create(organisationPayload);
+
+    await expect(createOrganisationTestFn({ pb: adminPb })).rejects.toThrow();
+    await expect(createOrganisationTestFn({ pb: superadminPb })).resolves.toMatchObject(
+      organisationPayload,
+    );
   });
 
   it("PDBP-ORG-CREATE-03 — Global Standard cannot CREATE", async () => {
@@ -125,11 +127,13 @@ describe(`${testSuiteName} tests`, () => {
       description: "Test Description",
     });
 
-    const testFn = async (p: { pb: PocketBase }) => {
-      return p.pb.collection(organisationsCollectionName).create(organisationPayload);
-    };
-    await expect(testFn({ pb: standardPb })).rejects.toThrow();
-    await expect(await testFn({ pb: superadminPb })).toBeTruthy();
+    const createOrganisationTestFn = (p: { pb: PocketBase }) =>
+      p.pb.collection(organisationsCollectionName).create(organisationPayload);
+
+    await expect(createOrganisationTestFn({ pb: standardPb })).rejects.toThrow();
+    await expect(createOrganisationTestFn({ pb: superadminPb })).resolves.toMatchObject(
+      organisationPayload,
+    );
   });
 
   // it("PDBP-ORG-SETUP-01 — Verify collection presence and validity is setup correctly", async () => {});
