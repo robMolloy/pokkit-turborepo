@@ -1032,8 +1032,8 @@
   },
   {
     "id": "pbc_1053844701",
-    "listRule": null,
-    "viewRule": null,
+    "listRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"",
+    "viewRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"",
     "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"",
     "updateRule": null,
     "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\n",
@@ -1106,9 +1106,11 @@
         "type": "autodate"
       }
     ],
-    "indexes": [],
+    "indexes": [
+      "CREATE UNIQUE INDEX `idx_l5jn9kiytc` ON `organisations` (`name`)"
+    ],
     "created": "2026-08-12 11:07:59.731Z",
-    "updated": "2026-08-14 15:36:31.267Z",
+    "updated": "2026-08-14 15:56:30.250Z",
     "system": false
   },
   {
