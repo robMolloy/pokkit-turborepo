@@ -944,7 +944,7 @@
         "type": "text"
       },
       {
-        "cascadeDelete": false,
+        "cascadeDelete": true,
         "collectionId": "_pb_users_auth_",
         "help": "",
         "hidden": false,
@@ -958,7 +958,7 @@
         "type": "relation"
       },
       {
-        "cascadeDelete": false,
+        "cascadeDelete": true,
         "collectionId": "pbc_1053844701",
         "help": "",
         "hidden": false,
@@ -1027,16 +1027,16 @@
       "CREATE UNIQUE INDEX `idx_2ag063yzee` ON `organisationUserPermissions` (\n  `orgId`,\n  `userId`\n)"
     ],
     "created": "2026-08-12 11:07:59.729Z",
-    "updated": "2026-08-14 14:52:08.750Z",
+    "updated": "2026-08-14 15:47:17.407Z",
     "system": false
   },
   {
     "id": "pbc_1053844701",
     "listRule": null,
     "viewRule": null,
-    "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"superadmin\"",
+    "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"",
     "updateRule": null,
-    "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\n",
+    "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\n",
     "name": "organisations",
     "type": "base",
     "fields": [
@@ -1108,7 +1108,7 @@
     ],
     "indexes": [],
     "created": "2026-08-12 11:07:59.731Z",
-    "updated": "2026-08-14 14:22:34.760Z",
+    "updated": "2026-08-14 15:36:31.267Z",
     "system": false
   },
   {

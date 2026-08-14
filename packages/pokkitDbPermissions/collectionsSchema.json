@@ -318,7 +318,7 @@
         "type": "text"
       },
       {
-        "cascadeDelete": false,
+        "cascadeDelete": true,
         "collectionId": "_pb_users_auth_",
         "help": "",
         "hidden": false,
@@ -332,7 +332,7 @@
         "type": "relation"
       },
       {
-        "cascadeDelete": false,
+        "cascadeDelete": true,
         "collectionId": "pbc_1053844701",
         "help": "",
         "hidden": false,
@@ -399,9 +399,9 @@
     "id": "pbc_1053844701",
     "listRule": null,
     "viewRule": null,
-    "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id && \n@collection.globalUserPermissions.role ?= \"superadmin\"",
+    "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n&& @collection.globalUserPermissions.role ?= \"superadmin\"",
     "updateRule": null,
-    "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n&& @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n&& @collection.organisationUserPermissions.role ?= \"admin\"\n\n",
+    "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n&& @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n&& @collection.organisationUserPermissions.role ?= \"admin\"\n&& @collection.organisationUserPermissions.status ?= \"approved\"\n\n",
     "name": "organisations",
     "type": "base",
     "fields": [
