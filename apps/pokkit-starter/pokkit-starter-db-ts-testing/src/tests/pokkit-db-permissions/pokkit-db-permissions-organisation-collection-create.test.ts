@@ -59,7 +59,7 @@ describe(`${testSuiteName} tests`, () => {
     expect(isHealthy.code).toBe(200);
   });
 
-  it("PDBP-OC-CREATE-01 — Global Superadmin can CREATE", async () => {
+  it("PDBP-ORG-CREATE-01 — Global Superadmin can CREATE", async () => {
     const superadminPb = createPbConnection();
     const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
     await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
@@ -78,7 +78,7 @@ describe(`${testSuiteName} tests`, () => {
     expect(createdOrganisationRecord).toMatchObject(organisationPayload);
   });
 
-  it("PDBP-OC-CREATE-02 — Global Admin cannot CREATE", async () => {
+  it("PDBP-ORG-CREATE-02 — Global Admin cannot CREATE", async () => {
     const superadminPb = createPbConnection();
     const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
     await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
@@ -97,8 +97,72 @@ describe(`${testSuiteName} tests`, () => {
       name: "Test Organisation",
       description: "Test Description",
     });
-    await expect(
-      adminPb.collection(organisationsCollectionName).create(organisationPayload),
-    ).rejects.toThrow();
+
+    const testFn = async (p: { pb: PocketBase }) => {
+      return p.pb.collection(organisationsCollectionName).create(organisationPayload);
+    };
+    await expect(testFn({ pb: adminPb })).rejects.toThrow();
+    await expect(await testFn({ pb: superadminPb })).toBeTruthy();
   });
+
+  it("PDBP-ORG-CREATE-03 — Global Standard cannot CREATE", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const standardPb = createPbConnection();
+    const standardUserPayload = userPayloadBuilder.forCreateRandomData();
+    await standardPb.collection(usersCollectionName).create(standardUserPayload);
+    await standardPb
+      .collection(usersCollectionName)
+      .authWithPassword(standardUserPayload.email, standardUserPayload.password);
+
+    const organisationPayload = organisationsPayloadBuilder.forCreateData({
+      name: "Test Organisation",
+      description: "Test Description",
+    });
+
+    const testFn = async (p: { pb: PocketBase }) => {
+      return p.pb.collection(organisationsCollectionName).create(organisationPayload);
+    };
+    await expect(testFn({ pb: standardPb })).rejects.toThrow();
+    await expect(await testFn({ pb: superadminPb })).toBeTruthy();
+  });
+
+  // it("PDBP-ORG-SETUP-01 — Verify collection presence and validity is setup correctly", async () => {});
+  // it("PDBP-ORG-SETUP-02 — First user created is given approved admin in organisationUserPermissions", async () => {});
+  // it("PDBP-ORG-SETUP-03 — Organisation creator is provisioned as approved admin for the new organisation", async () => {});
+
+  // it("PDBP-ORG-VIEW-01 — Global Superadmin can VIEW", async () => {});
+  // it("PDBP-ORG-VIEW-02 — Global Admin can VIEW", async () => {});
+  // it("PDBP-ORG-VIEW-03 — Global Standard can VIEW", async () => {});
+  // it("PDBP-ORG-VIEW-04 — Organisation Admin can VIEW", async () => {});
+  // it("PDBP-ORG-VIEW-05 — Organisation Standard can VIEW", async () => {});
+
+  // it("PDBP-ORG-LIST-01 — Global Superadmin can LIST", async () => {});
+  // it("PDBP-ORG-LIST-02 — Global Admin can LIST", async () => {});
+  // it("PDBP-ORG-LIST-03 — Global Standard can LIST", async () => {});
+  // it("PDBP-ORG-LIST-04 — Organisation Admin can LIST", async () => {});
+  // it("PDBP-ORG-LIST-05 — Organisation Standard can LIST", async () => {});
+
+  // it("PDBP-ORG-UPDATE-01 — Global Superadmin can UPDATE", async () => {});
+  // it("PDBP-ORG-UPDATE-02 — Global Admin cannot UPDATE", async () => {});
+  // it("PDBP-ORG-UPDATE-03 — Global Standard cannot UPDATE", async () => {});
+  // it("PDBP-ORG-UPDATE-04 — Organisation Admin (approved) can UPDATE", async () => {});
+  // it("PDBP-ORG-UPDATE-05 — Organisation Admin (pending or blocked) cannot UPDATE", async () => {});
+  // it("PDBP-ORG-UPDATE-06 — Organisation Standard cannot UPDATE", async () => {});
+
+  // it("PDBP-ORG-DELETE-01 — Global Superadmin can DELETE", async () => {});
+  // it("PDBP-ORG-DELETE-02 — Global Admin cannot DELETE", async () => {});
+  // it("PDBP-ORG-DELETE-03 — Global Standard cannot DELETE", async () => {});
+  // it("PDBP-ORG-DELETE-04 — Organisation Admin (approved) can DELETE", async () => {});
+  // it("PDBP-ORG-DELETE-05 — Organisation Admin (pending or blocked) cannot DELETE", async () => {});
+  // it("PDBP-ORG-DELETE-06 — Organisation Standard cannot DELETE", async () => {});
+
+  // it("PDBP-ORG-ISOLATION-CREATE-OTHER-01 — Organisation Admin (approved) cannot CREATE other org", async () => {});
+  // it("PDBP-ORG-ISOLATION-UPDATE-OTHER-01 — Organisation Admin (approved) cannot UPDATE other org", async () => {});
+  // it("PDBP-ORG-ISOLATION-DELETE-OTHER-01 — Organisation Admin (approved) cannot DELETE other org", async () => {});
 });

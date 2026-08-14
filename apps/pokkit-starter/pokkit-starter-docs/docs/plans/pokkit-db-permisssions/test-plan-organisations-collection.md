@@ -130,14 +130,14 @@ Checks that a user with organisation role `standard` cannot DELETE a record in t
 
 ## Organisation isolation tests
 
-### PDBP-ORG-CREATE-OTHER-01 — Organisation Admin (approved) cannot CREATE other org
+### PDBP-ORG-ISOLATION-CREATE-OTHER-01 — Organisation Admin (approved) cannot CREATE other org
 
 Checks that a user with organisation role `admin` and status `approved` cannot CREATE another organisation.
 
-### PDBP-ORG-UPDATE-OTHER-01 — Organisation Admin (approved) cannot UPDATE other org
+### PDBP-ORG-ISOLATION-UPDATE-OTHER-01 — Organisation Admin (approved) cannot UPDATE other org
 
 Checks that a user with organisation role `admin` and status `approved` cannot UPDATE another organisation.
 
-### PDBP-ORG-DELETE-OTHER-01 — Organisation Admin (approved) cannot DELETE other org
+### PDBP-ORG-ISOLATION-DELETE-OTHER-01 — Organisation Admin (approved) cannot DELETE other org
 
 Checks that a user with organisation role `admin` and status `approved` cannot DELETE another organisation.
