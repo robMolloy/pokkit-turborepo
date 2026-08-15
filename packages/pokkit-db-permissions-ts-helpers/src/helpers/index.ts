@@ -43,7 +43,7 @@ export const organisationsPayloadBuilder = {
 export type TOrganisationUserPermissionsRole = "admin" | "standard";
 export type TOrganisationUserPermissionsStatus = "approved" | "pending" | "blocked";
 export type TOrganisationsUserPermissionsCreatePayload = {
-  organisationId: string;
+  orgId: string;
   userId: string;
   role: TOrganisationUserPermissionsRole;
   status: TOrganisationUserPermissionsStatus;
@@ -51,7 +51,7 @@ export type TOrganisationsUserPermissionsCreatePayload = {
 export const organisationsUserPermissionsPayloadBuilder = {
   forCreateData: <T extends TOrganisationsUserPermissionsCreatePayload>(p: T) =>
     ({
-      organisationId: p.organisationId,
+      orgId: p.orgId,
       userId: p.userId,
       role: p.role,
       status: p.status,

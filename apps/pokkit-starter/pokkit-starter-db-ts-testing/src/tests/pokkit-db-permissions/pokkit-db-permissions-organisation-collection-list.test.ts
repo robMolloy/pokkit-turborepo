@@ -1,8 +1,10 @@
 import {
   globalUserPermissionsCollectionName,
   globalUserPermissionsPayloadBuilder,
+  organisationUserPermissionsCollectionName,
   organisationsCollectionName,
   organisationsPayloadBuilder,
+  organisationsUserPermissionsPayloadBuilder,
 } from "@repo/pokkit-db-permissions-ts-helpers";
 import {
   getPbFilePath,
@@ -80,7 +82,8 @@ describe(`${testSuiteName} tests`, () => {
     const organisations = await superadminPb.collection(organisationsCollectionName).getFullList();
     expect(organisations.length).toBe(2);
   });
-  it("PDBP-ORG-LIST-02 — Global Admin can LIST", async () => {
+
+  it("PDBP-ORG-LIST-02 — Global Admin (approved) can LIST", async () => {
     const superadminPb = createPbConnection();
     const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
     await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
@@ -111,7 +114,64 @@ describe(`${testSuiteName} tests`, () => {
     const organisations = await adminPb.collection(organisationsCollectionName).getFullList();
     expect(organisations.length).toBe(2);
   });
-  it("PDBP-ORG-LIST-03 — Global Standard can LIST", async () => {
+
+  it("PDBP-ORG-LIST-03 — Global Admin (pending or blocked) cannot LIST", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const organisation1Payload = organisationsPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(organisationsCollectionName).create(organisation1Payload);
+    const organisation2Payload = organisationsPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(organisationsCollectionName).create(organisation2Payload);
+
+    const pendingAdminPb = createPbConnection();
+    const pendingAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const pendingAdminUserRecord = await pendingAdminPb
+      .collection(usersCollectionName)
+      .create(pendingAdminUserPayload);
+    await pendingAdminPb
+      .collection(usersCollectionName)
+      .authWithPassword(pendingAdminUserPayload.email, pendingAdminUserPayload.password);
+
+    const blockedAdminPb = createPbConnection();
+    const blockedAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const blockedAdminUserRecord = await blockedAdminPb
+      .collection(usersCollectionName)
+      .create(blockedAdminUserPayload);
+    await blockedAdminPb
+      .collection(usersCollectionName)
+      .authWithPassword(blockedAdminUserPayload.email, blockedAdminUserPayload.password);
+
+    await superadminPb.collection(globalUserPermissionsCollectionName).create(
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: pendingAdminUserRecord.id,
+        role: "admin",
+        status: "pending",
+      }),
+    );
+    await superadminPb.collection(globalUserPermissionsCollectionName).create(
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: blockedAdminUserRecord.id,
+        role: "admin",
+        status: "blocked",
+      }),
+    );
+
+    const pendingAdminOrganisations = await pendingAdminPb
+      .collection(organisationsCollectionName)
+      .getFullList();
+    expect(pendingAdminOrganisations.length).toBe(0);
+    const blockedAdminOrganisations = await blockedAdminPb
+      .collection(organisationsCollectionName)
+      .getFullList();
+    expect(blockedAdminOrganisations.length).toBe(0);
+  });
+
+  it("PDBP-ORG-LIST-04 — Global Standard (approved) can LIST", async () => {
     const superadminPb = createPbConnection();
     const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
     await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
@@ -136,7 +196,7 @@ describe(`${testSuiteName} tests`, () => {
     await superadminPb.collection(globalUserPermissionsCollectionName).create(
       globalUserPermissionsPayloadBuilder.forCreateData({
         userId: standardUserRecord.id,
-        role: "admin",
+        role: "standard",
         status: "approved",
       }),
     );
@@ -144,32 +204,313 @@ describe(`${testSuiteName} tests`, () => {
     const organisations = await standardPb.collection(organisationsCollectionName).getFullList();
     expect(organisations.length).toBe(2);
   });
-  it("PDBP-ORG-LIST-04 — Organisation Admin can LIST", async () => {
-    // implied by PDBP-ORG-LIST-01,02,03
+
+  it("PDBP-ORG-LIST-05 — Global Standard (pending or blocked) cannot LIST", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const organisation1Payload = organisationsPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(organisationsCollectionName).create(organisation1Payload);
+    const organisation2Payload = organisationsPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(organisationsCollectionName).create(organisation2Payload);
+
+    const pendingStandardPb = createPbConnection();
+    const pendingStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const pendingStandardUserRecord = await pendingStandardPb
+      .collection(usersCollectionName)
+      .create(pendingStandardUserPayload);
+    await pendingStandardPb
+      .collection(usersCollectionName)
+      .authWithPassword(pendingStandardUserPayload.email, pendingStandardUserPayload.password);
+
+    const blockedStandardPb = createPbConnection();
+    const blockedStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const blockedStandardUserRecord = await blockedStandardPb
+      .collection(usersCollectionName)
+      .create(blockedStandardUserPayload);
+    await blockedStandardPb
+      .collection(usersCollectionName)
+      .authWithPassword(blockedStandardUserPayload.email, blockedStandardUserPayload.password);
+
+    await superadminPb.collection(globalUserPermissionsCollectionName).create(
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: pendingStandardUserRecord.id,
+        role: "standard",
+        status: "pending",
+      }),
+    );
+    await superadminPb.collection(globalUserPermissionsCollectionName).create(
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: blockedStandardUserRecord.id,
+        role: "standard",
+        status: "blocked",
+      }),
+    );
+
+    const pendingStandardOrganisations = await pendingStandardPb
+      .collection(organisationsCollectionName)
+      .getFullList();
+    expect(pendingStandardOrganisations.length).toBe(0);
+    const blockedStandardOrganisations = await blockedStandardPb
+      .collection(organisationsCollectionName)
+      .getFullList();
+    expect(blockedStandardOrganisations.length).toBe(0);
   });
-  it("PDBP-ORG-LIST-05 — Organisation Standard can LIST", async () => {
-    // implied by PDBP-ORG-LIST-01,02,03
-    // CHANGE BEHAVIOUR - NON-APPOROVED SHOULD FAIL
+
+  it("PDBP-ORG-LIST-06 — Organisation Admin (approved) can LIST", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const organisationPayload = organisationsPayloadBuilder.forCreateRandomData();
+    const organisationRecord = await superadminPb
+      .collection(organisationsCollectionName)
+      .create(organisationPayload);
+    const otherOrganisationPayload = organisationsPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(organisationsCollectionName).create(otherOrganisationPayload);
+
+    const pendingOrgAdminPb = createPbConnection();
+    const pendingOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const pendingOrgAdminUserRecord = await pendingOrgAdminPb
+      .collection(usersCollectionName)
+      .create(pendingOrgAdminUserPayload);
+    await pendingOrgAdminPb
+      .collection(usersCollectionName)
+      .authWithPassword(pendingOrgAdminUserPayload.email, pendingOrgAdminUserPayload.password);
+
+    const approvedOrgAdminPb = createPbConnection();
+    const approvedOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const approvedOrgAdminUserRecord = await approvedOrgAdminPb
+      .collection(usersCollectionName)
+      .create(approvedOrgAdminUserPayload);
+    await approvedOrgAdminPb
+      .collection(usersCollectionName)
+      .authWithPassword(approvedOrgAdminUserPayload.email, approvedOrgAdminUserPayload.password);
+
+    const blockedOrgAdminPb = createPbConnection();
+    const blockedOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const blockedOrgAdminUserRecord = await blockedOrgAdminPb
+      .collection(usersCollectionName)
+      .create(blockedOrgAdminUserPayload);
+    await blockedOrgAdminPb
+      .collection(usersCollectionName)
+      .authWithPassword(blockedOrgAdminUserPayload.email, blockedOrgAdminUserPayload.password);
+
+    await superadminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationsUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: pendingOrgAdminUserRecord.id,
+        role: "admin",
+        status: "pending",
+      }),
+    );
+    await superadminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationsUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: approvedOrgAdminUserRecord.id,
+        role: "admin",
+        status: "approved",
+      }),
+    );
+    await superadminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationsUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: blockedOrgAdminUserRecord.id,
+        role: "admin",
+        status: "blocked",
+      }),
+    );
+
+    const approvedOrgAdminOrganisations = await approvedOrgAdminPb
+      .collection(organisationsCollectionName)
+      .getFullList();
+    expect(approvedOrgAdminOrganisations.length).toBe(1);
+    expect(approvedOrgAdminOrganisations[0]?.id).toBe(organisationRecord.id);
   });
 
-  // it("PDBP-ORG-UPDATE-01 — Global Superadmin can UPDATE", async () => {});
-  // it("PDBP-ORG-UPDATE-02 — Global Admin cannot UPDATE", async () => {});
-  // it("PDBP-ORG-UPDATE-03 — Global Standard cannot UPDATE", async () => {});
-  // it("PDBP-ORG-UPDATE-04 — Organisation Admin (approved) can UPDATE", async () => {});
-  // it("PDBP-ORG-UPDATE-05 — Organisation Admin (pending or blocked) cannot UPDATE", async () => {});
-  // it("PDBP-ORG-UPDATE-06 — Organisation Standard cannot UPDATE", async () => {});
+  it("PDBP-ORG-LIST-07 — Organisation Standard (pending or blocked) cannot LIST", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
-  // it("PDBP-ORG-SETUP-01 — Verify collection presence and validity is setup correctly", async () => {});
-  // it("PDBP-ORG-SETUP-02 — First user created is given approved admin in organisationUserPermissions", async () => {});
-  // it("PDBP-ORG-SETUP-03 — Organisation creator is provisioned as approved admin for the new organisation", async () => {});
+    const organisationPayload = organisationsPayloadBuilder.forCreateRandomData();
+    const organisationRecord = await superadminPb
+      .collection(organisationsCollectionName)
+      .create(organisationPayload);
+    const otherOrganisationPayload = organisationsPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(organisationsCollectionName).create(otherOrganisationPayload);
 
-  // it("PDBP-ORG-VIEW-01 — Global Superadmin can VIEW", async () => {});
-  // it("PDBP-ORG-VIEW-02 — Global Admin can VIEW", async () => {});
-  // it("PDBP-ORG-VIEW-03 — Global Standard can VIEW", async () => {});
-  // it("PDBP-ORG-VIEW-04 — Organisation Admin can VIEW", async () => {});
-  // it("PDBP-ORG-VIEW-05 — Organisation Standard can VIEW", async () => {});
+    const pendingOrgAdminPb = createPbConnection();
+    const pendingOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const pendingOrgAdminUserRecord = await pendingOrgAdminPb
+      .collection(usersCollectionName)
+      .create(pendingOrgAdminUserPayload);
+    await pendingOrgAdminPb
+      .collection(usersCollectionName)
+      .authWithPassword(pendingOrgAdminUserPayload.email, pendingOrgAdminUserPayload.password);
 
-  // it("PDBP-ORG-ISOLATION-CREATE-OTHER-01 — Organisation Admin (approved) cannot CREATE other org", async () => {});
-  // it("PDBP-ORG-ISOLATION-UPDATE-OTHER-01 — Organisation Admin (approved) cannot UPDATE other org", async () => {});
-  // it("PDBP-ORG-ISOLATION-DELETE-OTHER-01 — Organisation Admin (approved) cannot DELETE other org", async () => {});
+    const approvedOrgAdminPb = createPbConnection();
+    const approvedOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const approvedOrgAdminUserRecord = await approvedOrgAdminPb
+      .collection(usersCollectionName)
+      .create(approvedOrgAdminUserPayload);
+    await approvedOrgAdminPb
+      .collection(usersCollectionName)
+      .authWithPassword(approvedOrgAdminUserPayload.email, approvedOrgAdminUserPayload.password);
+
+    const blockedOrgAdminPb = createPbConnection();
+    const blockedOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const blockedOrgAdminUserRecord = await blockedOrgAdminPb
+      .collection(usersCollectionName)
+      .create(blockedOrgAdminUserPayload);
+    await blockedOrgAdminPb
+      .collection(usersCollectionName)
+      .authWithPassword(blockedOrgAdminUserPayload.email, blockedOrgAdminUserPayload.password);
+
+    await superadminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationsUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: pendingOrgAdminUserRecord.id,
+        role: "admin",
+        status: "pending",
+      }),
+    );
+    await superadminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationsUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: approvedOrgAdminUserRecord.id,
+        role: "admin",
+        status: "approved",
+      }),
+    );
+    await superadminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationsUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: blockedOrgAdminUserRecord.id,
+        role: "admin",
+        status: "blocked",
+      }),
+    );
+
+    const pendingOrgAdminOrganisations = await pendingOrgAdminPb
+      .collection(organisationsCollectionName)
+      .getFullList();
+    expect(pendingOrgAdminOrganisations.length).toBe(0);
+    const blockedOrgAdminOrganisations = await blockedOrgAdminPb
+      .collection(organisationsCollectionName)
+      .getFullList();
+    expect(blockedOrgAdminOrganisations.length).toBe(0);
+  });
+
+  it("PDBP-ORG-LIST-08 — Organisation Standard (approved) can LIST", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const organisationPayload = organisationsPayloadBuilder.forCreateRandomData();
+    const organisationRecord = await superadminPb
+      .collection(organisationsCollectionName)
+      .create(organisationPayload);
+    const otherOrganisationPayload = organisationsPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(organisationsCollectionName).create(otherOrganisationPayload);
+
+    const orgStandardPb = createPbConnection();
+    const orgStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const orgStandardUserRecord = await orgStandardPb
+      .collection(usersCollectionName)
+      .create(orgStandardUserPayload);
+    await orgStandardPb
+      .collection(usersCollectionName)
+      .authWithPassword(orgStandardUserPayload.email, orgStandardUserPayload.password);
+
+    await superadminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationsUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: orgStandardUserRecord.id,
+        role: "standard",
+        status: "approved",
+      }),
+    );
+
+    const organisations = await orgStandardPb.collection(organisationsCollectionName).getFullList();
+    expect(organisations.length).toBe(1);
+    expect(organisations[0]).toMatchObject(organisationPayload);
+  });
+
+  it("PDBP-ORG-LIST-09 — Organisation Standard (pending or blocked) cannot LIST", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const organisationPayload = organisationsPayloadBuilder.forCreateRandomData();
+    const organisationRecord = await superadminPb
+      .collection(organisationsCollectionName)
+      .create(organisationPayload);
+
+    const pendingOrgStandardPb = createPbConnection();
+    const pendingOrgStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const pendingOrgStandardUserRecord = await pendingOrgStandardPb
+      .collection(usersCollectionName)
+      .create(pendingOrgStandardUserPayload);
+    await pendingOrgStandardPb
+      .collection(usersCollectionName)
+      .authWithPassword(
+        pendingOrgStandardUserPayload.email,
+        pendingOrgStandardUserPayload.password,
+      );
+
+    const blockedOrgStandardPb = createPbConnection();
+    const blockedOrgStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const blockedOrgStandardUserRecord = await blockedOrgStandardPb
+      .collection(usersCollectionName)
+      .create(blockedOrgStandardUserPayload);
+    await blockedOrgStandardPb
+      .collection(usersCollectionName)
+      .authWithPassword(
+        blockedOrgStandardUserPayload.email,
+        blockedOrgStandardUserPayload.password,
+      );
+
+    await superadminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationsUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: pendingOrgStandardUserRecord.id,
+        role: "standard",
+        status: "pending",
+      }),
+    );
+    await superadminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationsUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: blockedOrgStandardUserRecord.id,
+        role: "standard",
+        status: "blocked",
+      }),
+    );
+
+    const pendingOrgStandardOrganisations = await pendingOrgStandardPb
+      .collection(organisationsCollectionName)
+      .getFullList();
+    expect(pendingOrgStandardOrganisations.length).toBe(0);
+    const blockedOrgStandardOrganisations = await blockedOrgStandardPb
+      .collection(organisationsCollectionName)
+      .getFullList();
+    expect(blockedOrgStandardOrganisations.length).toBe(0);
+  });
 });

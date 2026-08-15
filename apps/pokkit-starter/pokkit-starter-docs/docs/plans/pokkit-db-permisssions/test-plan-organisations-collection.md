@@ -40,25 +40,41 @@ Checks that a user with global user permissions role `standard` cannot CREATE a 
 
 Checks that a user with global user permissions role `superadmin` can VIEW a record in the `organisations` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-ORG-VIEW-02 — Global Admin can VIEW
+### PDBP-ORG-VIEW-02 — Global Admin (approved) can VIEW
 
-Checks that a user with global user permissions role `admin` can VIEW a record in the `organisations` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `admin` and status `approved` can VIEW a record in the `organisations` collection.
 
-### PDBP-ORG-VIEW-03 — Global Standard can VIEW
+### PDBP-ORG-VIEW-03 — Global Admin (pending or blocked) cannot VIEW
 
-Checks that a user with global user permissions role `standard` can VIEW a record in the `organisations` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot VIEW a record in the `organisations` collection.
+
+### PDBP-ORG-VIEW-04 — Global Standard (approved) can VIEW
+
+Checks that a user with global user permissions role `standard` and status `approved` can VIEW a record in the `organisations` collection.
+
+### PDBP-ORG-VIEW-05 — Global Standard (pending or blocked) cannot VIEW
+
+Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot VIEW a record in the `organisations` collection.
 
 ### PDBP-ORG-LIST-01 — Global Superadmin can LIST
 
 Checks that a user with global user permissions role `superadmin` can LIST records in the `organisations` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-ORG-LIST-02 — Global Admin can LIST
+### PDBP-ORG-LIST-02 — Global Admin (approved) can LIST
 
-Checks that a user with global user permissions role `admin` can LIST records in the `organisations` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `admin` and status `approved` can LIST records in the `organisations` collection.
 
-### PDBP-ORG-LIST-03 — Global Standard can LIST
+### PDBP-ORG-LIST-03 — Global Admin (pending or blocked) cannot LIST
 
-Checks that a user with global user permissions role `standard` can LIST records in the `organisations` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot LIST records in the `organisations` collection.
+
+### PDBP-ORG-LIST-04 — Global Standard (approved) can LIST
+
+Checks that a user with global user permissions role `standard` and status `approved` can LIST records in the `organisations` collection.
+
+### PDBP-ORG-LIST-05 — Global Standard (pending or blocked) cannot LIST
+
+Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot LIST records in the `organisations` collection.
 
 ### PDBP-ORG-UPDATE-01 — Global Superadmin can UPDATE
 
@@ -88,21 +104,33 @@ Checks that a user with global user permissions role `standard` cannot DELETE a 
 
 Organisation role CREATE is N/A and is not tested.
 
-### PDBP-ORG-VIEW-04 — Organisation Admin can VIEW
+### PDBP-ORG-VIEW-06 — Organisation Admin can VIEW
 
 Checks that a user with organisation role `admin` can VIEW a record in the `organisations` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-ORG-VIEW-05 — Organisation Standard can VIEW
+### PDBP-ORG-VIEW-07 — Organisation Standard (approved) can VIEW
 
-Checks that a user with organisation role `standard` can VIEW a record in the `organisations` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with organisation role `standard` and status `approved` can VIEW a record in the `organisations` collection.
 
-### PDBP-ORG-LIST-04 — Organisation Admin can LIST
+### PDBP-ORG-VIEW-08 — Organisation Standard (pending or blocked) cannot VIEW
+
+Checks that a user with organisation role `standard` and status `pending` or `blocked` cannot VIEW a record in the `organisations` collection.
+
+### PDBP-ORG-LIST-06 — Organisation Admin (approved) can LIST
 
 Checks that a user with organisation role `admin` can LIST records in the `organisations` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-ORG-LIST-05 — Organisation Standard can LIST
+### PDBP-ORG-LIST-07 — Organisation Standard (pending or blocked) cannot LIST
 
-Checks that a user with organisation role `standard` can LIST records in the `organisations` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with organisation role `standard` and status `pending` or `blocked` cannot LIST records in the `organisations` collection.
+
+### PDBP-ORG-LIST-08 — Organisation Standard (approved) can LIST
+
+Checks that a user with organisation role `standard` and status `approved` can LIST records in the `organisations` collection.
+
+### PDBP-ORG-LIST-08 — Organisation Standard (pending or blocked) cannot LIST
+
+Checks that a user with organisation role `standard` and status `pending` or `blocked` cannot LIST records in the `organisations` collection.
 
 ### PDBP-ORG-UPDATE-04 — Organisation Admin (approved) can UPDATE
 

@@ -192,7 +192,7 @@ describe(`${testSuiteName} tests`, () => {
 
     const orgAdminOrganisationsUserPermissionsPayload =
       organisationsUserPermissionsPayloadBuilder.forCreateData({
-        organisationId: organisationRecord.id,
+        orgId: organisationRecord.id,
         userId: orgAdminUserRecord.id,
         role: "admin",
         status: "approved",
@@ -234,7 +234,7 @@ describe(`${testSuiteName} tests`, () => {
 
     const pendingOrgAdminOrganisationsUserPermissionsPayload =
       organisationsUserPermissionsPayloadBuilder.forCreateData({
-        organisationId: organisationRecord.id,
+        orgId: organisationRecord.id,
         userId: pendingOrgAdminUserRecord.id,
         role: "admin",
         status: "pending",
@@ -254,7 +254,7 @@ describe(`${testSuiteName} tests`, () => {
 
     const blockedOrgAdminOrganisationsUserPermissionsPayload =
       organisationsUserPermissionsPayloadBuilder.forCreateData({
-        organisationId: organisationRecord.id,
+        orgId: organisationRecord.id,
         userId: blockedOrgAdminUserRecord.id,
         role: "admin",
         status: "blocked",
@@ -298,7 +298,7 @@ describe(`${testSuiteName} tests`, () => {
 
     const orgStandardOrganisationsUserPermissionsPayload =
       organisationsUserPermissionsPayloadBuilder.forCreateData({
-        organisationId: organisationRecord.id,
+        orgId: organisationRecord.id,
         userId: orgStandardUserRecord.id,
         role: "standard",
         status: "approved",

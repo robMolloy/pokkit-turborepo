@@ -83,21 +83,21 @@ The creator of the organisation is provisioned as an approved admin in the `orga
 | **Super Admin** | Pending  |   ✅   |  ✅  |  ✅  |   ✅   |   ✅   |
 | _"_             | Approved |   ✅   |  ✅  |  ✅  |   ✅   |   ✅   |
 | _"_             | Blocked  |   ✅   |  ✅  |  ✅  |   ✅   |   ✅   |
-| **Admin**       | Pending  |   ❌   |  ✅  |  ✅  |   ❌   |   ❌   |
+| **Admin**       | Pending  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
 | _"_             | Approved |   ❌   |  ✅  |  ✅  |   ❌   |   ❌   |
-| _"_             | Blocked  |   ❌   |  ✅  |  ✅  |   ❌   |   ❌   |
-| **Standard**    | Pending  |   ❌   |  ✅  |  ✅  |   ❌   |   ❌   |
+| _"_             | Blocked  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
+| **Standard**    | Pending  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
 | _"_             | Approved |   ❌   |  ✅  |  ✅  |   ❌   |   ❌   |
-| _"_             | Blocked  |   ❌   |  ✅  |  ✅  |   ❌   |   ❌   |
+| _"_             | Blocked  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
 
 | Organisation Role | Status   | Create | View | List | Update | Delete |
 | ----------------- | -------- | :----: | :--: | :--: | :----: | :----: |
 | **Admin**         | Pending  |  N/A   |  ✅  |  ✅  |   ❌   |   ❌   |
 | _"_               | Approved |  N/A   |  ✅  |  ✅  |   ✅   |   ✅   |
 | _"_               | Blocked  |  N/A   |  ✅  |  ✅  |   ❌   |   ❌   |
-| **Standard**      | Pending  |  N/A   |  ✅  |  ✅  |   ❌   |   ❌   |
+| **Standard**      | Pending  |  N/A   |  ❌  |  ❌  |   ❌   |   ❌   |
 | _"_               | Approved |  N/A   |  ✅  |  ✅  |   ❌   |   ❌   |
-| _"_               | Blocked  |  N/A   |  ✅  |  ✅  |   ❌   |   ❌   |
+| _"_               | Blocked  |  N/A   |  ❌  |  ❌  |   ❌   |   ❌   |
 
 N/A = Not Applicable - If the organisation does not exist, a user cannot be part of that organisation so a CREATE action by a member of that organisation does not make sense
 
