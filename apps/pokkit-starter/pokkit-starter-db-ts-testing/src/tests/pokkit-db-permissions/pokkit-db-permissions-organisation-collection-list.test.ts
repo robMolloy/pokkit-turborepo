@@ -1,4 +1,10 @@
 import {
+  globalUserPermissionsCollectionName,
+  globalUserPermissionsPayloadBuilder,
+  organisationsCollectionName,
+  organisationsPayloadBuilder,
+} from "@repo/pokkit-db-permissions-ts-helpers";
+import {
   getPbFilePath,
   getPbServeUrl,
   killPbInstance,
@@ -11,17 +17,9 @@ import {
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../../config/pocketbaseConfig";
+import { userPayloadBuilder } from "../../utils/pocketbaseUserHelpers";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_constants";
 import { pokkitDbPermissionsTestsMetadata } from "./_pokkitDbConfigSyncTestsMetadata";
-import { userPayloadBuilder } from "../../utils/pocketbaseUserHelpers";
-import {
-  globalUserPermissionsPayloadBuilder,
-  organisationsPayloadBuilder,
-  organisationUserPermissionsCollectionName,
-  organisationsUserPermissionsPayloadBuilder,
-  organisationsCollectionName,
-  globalUserPermissionsCollectionName,
-} from "@repo/pokkit-db-permissions-ts-helpers";
 
 const testMetadata =
   pokkitDbPermissionsTestsMetadata.pokkitDbPermissionsOrganisationsCollectionCreate;
@@ -73,15 +71,10 @@ describe(`${testSuiteName} tests`, () => {
       .collection(usersCollectionName)
       .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
-    const organisation1Payload = organisationsPayloadBuilder.forCreateData({
-      name: "Test Organisation 1",
-      description: "Test Description 1",
-    });
+    const organisation1Payload = organisationsPayloadBuilder.forCreateRandomData();
     await superadminPb.collection(organisationsCollectionName).create(organisation1Payload);
-    const organisation2Payload = organisationsPayloadBuilder.forCreateData({
-      name: "Test Organisation 2",
-      description: "Test Description 2",
-    });
+
+    const organisation2Payload = organisationsPayloadBuilder.forCreateRandomData();
     await superadminPb.collection(organisationsCollectionName).create(organisation2Payload);
 
     const organisations = await superadminPb.collection(organisationsCollectionName).getFullList();
@@ -95,15 +88,9 @@ describe(`${testSuiteName} tests`, () => {
       .collection(usersCollectionName)
       .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
-    const organisation1Payload = organisationsPayloadBuilder.forCreateData({
-      name: "Test Organisation 1",
-      description: "Test Description 1",
-    });
+    const organisation1Payload = organisationsPayloadBuilder.forCreateRandomData();
     await superadminPb.collection(organisationsCollectionName).create(organisation1Payload);
-    const organisation2Payload = organisationsPayloadBuilder.forCreateData({
-      name: "Test Organisation 2",
-      description: "Test Description 2",
-    });
+    const organisation2Payload = organisationsPayloadBuilder.forCreateRandomData();
     await superadminPb.collection(organisationsCollectionName).create(organisation2Payload);
 
     const adminPb = createPbConnection();
@@ -132,15 +119,9 @@ describe(`${testSuiteName} tests`, () => {
       .collection(usersCollectionName)
       .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
-    const organisation1Payload = organisationsPayloadBuilder.forCreateData({
-      name: "Test Organisation 1",
-      description: "Test Description 1",
-    });
+    const organisation1Payload = organisationsPayloadBuilder.forCreateRandomData();
     await superadminPb.collection(organisationsCollectionName).create(organisation1Payload);
-    const organisation2Payload = organisationsPayloadBuilder.forCreateData({
-      name: "Test Organisation 2",
-      description: "Test Description 2",
-    });
+    const organisation2Payload = organisationsPayloadBuilder.forCreateRandomData();
     await superadminPb.collection(organisationsCollectionName).create(organisation2Payload);
 
     const standardPb = createPbConnection();

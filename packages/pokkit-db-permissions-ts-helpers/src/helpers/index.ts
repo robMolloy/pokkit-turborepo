@@ -26,11 +26,20 @@ export type TOrganisationsCreatePayload = {
   name: string;
   description: string;
 };
-export const organisationsPayloadBuilder = {
+const organisationsPayloadBuilderInit = {
   forCreateData: <T extends TOrganisationsCreatePayload>(p: T) =>
     ({ name: p.name, description: p.description }) as T,
 };
-
+export const organisationsPayloadBuilder = {
+  ...organisationsPayloadBuilderInit,
+  forCreateRandomData: () => {
+    const randomNumber = Math.floor(Math.random() * 1000000000000000000);
+    return organisationsPayloadBuilderInit.forCreateData({
+      name: `Org ${randomNumber}`,
+      description: `Desc ${randomNumber}`,
+    });
+  },
+};
 export type TOrganisationUserPermissionsRole = "admin" | "standard";
 export type TOrganisationUserPermissionsStatus = "approved" | "pending" | "blocked";
 export type TOrganisationsUserPermissionsCreatePayload = {
