@@ -55,4 +55,8 @@ export const pokkitDbPermissionsTestsMetadata = {
     portNumber: 8402,
     name: "pokkitDbPermissionsOrganisationsCollectionList",
   },
+  pokkitDbPermissionsOrganisationsCollectionView: {
+    portNumber: 8403,
+    name: "pokkitDbPermissionsOrganisationsCollectionView",
+  },
 } as const satisfies { [k: string]: { portNumber: number; name: string } };

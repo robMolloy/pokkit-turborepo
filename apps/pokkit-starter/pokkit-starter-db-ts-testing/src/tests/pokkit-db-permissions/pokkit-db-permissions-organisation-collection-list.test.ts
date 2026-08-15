@@ -335,7 +335,7 @@ describe(`${testSuiteName} tests`, () => {
     expect(approvedOrgAdminOrganisations[0]?.id).toBe(organisationRecord.id);
   });
 
-  it("PDBP-ORG-LIST-07 — Organisation Standard (pending or blocked) cannot LIST", async () => {
+  it("PDBP-ORG-LIST-07 — Organisation Admin (pending or blocked) can LIST", async () => {
     const superadminPb = createPbConnection();
     const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
     await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
@@ -359,14 +359,14 @@ describe(`${testSuiteName} tests`, () => {
       .collection(usersCollectionName)
       .authWithPassword(pendingOrgAdminUserPayload.email, pendingOrgAdminUserPayload.password);
 
-    const approvedOrgAdminPb = createPbConnection();
-    const approvedOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
-    const approvedOrgAdminUserRecord = await approvedOrgAdminPb
-      .collection(usersCollectionName)
-      .create(approvedOrgAdminUserPayload);
-    await approvedOrgAdminPb
-      .collection(usersCollectionName)
-      .authWithPassword(approvedOrgAdminUserPayload.email, approvedOrgAdminUserPayload.password);
+    await superadminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationsUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: pendingOrgAdminUserRecord.id,
+        role: "admin",
+        status: "pending",
+      }),
+    );
 
     const blockedOrgAdminPb = createPbConnection();
     const blockedOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -380,36 +380,20 @@ describe(`${testSuiteName} tests`, () => {
     await superadminPb.collection(organisationUserPermissionsCollectionName).create(
       organisationsUserPermissionsPayloadBuilder.forCreateData({
         orgId: organisationRecord.id,
-        userId: pendingOrgAdminUserRecord.id,
-        role: "admin",
-        status: "pending",
-      }),
-    );
-    await superadminPb.collection(organisationUserPermissionsCollectionName).create(
-      organisationsUserPermissionsPayloadBuilder.forCreateData({
-        orgId: organisationRecord.id,
-        userId: approvedOrgAdminUserRecord.id,
-        role: "admin",
-        status: "approved",
-      }),
-    );
-    await superadminPb.collection(organisationUserPermissionsCollectionName).create(
-      organisationsUserPermissionsPayloadBuilder.forCreateData({
-        orgId: organisationRecord.id,
         userId: blockedOrgAdminUserRecord.id,
         role: "admin",
         status: "blocked",
       }),
     );
 
-    const pendingOrgAdminOrganisations = await pendingOrgAdminPb
-      .collection(organisationsCollectionName)
-      .getFullList();
-    expect(pendingOrgAdminOrganisations.length).toBe(0);
-    const blockedOrgAdminOrganisations = await blockedOrgAdminPb
-      .collection(organisationsCollectionName)
-      .getFullList();
-    expect(blockedOrgAdminOrganisations.length).toBe(0);
+    const listOrganisationsTestFn = async ({ pb }: { pb: PocketBase }) =>
+      pb.collection(organisationsCollectionName).getFullList();
+
+    const pendingOrgAdminOrganisations = await listOrganisationsTestFn({ pb: pendingOrgAdminPb });
+    expect(pendingOrgAdminOrganisations[0]).toMatchObject(organisationPayload);
+
+    const blockedOrgAdminOrganisations = await listOrganisationsTestFn({ pb: blockedOrgAdminPb });
+    expect(blockedOrgAdminOrganisations[0]).toMatchObject(organisationPayload);
   });
 
   it("PDBP-ORG-LIST-08 — Organisation Standard (approved) can LIST", async () => {
