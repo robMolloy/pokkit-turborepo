@@ -1033,9 +1033,9 @@
   {
     "id": "pbc_1053844701",
     "listRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= id\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= id",
-    "viewRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= id\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= id",
+    "viewRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= id\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= id\n",
     "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"",
-    "updateRule": null,
+    "updateRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"",
     "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\n",
     "name": "organisations",
     "type": "base",
@@ -1110,7 +1110,7 @@
       "CREATE UNIQUE INDEX `idx_l5jn9kiytc` ON `organisations` (`name`)"
     ],
     "created": "2026-08-12 11:07:59.731Z",
-    "updated": "2026-08-15 07:52:40.554Z",
+    "updated": "2026-08-15 21:37:57.224Z",
     "system": false
   },
   {
