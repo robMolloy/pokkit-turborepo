@@ -24,7 +24,7 @@ import {
 } from "@repo/pokkit-db-permissions-ts-helpers";
 
 const testMetadata =
-  pokkitDbPermissionsTestsMetadata.pokkitDbPermissionsOrganisationsCollectionCreate;
+  pokkitDbPermissionsTestsMetadata.pokkitDbPermissionsOrganisationsCollectionDelete;
 const testSuiteName = testMetadata.name;
 
 const pbPortNumber = testMetadata.portNumber;

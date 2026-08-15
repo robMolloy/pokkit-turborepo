@@ -24,7 +24,7 @@ import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_c
 import { pokkitDbPermissionsTestsMetadata } from "./_pokkitDbConfigSyncTestsMetadata";
 
 const testMetadata =
-  pokkitDbPermissionsTestsMetadata.pokkitDbPermissionsOrganisationsCollectionCreate;
+  pokkitDbPermissionsTestsMetadata.pokkitDbPermissionsOrganisationsCollectionList;
 const testSuiteName = testMetadata.name;
 
 const pbPortNumber = testMetadata.portNumber;
