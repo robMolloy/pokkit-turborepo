@@ -14,13 +14,9 @@ Each test is given a tag in the following format. PDBP-{COLLECTION}-{ACTION}-{NN
 
 Checks that the default `organisations` collection from the database after plugin initialization is present and set up correctly.
 
-### PDBP-ORG-SETUP-02 — First user created is given approved admin in organisationUserPermissions
+### PDBP-ORG-SETUP-02 — Organisation creator becomes approved admin in organisationUserPermissions
 
-Checks that the first user created is given an approved admin record in the `organisationUserPermissions` collection.
-
-### PDBP-ORG-SETUP-03 — Organisation creator is provisioned as approved admin for the new organisation
-
-Checks that the creator of the organisation is provisioned as an approved admin in the `organisationUserPermissions` collection for the new organisation.
+The user who creates the organisation becomes an approved admin in the `organisationUserPermissions` collection for the new organisation.
 
 ## Global role permissions tests
 

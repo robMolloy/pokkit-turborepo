@@ -4,6 +4,8 @@ import (
 	"log"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
+
+	"github.com/pocketbase/pocketbase/core"
 )
 
 func BindFunctions(app pbCore.App) {
@@ -24,5 +26,17 @@ func BindFunctions(app pbCore.App) {
 		}
 
 		return e.Next()
+	})
+
+	app.OnRecordCreateRequest(organisationsCollectionName).BindFunc(func(e *core.RecordRequestEvent) error {
+
+		e.Next()
+		userId := e.Auth.GetString("id")
+		organisationId := e.Record.Id
+		err := ElevateOrgCreatorToOrgAdmin(e.App, userId, organisationId)
+		if err != nil {
+			log.Fatal("Error elevating org creator to admin in OnRecordCreateRequest: %w", err)
+		}
+		return nil
 	})
 }

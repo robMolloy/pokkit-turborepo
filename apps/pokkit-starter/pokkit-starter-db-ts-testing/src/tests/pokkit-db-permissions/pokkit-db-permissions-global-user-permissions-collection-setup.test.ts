@@ -64,8 +64,9 @@ describe(`${testSuiteName} tests`, () => {
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
 
-    const globalUserPermissionsCollection = superuserPb.collection(
-      globalUserPermissionsCollectionName,
+    const collections = await superuserPb.collections.getFullList();
+    const globalUserPermissionsCollection = collections.find(
+      (c) => c.name === globalUserPermissionsCollectionName,
     );
 
     expect(globalUserPermissionsCollection).toBeTruthy();
