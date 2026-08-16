@@ -6,8 +6,6 @@ This plan covers required tests for the Pokkit Db Permissions plugin:
 
 Each test is given a tag in the following format. PDBP-{COLLECTION}-{ACTION}-{NN} In order to track the tests more easily.
 
-Organisation role CREATE and CREATE OWN are N/A and are not tested. If the organisation does not exist, a user cannot be part of that organisation, so a CREATE action by a member of that organisation does not make sense.
-
 ---
 
 ## Organisation User Permissions collection setup tests
@@ -34,6 +32,18 @@ Checks that a user with global user permissions role `admin` cannot CREATE a rec
 
 Checks that a user with global user permissions role `standard` cannot CREATE a record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
+### PDBP-OUP-CREATE-05 — Organisation Admin (approved) can CREATE
+
+Checks that a user with organisation role `admin` and status `approved` can CREATE a record in the `organisationUserPermissions` collection.
+
+### PDBP-OUP-CREATE-06 — Organisation Admin (pending or blocked) cannot CREATE
+
+Checks that a user with organisation role `admin` and status `pending` or `blocked` cannot CREATE a record in the `organisationUserPermissions` collection.
+
+### PDBP-OUP-CREATE-07 — Organisation Standard cannot CREATE
+
+Checks that a user with organisation role `standard` cannot CREATE a record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
 ## CREATE OWN tests
 
 ### PDBP-OUP-CREATE-OWN-01 — Global Superadmin cannot CREATE OWN
@@ -47,6 +57,14 @@ Checks that a user with global user permissions role `admin` cannot CREATE their
 ### PDBP-OUP-CREATE-OWN-03 — Global Standard cannot CREATE OWN
 
 Checks that a user with global user permissions role `standard` cannot CREATE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
+### PDBP-OUP-CREATE-OWN-04 — Organisation Admin cannot CREATE OWN
+
+Checks that a user with organisation role `admin` cannot CREATE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
+### PDBP-OUP-CREATE-OWN-05 — Organisation Standard cannot CREATE OWN
+
+Checks that a user with organisation role `standard` cannot CREATE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
 ## VIEW tests
 
@@ -279,3 +297,27 @@ Checks that a user with organisation role `admin` cannot DELETE their own record
 ### PDBP-OUP-DELETE-OWN-05 — Organisation Standard cannot DELETE OWN
 
 Checks that a user with organisation role `standard` cannot DELETE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+
+## Organisation isolation tests
+
+Check that a member of an organisation can only create, view, list, update, and delete `organisationUserPermissions` records for their own organisation and not other organisations.
+
+### PDBP-OUP-ISOLATION-CREATE-OTHER-01 — Organisation Admin (approved) cannot CREATE a permission for another org
+
+Checks that a user with organisation role `admin` and status `approved` cannot CREATE a record in the `organisationUserPermissions` collection for another organisation.
+
+### PDBP-OUP-ISOLATION-VIEW-OTHER-01 — Organisation Admin (approved) cannot VIEW a permission for another org
+
+Checks that a user with organisation role `admin` and status `approved` cannot VIEW a record in the `organisationUserPermissions` collection for another organisation.
+
+### PDBP-OUP-ISOLATION-LIST-OTHER-01 — Organisation Admin (approved) cannot LIST permissions for another org
+
+Checks that a user with organisation role `admin` and status `approved` cannot LIST records in the `organisationUserPermissions` collection for another organisation.
+
+### PDBP-OUP-ISOLATION-UPDATE-OTHER-01 — Organisation Admin (approved) cannot UPDATE a permission for another org
+
+Checks that a user with organisation role `admin` and status `approved` cannot UPDATE a record in the `organisationUserPermissions` collection for another organisation.
+
+### PDBP-OUP-ISOLATION-DELETE-OTHER-01 — Organisation Admin (approved) cannot DELETE a permission for another org
+
+Checks that a user with organisation role `admin` and status `approved` cannot DELETE a record in the `organisationUserPermissions` collection for another organisation.

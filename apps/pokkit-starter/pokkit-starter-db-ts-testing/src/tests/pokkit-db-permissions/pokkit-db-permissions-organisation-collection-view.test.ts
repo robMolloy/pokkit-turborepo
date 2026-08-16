@@ -19,7 +19,7 @@ import {
   globalUserPermissionsPayloadBuilder,
   organisationsCollectionName,
   organisationsPayloadBuilder,
-  organisationsUserPermissionsPayloadBuilder,
+  organisationUserPermissionsPayloadBuilder,
   organisationUserPermissionsCollectionName,
 } from "@repo/pokkit-db-permissions-ts-helpers";
 
@@ -299,7 +299,7 @@ describe(`${testSuiteName} tests`, () => {
       .authWithPassword(blockedOrgAdminUserPayload.email, blockedOrgAdminUserPayload.password);
 
     await superadminPb.collection(organisationUserPermissionsCollectionName).create(
-      organisationsUserPermissionsPayloadBuilder.forCreateData({
+      organisationUserPermissionsPayloadBuilder.forCreateData({
         orgId: organisationRecord.id,
         userId: pendingOrgAdminUserRecord.id,
         role: "admin",
@@ -307,7 +307,7 @@ describe(`${testSuiteName} tests`, () => {
       }),
     );
     await superadminPb.collection(organisationUserPermissionsCollectionName).create(
-      organisationsUserPermissionsPayloadBuilder.forCreateData({
+      organisationUserPermissionsPayloadBuilder.forCreateData({
         orgId: organisationRecord.id,
         userId: approvedOrgAdminUserRecord.id,
         role: "admin",
@@ -315,7 +315,7 @@ describe(`${testSuiteName} tests`, () => {
       }),
     );
     await superadminPb.collection(organisationUserPermissionsCollectionName).create(
-      organisationsUserPermissionsPayloadBuilder.forCreateData({
+      organisationUserPermissionsPayloadBuilder.forCreateData({
         orgId: organisationRecord.id,
         userId: blockedOrgAdminUserRecord.id,
         role: "admin",
@@ -360,7 +360,7 @@ describe(`${testSuiteName} tests`, () => {
       .authWithPassword(orgStandardUserPayload.email, orgStandardUserPayload.password);
 
     await superadminPb.collection(organisationUserPermissionsCollectionName).create(
-      organisationsUserPermissionsPayloadBuilder.forCreateData({
+      organisationUserPermissionsPayloadBuilder.forCreateData({
         orgId: organisationRecord.id,
         userId: orgStandardUserRecord.id,
         role: "standard",
@@ -412,7 +412,7 @@ describe(`${testSuiteName} tests`, () => {
       );
 
     await superadminPb.collection(organisationUserPermissionsCollectionName).create(
-      organisationsUserPermissionsPayloadBuilder.forCreateData({
+      organisationUserPermissionsPayloadBuilder.forCreateData({
         orgId: organisationRecord.id,
         userId: pendingOrgStandardUserRecord.id,
         role: "standard",
@@ -420,7 +420,7 @@ describe(`${testSuiteName} tests`, () => {
       }),
     );
     await superadminPb.collection(organisationUserPermissionsCollectionName).create(
-      organisationsUserPermissionsPayloadBuilder.forCreateData({
+      organisationUserPermissionsPayloadBuilder.forCreateData({
         orgId: organisationRecord.id,
         userId: blockedOrgStandardUserRecord.id,
         role: "standard",

@@ -18,7 +18,7 @@ import {
   globalUserPermissionsPayloadBuilder,
   organisationsPayloadBuilder,
   organisationUserPermissionsCollectionName,
-  organisationsUserPermissionsPayloadBuilder,
+  organisationUserPermissionsPayloadBuilder,
   organisationsCollectionName,
   globalUserPermissionsCollectionName,
 } from "@repo/pokkit-db-permissions-ts-helpers";
@@ -191,7 +191,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(organisationPayload);
 
     const orgAdminOrganisationsUserPermissionsPayload =
-      organisationsUserPermissionsPayloadBuilder.forCreateData({
+      organisationUserPermissionsPayloadBuilder.forCreateData({
         orgId: organisationRecord.id,
         userId: orgAdminUserRecord.id,
         role: "admin",
@@ -233,7 +233,7 @@ describe(`${testSuiteName} tests`, () => {
       .authWithPassword(pendingOrgAdminUserPayload.email, pendingOrgAdminUserPayload.password);
 
     const pendingOrgAdminOrganisationsUserPermissionsPayload =
-      organisationsUserPermissionsPayloadBuilder.forCreateData({
+      organisationUserPermissionsPayloadBuilder.forCreateData({
         orgId: organisationRecord.id,
         userId: pendingOrgAdminUserRecord.id,
         role: "admin",
@@ -253,7 +253,7 @@ describe(`${testSuiteName} tests`, () => {
       .authWithPassword(blockedOrgAdminUserPayload.email, blockedOrgAdminUserPayload.password);
 
     const blockedOrgAdminOrganisationsUserPermissionsPayload =
-      organisationsUserPermissionsPayloadBuilder.forCreateData({
+      organisationUserPermissionsPayloadBuilder.forCreateData({
         orgId: organisationRecord.id,
         userId: blockedOrgAdminUserRecord.id,
         role: "admin",
@@ -297,7 +297,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(organisationPayload);
 
     const orgStandardOrganisationsUserPermissionsPayload =
-      organisationsUserPermissionsPayloadBuilder.forCreateData({
+      organisationUserPermissionsPayloadBuilder.forCreateData({
         orgId: organisationRecord.id,
         userId: orgStandardUserRecord.id,
         role: "standard",
