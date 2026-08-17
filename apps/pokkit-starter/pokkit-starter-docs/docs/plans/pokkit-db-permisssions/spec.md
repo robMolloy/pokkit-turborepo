@@ -119,17 +119,17 @@ Check that a member of an organisation can only (create) update and delete their
 
 ### Organisation User Permissions collection permissions matrix
 
-| Global Role     | Status   | Create | View | List | Update | Delete | Create Own | View Own | List Own | Update Own | Delete Own |
-| --------------- | -------- | :----: | :--: | :--: | :----: | :----: | :--------: | :------: | :------: | :--------: | :--------: |
-| **Super Admin** | Pending  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |     ❌     |    ✅    |    ✅    |     ❌     |     ❌     |
-| _"_             | Approved |   ✅   |  ✅  |  ✅  |   ✅   |   ✅   |     ❌     |    ✅    |    ✅    |     ❌     |     ❌     |
-| _"_             | Blocked  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |     ❌     |    ✅    |    ✅    |     ❌     |     ❌     |
-| **Admin**       | Pending  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |     ❌     |    ✅    |    ✅    |     ❌     |     ❌     |
-| _"_             | Approved |   ❌   |  ✅  |  ✅  |   ❌   |   ❌   |     ❌     |    ✅    |    ✅    |     ❌     |     ❌     |
-| _"_             | Blocked  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |     ❌     |    ✅    |    ✅    |     ❌     |     ❌     |
-| **Standard**    | Pending  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |     ❌     |    ✅    |    ✅    |     ❌     |     ❌     |
-| _"_             | Approved |   ❌   |  ✅  |  ✅  |   ❌   |   ❌   |     ❌     |    ✅    |    ✅    |     ❌     |     ❌     |
-| _"_             | Blocked  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |     ❌     |    ✅    |    ✅    |     ❌     |     ❌     |
+| Global Role     | Status   | Create | View | List | Update | Delete |
+| --------------- | -------- | :----: | :--: | :--: | :----: | :----: |
+| **Super Admin** | Pending  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
+| _"_             | Approved |   ✅   |  ✅  |  ✅  |   ✅   |   ✅   |
+| _"_             | Blocked  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
+| **Admin**       | Pending  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
+| _"_             | Approved |   ❌   |  ✅  |  ✅  |   ❌   |   ❌   |
+| _"_             | Blocked  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
+| **Standard**    | Pending  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
+| _"_             | Approved |   ❌   |  ✅  |  ✅  |   ❌   |   ❌   |
+| _"_             | Blocked  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
 
 | Organisation Role | Status   | Create | View | List | Update | Delete | Create Own | View Own | List Own | Update Own | Delete Own |
 | ----------------- | -------- | :----: | :--: | :--: | :----: | :----: | :--------: | :------: | :------: | :--------: | :--------: |

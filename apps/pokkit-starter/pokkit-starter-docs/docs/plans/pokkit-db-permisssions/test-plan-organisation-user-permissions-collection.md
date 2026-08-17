@@ -44,28 +44,6 @@ Checks that a user with organisation role `admin` and status `pending` or `block
 
 Checks that a user with organisation role `standard` cannot CREATE a record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-## CREATE OWN tests
-
-### PDBP-OUP-CREATE-OWN-01 — Global Superadmin cannot CREATE OWN
-
-Checks that a user with global user permissions role `superadmin` cannot CREATE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
-### PDBP-OUP-CREATE-OWN-02 — Global Admin cannot CREATE OWN
-
-Checks that a user with global user permissions role `admin` cannot CREATE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
-### PDBP-OUP-CREATE-OWN-03 — Global Standard cannot CREATE OWN
-
-Checks that a user with global user permissions role `standard` cannot CREATE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
-### PDBP-OUP-CREATE-OWN-04 — Organisation Admin cannot CREATE OWN
-
-Checks that a user with organisation role `admin` cannot CREATE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
-### PDBP-OUP-CREATE-OWN-05 — Organisation Standard cannot CREATE OWN
-
-Checks that a user with organisation role `standard` cannot CREATE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
 ## VIEW tests
 
 ### PDBP-OUP-VIEW-01 — Global Superadmin (approved) can VIEW
@@ -110,23 +88,11 @@ Checks that a user with organisation role `standard` and status `pending` or `bl
 
 ## VIEW OWN tests
 
-### PDBP-OUP-VIEW-OWN-01 — Global Superadmin can VIEW OWN
-
-Checks that a user with global user permissions role `superadmin` can VIEW their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
-### PDBP-OUP-VIEW-OWN-02 — Global Admin can VIEW OWN
-
-Checks that a user with global user permissions role `admin` can VIEW their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
-### PDBP-OUP-VIEW-OWN-03 — Global Standard can VIEW OWN
-
-Checks that a user with global user permissions role `standard` can VIEW their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
-### PDBP-OUP-VIEW-OWN-04 — Organisation Admin can VIEW OWN
+### PDBP-OUP-VIEW-OWN-01 — Organisation Admin can VIEW OWN
 
 Checks that a user with organisation role `admin` can VIEW their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-OUP-VIEW-OWN-05 — Organisation Standard can VIEW OWN
+### PDBP-OUP-VIEW-OWN-02 — Organisation Standard can VIEW OWN
 
 Checks that a user with organisation role `standard` can VIEW their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
@@ -174,23 +140,11 @@ Checks that a user with organisation role `standard` and status `pending` or `bl
 
 ## LIST OWN tests
 
-### PDBP-OUP-LIST-OWN-01 — Global Superadmin can LIST OWN
-
-Checks that a user with global user permissions role `superadmin` can LIST their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
-### PDBP-OUP-LIST-OWN-02 — Global Admin can LIST OWN
-
-Checks that a user with global user permissions role `admin` can LIST their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
-### PDBP-OUP-LIST-OWN-03 — Global Standard can LIST OWN
-
-Checks that a user with global user permissions role `standard` can LIST their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
-### PDBP-OUP-LIST-OWN-04 — Organisation Admin can LIST OWN
+### PDBP-OUP-LIST-OWN-01 — Organisation Admin can LIST OWN
 
 Checks that a user with organisation role `admin` can LIST their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-OUP-LIST-OWN-05 — Organisation Standard can LIST OWN
+### PDBP-OUP-LIST-OWN-02 — Organisation Standard can LIST OWN
 
 Checks that a user with organisation role `standard` can LIST their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
@@ -226,23 +180,11 @@ Checks that a user with organisation role `standard` cannot UPDATE a record in t
 
 ## UPDATE OWN tests
 
-### PDBP-OUP-UPDATE-OWN-01 — Global Superadmin cannot UPDATE OWN
-
-Checks that a user with global user permissions role `superadmin` cannot UPDATE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
-### PDBP-OUP-UPDATE-OWN-02 — Global Admin cannot UPDATE OWN
-
-Checks that a user with global user permissions role `admin` cannot UPDATE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
-### PDBP-OUP-UPDATE-OWN-03 — Global Standard cannot UPDATE OWN
-
-Checks that a user with global user permissions role `standard` cannot UPDATE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
-### PDBP-OUP-UPDATE-OWN-04 — Organisation Admin cannot UPDATE OWN
+### PDBP-OUP-UPDATE-OWN-01 — Organisation Admin cannot UPDATE OWN
 
 Checks that a user with organisation role `admin` cannot UPDATE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-OUP-UPDATE-OWN-05 — Organisation Standard cannot UPDATE OWN
+### PDBP-OUP-UPDATE-OWN-02 — Organisation Standard cannot UPDATE OWN
 
 Checks that a user with organisation role `standard` cannot UPDATE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
@@ -278,23 +220,11 @@ Checks that a user with organisation role `standard` cannot DELETE a record in t
 
 ## DELETE OWN tests
 
-### PDBP-OUP-DELETE-OWN-01 — Global Superadmin cannot DELETE OWN
-
-Checks that a user with global user permissions role `superadmin` cannot DELETE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
-### PDBP-OUP-DELETE-OWN-02 — Global Admin cannot DELETE OWN
-
-Checks that a user with global user permissions role `admin` cannot DELETE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
-### PDBP-OUP-DELETE-OWN-03 — Global Standard cannot DELETE OWN
-
-Checks that a user with global user permissions role `standard` cannot DELETE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
-### PDBP-OUP-DELETE-OWN-04 — Organisation Admin cannot DELETE OWN
+### PDBP-OUP-DELETE-OWN-01 — Organisation Admin cannot DELETE OWN
 
 Checks that a user with organisation role `admin` cannot DELETE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
-### PDBP-OUP-DELETE-OWN-05 — Organisation Standard cannot DELETE OWN
+### PDBP-OUP-DELETE-OWN-02 — Organisation Standard cannot DELETE OWN
 
 Checks that a user with organisation role `standard` cannot DELETE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
