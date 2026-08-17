@@ -1,3 +1,5 @@
+import PocketBase from "pocketbase";
+
 export const usersCollectionName = "users";
 export const globalUserPermissionsCollectionName = "globalUserPermissions";
 export const organisationsCollectionName = "organisations";
@@ -8,6 +10,34 @@ export const pokkitDbPermissionsCollectionNames = [
   organisationUserPermissionsCollectionName,
   organisationsCollectionName,
 ];
+
+export type TUserPayloadCreateData = {
+  email: string;
+  password: string;
+  passwordConfirm: string;
+};
+
+const createRandomEmailAddress = () => `test${Math.floor(Math.random() * 10000000)}@example.com`;
+
+function createRandomUserEmailPasswordData(): TUserPayloadCreateData {
+  const email = createRandomEmailAddress();
+  return { email, password: email, passwordConfirm: email };
+}
+
+const userPayloadBuilderInit = {
+  forCreateData: <T extends TUserPayloadCreateData>(p: T) =>
+    ({
+      email: p.email,
+      password: p.password,
+      passwordConfirm: p.passwordConfirm,
+    }) as T,
+};
+
+export const userPayloadBuilder = {
+  ...userPayloadBuilderInit,
+  forCreateRandomData: () =>
+    userPayloadBuilderInit.forCreateData(createRandomUserEmailPasswordData()),
+};
 
 export type TGlobalUserPermissionsRole = "superadmin" | "admin" | "standard";
 export type TGlobalUserPermissionsStatus = "approved" | "pending" | "blocked";
@@ -56,4 +86,39 @@ export const organisationUserPermissionsPayloadBuilder = {
       role: p.role,
       status: p.status,
     }) as T,
+};
+
+export const createUserAndPermissions = async (p: {
+  user: { toBeActionedByPb: PocketBase; payload: TUserPayloadCreateData };
+  globalUserPermissions?: {
+    toBeActionedByPb: PocketBase;
+    payload: Omit<TGlobalUserPermissionsCreatePayload, "userId">;
+  };
+  organisationUserPermissions?: {
+    toBeActionedByPb: PocketBase;
+    payload: Omit<TOrganisationUserPermissionsCreatePayload, "userId">;
+  };
+}) => {
+  const userRecord = await p.user.toBeActionedByPb
+    .collection(usersCollectionName)
+    .create(p.user.payload);
+  await p.user.toBeActionedByPb
+    .collection(usersCollectionName)
+    .authWithPassword(p.user.payload.email, p.user.payload.password);
+
+  const globalUserPermissionsRecord = await (() => {
+    if (!p.globalUserPermissions) return undefined;
+    return p.globalUserPermissions.toBeActionedByPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(p.globalUserPermissions.payload);
+  })();
+
+  const organisationUserPermissionsRecord = await (() => {
+    if (!p.organisationUserPermissions) return undefined;
+    return p.organisationUserPermissions.toBeActionedByPb
+      .collection(organisationUserPermissionsCollectionName)
+      .create(p.organisationUserPermissions.payload);
+  })();
+
+  return { userRecord, globalUserPermissionsRecord, organisationUserPermissionsRecord };
 };

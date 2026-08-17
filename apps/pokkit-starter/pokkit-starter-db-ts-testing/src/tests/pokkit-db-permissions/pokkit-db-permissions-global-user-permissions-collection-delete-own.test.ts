@@ -11,9 +11,9 @@ import {
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../../config/pocketbaseConfig";
-import { userPayloadBuilder } from "../../utils/pocketbaseUserHelpers";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_constants";
 import { pokkitDbPermissionsTestsMetadata } from "./_pokkitDbConfigSyncTestsMetadata";
+import { userPayloadBuilder } from "@repo/pokkit-db-permissions-ts-helpers";
 import {
   globalUserPermissionsCollectionName,
   globalUserPermissionsPayloadBuilder,
