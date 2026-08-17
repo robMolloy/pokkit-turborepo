@@ -923,8 +923,8 @@
     "listRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n",
     "viewRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"",
     "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= orgId\n\u0026\u0026 @collection.organisationUserPermissions.userId ?!= userId\n",
-    "updateRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"",
-    "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n",
+    "updateRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= orgId\n\u0026\u0026 @collection.organisationUserPermissions.userId ?!= userId",
+    "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= orgId\n\u0026\u0026 @collection.organisationUserPermissions.userId ?!= userId\n",
     "name": "organisationUserPermissions",
     "type": "base",
     "fields": [
@@ -1027,7 +1027,7 @@
       "CREATE UNIQUE INDEX `idx_2ag063yzee` ON `organisationUserPermissions` (\n  `orgId`,\n  `userId`\n)"
     ],
     "created": "2026-08-12 11:07:59.729Z",
-    "updated": "2026-08-17 00:29:00.703Z",
+    "updated": "2026-08-17 08:20:41.892Z",
     "system": false
   },
   {
