@@ -6,7 +6,6 @@ import {
   superusersCollectionName,
   truncatePbCollections,
   upsertPbAdminCredentialsFromCli,
-  usersCollectionName,
 } from "@repo/pokkit-testing";
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
@@ -15,6 +14,7 @@ import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_c
 import { pokkitDbPermissionsTestsMetadata } from "./_pokkitDbConfigSyncTestsMetadata";
 import { userPayloadBuilder } from "@repo/pokkit-db-permissions-ts-helpers";
 import {
+  usersCollectionName,
   organisationsCollectionName,
   organisationsPayloadBuilder,
 } from "@repo/pokkit-db-permissions-ts-helpers";

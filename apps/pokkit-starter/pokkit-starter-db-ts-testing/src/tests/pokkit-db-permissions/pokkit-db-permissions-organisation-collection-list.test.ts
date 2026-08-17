@@ -14,12 +14,11 @@ import {
   superusersCollectionName,
   truncatePbCollections,
   upsertPbAdminCredentialsFromCli,
-  usersCollectionName,
 } from "@repo/pokkit-testing";
 import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../../config/pocketbaseConfig";
-import { userPayloadBuilder } from "@repo/pokkit-db-permissions-ts-helpers";
+import { usersCollectionName, userPayloadBuilder } from "@repo/pokkit-db-permissions-ts-helpers";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_constants";
 import { pokkitDbPermissionsTestsMetadata } from "./_pokkitDbConfigSyncTestsMetadata";
 
