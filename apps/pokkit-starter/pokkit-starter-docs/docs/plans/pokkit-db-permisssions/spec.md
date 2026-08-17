@@ -8,6 +8,16 @@ sidebar_position: 1
 
 The overview can be found [here](./index.mdx).
 
+## Permissions philosophy
+
+The current philosophy makes it very difficult to "lock yourself out". For example, a global superadmin cannot update or delete themselves. This stops the user from being able to lock themselves out of the system.
+
+The same is done for organisation admins which cannot update or delete themselves from their own organisation. This stops the user from being able to lock themselves out of the organisation.
+
+Any scenario can be remedied by using the superuser (not to be confused with global superadmin) to change any records through the db ui but this method should not be required in normal usage, based on the philosophy above.
+
+It may be that there are more intuitive ways to handle this, including through event hooks that stop the last superuser from being able to delete/update themselves in a way that causes lock out scenarios.
+
 ## Users collection
 
 This uses the default PocketBase `users` collection

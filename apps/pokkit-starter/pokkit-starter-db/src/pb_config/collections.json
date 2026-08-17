@@ -94,7 +94,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-08-12 07:22:44.810Z",
-    "updated": "2026-08-15 23:38:49.434Z",
+    "updated": "2026-08-17 09:46:24.544Z",
     "system": true
   },
   {
@@ -206,7 +206,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-08-12 07:22:44.812Z",
-    "updated": "2026-08-15 23:38:49.436Z",
+    "updated": "2026-08-17 09:46:24.546Z",
     "system": true
   },
   {
@@ -320,7 +320,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-08-12 07:22:44.814Z",
-    "updated": "2026-08-15 23:38:49.437Z",
+    "updated": "2026-08-17 09:46:24.547Z",
     "system": true
   },
   {
@@ -418,7 +418,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-08-12 07:22:44.817Z",
-    "updated": "2026-08-15 23:38:49.439Z",
+    "updated": "2026-08-17 09:46:24.548Z",
     "system": true
   },
   {
@@ -533,7 +533,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-08-12 07:22:44.819Z",
-    "updated": "2026-08-15 23:38:49.440Z",
+    "updated": "2026-08-17 09:46:24.549Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -750,7 +750,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-08-12 07:22:44.822Z",
-    "updated": "2026-08-15 23:38:49.479Z",
+    "updated": "2026-08-17 09:46:24.585Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -915,15 +915,15 @@
       "CREATE UNIQUE INDEX `idx_djyvvpjhe1` ON `globalUserPermissions` (`userId`)"
     ],
     "created": "2026-08-12 11:07:59.725Z",
-    "updated": "2026-08-15 23:38:49.481Z",
+    "updated": "2026-08-17 09:46:24.587Z",
     "system": false
   },
   {
     "id": "pbc_230240349",
-    "listRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n",
-    "viewRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"",
+    "listRule": "@request.auth.id ?= userId\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n",
+    "viewRule": "userId ?= @request.auth.id\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"",
     "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= orgId\n\u0026\u0026 @collection.organisationUserPermissions.userId ?!= userId\n",
-    "updateRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= orgId\n\u0026\u0026 @collection.organisationUserPermissions.userId ?!= userId",
+    "updateRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 orgId:changed = false\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= orgId\n\u0026\u0026 @collection.organisationUserPermissions.userId ?!= userId\n\u0026\u0026 orgId:changed = false\n",
     "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= orgId\n\u0026\u0026 @collection.organisationUserPermissions.userId ?!= userId\n",
     "name": "organisationUserPermissions",
     "type": "base",
@@ -1027,7 +1027,7 @@
       "CREATE UNIQUE INDEX `idx_2ag063yzee` ON `organisationUserPermissions` (\n  `orgId`,\n  `userId`\n)"
     ],
     "created": "2026-08-12 11:07:59.729Z",
-    "updated": "2026-08-17 08:20:41.892Z",
+    "updated": "2026-08-17 11:00:16.612Z",
     "system": false
   },
   {
@@ -1110,7 +1110,7 @@
       "CREATE UNIQUE INDEX `idx_l5jn9kiytc` ON `organisations` (`name`)"
     ],
     "created": "2026-08-12 11:07:59.731Z",
-    "updated": "2026-08-15 23:38:49.483Z",
+    "updated": "2026-08-17 09:46:24.589Z",
     "system": false
   },
   {
@@ -1192,8 +1192,8 @@
     "indexes": [
       "CREATE UNIQUE INDEX `idx_secrets_key` ON `_pb_config_secrets` (key)"
     ],
-    "created": "2026-08-15 23:38:49.470Z",
-    "updated": "2026-08-15 23:38:49.470Z",
+    "created": "2026-08-17 09:46:24.578Z",
+    "updated": "2026-08-17 09:46:24.578Z",
     "system": false
   }
 ]
