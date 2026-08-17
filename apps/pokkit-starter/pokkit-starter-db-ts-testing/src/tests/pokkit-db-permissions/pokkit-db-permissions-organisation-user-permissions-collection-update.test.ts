@@ -63,9 +63,6 @@ describe(`${testSuiteName} tests`, () => {
   it("PDBP-OUP-UPDATE-06 — Organisation Admin (pending or blocked) cannot UPDATE", async () => {});
   it("PDBP-OUP-UPDATE-07 — Organisation Standard cannot UPDATE", async () => {});
 
-  it("PDBP-OUP-UPDATE-OWN-01 — Global Superadmin cannot UPDATE OWN", async () => {});
-  it("PDBP-OUP-UPDATE-OWN-02 — Global Admin cannot UPDATE OWN", async () => {});
-  it("PDBP-OUP-UPDATE-OWN-03 — Global Standard cannot UPDATE OWN", async () => {});
-  it("PDBP-OUP-UPDATE-OWN-04 — Organisation Admin cannot UPDATE OWN", async () => {});
-  it("PDBP-OUP-UPDATE-OWN-05 — Organisation Standard cannot UPDATE OWN", async () => {});
+  it("PDBP-OUP-UPDATE-OWN-01 — Organisation Admin cannot UPDATE OWN", async () => {});
+  it("PDBP-OUP-UPDATE-OWN-02 — Organisation Standard cannot UPDATE OWN", async () => {});
 });

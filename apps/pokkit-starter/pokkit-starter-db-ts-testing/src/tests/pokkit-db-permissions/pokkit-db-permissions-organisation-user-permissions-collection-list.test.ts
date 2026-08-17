@@ -66,9 +66,6 @@ describe(`${testSuiteName} tests`, () => {
   it("PDBP-OUP-LIST-09 — Organisation Standard (approved) can LIST", async () => {});
   it("PDBP-OUP-LIST-10 — Organisation Standard (pending or blocked) cannot LIST", async () => {});
 
-  it("PDBP-OUP-LIST-OWN-01 — Global Superadmin can LIST OWN", async () => {});
-  it("PDBP-OUP-LIST-OWN-02 — Global Admin can LIST OWN", async () => {});
-  it("PDBP-OUP-LIST-OWN-03 — Global Standard can LIST OWN", async () => {});
-  it("PDBP-OUP-LIST-OWN-04 — Organisation Admin can LIST OWN", async () => {});
-  it("PDBP-OUP-LIST-OWN-05 — Organisation Standard can LIST OWN", async () => {});
+  it("PDBP-OUP-LIST-OWN-01 — Organisation Admin can LIST OWN", async () => {});
+  it("PDBP-OUP-LIST-OWN-02 — Organisation Standard can LIST OWN", async () => {});
 });

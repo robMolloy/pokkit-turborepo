@@ -63,9 +63,6 @@ describe(`${testSuiteName} tests`, () => {
   it("PDBP-OUP-DELETE-06 — Organisation Admin (pending or blocked) cannot DELETE", async () => {});
   it("PDBP-OUP-DELETE-07 — Organisation Standard cannot DELETE", async () => {});
 
-  it("PDBP-OUP-DELETE-OWN-01 — Global Superadmin cannot DELETE OWN", async () => {});
-  it("PDBP-OUP-DELETE-OWN-02 — Global Admin cannot DELETE OWN", async () => {});
-  it("PDBP-OUP-DELETE-OWN-03 — Global Standard cannot DELETE OWN", async () => {});
-  it("PDBP-OUP-DELETE-OWN-04 — Organisation Admin cannot DELETE OWN", async () => {});
-  it("PDBP-OUP-DELETE-OWN-05 — Organisation Standard cannot DELETE OWN", async () => {});
+  it("PDBP-OUP-DELETE-OWN-01 — Organisation Admin cannot DELETE OWN", async () => {});
+  it("PDBP-OUP-DELETE-OWN-02 — Organisation Standard cannot DELETE OWN", async () => {});
 });

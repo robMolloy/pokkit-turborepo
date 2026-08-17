@@ -66,9 +66,6 @@ describe(`${testSuiteName} tests`, () => {
   it("PDBP-OUP-VIEW-09 — Organisation Standard (approved) can VIEW", async () => {});
   it("PDBP-OUP-VIEW-10 — Organisation Standard (pending or blocked) cannot VIEW", async () => {});
 
-  it("PDBP-OUP-VIEW-OWN-01 — Global Superadmin can VIEW OWN", async () => {});
-  it("PDBP-OUP-VIEW-OWN-02 — Global Admin can VIEW OWN", async () => {});
-  it("PDBP-OUP-VIEW-OWN-03 — Global Standard can VIEW OWN", async () => {});
-  it("PDBP-OUP-VIEW-OWN-04 — Organisation Admin can VIEW OWN", async () => {});
-  it("PDBP-OUP-VIEW-OWN-05 — Organisation Standard can VIEW OWN", async () => {});
+  it("PDBP-OUP-VIEW-OWN-01 — Organisation Admin can VIEW OWN", async () => {});
+  it("PDBP-OUP-VIEW-OWN-02 — Organisation Standard can VIEW OWN", async () => {});
 });
