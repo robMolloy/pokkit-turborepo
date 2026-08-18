@@ -65,18 +65,6 @@ describe(`${testSuiteName} tests`, () => {
     expect(isHealthy.code).toBe(200);
   });
 
-  it("PDBP-OUP-CREATE-01 — Global Superadmin (approved) can CREATE", async () => {});
-  it("PDBP-OUP-CREATE-02 — Global Superadmin (pending or blocked) cannot CREATE", async () => {});
-  it("PDBP-OUP-CREATE-03 — Global Admin (approved, pending, or blocked) cannot CREATE", async () => {});
-  it("PDBP-OUP-CREATE-04 — Global Standard (approved, pending, or blocked) cannot CREATE", async () => {});
-
-  it("PDBP-OUP-CREATE-AS-MEMBER-01 — Organisation Admin (approved) can CREATE AS MEMBER", async () => {});
-  it("PDBP-OUP-CREATE-AS-MEMBER-02 — Organisation Admin (pending or blocked) cannot CREATE AS MEMBER", async () => {});
-  it("PDBP-OUP-CREATE-AS-MEMBER-03 — Organisation Standard (approved, pending, or blocked) cannot CREATE AS MEMBER", async () => {});
-
-  it("PDBP-OUP-CREATE-AS-NON-MEMBER-01 — Organisation Admin (approved, pending, or blocked) cannot CREATE AS NON-MEMBER", async () => {});
-  it("PDBP-OUP-CREATE-AS-NON-MEMBER-02 — Organisation Standard (approved, pending, or blocked) cannot CREATE AS NON-MEMBER", async () => {});
-
   it("PDBP-OUP-CREATE-01 — Global Superadmin (approved) can CREATE", async () => {
     const superadminAndOrgAdminPb = createPbConnection();
     const superadminAndOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
@@ -143,7 +131,7 @@ describe(`${testSuiteName} tests`, () => {
     const pendingAdminGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
         userId: pendingAdminUserRecord.id,
-        role: "superadmin",
+        role: "admin",
         status: "pending",
       });
 
@@ -159,42 +147,39 @@ describe(`${testSuiteName} tests`, () => {
     await blockedAdminUserPb
       .collection(usersCollectionName)
       .authWithPassword(blockedAdminUserPayload.email, blockedAdminUserPayload.password);
-
     const blockedAdminGlobalUserPermissionsPayload =
       globalUserPermissionsPayloadBuilder.forCreateData({
         userId: blockedAdminUserRecord.id,
-        role: "superadmin",
+        role: "admin",
         status: "blocked",
       });
+
     await superadminAndOrgAdminPb
       .collection(globalUserPermissionsCollectionName)
       .create(blockedAdminGlobalUserPermissionsPayload);
 
-    const user1Pb = createPbConnection();
-    const user1UserPayload = userPayloadBuilder.forCreateRandomData();
-    const user1Record = await user1Pb.collection(usersCollectionName).create(user1UserPayload);
-
-    const user1OrganisationUserPermissionsPayload =
-      organisationUserPermissionsPayloadBuilder.forCreateData({
-        orgId: organisationRecord.id,
-        userId: user1Record.id,
-        role: "admin",
-        status: "approved",
-      });
-
-    const testFn = (p: { pb: PocketBase }) =>
-      p.pb
-        .collection(organisationUserPermissionsCollectionName)
-        .create(user1OrganisationUserPermissionsPayload);
-
-    await expect(testFn({ pb: pendingAdminUserPb })).rejects.toThrow();
-    await expect(testFn({ pb: blockedAdminUserPb })).rejects.toThrow();
-    await expect(testFn({ pb: superadminAndOrgAdminPb })).resolves.toMatchObject(
-      user1OrganisationUserPermissionsPayload,
-    );
+    await expect(
+      pendingAdminUserPb.collection(organisationUserPermissionsCollectionName).create(
+        organisationUserPermissionsPayloadBuilder.forCreateData({
+          orgId: organisationRecord.id,
+          userId: blockedAdminUserRecord.id,
+          role: "admin",
+          status: "blocked",
+        }),
+      ),
+    ).rejects.toThrow();
+    await expect(
+      blockedAdminUserPb.collection(organisationUserPermissionsCollectionName).create(
+        organisationUserPermissionsPayloadBuilder.forCreateData({
+          orgId: organisationRecord.id,
+          userId: blockedAdminUserRecord.id,
+          role: "admin",
+          status: "blocked",
+        }),
+      ),
+    ).rejects.toThrow();
   });
-
-  it("PDBP-OUP-CREATE-03 — Global Admin cannot CREATE", async () => {
+  it("PDBP-OUP-CREATE-03 — Global Admin (approved, pending, or blocked) cannot CREATE", async () => {
     const superadminAndOrgAdminPb = createPbConnection();
     const superadminAndOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
     await superadminAndOrgAdminPb
@@ -211,110 +196,136 @@ describe(`${testSuiteName} tests`, () => {
       .collection(organisationsCollectionName)
       .create(organisationsPayloadBuilder.forCreateRandomData());
 
-    const adminUserPb = createPbConnection();
-    const adminUserPayload = userPayloadBuilder.forCreateRandomData();
-    const adminUserRecord = await adminUserPb
+    const approvedAdminUserPb = createPbConnection();
+    const approvedAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const approvedAdminUserRecord = await approvedAdminUserPb
       .collection(usersCollectionName)
-      .create(adminUserPayload);
-    await adminUserPb
+      .create(approvedAdminUserPayload);
+    await approvedAdminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(adminUserPayload.email, adminUserPayload.password);
+      .authWithPassword(approvedAdminUserPayload.email, approvedAdminUserPayload.password);
 
-    const adminGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
-      userId: adminUserRecord.id,
-      role: "admin",
-      status: "approved",
-    });
+    const approvedAdminGlobalUserPermissionsPayload =
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: approvedAdminUserRecord.id,
+        role: "admin",
+        status: "approved",
+      });
+
     await superadminAndOrgAdminPb
       .collection(globalUserPermissionsCollectionName)
-      .create(adminGlobalUserPermissionsPayload);
+      .create(approvedAdminGlobalUserPermissionsPayload);
 
-    const user1Pb = createPbConnection();
-    const user1UserPayload = userPayloadBuilder.forCreateRandomData();
-    const user1Record = await user1Pb.collection(usersCollectionName).create(user1UserPayload);
-    await user1Pb
+    const pendingAdminUserPb = createPbConnection();
+    const pendingAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const pendingAdminUserRecord = await pendingAdminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(user1UserPayload.email, user1UserPayload.password);
+      .create(pendingAdminUserPayload);
+    await pendingAdminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(pendingAdminUserPayload.email, pendingAdminUserPayload.password);
 
-    const user1OrganisationUserPermissionsPayload =
-      organisationUserPermissionsPayloadBuilder.forCreateData({
-        orgId: organisationRecord.id,
-        userId: user1Record.id,
+    const pendingAdminGlobalUserPermissionsPayload =
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: pendingAdminUserRecord.id,
         role: "admin",
-        status: "approved",
+        status: "pending",
       });
 
-    const testFn = (p: { pb: PocketBase }) =>
-      p.pb
-        .collection(organisationUserPermissionsCollectionName)
-        .create(user1OrganisationUserPermissionsPayload);
-    await expect(testFn({ pb: adminUserPb })).rejects.toThrow();
-    await expect(testFn({ pb: superadminAndOrgAdminPb })).resolves.toMatchObject(
-      user1OrganisationUserPermissionsPayload,
-    );
-  });
-
-  it("PDBP-OUP-CREATE-04 — Global Standard cannot CREATE", async () => {
-    const superadminAndOrgAdminPb = createPbConnection();
-    const superadminAndOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
-    await superadminAndOrgAdminPb
-      .collection(usersCollectionName)
-      .create(superadminAndOrgAdminUserPayload);
-    await superadminAndOrgAdminPb
-      .collection(usersCollectionName)
-      .authWithPassword(
-        superadminAndOrgAdminUserPayload.email,
-        superadminAndOrgAdminUserPayload.password,
-      );
-
-    const organisationRecord = await superadminAndOrgAdminPb
-      .collection(organisationsCollectionName)
-      .create(organisationsPayloadBuilder.forCreateRandomData());
-
-    const standardUserPb = createPbConnection();
-    const standardUserPayload = userPayloadBuilder.forCreateRandomData();
-    const standardUserRecord = await standardUserPb
-      .collection(usersCollectionName)
-      .create(standardUserPayload);
-    await standardUserPb
-      .collection(usersCollectionName)
-      .authWithPassword(standardUserPayload.email, standardUserPayload.password);
-
-    const standardGlobalUserPermissionsPayload = globalUserPermissionsPayloadBuilder.forCreateData({
-      userId: standardUserRecord.id,
-      role: "standard",
-      status: "approved",
-    });
     await superadminAndOrgAdminPb
       .collection(globalUserPermissionsCollectionName)
-      .create(standardGlobalUserPermissionsPayload);
+      .create(pendingAdminGlobalUserPermissionsPayload);
 
-    const user1Pb = createPbConnection();
-    const user1UserPayload = userPayloadBuilder.forCreateRandomData();
-    const user1Record = await user1Pb.collection(usersCollectionName).create(user1UserPayload);
-    await user1Pb
+    const blockedAdminUserPb = createPbConnection();
+    const blockedAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const blockedAdminUserRecord = await blockedAdminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(user1UserPayload.email, user1UserPayload.password);
+      .create(blockedAdminUserPayload);
+    await blockedAdminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(blockedAdminUserPayload.email, blockedAdminUserPayload.password);
+    const blockedAdminGlobalUserPermissionsPayload =
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: blockedAdminUserRecord.id,
+        role: "admin",
+        status: "blocked",
+      });
 
-    const user1OrganisationUserPermissionsPayload =
+    await superadminAndOrgAdminPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(blockedAdminGlobalUserPermissionsPayload);
+
+    const promoteApprovedAdminUserToOrgAdminPayload =
       organisationUserPermissionsPayloadBuilder.forCreateData({
         orgId: organisationRecord.id,
-        userId: user1Record.id,
+        userId: approvedAdminUserRecord.id,
+        role: "admin",
+        status: "approved",
+      });
+    const promotePendingAdminUserToOrgAdminPayload =
+      organisationUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: pendingAdminUserRecord.id,
+        role: "admin",
+        status: "approved",
+      });
+    const promoteBlockedAdminUserToOrgAdminPayload =
+      organisationUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: blockedAdminUserRecord.id,
         role: "admin",
         status: "approved",
       });
 
-    const testFn = (p: { pb: PocketBase }) =>
-      p.pb
+    await expect(
+      approvedAdminUserPb
         .collection(organisationUserPermissionsCollectionName)
-        .create(user1OrganisationUserPermissionsPayload);
-    await expect(testFn({ pb: standardUserPb })).rejects.toThrow();
-    await expect(testFn({ pb: superadminAndOrgAdminPb })).resolves.toMatchObject(
-      user1OrganisationUserPermissionsPayload,
-    );
-  });
+        .create(promoteApprovedAdminUserToOrgAdminPayload),
+    ).rejects.toThrow();
+    await expect(
+      approvedAdminUserPb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(promotePendingAdminUserToOrgAdminPayload),
+    ).rejects.toThrow();
+    await expect(
+      approvedAdminUserPb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(promoteBlockedAdminUserToOrgAdminPayload),
+    ).rejects.toThrow();
 
-  it("PDBP-OUP-CREATE-05 — Organisation Admin (approved) can CREATE", async () => {
+    await expect(
+      pendingAdminUserPb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(promoteApprovedAdminUserToOrgAdminPayload),
+    ).rejects.toThrow();
+    await expect(
+      pendingAdminUserPb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(promotePendingAdminUserToOrgAdminPayload),
+    ).rejects.toThrow();
+    await expect(
+      pendingAdminUserPb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(promoteBlockedAdminUserToOrgAdminPayload),
+    ).rejects.toThrow();
+
+    await expect(
+      blockedAdminUserPb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(promoteApprovedAdminUserToOrgAdminPayload),
+    ).rejects.toThrow();
+    await expect(
+      blockedAdminUserPb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(promotePendingAdminUserToOrgAdminPayload),
+    ).rejects.toThrow();
+    await expect(
+      blockedAdminUserPb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(promoteBlockedAdminUserToOrgAdminPayload),
+    ).rejects.toThrow();
+  });
+  it("PDBP-OUP-CREATE-04 — Global Standard (approved, pending, or blocked) cannot CREATE", async () => {
     const superadminAndOrgAdminPb = createPbConnection();
     const superadminAndOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
     await superadminAndOrgAdminPb
@@ -331,25 +342,167 @@ describe(`${testSuiteName} tests`, () => {
       .collection(organisationsCollectionName)
       .create(organisationsPayloadBuilder.forCreateRandomData());
 
-    const orgAdminUserPb = createPbConnection();
-    const orgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
-    const orgAdminUserRecord = await orgAdminUserPb
+    const approvedStandardUserPb = createPbConnection();
+    const approvedStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const approvedStandardUserRecord = await approvedStandardUserPb
       .collection(usersCollectionName)
-      .create(orgAdminUserPayload);
-    await orgAdminUserPb
+      .create(approvedStandardUserPayload);
+    await approvedStandardUserPb
       .collection(usersCollectionName)
-      .authWithPassword(orgAdminUserPayload.email, orgAdminUserPayload.password);
+      .authWithPassword(approvedStandardUserPayload.email, approvedStandardUserPayload.password);
 
-    const adminOrganisationUserPermissionsPayload =
-      organisationUserPermissionsPayloadBuilder.forCreateData({
-        orgId: organisationRecord.id,
-        userId: orgAdminUserRecord.id,
-        role: "admin",
+    const approvedStandardGlobalUserPermissionsPayload =
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: approvedStandardUserRecord.id,
+        role: "standard",
         status: "approved",
       });
     await superadminAndOrgAdminPb
-      .collection(organisationUserPermissionsCollectionName)
-      .create(adminOrganisationUserPermissionsPayload);
+      .collection(globalUserPermissionsCollectionName)
+      .create(approvedStandardGlobalUserPermissionsPayload);
+
+    const pendingStandardUserPb = createPbConnection();
+    const pendingStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const pendingStandardUserRecord = await pendingStandardUserPb
+      .collection(usersCollectionName)
+      .create(pendingStandardUserPayload);
+    await pendingStandardUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(pendingStandardUserPayload.email, pendingStandardUserPayload.password);
+    const pendingStandardGlobalUserPermissionsPayload =
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: pendingStandardUserRecord.id,
+        role: "standard",
+        status: "pending",
+      });
+
+    await superadminAndOrgAdminPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(pendingStandardGlobalUserPermissionsPayload);
+
+    const blockedStandardUserPb = createPbConnection();
+    const blockedStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const blockedStandardUserRecord = await blockedStandardUserPb
+      .collection(usersCollectionName)
+      .create(blockedStandardUserPayload);
+    await blockedStandardUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(blockedStandardUserPayload.email, blockedStandardUserPayload.password);
+    const blockedStandardGlobalUserPermissionsPayload =
+      globalUserPermissionsPayloadBuilder.forCreateData({
+        userId: blockedStandardUserRecord.id,
+        role: "standard",
+        status: "blocked",
+      });
+    await superadminAndOrgAdminPb
+      .collection(globalUserPermissionsCollectionName)
+      .create(blockedStandardGlobalUserPermissionsPayload);
+
+    const promoteApprovedStandardUserToOrgAdminPayload =
+      organisationUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: approvedStandardUserRecord.id,
+        role: "admin",
+        status: "approved",
+      });
+    const promotePendingStandardUserToOrgAdminPayload =
+      organisationUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: pendingStandardUserRecord.id,
+        role: "admin",
+        status: "approved",
+      });
+    const promoteBlockedStandardUserToOrgAdminPayload =
+      organisationUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: blockedStandardUserRecord.id,
+        role: "admin",
+        status: "approved",
+      });
+
+    await expect(
+      approvedStandardUserPb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(promoteApprovedStandardUserToOrgAdminPayload),
+    ).rejects.toThrow();
+    await expect(
+      approvedStandardUserPb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(promotePendingStandardUserToOrgAdminPayload),
+    ).rejects.toThrow();
+    await expect(
+      approvedStandardUserPb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(promoteBlockedStandardUserToOrgAdminPayload),
+    ).rejects.toThrow();
+
+    await expect(
+      pendingStandardUserPb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(promoteApprovedStandardUserToOrgAdminPayload),
+    ).rejects.toThrow();
+    await expect(
+      pendingStandardUserPb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(promotePendingStandardUserToOrgAdminPayload),
+    ).rejects.toThrow();
+    await expect(
+      pendingStandardUserPb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(promoteBlockedStandardUserToOrgAdminPayload),
+    ).rejects.toThrow();
+
+    await expect(
+      blockedStandardUserPb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(promoteApprovedStandardUserToOrgAdminPayload),
+    ).rejects.toThrow();
+    await expect(
+      blockedStandardUserPb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(promotePendingStandardUserToOrgAdminPayload),
+    ).rejects.toThrow();
+    await expect(
+      blockedStandardUserPb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(promoteBlockedStandardUserToOrgAdminPayload),
+    ).rejects.toThrow();
+  });
+
+  it("PDBP-OUP-CREATE-AS-MEMBER-01 — Organisation Admin (approved) can CREATE AS MEMBER", async () => {
+    const superadminAndOrgAdminPb = createPbConnection();
+    const superadminAndOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminAndOrgAdminPb
+      .collection(usersCollectionName)
+      .create(superadminAndOrgAdminUserPayload);
+    await superadminAndOrgAdminPb
+      .collection(usersCollectionName)
+      .authWithPassword(
+        superadminAndOrgAdminUserPayload.email,
+        superadminAndOrgAdminUserPayload.password,
+      );
+
+    const organisationRecord = await superadminAndOrgAdminPb
+      .collection(organisationsCollectionName)
+      .create(organisationsPayloadBuilder.forCreateRandomData());
+
+    const approvedOrgAdminUserPb = createPbConnection();
+    const approvedOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const approvedOrgAdminUserRecord = await approvedOrgAdminUserPb
+      .collection(usersCollectionName)
+      .create(approvedOrgAdminUserPayload);
+    await approvedOrgAdminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(approvedOrgAdminUserPayload.email, approvedOrgAdminUserPayload.password);
+
+    await superadminAndOrgAdminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: approvedOrgAdminUserRecord.id,
+        role: "admin",
+        status: "approved",
+      }),
+    );
 
     const user1Pb = createPbConnection();
     const user1UserPayload = userPayloadBuilder.forCreateRandomData();
@@ -367,13 +520,12 @@ describe(`${testSuiteName} tests`, () => {
       });
 
     await expect(
-      orgAdminUserPb
+      approvedOrgAdminUserPb
         .collection(organisationUserPermissionsCollectionName)
         .create(user1OrganisationUserPermissionsPayload),
     ).resolves.toMatchObject(user1OrganisationUserPermissionsPayload);
   });
-
-  it("PDBP-OUP-CREATE-06 — Organisation Admin (pending or blocked) cannot CREATE", async () => {
+  it("PDBP-OUP-CREATE-AS-MEMBER-02 — Organisation Admin (pending or blocked) cannot CREATE AS MEMBER", async () => {
     const superadminAndOrgAdminPb = createPbConnection();
     const superadminAndOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
     await superadminAndOrgAdminPb
@@ -390,51 +542,45 @@ describe(`${testSuiteName} tests`, () => {
       .collection(organisationsCollectionName)
       .create(organisationsPayloadBuilder.forCreateRandomData());
 
-    const pendingAdminUserPb = createPbConnection();
-    const pendingAdminUserPayload = userPayloadBuilder.forCreateRandomData();
-    const pendingAdminUserRecord = await pendingAdminUserPb
+    const pendingOrgAdminUserPb = createPbConnection();
+    const pendingOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const pendingOrgAdminUserRecord = await pendingOrgAdminUserPb
       .collection(usersCollectionName)
-      .create(pendingAdminUserPayload);
-    await pendingAdminUserPb
+      .create(pendingOrgAdminUserPayload);
+    await pendingOrgAdminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(pendingAdminUserPayload.email, pendingAdminUserPayload.password);
+      .authWithPassword(pendingOrgAdminUserPayload.email, pendingOrgAdminUserPayload.password);
 
-    const pendingAdminOrganisationUserPermissionsPayload =
+    await superadminAndOrgAdminPb.collection(organisationUserPermissionsCollectionName).create(
       organisationUserPermissionsPayloadBuilder.forCreateData({
         orgId: organisationRecord.id,
-        userId: pendingAdminUserRecord.id,
+        userId: pendingOrgAdminUserRecord.id,
         role: "admin",
         status: "pending",
-      });
+      }),
+    );
 
-    await superadminAndOrgAdminPb
-      .collection(organisationUserPermissionsCollectionName)
-      .create(pendingAdminOrganisationUserPermissionsPayload);
-
-    const blockedAdminUserPb = createPbConnection();
-    const blockedAdminUserPayload = userPayloadBuilder.forCreateRandomData();
-    const blockedAdminUserRecord = await blockedAdminUserPb
+    const blockedOrgAdminUserPb = createPbConnection();
+    const blockedOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const blockedOrgAdminUserRecord = await blockedOrgAdminUserPb
       .collection(usersCollectionName)
-      .create(blockedAdminUserPayload);
-    await blockedAdminUserPb
+      .create(blockedOrgAdminUserPayload);
+    await blockedOrgAdminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(blockedAdminUserPayload.email, blockedAdminUserPayload.password);
+      .authWithPassword(blockedOrgAdminUserPayload.email, blockedOrgAdminUserPayload.password);
 
-    const blockedAdminOrganisationUserPermissionsPayload =
+    await superadminAndOrgAdminPb.collection(organisationUserPermissionsCollectionName).create(
       organisationUserPermissionsPayloadBuilder.forCreateData({
         orgId: organisationRecord.id,
-        userId: blockedAdminUserRecord.id,
+        userId: blockedOrgAdminUserRecord.id,
         role: "admin",
         status: "blocked",
-      });
-    await superadminAndOrgAdminPb
-      .collection(organisationUserPermissionsCollectionName)
-      .create(blockedAdminOrganisationUserPermissionsPayload);
+      }),
+    );
 
     const user1Pb = createPbConnection();
     const user1UserPayload = userPayloadBuilder.forCreateRandomData();
     const user1Record = await user1Pb.collection(usersCollectionName).create(user1UserPayload);
-
     const user1OrganisationUserPermissionsPayload =
       organisationUserPermissionsPayloadBuilder.forCreateData({
         orgId: organisationRecord.id,
@@ -447,14 +593,118 @@ describe(`${testSuiteName} tests`, () => {
       p.pb
         .collection(organisationUserPermissionsCollectionName)
         .create(user1OrganisationUserPermissionsPayload);
-    await expect(testFn({ pb: pendingAdminUserPb })).rejects.toThrow();
-    await expect(testFn({ pb: blockedAdminUserPb })).rejects.toThrow();
+
+    await expect(testFn({ pb: pendingOrgAdminUserPb })).rejects.toThrow();
+    await expect(testFn({ pb: blockedOrgAdminUserPb })).rejects.toThrow();
+    await expect(testFn({ pb: superadminAndOrgAdminPb })).resolves.toMatchObject(
+      user1OrganisationUserPermissionsPayload,
+    );
+  });
+  it("PDBP-OUP-CREATE-AS-MEMBER-03 — Organisation Standard (approved, pending, or blocked) cannot CREATE AS MEMBER", async () => {
+    const superadminAndOrgAdminPb = createPbConnection();
+    const superadminAndOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminAndOrgAdminPb
+      .collection(usersCollectionName)
+      .create(superadminAndOrgAdminUserPayload);
+    await superadminAndOrgAdminPb
+      .collection(usersCollectionName)
+      .authWithPassword(
+        superadminAndOrgAdminUserPayload.email,
+        superadminAndOrgAdminUserPayload.password,
+      );
+
+    const organisationRecord = await superadminAndOrgAdminPb
+      .collection(organisationsCollectionName)
+      .create(organisationsPayloadBuilder.forCreateRandomData());
+
+    const approvedOrgStandardUserPb = createPbConnection();
+    const approvedOrgStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const approvedOrgStandardUserRecord = await approvedOrgStandardUserPb
+      .collection(usersCollectionName)
+      .create(approvedOrgStandardUserPayload);
+    await approvedOrgStandardUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(
+        approvedOrgStandardUserPayload.email,
+        approvedOrgStandardUserPayload.password,
+      );
+
+    await superadminAndOrgAdminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: approvedOrgStandardUserRecord.id,
+        role: "standard",
+        status: "approved",
+      }),
+    );
+
+    const pendingOrgStandardUserPb = createPbConnection();
+    const pendingOrgStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const pendingOrgStandardUserRecord = await pendingOrgStandardUserPb
+      .collection(usersCollectionName)
+      .create(pendingOrgStandardUserPayload);
+    await pendingOrgStandardUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(
+        pendingOrgStandardUserPayload.email,
+        pendingOrgStandardUserPayload.password,
+      );
+
+    await superadminAndOrgAdminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: pendingOrgStandardUserRecord.id,
+        role: "standard",
+        status: "pending",
+      }),
+    );
+
+    const blockedOrgStandardUserPb = createPbConnection();
+    const blockedOrgStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const blockedOrgStandardUserRecord = await blockedOrgStandardUserPb
+      .collection(usersCollectionName)
+      .create(blockedOrgStandardUserPayload);
+    await blockedOrgStandardUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(
+        blockedOrgStandardUserPayload.email,
+        blockedOrgStandardUserPayload.password,
+      );
+
+    await superadminAndOrgAdminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: blockedOrgStandardUserRecord.id,
+        role: "standard",
+        status: "blocked",
+      }),
+    );
+
+    const user1Pb = createPbConnection();
+    const user1UserPayload = userPayloadBuilder.forCreateRandomData();
+    const user1Record = await user1Pb.collection(usersCollectionName).create(user1UserPayload);
+    const user1OrganisationUserPermissionsPayload =
+      organisationUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisationRecord.id,
+        userId: user1Record.id,
+        role: "admin",
+        status: "approved",
+      });
+
+    const testFn = (p: { pb: PocketBase }) =>
+      p.pb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(user1OrganisationUserPermissionsPayload);
+
+    await expect(testFn({ pb: approvedOrgStandardUserPb })).rejects.toThrow();
+    await expect(testFn({ pb: pendingOrgStandardUserPb })).rejects.toThrow();
+    await expect(testFn({ pb: blockedOrgStandardUserPb })).rejects.toThrow();
     await expect(testFn({ pb: superadminAndOrgAdminPb })).resolves.toMatchObject(
       user1OrganisationUserPermissionsPayload,
     );
   });
 
-  it("PDBP-OUP-CREATE-07 — Organisation Standard cannot CREATE", async () => {
+  it("PDBP-OUP-CREATE-AS-NON-MEMBER-01 — Organisation Admin (approved, pending, or blocked) cannot CREATE AS NON-MEMBER", async () => {
     const superadminAndOrgAdminPb = createPbConnection();
     const superadminAndOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
     await superadminAndOrgAdminPb
@@ -467,40 +717,73 @@ describe(`${testSuiteName} tests`, () => {
         superadminAndOrgAdminUserPayload.password,
       );
 
-    const organisationRecord = await superadminAndOrgAdminPb
+    const organisation1Record = await superadminAndOrgAdminPb
+      .collection(organisationsCollectionName)
+      .create(organisationsPayloadBuilder.forCreateRandomData());
+    const organisation2Record = await superadminAndOrgAdminPb
       .collection(organisationsCollectionName)
       .create(organisationsPayloadBuilder.forCreateRandomData());
 
-    const standardUserPb = createPbConnection();
-    const standardUserPayload = userPayloadBuilder.forCreateRandomData();
-    const standardUserRecord = await standardUserPb
+    const approvedOrgAdminUserPb = createPbConnection();
+    const approvedOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const approvedOrgAdminUserRecord = await approvedOrgAdminUserPb
       .collection(usersCollectionName)
-      .create(standardUserPayload);
-    await standardUserPb
+      .create(approvedOrgAdminUserPayload);
+    await approvedOrgAdminUserPb
       .collection(usersCollectionName)
-      .authWithPassword(standardUserPayload.email, standardUserPayload.password);
+      .authWithPassword(approvedOrgAdminUserPayload.email, approvedOrgAdminUserPayload.password);
 
-    const standardOrganisationUserPermissionsPayload =
+    await superadminAndOrgAdminPb.collection(organisationUserPermissionsCollectionName).create(
       organisationUserPermissionsPayloadBuilder.forCreateData({
-        orgId: organisationRecord.id,
-        userId: standardUserRecord.id,
-        role: "standard",
+        orgId: organisation1Record.id,
+        userId: approvedOrgAdminUserRecord.id,
+        role: "admin",
         status: "approved",
-      });
-    await superadminAndOrgAdminPb
-      .collection(organisationUserPermissionsCollectionName)
-      .create(standardOrganisationUserPermissionsPayload);
+      }),
+    );
+
+    const pendingOrgAdminUserPb = createPbConnection();
+    const pendingOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const pendingOrgAdminUserRecord = await pendingOrgAdminUserPb
+      .collection(usersCollectionName)
+      .create(pendingOrgAdminUserPayload);
+    await pendingOrgAdminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(pendingOrgAdminUserPayload.email, pendingOrgAdminUserPayload.password);
+
+    await superadminAndOrgAdminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisation1Record.id,
+        userId: pendingOrgAdminUserRecord.id,
+        role: "admin",
+        status: "pending",
+      }),
+    );
+
+    const blockedOrgAdminUserPb = createPbConnection();
+    const blockedOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const blockedOrgAdminUserRecord = await blockedOrgAdminUserPb
+      .collection(usersCollectionName)
+      .create(blockedOrgAdminUserPayload);
+    await blockedOrgAdminUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(blockedOrgAdminUserPayload.email, blockedOrgAdminUserPayload.password);
+
+    await superadminAndOrgAdminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisation1Record.id,
+        userId: blockedOrgAdminUserRecord.id,
+        role: "admin",
+        status: "blocked",
+      }),
+    );
 
     const user1Pb = createPbConnection();
     const user1UserPayload = userPayloadBuilder.forCreateRandomData();
     const user1Record = await user1Pb.collection(usersCollectionName).create(user1UserPayload);
-    await user1Pb
-      .collection(usersCollectionName)
-      .authWithPassword(user1UserPayload.email, user1UserPayload.password);
-
     const user1OrganisationUserPermissionsPayload =
       organisationUserPermissionsPayloadBuilder.forCreateData({
-        orgId: organisationRecord.id,
+        orgId: organisation2Record.id,
         userId: user1Record.id,
         role: "admin",
         status: "approved",
@@ -510,7 +793,116 @@ describe(`${testSuiteName} tests`, () => {
       p.pb
         .collection(organisationUserPermissionsCollectionName)
         .create(user1OrganisationUserPermissionsPayload);
-    await expect(testFn({ pb: standardUserPb })).rejects.toThrow();
+
+    await expect(testFn({ pb: approvedOrgAdminUserPb })).rejects.toThrow();
+    await expect(testFn({ pb: pendingOrgAdminUserPb })).rejects.toThrow();
+    await expect(testFn({ pb: blockedOrgAdminUserPb })).rejects.toThrow();
+    await expect(testFn({ pb: superadminAndOrgAdminPb })).resolves.toMatchObject(
+      user1OrganisationUserPermissionsPayload,
+    );
+  });
+  it("PDBP-OUP-CREATE-AS-NON-MEMBER-02 — Organisation Standard (approved, pending, or blocked) cannot CREATE AS NON-MEMBER", async () => {
+    const superadminAndOrgAdminPb = createPbConnection();
+    const superadminAndOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminAndOrgAdminPb
+      .collection(usersCollectionName)
+      .create(superadminAndOrgAdminUserPayload);
+    await superadminAndOrgAdminPb
+      .collection(usersCollectionName)
+      .authWithPassword(
+        superadminAndOrgAdminUserPayload.email,
+        superadminAndOrgAdminUserPayload.password,
+      );
+
+    const organisation1Record = await superadminAndOrgAdminPb
+      .collection(organisationsCollectionName)
+      .create(organisationsPayloadBuilder.forCreateRandomData());
+    const organisation2Record = await superadminAndOrgAdminPb
+      .collection(organisationsCollectionName)
+      .create(organisationsPayloadBuilder.forCreateRandomData());
+
+    const approvedOrgStandardUserPb = createPbConnection();
+    const approvedOrgStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const approvedOrgStandardUserRecord = await approvedOrgStandardUserPb
+      .collection(usersCollectionName)
+      .create(approvedOrgStandardUserPayload);
+    await approvedOrgStandardUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(
+        approvedOrgStandardUserPayload.email,
+        approvedOrgStandardUserPayload.password,
+      );
+
+    await superadminAndOrgAdminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisation1Record.id,
+        userId: approvedOrgStandardUserRecord.id,
+        role: "standard",
+        status: "approved",
+      }),
+    );
+
+    const pendingOrgStandardUserPb = createPbConnection();
+    const pendingOrgStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const pendingOrgStandardUserRecord = await pendingOrgStandardUserPb
+      .collection(usersCollectionName)
+      .create(pendingOrgStandardUserPayload);
+    await pendingOrgStandardUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(
+        pendingOrgStandardUserPayload.email,
+        pendingOrgStandardUserPayload.password,
+      );
+
+    await superadminAndOrgAdminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisation1Record.id,
+        userId: pendingOrgStandardUserRecord.id,
+        role: "standard",
+        status: "pending",
+      }),
+    );
+
+    const blockedOrgStandardUserPb = createPbConnection();
+    const blockedOrgStandardUserPayload = userPayloadBuilder.forCreateRandomData();
+    const blockedOrgStandardUserRecord = await blockedOrgStandardUserPb
+      .collection(usersCollectionName)
+      .create(blockedOrgStandardUserPayload);
+    await blockedOrgStandardUserPb
+      .collection(usersCollectionName)
+      .authWithPassword(
+        blockedOrgStandardUserPayload.email,
+        blockedOrgStandardUserPayload.password,
+      );
+
+    await superadminAndOrgAdminPb.collection(organisationUserPermissionsCollectionName).create(
+      organisationUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisation1Record.id,
+        userId: blockedOrgStandardUserRecord.id,
+        role: "standard",
+        status: "blocked",
+      }),
+    );
+
+    const user1Pb = createPbConnection();
+    const user1UserPayload = userPayloadBuilder.forCreateRandomData();
+    const user1Record = await user1Pb.collection(usersCollectionName).create(user1UserPayload);
+    const user1OrganisationUserPermissionsPayload =
+      organisationUserPermissionsPayloadBuilder.forCreateData({
+        orgId: organisation2Record.id,
+        userId: user1Record.id,
+        role: "admin",
+        status: "approved",
+      });
+
+    const testFn = (p: { pb: PocketBase }) =>
+      p.pb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(user1OrganisationUserPermissionsPayload);
+
+    await expect(testFn({ pb: approvedOrgStandardUserPb })).rejects.toThrow();
+    await expect(testFn({ pb: pendingOrgStandardUserPb })).rejects.toThrow();
+    await expect(testFn({ pb: blockedOrgStandardUserPb })).rejects.toThrow();
     await expect(testFn({ pb: superadminAndOrgAdminPb })).resolves.toMatchObject(
       user1OrganisationUserPermissionsPayload,
     );
