@@ -1426,24 +1426,24 @@ describe(`${testSuiteName} tests`, () => {
       .collection(organisationsCollectionName)
       .create(organisation2Payload);
 
-    const approvedOrgAdminPb = createPbConnection();
-    const approvedOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
-    const approvedOrgAdminUserRecord = await approvedOrgAdminPb
+    const approvedOrg1AdminPb = createPbConnection();
+    const approvedOrg1AdminUserPayload = userPayloadBuilder.forCreateRandomData();
+    const approvedOrg1AdminUserRecord = await approvedOrg1AdminPb
       .collection(usersCollectionName)
-      .create(approvedOrgAdminUserPayload);
-    await approvedOrgAdminPb
+      .create(approvedOrg1AdminUserPayload);
+    await approvedOrg1AdminPb
       .collection(usersCollectionName)
-      .authWithPassword(approvedOrgAdminUserPayload.email, approvedOrgAdminUserPayload.password);
-    const approvedOrgAdminOrganisationUserPermissionsPayload =
+      .authWithPassword(approvedOrg1AdminUserPayload.email, approvedOrg1AdminUserPayload.password);
+    const approvedOrg1AdminOrganisationUserPermissionsPayload =
       organisationUserPermissionsPayloadBuilder.forCreateData({
-        userId: approvedOrgAdminUserRecord.id,
+        userId: approvedOrg1AdminUserRecord.id,
         orgId: organisation1Record.id,
         role: "admin",
         status: "approved",
       });
     await superadminAndOrgAdminPb
       .collection(organisationUserPermissionsCollectionName)
-      .create(approvedOrgAdminOrganisationUserPermissionsPayload);
+      .create(approvedOrg1AdminOrganisationUserPermissionsPayload);
 
     const user1Pb = createPbConnection();
     const user1UserPayload = userPayloadBuilder.forCreateRandomData();
@@ -1482,7 +1482,7 @@ describe(`${testSuiteName} tests`, () => {
       .create(user2OrganisationUserPermissionsPayload);
 
     await expect(
-      approvedOrgAdminPb
+      approvedOrg1AdminPb
         .collection(organisationUserPermissionsCollectionName)
         .update(user1OrganisationUserPermissionRecord.id, {
           ...user1OrganisationUserPermissionRecord,
