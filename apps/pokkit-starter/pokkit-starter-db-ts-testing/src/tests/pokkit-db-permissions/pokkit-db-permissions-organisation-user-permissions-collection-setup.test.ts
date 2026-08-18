@@ -12,6 +12,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../../config/pocketbaseConfig";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_constants";
 import { pokkitDbPermissionsTestsMetadata } from "./_pokkitDbConfigSyncTestsMetadata";
+import { organisationUserPermissionsCollectionName } from "@repo/pokkit-db-permissions-ts-helpers";
 
 const testMetadata =
   pokkitDbPermissionsTestsMetadata.pokkitDbPermissionsOrganisationUserPermissionsCollectionSetup;
@@ -55,5 +56,15 @@ describe(`${testSuiteName} tests`, () => {
     expect(isHealthy.code).toBe(200);
   });
 
-  it("PDBP-OUP-SETUP-01 — Verify collection presence and validity is setup correctly", async () => {});
+  it("PDBP-OUP-SETUP-01 — Verify collection presence and validity is setup correctly", async () => {
+    const superuserPb = createPbConnection();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+    const collections = await superuserPb.collections.getFullList();
+    const organisationUserPermissionsCollection = collections.find(
+      (c) => c.name === organisationUserPermissionsCollectionName,
+    );
+    expect(organisationUserPermissionsCollection).toBeTruthy();
+  });
 });
