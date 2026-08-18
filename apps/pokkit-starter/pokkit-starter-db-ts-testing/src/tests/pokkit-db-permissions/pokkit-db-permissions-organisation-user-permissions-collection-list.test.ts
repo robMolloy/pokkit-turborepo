@@ -34,7 +34,11 @@ const pbFilePath = getPbFilePath({ pbDirPath });
 const pbServeUrl = getPbServeUrl({ pbPortNumber });
 const logFilePath = `_logs/${testSuiteName}`;
 
-const createPbConnection = () => new PocketBase(pbServeUrl);
+const createPbConnection = () => {
+  const pb = new PocketBase(pbServeUrl);
+  pb.autoCancellation(false);
+  return pb;
+};
 
 describe(`${testSuiteName} tests`, () => {
   beforeAll(async () => {
@@ -530,6 +534,144 @@ describe(`${testSuiteName} tests`, () => {
     await expect(testFn({ pb: superadminPb })).resolves.toHaveLength(3);
   });
 
-  // it("PDBP-OUP-LIST-OWN-01 — Organisation Admin can LIST OWN", async () => {});
-  // it("PDBP-OUP-LIST-OWN-02 — Organisation Standard can LIST OWN", async () => {});
+  it("PDBP-OUP-LIST-OWN-01 — Organisation Admin can LIST OWN", async () => {
+    const superadminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: { toBeActionedByPb: superadminPb, payload: userPayloadBuilder.forCreateRandomData() },
+    });
+
+    const organisation1Record = await superadminPb
+      .collection(organisationsCollectionName)
+      .create(organisationsPayloadBuilder.forCreateRandomData());
+    const organisation2Record = await superadminPb
+      .collection(organisationsCollectionName)
+      .create(organisationsPayloadBuilder.forCreateRandomData());
+    const organisation3Record = await superadminPb
+      .collection(organisationsCollectionName)
+      .create(organisationsPayloadBuilder.forCreateRandomData());
+    const organisation4Record = await superadminPb
+      .collection(organisationsCollectionName)
+      .create(organisationsPayloadBuilder.forCreateRandomData());
+
+    const approvedOrgAdminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: approvedOrgAdminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+      },
+      organisationUserPermissions: [
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisation1Record.id, role: "admin", status: "approved" },
+        },
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisation2Record.id, role: "admin", status: "approved" },
+        },
+      ],
+    });
+    const pendingOrgAdminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: pendingOrgAdminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+      },
+      organisationUserPermissions: [
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisation3Record.id, role: "admin", status: "pending" },
+        },
+      ],
+    });
+    const blockedOrgAdminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: blockedOrgAdminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+      },
+      organisationUserPermissions: [
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisation4Record.id, role: "admin", status: "blocked" },
+        },
+      ],
+    });
+    const testFn = async (p: { pb: PocketBase }) =>
+      p.pb.collection(organisationUserPermissionsCollectionName).getFullList();
+
+    await expect(testFn({ pb: approvedOrgAdminPb })).resolves.toHaveLength(4);
+    await expect(testFn({ pb: pendingOrgAdminPb })).resolves.toHaveLength(1);
+    await expect(testFn({ pb: blockedOrgAdminPb })).resolves.toHaveLength(1);
+    await expect(testFn({ pb: superadminPb })).resolves.toHaveLength(8);
+  });
+  it("PDBP-OUP-LIST-OWN-02 — Organisation Standard can LIST OWN", async () => {
+    const superadminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: { toBeActionedByPb: superadminPb, payload: userPayloadBuilder.forCreateRandomData() },
+    });
+
+    const organisation1Record = await superadminPb
+      .collection(organisationsCollectionName)
+      .create(organisationsPayloadBuilder.forCreateRandomData());
+    const organisation2Record = await superadminPb
+      .collection(organisationsCollectionName)
+      .create(organisationsPayloadBuilder.forCreateRandomData());
+    const organisation3Record = await superadminPb
+      .collection(organisationsCollectionName)
+      .create(organisationsPayloadBuilder.forCreateRandomData());
+    const organisation4Record = await superadminPb
+      .collection(organisationsCollectionName)
+      .create(organisationsPayloadBuilder.forCreateRandomData());
+
+    const approvedOrgStandardPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: approvedOrgStandardPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+      },
+      organisationUserPermissions: [
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisation1Record.id, role: "standard", status: "approved" },
+        },
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisation2Record.id, role: "standard", status: "approved" },
+        },
+      ],
+    });
+    const pendingOrgStandardPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: pendingOrgStandardPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+      },
+      organisationUserPermissions: [
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisation3Record.id, role: "standard", status: "pending" },
+        },
+      ],
+    });
+    const blockedOrgStandardPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: blockedOrgStandardPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+      },
+      organisationUserPermissions: [
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisation4Record.id, role: "standard", status: "blocked" },
+        },
+      ],
+    });
+    const testFn = async (p: { pb: PocketBase }) =>
+      p.pb.collection(organisationUserPermissionsCollectionName).getFullList();
+
+    await expect(testFn({ pb: approvedOrgStandardPb })).resolves.toHaveLength(4);
+    await expect(testFn({ pb: pendingOrgStandardPb })).resolves.toHaveLength(1);
+    await expect(testFn({ pb: blockedOrgStandardPb })).resolves.toHaveLength(1);
+    await expect(testFn({ pb: superadminPb })).resolves.toHaveLength(8);
+  });
 });
