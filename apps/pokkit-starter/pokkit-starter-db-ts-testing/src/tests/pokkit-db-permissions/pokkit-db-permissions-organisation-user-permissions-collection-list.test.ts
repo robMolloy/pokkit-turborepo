@@ -197,10 +197,12 @@ describe(`${testSuiteName} tests`, () => {
     const user1Pb = createPbConnection();
     await createUserAndPermissions({
       user: { toBeActionedByPb: user1Pb, payload: userPayloadBuilder.forCreateRandomData() },
-      organisationUserPermissions: {
-        toBeActionedByPb: superadminPb,
-        payload: { orgId: organisationRecord.id, role: "admin", status: "approved" },
-      },
+      organisationUserPermissions: [
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisationRecord.id, role: "admin", status: "approved" },
+        },
+      ],
     });
 
     const organisationUserPermissionRecords = await adminPb
@@ -239,10 +241,12 @@ describe(`${testSuiteName} tests`, () => {
     const user1Pb = createPbConnection();
     await createUserAndPermissions({
       user: { toBeActionedByPb: user1Pb, payload: userPayloadBuilder.forCreateRandomData() },
-      organisationUserPermissions: {
-        toBeActionedByPb: superadminPb,
-        payload: { orgId: organisationRecord.id, role: "admin", status: "approved" },
-      },
+      organisationUserPermissions: [
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisationRecord.id, role: "admin", status: "approved" },
+        },
+      ],
     });
 
     const testFn = async (p: { pb: PocketBase }) =>
@@ -275,10 +279,12 @@ describe(`${testSuiteName} tests`, () => {
     const user1Pb = createPbConnection();
     await createUserAndPermissions({
       user: { toBeActionedByPb: user1Pb, payload: userPayloadBuilder.forCreateRandomData() },
-      organisationUserPermissions: {
-        toBeActionedByPb: superadminPb,
-        payload: { orgId: organisationRecord.id, role: "admin", status: "approved" },
-      },
+      organisationUserPermissions: [
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisationRecord.id, role: "admin", status: "approved" },
+        },
+      ],
     });
 
     const testFn = async (p: { pb: PocketBase }) =>
@@ -325,10 +331,12 @@ describe(`${testSuiteName} tests`, () => {
     const user1Pb = createPbConnection();
     await createUserAndPermissions({
       user: { toBeActionedByPb: user1Pb, payload: userPayloadBuilder.forCreateRandomData() },
-      organisationUserPermissions: {
-        toBeActionedByPb: superadminPb,
-        payload: { orgId: organisationRecord.id, role: "admin", status: "approved" },
-      },
+      organisationUserPermissions: [
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisationRecord.id, role: "admin", status: "approved" },
+        },
+      ],
     });
 
     const testFn = async (p: { pb: PocketBase }) =>
@@ -352,10 +360,12 @@ describe(`${testSuiteName} tests`, () => {
     const orgAdminPb = createPbConnection();
     await createUserAndPermissions({
       user: { toBeActionedByPb: orgAdminPb, payload: userPayloadBuilder.forCreateRandomData() },
-      organisationUserPermissions: {
-        toBeActionedByPb: superadminPb,
-        payload: { orgId: organisationRecord.id, role: "admin", status: "approved" },
-      },
+      organisationUserPermissions: [
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisationRecord.id, role: "admin", status: "approved" },
+        },
+      ],
     });
 
     await expect(
@@ -379,10 +389,12 @@ describe(`${testSuiteName} tests`, () => {
         toBeActionedByPb: pendingOrgAdminPb,
         payload: userPayloadBuilder.forCreateRandomData(),
       },
-      organisationUserPermissions: {
-        toBeActionedByPb: superadminPb,
-        payload: { orgId: organisationRecord.id, role: "admin", status: "pending" },
-      },
+      organisationUserPermissions: [
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisationRecord.id, role: "admin", status: "pending" },
+        },
+      ],
     });
     const blockedOrgAdminPb = createPbConnection();
     await createUserAndPermissions({
@@ -390,10 +402,12 @@ describe(`${testSuiteName} tests`, () => {
         toBeActionedByPb: blockedOrgAdminPb,
         payload: userPayloadBuilder.forCreateRandomData(),
       },
-      organisationUserPermissions: {
-        toBeActionedByPb: superadminPb,
-        payload: { orgId: organisationRecord.id, role: "admin", status: "blocked" },
-      },
+      organisationUserPermissions: [
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisationRecord.id, role: "admin", status: "blocked" },
+        },
+      ],
     });
 
     const testFn = async (p: { pb: PocketBase }) =>
@@ -423,10 +437,12 @@ describe(`${testSuiteName} tests`, () => {
         toBeActionedByPb: org1StandardMember1Pb,
         payload: userPayloadBuilder.forCreateRandomData(),
       },
-      organisationUserPermissions: {
-        toBeActionedByPb: superadminPb,
-        payload: { orgId: organisation1Record.id, role: "standard", status: "approved" },
-      },
+      organisationUserPermissions: [
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisation1Record.id, role: "standard", status: "approved" },
+        },
+      ],
     });
 
     const org1StandardMember2Pb = createPbConnection();
@@ -435,10 +451,12 @@ describe(`${testSuiteName} tests`, () => {
         toBeActionedByPb: org1StandardMember2Pb,
         payload: userPayloadBuilder.forCreateRandomData(),
       },
-      organisationUserPermissions: {
-        toBeActionedByPb: superadminPb,
-        payload: { orgId: organisation1Record.id, role: "standard", status: "approved" },
-      },
+      organisationUserPermissions: [
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisation1Record.id, role: "standard", status: "approved" },
+        },
+      ],
     });
 
     const org2StandardMember1Pb = createPbConnection();
@@ -447,10 +465,12 @@ describe(`${testSuiteName} tests`, () => {
         toBeActionedByPb: org2StandardMember1Pb,
         payload: userPayloadBuilder.forCreateRandomData(),
       },
-      organisationUserPermissions: {
-        toBeActionedByPb: superadminPb,
-        payload: { orgId: organisation2Record.id, role: "standard", status: "approved" },
-      },
+      organisationUserPermissions: [
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisation2Record.id, role: "standard", status: "approved" },
+        },
+      ],
     });
 
     await expect(
@@ -480,10 +500,12 @@ describe(`${testSuiteName} tests`, () => {
         toBeActionedByPb: pendingOrgStandardPb,
         payload: userPayloadBuilder.forCreateRandomData(),
       },
-      organisationUserPermissions: {
-        toBeActionedByPb: superadminPb,
-        payload: { orgId: organisationRecord.id, role: "admin", status: "pending" },
-      },
+      organisationUserPermissions: [
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisationRecord.id, role: "admin", status: "pending" },
+        },
+      ],
     });
 
     const blockedOrgStandardPb = createPbConnection();
@@ -492,10 +514,12 @@ describe(`${testSuiteName} tests`, () => {
         toBeActionedByPb: blockedOrgStandardPb,
         payload: userPayloadBuilder.forCreateRandomData(),
       },
-      organisationUserPermissions: {
-        toBeActionedByPb: superadminPb,
-        payload: { orgId: organisationRecord.id, role: "admin", status: "blocked" },
-      },
+      organisationUserPermissions: [
+        {
+          toBeActionedByPb: superadminPb,
+          payload: { orgId: organisationRecord.id, role: "admin", status: "blocked" },
+        },
+      ],
     });
 
     const testFn = async (p: { pb: PocketBase }) =>

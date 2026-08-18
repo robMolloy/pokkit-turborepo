@@ -97,7 +97,7 @@ export const createUserAndPermissions = async (p: {
   organisationUserPermissions?: {
     toBeActionedByPb: PocketBase;
     payload: Omit<TOrganisationUserPermissionsCreatePayload, "userId">;
-  };
+  }[];
 }) => {
   const userRecord = await p.user.toBeActionedByPb
     .collection(usersCollectionName)
@@ -118,17 +118,19 @@ export const createUserAndPermissions = async (p: {
       );
   })();
 
-  const organisationUserPermissionsRecord = await (() => {
+  const organisationUserPermissionsRecordsPrmosises = (() => {
     if (!p.organisationUserPermissions) return undefined;
-    return p.organisationUserPermissions.toBeActionedByPb
-      .collection(organisationUserPermissionsCollectionName)
-      .create(
-        organisationUserPermissionsPayloadBuilder.forCreateData({
-          ...p.organisationUserPermissions.payload,
-          userId: userRecord.id,
-        }),
-      );
+    return p.organisationUserPermissions.map((x) => {
+      const payload = { ...x.payload, userId: userRecord.id };
+      return x.toBeActionedByPb
+        .collection(organisationUserPermissionsCollectionName)
+        .create(organisationUserPermissionsPayloadBuilder.forCreateData(payload));
+    });
   })();
 
-  return { userRecord, globalUserPermissionsRecord, organisationUserPermissionsRecord };
+  const organisationUserPermissionsRecords = organisationUserPermissionsRecordsPrmosises
+    ? await Promise.all(organisationUserPermissionsRecordsPrmosises)
+    : undefined;
+
+  return { userRecord, globalUserPermissionsRecord, organisationUserPermissionsRecords };
 };
