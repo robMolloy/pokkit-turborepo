@@ -130,7 +130,7 @@ export const createUserAndPermissions = async (p: {
 
   const organisationUserPermissionsRecords = organisationUserPermissionsRecordsPrmosises
     ? await Promise.all(organisationUserPermissionsRecordsPrmosises)
-    : undefined;
+    : [];
 
   return { userRecord, globalUserPermissionsRecord, organisationUserPermissionsRecords };
 };
