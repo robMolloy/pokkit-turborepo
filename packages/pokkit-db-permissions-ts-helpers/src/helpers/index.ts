@@ -78,11 +78,20 @@ export type TOrganisationUserPermissionsCreatePayload = {
   role: TOrganisationUserPermissionsRole;
   status: TOrganisationUserPermissionsStatus;
 };
+export type TOrganisationUserPermissionsUpdatePayload = {
+  role?: TOrganisationUserPermissionsRole;
+  status?: TOrganisationUserPermissionsStatus;
+};
 export const organisationUserPermissionsPayloadBuilder = {
   forCreateData: <T extends TOrganisationUserPermissionsCreatePayload>(p: T) =>
     ({
       orgId: p.orgId,
       userId: p.userId,
+      role: p.role,
+      status: p.status,
+    }) as T,
+  forUpdateData: <T extends TOrganisationUserPermissionsUpdatePayload>(p: T) =>
+    ({
       role: p.role,
       status: p.status,
     }) as T,
