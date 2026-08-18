@@ -141,11 +141,29 @@ Check that a member of an organisation can only (create) update and delete their
 | _"_             | Approved |   ❌   |  ✅  |  ✅  |   ❌   |   ❌   |
 | _"_             | Blocked  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
 
-| Organisation Role | Status   | Create | View | List | Update | Delete | Create Own | View Own | List Own | Update Own | Delete Own |
-| ----------------- | -------- | :----: | :--: | :--: | :----: | :----: | :--------: | :------: | :------: | :--------: | :--------: |
-| **Admin**         | Pending  |  N/A   |  ❌  |  ❌  |   ❌   |   ❌   |    N/A     |    ✅    |    ✅    |     ❌     |     ❌     |
-| _"_               | Approved |  N/A   |  ✅  |  ✅  |   ✅   |   ✅   |    N/A     |    ✅    |    ✅    |     ❌     |     ❌     |
-| _"_               | Blocked  |  N/A   |  ❌  |  ❌  |   ❌   |   ❌   |    N/A     |    ✅    |    ✅    |     ❌     |     ❌     |
-| **Standard**      | Pending  |  N/A   |  ❌  |  ❌  |   ❌   |   ❌   |    N/A     |    ✅    |    ✅    |     ❌     |     ❌     |
-| _"_               | Approved |  N/A   |  ✅  |  ✅  |   ❌   |   ❌   |    N/A     |    ✅    |    ✅    |     ❌     |     ❌     |
-| _"_               | Blocked  |  N/A   |  ❌  |  ❌  |   ❌   |   ❌   |    N/A     |    ✅    |    ✅    |     ❌     |     ❌     |
+| Organisation Role | Status   | Create (As Member) | View (As Member) | List (As Member) | Update (As Member) | Delete (As Member) |
+| ----------------- | -------- | :----------------: | :--------------: | :--------------: | :----------------: | :----------------: |
+| **Admin**         | Pending  |         ❌         |        ❌        |        ❌        |         ❌         |         ❌         |
+| _"_               | Approved |         ✅         |        ✅        |        ✅        |         ✅         |         ✅         |
+| _"_               | Blocked  |         ❌         |        ❌        |        ❌        |         ❌         |         ❌         |
+| **Standard**      | Pending  |         ❌         |        ❌        |        ❌        |         ❌         |         ❌         |
+| _"_               | Approved |         ❌         |        ✅        |        ✅        |         ❌         |         ❌         |
+| _"_               | Blocked  |         ❌         |        ❌        |        ❌        |         ❌         |         ❌         |
+
+| Organisation Role | Status   | Create (As Non-Member) | View (As Non-Member) | List (As Non-Member) | Update (As Non-Member) | Delete (As Non-Member) |
+| ----------------- | -------- | :--------------------: | :------------------: | :------------------: | :--------------------: | :--------------------: |
+| **Admin**         | Pending  |           ❌           |          ❌          |          ❌          |           ❌           |           ❌           |
+| _"_               | Approved |           ❌           |          ❌          |          ❌          |           ❌           |           ❌           |
+| _"_               | Blocked  |           ❌           |          ❌          |          ❌          |           ❌           |           ❌           |
+| **Standard**      | Pending  |           ❌           |          ❌          |          ❌          |           ❌           |           ❌           |
+| _"_               | Approved |           ❌           |          ❌          |          ❌          |           ❌           |           ❌           |
+| _"_               | Blocked  |           ❌           |          ❌          |          ❌          |           ❌           |           ❌           |
+
+| Organisation Role | Status   | Create Own | View Own | List Own | Update Own | Delete Own |
+| ----------------- | -------- | :--------: | :------: | :------: | :--------: | :--------: |
+| **Admin**         | Pending  |    N/A     |    ✅    |    ✅    |     ❌     |     ❌     |
+| _"_               | Approved |    N/A     |    ✅    |    ✅    |     ❌     |     ❌     |
+| _"_               | Blocked  |    N/A     |    ✅    |    ✅    |     ❌     |     ❌     |
+| **Standard**      | Pending  |    N/A     |    ✅    |    ✅    |     ❌     |     ❌     |
+| _"_               | Approved |    N/A     |    ✅    |    ✅    |     ❌     |     ❌     |
+| _"_               | Blocked  |    N/A     |    ✅    |    ✅    |     ❌     |     ❌     |

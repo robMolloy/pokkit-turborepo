@@ -2,9 +2,22 @@
 
 ## Scope
 
-This plan covers required tests for the Pokkit Db Permissions plugin:
+This plan covers required tests for the Pokkit Db Permissions plugin.
 
-Each test is given a tag in the following format. PDBP-{COLLECTION}-{ACTION}-{NN} In order to track the tests more easily.
+Each test is given a tag in order to track the tests more easily:
+
+- Global role tests: `PDBP-OUP-{ACTION}-{NN}`
+- Organisation role tests: `PDBP-OUP-{ACTION}-AS-MEMBER-{NN}`, `PDBP-OUP-{ACTION}-AS-NON-MEMBER-{NN}`, `PDBP-OUP-{ACTION}-OWN-{NN}`
+
+A ❌ in the spec still requires a test. It means the action must not succeed. Statuses that share the same outcome may be grouped (`pending or blocked`, or `approved, pending, or blocked`); the grouping must appear in the test title.
+
+Organisation role tests use these meanings:
+
+- **As Member**: the actor has an `organisationUserPermissions` record for the same organisation as the target record, and the target is not the actor's own record
+- **As Non-Member**: the actor is not a member of the target organisation (including when they are a member of a different organisation)
+- **Own**: the target is the actor's own `organisationUserPermissions` record
+
+Create Own is N/A in the spec (users are not expected to create their own membership record) and has no tests.
 
 ---
 
@@ -24,25 +37,37 @@ Checks that a user with global user permissions role `superadmin` and status `ap
 
 Checks that a user with global user permissions role `superadmin` and status `pending` or `blocked` cannot CREATE a record in the `organisationUserPermissions` collection.
 
-### PDBP-OUP-CREATE-03 — Global Admin cannot CREATE
+### PDBP-OUP-CREATE-03 — Global Admin (approved, pending, or blocked) cannot CREATE
 
-Checks that a user with global user permissions role `admin` cannot CREATE a record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `admin` and status `approved`, `pending`, or `blocked` cannot CREATE a record in the `organisationUserPermissions` collection.
 
-### PDBP-OUP-CREATE-04 — Global Standard cannot CREATE
+### PDBP-OUP-CREATE-04 — Global Standard (approved, pending, or blocked) cannot CREATE
 
-Checks that a user with global user permissions role `standard` cannot CREATE a record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `standard` and status `approved`, `pending`, or `blocked` cannot CREATE a record in the `organisationUserPermissions` collection.
 
-### PDBP-OUP-CREATE-05 — Organisation Admin (approved) can CREATE
+## CREATE AS MEMBER tests
 
-Checks that a user with organisation role `admin` and status `approved` can CREATE a record in the `organisationUserPermissions` collection.
+### PDBP-OUP-CREATE-AS-MEMBER-01 — Organisation Admin (approved) can CREATE AS MEMBER
 
-### PDBP-OUP-CREATE-06 — Organisation Admin (pending or blocked) cannot CREATE
+Checks that a user with organisation role `admin` and status `approved` can CREATE a record in the `organisationUserPermissions` collection for another user in an organisation they are a member of.
 
-Checks that a user with organisation role `admin` and status `pending` or `blocked` cannot CREATE a record in the `organisationUserPermissions` collection.
+### PDBP-OUP-CREATE-AS-MEMBER-02 — Organisation Admin (pending or blocked) cannot CREATE AS MEMBER
 
-### PDBP-OUP-CREATE-07 — Organisation Standard cannot CREATE
+Checks that a user with organisation role `admin` and status `pending` or `blocked` cannot CREATE a record in the `organisationUserPermissions` collection for another user in an organisation they are a member of.
 
-Checks that a user with organisation role `standard` cannot CREATE a record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+### PDBP-OUP-CREATE-AS-MEMBER-03 — Organisation Standard (approved, pending, or blocked) cannot CREATE AS MEMBER
+
+Checks that a user with organisation role `standard` and status `approved`, `pending`, or `blocked` cannot CREATE a record in the `organisationUserPermissions` collection for another user in an organisation they are a member of.
+
+## CREATE AS NON-MEMBER tests
+
+### PDBP-OUP-CREATE-AS-NON-MEMBER-01 — Organisation Admin (approved, pending, or blocked) cannot CREATE AS NON-MEMBER
+
+Checks that a user with organisation role `admin` and status `approved`, `pending`, or `blocked` cannot CREATE a record in the `organisationUserPermissions` collection for an organisation they are not a member of.
+
+### PDBP-OUP-CREATE-AS-NON-MEMBER-02 — Organisation Standard (approved, pending, or blocked) cannot CREATE AS NON-MEMBER
+
+Checks that a user with organisation role `standard` and status `approved`, `pending`, or `blocked` cannot CREATE a record in the `organisationUserPermissions` collection for an organisation they are not a member of.
 
 ## VIEW tests
 
@@ -70,31 +95,43 @@ Checks that a user with global user permissions role `standard` and status `appr
 
 Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot VIEW a record in the `organisationUserPermissions` collection.
 
-### PDBP-OUP-VIEW-07 — Organisation Admin (approved) can VIEW
+## VIEW AS MEMBER tests
 
-Checks that a user with organisation role `admin` and status `approved` can VIEW a record in the `organisationUserPermissions` collection.
+### PDBP-OUP-VIEW-AS-MEMBER-01 — Organisation Admin (approved) can VIEW AS MEMBER
 
-### PDBP-OUP-VIEW-08 — Organisation Admin (pending or blocked) cannot VIEW
+Checks that a user with organisation role `admin` and status `approved` can VIEW another member's record in the `organisationUserPermissions` collection for an organisation they are a member of.
 
-Checks that a user with organisation role `admin` and status `pending` or `blocked` cannot VIEW a record in the `organisationUserPermissions` collection.
+### PDBP-OUP-VIEW-AS-MEMBER-02 — Organisation Admin (pending or blocked) cannot VIEW AS MEMBER
 
-### PDBP-OUP-VIEW-09 — Organisation Standard (approved) can VIEW
+Checks that a user with organisation role `admin` and status `pending` or `blocked` cannot VIEW another member's record in the `organisationUserPermissions` collection for an organisation they are a member of.
 
-Checks that a user with organisation role `standard` and status `approved` can VIEW a record in the `organisationUserPermissions` collection.
+### PDBP-OUP-VIEW-AS-MEMBER-03 — Organisation Standard (approved) can VIEW AS MEMBER
 
-### PDBP-OUP-VIEW-10 — Organisation Standard (pending or blocked) cannot VIEW
+Checks that a user with organisation role `standard` and status `approved` can VIEW another member's record in the `organisationUserPermissions` collection for an organisation they are a member of.
 
-Checks that a user with organisation role `standard` and status `pending` or `blocked` cannot VIEW a record in the `organisationUserPermissions` collection.
+### PDBP-OUP-VIEW-AS-MEMBER-04 — Organisation Standard (pending or blocked) cannot VIEW AS MEMBER
+
+Checks that a user with organisation role `standard` and status `pending` or `blocked` cannot VIEW another member's record in the `organisationUserPermissions` collection for an organisation they are a member of.
+
+## VIEW AS NON-MEMBER tests
+
+### PDBP-OUP-VIEW-AS-NON-MEMBER-01 — Organisation Admin (approved, pending, or blocked) cannot VIEW AS NON-MEMBER
+
+Checks that a user with organisation role `admin` and status `approved`, `pending`, or `blocked` cannot VIEW a record in the `organisationUserPermissions` collection for an organisation they are not a member of.
+
+### PDBP-OUP-VIEW-AS-NON-MEMBER-02 — Organisation Standard (approved, pending, or blocked) cannot VIEW AS NON-MEMBER
+
+Checks that a user with organisation role `standard` and status `approved`, `pending`, or `blocked` cannot VIEW a record in the `organisationUserPermissions` collection for an organisation they are not a member of.
 
 ## VIEW OWN tests
 
-### PDBP-OUP-VIEW-OWN-01 — Organisation Admin can VIEW OWN
+### PDBP-OUP-VIEW-OWN-01 — Organisation Admin (approved, pending, or blocked) can VIEW OWN
 
-Checks that a user with organisation role `admin` can VIEW their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with organisation role `admin` and status `approved`, `pending`, or `blocked` can VIEW their own record in the `organisationUserPermissions` collection.
 
-### PDBP-OUP-VIEW-OWN-02 — Organisation Standard can VIEW OWN
+### PDBP-OUP-VIEW-OWN-02 — Organisation Standard (approved, pending, or blocked) can VIEW OWN
 
-Checks that a user with organisation role `standard` can VIEW their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with organisation role `standard` and status `approved`, `pending`, or `blocked` can VIEW their own record in the `organisationUserPermissions` collection.
 
 ## LIST tests
 
@@ -122,31 +159,43 @@ Checks that a user with global user permissions role `standard` and status `appr
 
 Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot LIST records in the `organisationUserPermissions` collection.
 
-### PDBP-OUP-LIST-07 — Organisation Admin (approved) can LIST
+## LIST AS MEMBER tests
 
-Checks that a user with organisation role `admin` and status `approved` can LIST records in the `organisationUserPermissions` collection.
+### PDBP-OUP-LIST-AS-MEMBER-01 — Organisation Admin (approved) can LIST AS MEMBER
 
-### PDBP-OUP-LIST-08 — Organisation Admin (pending or blocked) cannot LIST
+Checks that a user with organisation role `admin` and status `approved` can LIST other members' records in the `organisationUserPermissions` collection for an organisation they are a member of.
 
-Checks that a user with organisation role `admin` and status `pending` or `blocked` cannot LIST records in the `organisationUserPermissions` collection.
+### PDBP-OUP-LIST-AS-MEMBER-02 — Organisation Admin (pending or blocked) cannot LIST AS MEMBER
 
-### PDBP-OUP-LIST-09 — Organisation Standard (approved) can LIST
+Checks that a user with organisation role `admin` and status `pending` or `blocked` cannot LIST other members' records in the `organisationUserPermissions` collection for an organisation they are a member of.
 
-Checks that a user with organisation role `standard` and status `approved` can LIST records in the `organisationUserPermissions` collection.
+### PDBP-OUP-LIST-AS-MEMBER-03 — Organisation Standard (approved) can LIST AS MEMBER
 
-### PDBP-OUP-LIST-10 — Organisation Standard (pending or blocked) cannot LIST
+Checks that a user with organisation role `standard` and status `approved` can LIST other members' records in the `organisationUserPermissions` collection for an organisation they are a member of.
 
-Checks that a user with organisation role `standard` and status `pending` or `blocked` cannot LIST records in the `organisationUserPermissions` collection.
+### PDBP-OUP-LIST-AS-MEMBER-04 — Organisation Standard (pending or blocked) cannot LIST AS MEMBER
+
+Checks that a user with organisation role `standard` and status `pending` or `blocked` cannot LIST other members' records in the `organisationUserPermissions` collection for an organisation they are a member of.
+
+## LIST AS NON-MEMBER tests
+
+### PDBP-OUP-LIST-AS-NON-MEMBER-01 — Organisation Admin (approved, pending, or blocked) cannot LIST AS NON-MEMBER
+
+Checks that a user with organisation role `admin` and status `approved`, `pending`, or `blocked` cannot LIST records in the `organisationUserPermissions` collection for an organisation they are not a member of.
+
+### PDBP-OUP-LIST-AS-NON-MEMBER-02 — Organisation Standard (approved, pending, or blocked) cannot LIST AS NON-MEMBER
+
+Checks that a user with organisation role `standard` and status `approved`, `pending`, or `blocked` cannot LIST records in the `organisationUserPermissions` collection for an organisation they are not a member of.
 
 ## LIST OWN tests
 
-### PDBP-OUP-LIST-OWN-01 — Organisation Admin can LIST OWN
+### PDBP-OUP-LIST-OWN-01 — Organisation Admin (approved, pending, or blocked) can LIST OWN
 
-Checks that a user with organisation role `admin` can LIST their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with organisation role `admin` and status `approved`, `pending`, or `blocked` can LIST their own record in the `organisationUserPermissions` collection.
 
-### PDBP-OUP-LIST-OWN-02 — Organisation Standard can LIST OWN
+### PDBP-OUP-LIST-OWN-02 — Organisation Standard (approved, pending, or blocked) can LIST OWN
 
-Checks that a user with organisation role `standard` can LIST their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with organisation role `standard` and status `approved`, `pending`, or `blocked` can LIST their own record in the `organisationUserPermissions` collection.
 
 ## UPDATE tests
 
@@ -158,35 +207,47 @@ Checks that a user with global user permissions role `superadmin` and status `ap
 
 Checks that a user with global user permissions role `superadmin` and status `pending` or `blocked` cannot UPDATE a record in the `organisationUserPermissions` collection.
 
-### PDBP-OUP-UPDATE-03 — Global Admin cannot UPDATE
+### PDBP-OUP-UPDATE-03 — Global Admin (approved, pending, or blocked) cannot UPDATE
 
-Checks that a user with global user permissions role `admin` cannot UPDATE a record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `admin` and status `approved`, `pending`, or `blocked` cannot UPDATE a record in the `organisationUserPermissions` collection.
 
-### PDBP-OUP-UPDATE-04 — Global Standard cannot UPDATE
+### PDBP-OUP-UPDATE-04 — Global Standard (approved, pending, or blocked) cannot UPDATE
 
-Checks that a user with global user permissions role `standard` cannot UPDATE a record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `standard` and status `approved`, `pending`, or `blocked` cannot UPDATE a record in the `organisationUserPermissions` collection.
 
-### PDBP-OUP-UPDATE-05 — Organisation Admin (approved) can UPDATE
+## UPDATE AS MEMBER tests
 
-Checks that a user with organisation role `admin` and status `approved` can UPDATE a record in the `organisationUserPermissions` collection.
+### PDBP-OUP-UPDATE-AS-MEMBER-01 — Organisation Admin (approved) can UPDATE AS MEMBER
 
-### PDBP-OUP-UPDATE-06 — Organisation Admin (pending or blocked) cannot UPDATE
+Checks that a user with organisation role `admin` and status `approved` can UPDATE another member's record in the `organisationUserPermissions` collection for an organisation they are a member of.
 
-Checks that a user with organisation role `admin` and status `pending` or `blocked` cannot UPDATE a record in the `organisationUserPermissions` collection.
+### PDBP-OUP-UPDATE-AS-MEMBER-02 — Organisation Admin (pending or blocked) cannot UPDATE AS MEMBER
 
-### PDBP-OUP-UPDATE-07 — Organisation Standard cannot UPDATE
+Checks that a user with organisation role `admin` and status `pending` or `blocked` cannot UPDATE another member's record in the `organisationUserPermissions` collection for an organisation they are a member of.
 
-Checks that a user with organisation role `standard` cannot UPDATE a record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+### PDBP-OUP-UPDATE-AS-MEMBER-03 — Organisation Standard (approved, pending, or blocked) cannot UPDATE AS MEMBER
+
+Checks that a user with organisation role `standard` and status `approved`, `pending`, or `blocked` cannot UPDATE another member's record in the `organisationUserPermissions` collection for an organisation they are a member of.
+
+## UPDATE AS NON-MEMBER tests
+
+### PDBP-OUP-UPDATE-AS-NON-MEMBER-01 — Organisation Admin (approved, pending, or blocked) cannot UPDATE AS NON-MEMBER
+
+Checks that a user with organisation role `admin` and status `approved`, `pending`, or `blocked` cannot UPDATE a record in the `organisationUserPermissions` collection for an organisation they are not a member of.
+
+### PDBP-OUP-UPDATE-AS-NON-MEMBER-02 — Organisation Standard (approved, pending, or blocked) cannot UPDATE AS NON-MEMBER
+
+Checks that a user with organisation role `standard` and status `approved`, `pending`, or `blocked` cannot UPDATE a record in the `organisationUserPermissions` collection for an organisation they are not a member of.
 
 ## UPDATE OWN tests
 
-### PDBP-OUP-UPDATE-OWN-01 — Organisation Admin cannot UPDATE OWN
+### PDBP-OUP-UPDATE-OWN-01 — Organisation Admin (approved, pending, or blocked) cannot UPDATE OWN
 
-Checks that a user with organisation role `admin` cannot UPDATE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with organisation role `admin` and status `approved`, `pending`, or `blocked` cannot UPDATE their own record in the `organisationUserPermissions` collection.
 
-### PDBP-OUP-UPDATE-OWN-02 — Organisation Standard cannot UPDATE OWN
+### PDBP-OUP-UPDATE-OWN-02 — Organisation Standard (approved, pending, or blocked) cannot UPDATE OWN
 
-Checks that a user with organisation role `standard` cannot UPDATE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with organisation role `standard` and status `approved`, `pending`, or `blocked` cannot UPDATE their own record in the `organisationUserPermissions` collection.
 
 ## DELETE tests
 
@@ -198,56 +259,44 @@ Checks that a user with global user permissions role `superadmin` and status `ap
 
 Checks that a user with global user permissions role `superadmin` and status `pending` or `blocked` cannot DELETE a record in the `organisationUserPermissions` collection.
 
-### PDBP-OUP-DELETE-03 — Global Admin cannot DELETE
+### PDBP-OUP-DELETE-03 — Global Admin (approved, pending, or blocked) cannot DELETE
 
-Checks that a user with global user permissions role `admin` cannot DELETE a record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `admin` and status `approved`, `pending`, or `blocked` cannot DELETE a record in the `organisationUserPermissions` collection.
 
-### PDBP-OUP-DELETE-04 — Global Standard cannot DELETE
+### PDBP-OUP-DELETE-04 — Global Standard (approved, pending, or blocked) cannot DELETE
 
-Checks that a user with global user permissions role `standard` cannot DELETE a record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with global user permissions role `standard` and status `approved`, `pending`, or `blocked` cannot DELETE a record in the `organisationUserPermissions` collection.
 
-### PDBP-OUP-DELETE-05 — Organisation Admin (approved) can DELETE
+## DELETE AS MEMBER tests
 
-Checks that a user with organisation role `admin` and status `approved` can DELETE a record in the `organisationUserPermissions` collection.
+### PDBP-OUP-DELETE-AS-MEMBER-01 — Organisation Admin (approved) can DELETE AS MEMBER
 
-### PDBP-OUP-DELETE-06 — Organisation Admin (pending or blocked) cannot DELETE
+Checks that a user with organisation role `admin` and status `approved` can DELETE another member's record in the `organisationUserPermissions` collection for an organisation they are a member of.
 
-Checks that a user with organisation role `admin` and status `pending` or `blocked` cannot DELETE a record in the `organisationUserPermissions` collection.
+### PDBP-OUP-DELETE-AS-MEMBER-02 — Organisation Admin (pending or blocked) cannot DELETE AS MEMBER
 
-### PDBP-OUP-DELETE-07 — Organisation Standard cannot DELETE
+Checks that a user with organisation role `admin` and status `pending` or `blocked` cannot DELETE another member's record in the `organisationUserPermissions` collection for an organisation they are a member of.
 
-Checks that a user with organisation role `standard` cannot DELETE a record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+### PDBP-OUP-DELETE-AS-MEMBER-03 — Organisation Standard (approved, pending, or blocked) cannot DELETE AS MEMBER
+
+Checks that a user with organisation role `standard` and status `approved`, `pending`, or `blocked` cannot DELETE another member's record in the `organisationUserPermissions` collection for an organisation they are a member of.
+
+## DELETE AS NON-MEMBER tests
+
+### PDBP-OUP-DELETE-AS-NON-MEMBER-01 — Organisation Admin (approved, pending, or blocked) cannot DELETE AS NON-MEMBER
+
+Checks that a user with organisation role `admin` and status `approved`, `pending`, or `blocked` cannot DELETE a record in the `organisationUserPermissions` collection for an organisation they are not a member of.
+
+### PDBP-OUP-DELETE-AS-NON-MEMBER-02 — Organisation Standard (approved, pending, or blocked) cannot DELETE AS NON-MEMBER
+
+Checks that a user with organisation role `standard` and status `approved`, `pending`, or `blocked` cannot DELETE a record in the `organisationUserPermissions` collection for an organisation they are not a member of.
 
 ## DELETE OWN tests
 
-### PDBP-OUP-DELETE-OWN-01 — Organisation Admin cannot DELETE OWN
+### PDBP-OUP-DELETE-OWN-01 — Organisation Admin (approved, pending, or blocked) cannot DELETE OWN
 
-Checks that a user with organisation role `admin` cannot DELETE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
+Checks that a user with organisation role `admin` and status `approved`, `pending`, or `blocked` cannot DELETE their own record in the `organisationUserPermissions` collection.
 
-### PDBP-OUP-DELETE-OWN-02 — Organisation Standard cannot DELETE OWN
+### PDBP-OUP-DELETE-OWN-02 — Organisation Standard (approved, pending, or blocked) cannot DELETE OWN
 
-Checks that a user with organisation role `standard` cannot DELETE their own record in the `organisationUserPermissions` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
-
-## Organisation isolation tests
-
-Check that a member of an organisation can only create, view, list, update, and delete `organisationUserPermissions` records for their own organisation and not other organisations.
-
-### PDBP-OUP-ISOLATION-CREATE-OTHER-01 — Organisation Admin (approved) cannot CREATE a permission for another org
-
-Checks that a user with organisation role `admin` and status `approved` cannot CREATE a record in the `organisationUserPermissions` collection for another organisation.
-
-### PDBP-OUP-ISOLATION-VIEW-OTHER-01 — Organisation Admin (approved) cannot VIEW a permission for another org
-
-Checks that a user with organisation role `admin` and status `approved` cannot VIEW a record in the `organisationUserPermissions` collection for another organisation.
-
-### PDBP-OUP-ISOLATION-LIST-OTHER-01 — Organisation Admin (approved) cannot LIST permissions for another org
-
-Checks that a user with organisation role `admin` and status `approved` cannot LIST records in the `organisationUserPermissions` collection for another organisation.
-
-### PDBP-OUP-ISOLATION-UPDATE-OTHER-01 — Organisation Admin (approved) cannot UPDATE a permission for another org
-
-Checks that a user with organisation role `admin` and status `approved` cannot UPDATE a record in the `organisationUserPermissions` collection for another organisation.
-
-### PDBP-OUP-ISOLATION-DELETE-OTHER-01 — Organisation Admin (approved) cannot DELETE a permission for another org
-
-Checks that a user with organisation role `admin` and status `approved` cannot DELETE a record in the `organisationUserPermissions` collection for another organisation.
+Checks that a user with organisation role `standard` and status `approved`, `pending`, or `blocked` cannot DELETE their own record in the `organisationUserPermissions` collection.
