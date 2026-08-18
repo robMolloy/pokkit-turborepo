@@ -65,6 +65,21 @@ describe(`${testSuiteName} tests`, () => {
     expect(isHealthy.code).toBe(200);
   });
 
+  it("PDBP-OUP-DELETE-01 — Global Superadmin (approved) can DELETE", async () => {});
+  it("PDBP-OUP-DELETE-02 — Global Superadmin (pending or blocked) cannot DELETE", async () => {});
+  it("PDBP-OUP-DELETE-03 — Global Admin (approved, pending, or blocked) cannot DELETE", async () => {});
+  it("PDBP-OUP-DELETE-04 — Global Standard (approved, pending, or blocked) cannot DELETE", async () => {});
+
+  it("PDBP-OUP-DELETE-AS-MEMBER-01 — Organisation Admin (approved) can DELETE AS MEMBER", async () => {});
+  it("PDBP-OUP-DELETE-AS-MEMBER-02 — Organisation Admin (pending or blocked) cannot DELETE AS MEMBER", async () => {});
+  it("PDBP-OUP-DELETE-AS-MEMBER-03 — Organisation Standard (approved, pending, or blocked) cannot DELETE AS MEMBER", async () => {});
+
+  it("PDBP-OUP-DELETE-AS-NON-MEMBER-01 — Organisation Admin (approved, pending, or blocked) cannot DELETE AS NON-MEMBER", async () => {});
+  it("PDBP-OUP-DELETE-AS-NON-MEMBER-02 — Organisation Standard (approved, pending, or blocked) cannot DELETE AS NON-MEMBER", async () => {});
+
+  it("PDBP-OUP-DELETE-OWN-01 — Organisation Admin (approved, pending, or blocked) cannot DELETE OWN", async () => {});
+  it("PDBP-OUP-DELETE-OWN-02 — Organisation Standard (approved, pending, or blocked) cannot DELETE OWN", async () => {});
+
   it("PDBP-OUP-DELETE-01 — Global Superadmin (approved) can DELETE", async () => {
     const superadminAndOrgAdminPb = createPbConnection();
     const superadminAndOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();

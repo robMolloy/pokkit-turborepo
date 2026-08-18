@@ -70,6 +70,24 @@ describe(`${testSuiteName} tests`, () => {
     expect(isHealthy.code).toBe(200);
   });
 
+  it("PDBP-OUP-LIST-01 — Global Superadmin (approved) can LIST", async () => {});
+  it("PDBP-OUP-LIST-02 — Global Superadmin (pending or blocked) cannot LIST", async () => {});
+  it("PDBP-OUP-LIST-03 — Global Admin (approved) can LIST", async () => {});
+  it("PDBP-OUP-LIST-04 — Global Admin (pending or blocked) cannot LIST", async () => {});
+  it("PDBP-OUP-LIST-05 — Global Standard (approved) can LIST", async () => {});
+  it("PDBP-OUP-LIST-06 — Global Standard (pending or blocked) cannot LIST", async () => {});
+
+  it("PDBP-OUP-LIST-AS-MEMBER-01 — Organisation Admin (approved) can LIST AS MEMBER", async () => {});
+  it("PDBP-OUP-LIST-AS-MEMBER-02 — Organisation Admin (pending or blocked) cannot LIST AS MEMBER", async () => {});
+  it("PDBP-OUP-LIST-AS-MEMBER-03 — Organisation Standard (approved) can LIST AS MEMBER", async () => {});
+  it("PDBP-OUP-LIST-AS-MEMBER-04 — Organisation Standard (pending or blocked) cannot LIST AS MEMBER", async () => {});
+
+  it("PDBP-OUP-LIST-AS-NON-MEMBER-01 — Organisation Admin (approved, pending, or blocked) cannot LIST AS NON-MEMBER", async () => {});
+  it("PDBP-OUP-LIST-AS-NON-MEMBER-02 — Organisation Standard (approved, pending, or blocked) cannot LIST AS NON-MEMBER", async () => {});
+
+  it("PDBP-OUP-LIST-OWN-01 — Organisation Admin (approved, pending, or blocked) can LIST OWN", async () => {});
+  it("PDBP-OUP-LIST-OWN-02 — Organisation Standard (approved, pending, or blocked) can LIST OWN", async () => {});
+
   it("PDBP-OUP-LIST-01 — Global Superadmin (approved) can LIST", async () => {
     const superadminPb = createPbConnection();
     const superadminUserPayload = userPayloadBuilder.forCreateRandomData();

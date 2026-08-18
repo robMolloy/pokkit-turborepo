@@ -63,6 +63,24 @@ describe(`${testSuiteName} tests`, () => {
     expect(isHealthy.code).toBe(200);
   });
 
+  it("PDBP-OUP-VIEW-01 — Global Superadmin (approved) can VIEW", async () => {});
+  it("PDBP-OUP-VIEW-02 — Global Superadmin (pending or blocked) cannot VIEW", async () => {});
+  it("PDBP-OUP-VIEW-03 — Global Admin (approved) can VIEW", async () => {});
+  it("PDBP-OUP-VIEW-04 — Global Admin (pending or blocked) cannot VIEW", async () => {});
+  it("PDBP-OUP-VIEW-05 — Global Standard (approved) can VIEW", async () => {});
+  it("PDBP-OUP-VIEW-06 — Global Standard (pending or blocked) cannot VIEW", async () => {});
+
+  it("PDBP-OUP-VIEW-AS-MEMBER-01 — Organisation Admin (approved) can VIEW AS MEMBER", async () => {});
+  it("PDBP-OUP-VIEW-AS-MEMBER-02 — Organisation Admin (pending or blocked) cannot VIEW AS MEMBER", async () => {});
+  it("PDBP-OUP-VIEW-AS-MEMBER-03 — Organisation Standard (approved) can VIEW AS MEMBER", async () => {});
+  it("PDBP-OUP-VIEW-AS-MEMBER-04 — Organisation Standard (pending or blocked) cannot VIEW AS MEMBER", async () => {});
+
+  it("PDBP-OUP-VIEW-AS-NON-MEMBER-01 — Organisation Admin (approved, pending, or blocked) cannot VIEW AS NON-MEMBER", async () => {});
+  it("PDBP-OUP-VIEW-AS-NON-MEMBER-02 — Organisation Standard (approved, pending, or blocked) cannot VIEW AS NON-MEMBER", async () => {});
+
+  it("PDBP-OUP-VIEW-OWN-01 — Organisation Admin (approved, pending, or blocked) can VIEW OWN", async () => {});
+  it("PDBP-OUP-VIEW-OWN-02 — Organisation Standard (approved, pending, or blocked) can VIEW OWN", async () => {});
+
   it("PDBP-OUP-VIEW-01 — Global Superadmin (approved) can VIEW", async () => {
     const superadminPb = createPbConnection();
     await createUserAndPermissions({

@@ -57,12 +57,16 @@ describe(`${testSuiteName} tests`, () => {
 
   it("PDBP-OUP-UPDATE-01 — Global Superadmin (approved) can UPDATE", async () => {});
   it("PDBP-OUP-UPDATE-02 — Global Superadmin (pending or blocked) cannot UPDATE", async () => {});
-  it("PDBP-OUP-UPDATE-03 — Global Admin cannot UPDATE", async () => {});
-  it("PDBP-OUP-UPDATE-04 — Global Standard cannot UPDATE", async () => {});
-  it("PDBP-OUP-UPDATE-05 — Organisation Admin (approved) can UPDATE", async () => {});
-  it("PDBP-OUP-UPDATE-06 — Organisation Admin (pending or blocked) cannot UPDATE", async () => {});
-  it("PDBP-OUP-UPDATE-07 — Organisation Standard cannot UPDATE", async () => {});
+  it("PDBP-OUP-UPDATE-03 — Global Admin (approved, pending, or blocked) cannot UPDATE", async () => {});
+  it("PDBP-OUP-UPDATE-04 — Global Standard (approved, pending, or blocked) cannot UPDATE", async () => {});
 
-  it("PDBP-OUP-UPDATE-OWN-01 — Organisation Admin cannot UPDATE OWN", async () => {});
-  it("PDBP-OUP-UPDATE-OWN-02 — Organisation Standard cannot UPDATE OWN", async () => {});
+  it("PDBP-OUP-UPDATE-AS-MEMBER-01 — Organisation Admin (approved) can UPDATE AS MEMBER", async () => {});
+  it("PDBP-OUP-UPDATE-AS-MEMBER-02 — Organisation Admin (pending or blocked) cannot UPDATE AS MEMBER", async () => {});
+  it("PDBP-OUP-UPDATE-AS-MEMBER-03 — Organisation Standard (approved, pending, or blocked) cannot UPDATE AS MEMBER", async () => {});
+
+  it("PDBP-OUP-UPDATE-AS-NON-MEMBER-01 — Organisation Admin (approved, pending, or blocked) cannot UPDATE AS NON-MEMBER", async () => {});
+  it("PDBP-OUP-UPDATE-AS-NON-MEMBER-02 — Organisation Standard (approved, pending, or blocked) cannot UPDATE AS NON-MEMBER", async () => {});
+
+  it("PDBP-OUP-UPDATE-OWN-01 — Organisation Admin (approved, pending, or blocked) cannot UPDATE OWN", async () => {});
+  it("PDBP-OUP-UPDATE-OWN-02 — Organisation Standard (approved, pending, or blocked) cannot UPDATE OWN", async () => {});
 });

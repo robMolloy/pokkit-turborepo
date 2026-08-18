@@ -65,6 +65,18 @@ describe(`${testSuiteName} tests`, () => {
     expect(isHealthy.code).toBe(200);
   });
 
+  it("PDBP-OUP-CREATE-01 — Global Superadmin (approved) can CREATE", async () => {});
+  it("PDBP-OUP-CREATE-02 — Global Superadmin (pending or blocked) cannot CREATE", async () => {});
+  it("PDBP-OUP-CREATE-03 — Global Admin (approved, pending, or blocked) cannot CREATE", async () => {});
+  it("PDBP-OUP-CREATE-04 — Global Standard (approved, pending, or blocked) cannot CREATE", async () => {});
+
+  it("PDBP-OUP-CREATE-AS-MEMBER-01 — Organisation Admin (approved) can CREATE AS MEMBER", async () => {});
+  it("PDBP-OUP-CREATE-AS-MEMBER-02 — Organisation Admin (pending or blocked) cannot CREATE AS MEMBER", async () => {});
+  it("PDBP-OUP-CREATE-AS-MEMBER-03 — Organisation Standard (approved, pending, or blocked) cannot CREATE AS MEMBER", async () => {});
+
+  it("PDBP-OUP-CREATE-AS-NON-MEMBER-01 — Organisation Admin (approved, pending, or blocked) cannot CREATE AS NON-MEMBER", async () => {});
+  it("PDBP-OUP-CREATE-AS-NON-MEMBER-02 — Organisation Standard (approved, pending, or blocked) cannot CREATE AS NON-MEMBER", async () => {});
+
   it("PDBP-OUP-CREATE-01 — Global Superadmin (approved) can CREATE", async () => {
     const superadminAndOrgAdminPb = createPbConnection();
     const superadminAndOrgAdminUserPayload = userPayloadBuilder.forCreateRandomData();
