@@ -69,4 +69,9 @@ describe(`${testSuiteName} tests`, () => {
 
   it("PDBP-OUP-UPDATE-OWN-01 — Organisation Admin (approved, pending, or blocked) cannot UPDATE OWN", async () => {});
   it("PDBP-OUP-UPDATE-OWN-02 — Organisation Standard (approved, pending, or blocked) cannot UPDATE OWN", async () => {});
+
+  it("PDBP-OUP-IDENTITY-LOCK-UPDATE-01 — Global Superadmin (approved) cannot change userId on UPDATE", async () => {});
+  it("PDBP-OUP-IDENTITY-LOCK-UPDATE-02 — Global Superadmin (approved) cannot change orgId on UPDATE", async () => {});
+  it("PDBP-OUP-IDENTITY-LOCK-UPDATE-AS-MEMBER-01 — Organisation Admin (approved) cannot change userId on UPDATE AS MEMBER", async () => {});
+  it("PDBP-OUP-IDENTITY-LOCK-UPDATE-AS-MEMBER-02 — Organisation Admin (approved) cannot change orgId on UPDATE AS MEMBER", async () => {});
 });

@@ -8,6 +8,7 @@ Each test is given a tag in order to track the tests more easily:
 
 - Global role tests: `PDBP-OUP-{ACTION}-{NN}`
 - Organisation role tests: `PDBP-OUP-{ACTION}-AS-MEMBER-{NN}`, `PDBP-OUP-{ACTION}-AS-NON-MEMBER-{NN}`, `PDBP-OUP-{ACTION}-OWN-{NN}`
+- Identity lock tests: `PDBP-OUP-IDENTITY-LOCK-{ACTION}-{NN}`, `PDBP-OUP-IDENTITY-LOCK-{ACTION}-AS-MEMBER-{NN}`
 
 A ❌ in the spec still requires a test. It means the action must not succeed. Statuses that share the same outcome may be grouped (`pending or blocked`, or `approved, pending, or blocked`); the grouping must appear in the test title.
 
@@ -16,6 +17,7 @@ Organisation role tests use these meanings:
 - **As Member**: the actor has an `organisationUserPermissions` record for the same organisation as the target record, and the target is not the actor's own record
 - **As Non-Member**: the actor is not a member of the target organisation (including when they are a member of a different organisation)
 - **Own**: the target is the actor's own `organisationUserPermissions` record
+- **Identity lock**: even when UPDATE is allowed, `userId` and `orgId` must not change (the membership cannot be rebound to a different user or organisation)
 
 Create Own is N/A in the spec (users are not expected to create their own membership record) and has no tests.
 
@@ -248,6 +250,24 @@ Checks that a user with organisation role `admin` and status `approved`, `pendin
 ### PDBP-OUP-UPDATE-OWN-02 — Organisation Standard (approved, pending, or blocked) cannot UPDATE OWN
 
 Checks that a user with organisation role `standard` and status `approved`, `pending`, or `blocked` cannot UPDATE their own record in the `organisationUserPermissions` collection.
+
+## Identity lock tests
+
+### PDBP-OUP-IDENTITY-LOCK-UPDATE-01 — Global Superadmin (approved) cannot change userId on UPDATE
+
+Checks that a user with global user permissions role `superadmin` and status `approved` cannot change `userId` when updating a record in the `organisationUserPermissions` collection.
+
+### PDBP-OUP-IDENTITY-LOCK-UPDATE-02 — Global Superadmin (approved) cannot change orgId on UPDATE
+
+Checks that a user with global user permissions role `superadmin` and status `approved` cannot change `orgId` when updating a record in the `organisationUserPermissions` collection.
+
+### PDBP-OUP-IDENTITY-LOCK-UPDATE-AS-MEMBER-01 — Organisation Admin (approved) cannot change userId on UPDATE AS MEMBER
+
+Checks that a user with organisation role `admin` and status `approved` cannot change `userId` when updating another member's record in the `organisationUserPermissions` collection for an organisation they are a member of.
+
+### PDBP-OUP-IDENTITY-LOCK-UPDATE-AS-MEMBER-02 — Organisation Admin (approved) cannot change orgId on UPDATE AS MEMBER
+
+Checks that a user with organisation role `admin` and status `approved` cannot change `orgId` when updating another member's record in the `organisationUserPermissions` collection for an organisation they are a member of.
 
 ## DELETE tests
 

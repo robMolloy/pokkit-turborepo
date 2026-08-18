@@ -167,3 +167,14 @@ Check that a member of an organisation can only (create) update and delete their
 | **Standard**      | Pending  |    N/A     |    ✅    |    ✅    |     ❌     |     ❌     |
 | _"_               | Approved |    N/A     |    ✅    |    ✅    |     ❌     |     ❌     |
 | _"_               | Blocked  |    N/A     |    ✅    |    ✅    |     ❌     |     ❌     |
+
+### Identity lock
+
+Check that `userId` and `orgId` cannot be changed on UPDATE of an `organisationUserPermissions` record. These fields are the identity of the membership; an update may change `role` or `status`, but must not rebind the record to a different user or organisation.
+
+Identity lock is tested for actors who are otherwise allowed to UPDATE (isolation is tested the same way: only for the role that could otherwise succeed).
+
+| Actor                         | Status   | Change userId | Change orgId |
+| ----------------------------- | -------- | :-----------: | :----------: |
+| **Global Super Admin**        | Approved |      ❌       |      ❌      |
+| **Organisation Admin** (as member) | Approved |      ❌       |      ❌      |
