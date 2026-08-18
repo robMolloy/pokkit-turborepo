@@ -920,8 +920,8 @@
   },
   {
     "id": "pbc_230240349",
-    "listRule": "@request.auth.id ?= userId\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n",
-    "viewRule": "userId ?= @request.auth.id\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"",
+    "listRule": "@request.auth.id ?= userId\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= orgId",
+    "viewRule": "@request.auth.id ?= userId\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= orgId",
     "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= orgId\n\u0026\u0026 @collection.organisationUserPermissions.userId ?!= userId\n",
     "updateRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 orgId:changed = false\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= orgId\n\u0026\u0026 @collection.organisationUserPermissions.userId ?!= userId\n\u0026\u0026 orgId:changed = false\n",
     "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= orgId\n\u0026\u0026 @collection.organisationUserPermissions.userId ?!= userId\n",
@@ -1027,7 +1027,7 @@
       "CREATE UNIQUE INDEX `idx_2ag063yzee` ON `organisationUserPermissions` (\n  `orgId`,\n  `userId`\n)"
     ],
     "created": "2026-08-12 11:07:59.729Z",
-    "updated": "2026-08-17 11:00:16.612Z",
+    "updated": "2026-08-17 21:19:59.848Z",
     "system": false
   },
   {

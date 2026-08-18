@@ -110,14 +110,24 @@ export const createUserAndPermissions = async (p: {
     if (!p.globalUserPermissions) return undefined;
     return p.globalUserPermissions.toBeActionedByPb
       .collection(globalUserPermissionsCollectionName)
-      .create(p.globalUserPermissions.payload);
+      .create(
+        globalUserPermissionsPayloadBuilder.forCreateData({
+          ...p.globalUserPermissions.payload,
+          userId: userRecord.id,
+        }),
+      );
   })();
 
   const organisationUserPermissionsRecord = await (() => {
     if (!p.organisationUserPermissions) return undefined;
     return p.organisationUserPermissions.toBeActionedByPb
       .collection(organisationUserPermissionsCollectionName)
-      .create(p.organisationUserPermissions.payload);
+      .create(
+        organisationUserPermissionsPayloadBuilder.forCreateData({
+          ...p.organisationUserPermissions.payload,
+          userId: userRecord.id,
+        }),
+      );
   })();
 
   return { userRecord, globalUserPermissionsRecord, organisationUserPermissionsRecord };
