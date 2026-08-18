@@ -119,7 +119,7 @@ export const createUserAndPermissions = async (p: {
   })();
 
   const organisationUserPermissionsRecordsPrmosises = (() => {
-    if (!p.organisationUserPermissions) return undefined;
+    if (!p.organisationUserPermissions) return [];
     return p.organisationUserPermissions.map((x) => {
       const payload = { ...x.payload, userId: userRecord.id };
       return x.toBeActionedByPb
@@ -128,9 +128,9 @@ export const createUserAndPermissions = async (p: {
     });
   })();
 
-  const organisationUserPermissionsRecords = organisationUserPermissionsRecordsPrmosises
-    ? await Promise.all(organisationUserPermissionsRecordsPrmosises)
-    : [];
+  const organisationUserPermissionsRecords = await Promise.all(
+    organisationUserPermissionsRecordsPrmosises,
+  );
 
   return { userRecord, globalUserPermissionsRecord, organisationUserPermissionsRecords };
 };
