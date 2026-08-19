@@ -1270,10 +1270,10 @@
   {
     "id": "pbc_2420281325",
     "listRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"standard\"\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 publishAt != null \u0026\u0026 publishAt \u003e @now\n",
-    "viewRule": "@request.auth.role=\"admin\" || (@request.auth.role=\"approved\" \u0026\u0026 publishAt != null)",
-    "createRule": "@request.auth.role=\"admin\"",
-    "updateRule": "@request.auth.role=\"admin\"",
-    "deleteRule": "@request.auth.role=\"admin\"",
+    "viewRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"standard\"\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 publishAt != null \u0026\u0026 publishAt \u003e @now",
+    "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.globalUserPermissions.role ?= \"admin\"",
+    "updateRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.globalUserPermissions.role ?= \"admin\"",
+    "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.globalUserPermissions.role ?= \"admin\"",
     "name": "blogPosts",
     "type": "base",
     "fields": [
@@ -1401,7 +1401,7 @@
     ],
     "indexes": [],
     "created": "2026-08-19 21:03:23.839Z",
-    "updated": "2026-08-19 21:11:46.675Z",
+    "updated": "2026-08-19 23:06:55.880Z",
     "system": false
   }
 ]
