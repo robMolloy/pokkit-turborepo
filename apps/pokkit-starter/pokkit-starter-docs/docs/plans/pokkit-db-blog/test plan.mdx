@@ -31,7 +31,7 @@ Checks that a user with global user permissions role `admin` and status `approve
 
 Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot CREATE a record in the `blogPosts` collection.
 
-### PDB-BP-CREATE-05 — Global Standard cannot CREATE
+### PDB-BP-CREATE-05 — Global Standard (approved, pending or blocked) cannot CREATE
 
 Checks that a user with global user permissions role `standard` cannot CREATE a record in the `blogPosts` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
@@ -59,7 +59,7 @@ Checks that a user with global user permissions role `standard` and status `appr
 
 Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot VIEW a record in the `blogPosts` collection.
 
-### PDB-BP-VIEW-07 — Global Standard (approved) cannot VIEW (in future)
+### PDB-BP-VIEW-07 — Global Standard (approved) cannot VIEW if publishAt datetime is in future
 
 Checks that a user with global user permissions role `standard` and status `approved` cannot VIEW a `blogPosts` record whose `publishAt` datetime is in the future.
 
@@ -87,7 +87,7 @@ Checks that a user with global user permissions role `standard` and status `appr
 
 Checks that a user with global user permissions role `standard` and status `pending` or `blocked` cannot LIST records in the `blogPosts` collection.
 
-### PDB-BP-LIST-07 — Global Standard (approved) cannot LIST (in future)
+### PDB-BP-LIST-07 — Global Standard (approved) cannot LIST if publishAt datetime is in future
 
 Checks that a user with global user permissions role `standard` and status `approved` cannot LIST a `blogPosts` record whose `publishAt` datetime is in the future.
 
@@ -107,7 +107,7 @@ Checks that a user with global user permissions role `admin` and status `approve
 
 Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot UPDATE a record in the `blogPosts` collection.
 
-### PDB-BP-UPDATE-05 — Global Standard cannot UPDATE
+### PDB-BP-UPDATE-05 — Global Standard (approved, pending or blocked) cannot UPDATE
 
 Checks that a user with global user permissions role `standard` cannot UPDATE a record in the `blogPosts` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
@@ -127,7 +127,7 @@ Checks that a user with global user permissions role `admin` and status `approve
 
 Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot DELETE a record in the `blogPosts` collection.
 
-### PDB-BP-DELETE-05 — Global Standard cannot DELETE
+### PDB-BP-DELETE-05 — Global Standard (approved, pending or blocked) cannot DELETE
 
 Checks that a user with global user permissions role `standard` cannot DELETE a record in the `blogPosts` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
@@ -151,7 +151,7 @@ Checks that a user with global user permissions role `admin` and status `approve
 
 Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot CREATE a record in the `blogPostImages` collection.
 
-### PDB-BPI-CREATE-05 — Global Standard cannot CREATE
+### PDB-BPI-CREATE-05 — Global Standard (approved, pending or blocked) cannot CREATE
 
 Checks that a user with global user permissions role `standard` cannot CREATE a record in the `blogPostImages` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
@@ -219,7 +219,7 @@ Checks that a user with global user permissions role `admin` and status `approve
 
 Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot UPDATE a record in the `blogPostImages` collection.
 
-### PDB-BPI-UPDATE-05 — Global Standard cannot UPDATE
+### PDB-BPI-UPDATE-05 — Global Standard (approved, pending or blocked) cannot UPDATE
 
 Checks that a user with global user permissions role `standard` cannot UPDATE a record in the `blogPostImages` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
 
@@ -239,6 +239,6 @@ Checks that a user with global user permissions role `admin` and status `approve
 
 Checks that a user with global user permissions role `admin` and status `pending` or `blocked` cannot DELETE a record in the `blogPostImages` collection.
 
-### PDB-BPI-DELETE-05 — Global Standard cannot DELETE
+### PDB-BPI-DELETE-05 — Global Standard (approved, pending or blocked) cannot DELETE
 
 Checks that a user with global user permissions role `standard` cannot DELETE a record in the `blogPostImages` collection - it is not relevant whether the user is `pending`, `approved`, or `blocked`.
