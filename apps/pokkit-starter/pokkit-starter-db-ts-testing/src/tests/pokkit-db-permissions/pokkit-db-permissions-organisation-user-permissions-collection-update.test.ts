@@ -1211,29 +1211,17 @@ describe(`${testSuiteName} tests`, () => {
     const user2Pb = createPbConnection();
     const user2UserPayload = userPayloadBuilder.forCreateRandomData();
     const user2UserRecord = await user2Pb.collection(usersCollectionName).create(user2UserPayload);
-    await user2Pb
-      .collection(usersCollectionName)
-      .authWithPassword(user2UserPayload.email, user2UserPayload.password);
-    const user2OrganisationUserPermissionsPayload =
-      organisationUserPermissionsPayloadBuilder.forCreateData({
-        orgId: organisationRecord.id,
-        userId: user2UserRecord.id,
-        role: "admin",
-        status: "approved",
-      });
 
-    await superadminAndOrgAdminPb
-      .collection(organisationUserPermissionsCollectionName)
-      .create(user2OrganisationUserPermissionsPayload);
-
-    await expect(
-      approvedSuperadminPb
+    const testFn = (p: { pb: PocketBase }) =>
+      p.pb
         .collection(organisationUserPermissionsCollectionName)
         .update(user1OrganisationUserPermissionRecord.id, {
           ...user1OrganisationUserPermissionRecord,
           userId: user2UserRecord.id,
-        }),
-    ).rejects.toThrow();
+        });
+
+    await expect(testFn({ pb: approvedSuperadminPb })).rejects.toThrow();
+    await expect(testFn({ pb: superadminAndOrgAdminPb })).rejects.toThrow();
   });
   it("PDBP-OUP-IDENTITY-LOCK-UPDATE-02 — Global Superadmin (approved) cannot change orgId on UPDATE", async () => {
     const superadminAndOrgAdminPb = createPbConnection();
@@ -1298,30 +1286,18 @@ describe(`${testSuiteName} tests`, () => {
 
     const user2Pb = createPbConnection();
     const user2UserPayload = userPayloadBuilder.forCreateRandomData();
-    const user2UserRecord = await user2Pb.collection(usersCollectionName).create(user2UserPayload);
-    await user2Pb
-      .collection(usersCollectionName)
-      .authWithPassword(user2UserPayload.email, user2UserPayload.password);
-    const user2OrganisationUserPermissionsPayload =
-      organisationUserPermissionsPayloadBuilder.forCreateData({
-        orgId: organisation1Record.id,
-        userId: user2UserRecord.id,
-        role: "admin",
-        status: "approved",
-      });
+    await user2Pb.collection(usersCollectionName).create(user2UserPayload);
 
-    await superadminAndOrgAdminPb
-      .collection(organisationUserPermissionsCollectionName)
-      .create(user2OrganisationUserPermissionsPayload);
-
-    await expect(
-      approvedSuperadminPb
+    const testFn = (p: { pb: PocketBase }) =>
+      p.pb
         .collection(organisationUserPermissionsCollectionName)
         .update(user1OrganisationUserPermissionRecord.id, {
           ...user1OrganisationUserPermissionRecord,
           orgId: organisation2Record.id,
-        }),
-    ).rejects.toThrow();
+        });
+
+    await expect(testFn({ pb: approvedSuperadminPb })).rejects.toThrow();
+    await expect(testFn({ pb: superadminAndOrgAdminPb })).rejects.toThrow();
   });
   it("PDBP-OUP-IDENTITY-LOCK-UPDATE-AS-MEMBER-01 — Organisation Admin (approved) cannot change userId on UPDATE AS MEMBER", async () => {
     const superadminAndOrgAdminPb = createPbConnection();
@@ -1383,17 +1359,6 @@ describe(`${testSuiteName} tests`, () => {
     await user2Pb
       .collection(usersCollectionName)
       .authWithPassword(user2UserPayload.email, user2UserPayload.password);
-    const user2OrganisationUserPermissionsPayload =
-      organisationUserPermissionsPayloadBuilder.forCreateData({
-        orgId: organisationRecord.id,
-        userId: user2UserRecord.id,
-        role: "admin",
-        status: "approved",
-      });
-
-    await superadminAndOrgAdminPb
-      .collection(organisationUserPermissionsCollectionName)
-      .create(user2OrganisationUserPermissionsPayload);
 
     await expect(
       approvedOrgAdminPb
@@ -1465,21 +1430,7 @@ describe(`${testSuiteName} tests`, () => {
 
     const user2Pb = createPbConnection();
     const user2UserPayload = userPayloadBuilder.forCreateRandomData();
-    const user2UserRecord = await user2Pb.collection(usersCollectionName).create(user2UserPayload);
-    await user2Pb
-      .collection(usersCollectionName)
-      .authWithPassword(user2UserPayload.email, user2UserPayload.password);
-    const user2OrganisationUserPermissionsPayload =
-      organisationUserPermissionsPayloadBuilder.forCreateData({
-        orgId: organisation1Record.id,
-        userId: user2UserRecord.id,
-        role: "admin",
-        status: "approved",
-      });
-
-    await superadminAndOrgAdminPb
-      .collection(organisationUserPermissionsCollectionName)
-      .create(user2OrganisationUserPermissionsPayload);
+    await user2Pb.collection(usersCollectionName).create(user2UserPayload);
 
     await expect(
       approvedOrg1AdminPb

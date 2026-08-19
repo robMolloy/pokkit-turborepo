@@ -94,7 +94,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-08-12 07:22:44.810Z",
-    "updated": "2026-08-17 09:46:24.544Z",
+    "updated": "2026-08-19 21:03:23.841Z",
     "system": true
   },
   {
@@ -206,7 +206,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-08-12 07:22:44.812Z",
-    "updated": "2026-08-17 09:46:24.546Z",
+    "updated": "2026-08-19 21:03:23.843Z",
     "system": true
   },
   {
@@ -320,7 +320,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-08-12 07:22:44.814Z",
-    "updated": "2026-08-17 09:46:24.547Z",
+    "updated": "2026-08-19 21:03:23.844Z",
     "system": true
   },
   {
@@ -418,7 +418,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-08-12 07:22:44.817Z",
-    "updated": "2026-08-17 09:46:24.548Z",
+    "updated": "2026-08-19 21:03:23.846Z",
     "system": true
   },
   {
@@ -533,7 +533,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-08-12 07:22:44.819Z",
-    "updated": "2026-08-17 09:46:24.549Z",
+    "updated": "2026-08-19 21:03:23.847Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -750,7 +750,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-08-12 07:22:44.822Z",
-    "updated": "2026-08-17 09:46:24.585Z",
+    "updated": "2026-08-19 21:03:23.850Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -915,7 +915,7 @@
       "CREATE UNIQUE INDEX `idx_djyvvpjhe1` ON `globalUserPermissions` (`userId`)"
     ],
     "created": "2026-08-12 11:07:59.725Z",
-    "updated": "2026-08-17 09:46:24.587Z",
+    "updated": "2026-08-19 21:03:23.852Z",
     "system": false
   },
   {
@@ -923,7 +923,7 @@
     "listRule": "@request.auth.id ?= userId\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= orgId",
     "viewRule": "@request.auth.id ?= userId\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= orgId",
     "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= orgId\n\u0026\u0026 @collection.organisationUserPermissions.userId ?!= userId\n",
-    "updateRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 @request.body.orgId:changed = false\n  || @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= orgId\n\u0026\u0026 @collection.organisationUserPermissions.userId ?!= userId\n\u0026\u0026 @request.body.orgId = orgId\n",
+    "updateRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 @request.body.orgId:changed = false\n\u0026\u0026 @request.body.userId:changed = false\n  || @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= orgId\n\u0026\u0026 @collection.organisationUserPermissions.userId ?!= userId\n\u0026\u0026 @request.body.orgId:changed = false\n\u0026\u0026 @request.body.userId:changed = false\n",
     "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\" \n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.organisationUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.organisationUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.organisationUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.organisationUserPermissions.orgId ?= orgId\n\u0026\u0026 @collection.organisationUserPermissions.userId ?!= userId\n",
     "name": "organisationUserPermissions",
     "type": "base",
@@ -1027,7 +1027,7 @@
       "CREATE UNIQUE INDEX `idx_2ag063yzee` ON `organisationUserPermissions` (\n  `orgId`,\n  `userId`\n)"
     ],
     "created": "2026-08-12 11:07:59.729Z",
-    "updated": "2026-08-19 07:28:08.057Z",
+    "updated": "2026-08-19 21:03:23.856Z",
     "system": false
   },
   {
@@ -1110,7 +1110,7 @@
       "CREATE UNIQUE INDEX `idx_l5jn9kiytc` ON `organisations` (`name`)"
     ],
     "created": "2026-08-12 11:07:59.731Z",
-    "updated": "2026-08-17 09:46:24.589Z",
+    "updated": "2026-08-19 21:03:23.857Z",
     "system": false
   },
   {
@@ -1193,7 +1193,215 @@
       "CREATE UNIQUE INDEX `idx_secrets_key` ON `_pb_config_secrets` (key)"
     ],
     "created": "2026-08-17 09:46:24.578Z",
-    "updated": "2026-08-17 09:46:24.578Z",
+    "updated": "2026-08-19 21:03:23.859Z",
+    "system": false
+  },
+  {
+    "id": "pbc_2059723834",
+    "listRule": "@collection.globalUserPermissions.status ?= \"approved\"\n",
+    "viewRule": "@collection.globalUserPermissions.status ?= \"approved\"",
+    "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.globalUserPermissions.role ?= \"admin\"",
+    "updateRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.globalUserPermissions.role ?= \"admin\"\n",
+    "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 @collection.globalUserPermissions.role ?= \"admin\"",
+    "name": "blogPostImages",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "help": "",
+        "hidden": false,
+        "id": "file1542800728",
+        "maxSelect": 1,
+        "maxSize": 0,
+        "mimeTypes": [
+          "image/png",
+          "image/jpeg",
+          "image/gif",
+          "image/webp"
+        ],
+        "name": "imageUrl",
+        "presentable": false,
+        "protected": false,
+        "required": false,
+        "system": false,
+        "thumbs": [],
+        "type": "file"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "created": "2026-08-19 21:03:23.836Z",
+    "updated": "2026-08-19 21:17:39.428Z",
+    "system": false
+  },
+  {
+    "id": "pbc_2420281325",
+    "listRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"admin\"\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"standard\"\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\u0026\u0026 publishAt != null \u0026\u0026 publishAt \u003e @now\n",
+    "viewRule": "@request.auth.role=\"admin\" || (@request.auth.role=\"approved\" \u0026\u0026 publishAt != null)",
+    "createRule": "@request.auth.role=\"admin\"",
+    "updateRule": "@request.auth.role=\"admin\"",
+    "deleteRule": "@request.auth.role=\"admin\"",
+    "name": "blogPosts",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "help": "",
+        "hidden": false,
+        "id": "text724990059",
+        "max": 0,
+        "min": 0,
+        "name": "title",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "help": "",
+        "hidden": false,
+        "id": "text1367709617",
+        "max": 0,
+        "min": 0,
+        "name": "subtitle",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "help": "",
+        "hidden": false,
+        "id": "text4274335913",
+        "max": 0,
+        "min": 0,
+        "name": "content",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "cascadeDelete": false,
+        "collectionId": "pbc_2059723834",
+        "help": "",
+        "hidden": false,
+        "id": "relation357459057",
+        "maxSelect": 1,
+        "minSelect": 0,
+        "name": "blogPostImageId",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "relation"
+      },
+      {
+        "autogeneratePattern": "",
+        "help": "",
+        "hidden": false,
+        "id": "text490654345",
+        "max": 0,
+        "min": 0,
+        "name": "blogPostImageCaption",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "help": "",
+        "hidden": false,
+        "id": "date3085063276",
+        "max": "",
+        "min": "",
+        "name": "publishAt",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "date"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "created": "2026-08-19 21:03:23.839Z",
+    "updated": "2026-08-19 21:11:46.675Z",
     "system": false
   }
 ]
