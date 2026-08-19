@@ -31,3 +31,20 @@ export const blogPostPayloadBuilder = {
       publishAt: new Date().toISOString().replace("T", " "),
     }),
 };
+
+export type TBlogPostImagePayloadCreateData = {
+  imageUrl?: File | Blob;
+};
+
+const blogPostImagePayloadBuilderInit = {
+  forCreateData: <T extends TBlogPostImagePayloadCreateData>(p: T) => {
+    const payload: TBlogPostImagePayloadCreateData = {};
+    if (p.imageUrl) payload.imageUrl = p.imageUrl;
+    return payload as T;
+  },
+};
+
+export const blogPostImagePayloadBuilder = {
+  ...blogPostImagePayloadBuilderInit,
+  forCreateRandomData: () => blogPostImagePayloadBuilderInit.forCreateData({}),
+};
