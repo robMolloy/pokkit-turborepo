@@ -1,0 +1,50 @@
+---
+sidebar_position: 1
+---
+
+# Spec
+
+## Overview
+
+The overview can be found [here](./index.mdx).
+
+## On startup
+
+| Condition                                       | Action                       |
+| ----------------------------------------------- | ---------------------------- |
+| `blogPosts` collection exists and is valid      | Import collections from file |
+| `blogPostImages` collection exists and is valid | Import collections from file |
+
+## Collection permissions
+
+### blogPosts collection permission matrix
+
+| Global Role     | Status   | Create | View | List | Update | Delete |
+| --------------- | -------- | :----: | :--: | :--: | :----: | :----: |
+| **Super Admin** | Pending  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
+| _"_             | Approved |   ✅   |  ✅  |  ✅  |   ✅   |   ✅   |
+| _"_             | Blocked  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
+| **Admin**       | Pending  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
+| _"_             | Approved |   ✅   |  ✅  |  ✅  |   ✅   |   ✅   |
+| _"_             | Blocked  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
+| **Standard**    | Pending  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
+| _"_             | Approved |   ❌   |  ✅  |  ✅  |   ❌   |   ❌   |
+| _"_             | Blocked  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
+
+| Global Role  | Status   | View (in future) | List (in future) |
+| ------------ | -------- | :--------------: | :--------------: |
+| **Standard** | Approved |        ❌        |        ❌        |
+
+### blogPostImages collection permission matrix
+
+| Global Role     | Status   | Create | View | List | Update | Delete |
+| --------------- | -------- | :----: | :--: | :--: | :----: | :----: |
+| **Super Admin** | Pending  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
+| _"_             | Approved |   ✅   |  ✅  |  ✅  |   ✅   |   ✅   |
+| _"_             | Blocked  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
+| **Admin**       | Pending  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
+| _"_             | Approved |   ✅   |  ✅  |  ✅  |   ✅   |   ✅   |
+| _"_             | Blocked  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
+| **Standard**    | Pending  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |
+| _"_             | Approved |   ❌   |  ✅  |  ✅  |   ❌   |   ❌   |
+| _"_             | Blocked  |   ❌   |  ❌  |  ❌  |   ❌   |   ❌   |

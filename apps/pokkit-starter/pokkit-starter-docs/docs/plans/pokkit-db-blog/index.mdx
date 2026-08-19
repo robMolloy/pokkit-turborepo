@@ -1,0 +1,11 @@
+# Pokkit Db Blog
+
+## Overview
+
+Pokkit Db blog is a PocketBase plugin that adds the database configuration for the two blog collections; `blogPosts` and `blogPostImages`. In general, all approved users will have access to the records. `superadmin` and `admin` users (if approved) can create, update and delete `blogPosts` and `blogPostImages`. `standard` users can only view `blogPosts` and `blogPostImages`.
+
+There is publishAt datetime field that will stop `blogPosts` from being visible to `standard` users until the publishAt datetime is in the past.
+
+## How it works
+
+When the app is started, the plugin will merge the collections schema with the existing collections schema.
