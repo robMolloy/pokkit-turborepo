@@ -35,4 +35,8 @@ export const pokkitDbBlogTestsMetadata = {
     portNumber: 8508,
     name: "pokkitDbBlogPostImagesCollectionUpdate",
   },
+  pokkitDbBlogPostImagesCollectionView: {
+    portNumber: 8509,
+    name: "pokkitDbBlogPostImagesCollectionView",
+  },
 } as const satisfies { [k: string]: { portNumber: number; name: string } };
