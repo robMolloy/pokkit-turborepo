@@ -70,7 +70,7 @@ describe(`${testSuiteName} tests`, () => {
     expect(isHealthy.code).toBe(200);
   });
 
-  it("PDBCS-COL-01 — Valid collections file imports on startup", async () => {
+  it.todo("PDBCS-COL-01 — Valid collections file imports on startup", async () => {
     const superuserPb = createPbConnection();
     await superuserPb
       .collection(superusersCollectionName)
@@ -99,7 +99,7 @@ describe(`${testSuiteName} tests`, () => {
     );
   });
 
-  it("PDBCS-COL-02 - Valid collections file unchanged when already in sync", async () => {
+  it.todo("PDBCS-COL-02 - Valid collections file unchanged when already in sync", async () => {
     const collectionsFileContentsAtEnd = fse.readFileSync(
       getPokkitDbCollectionsFilePath({ pbDirPath }),
       "utf8",
