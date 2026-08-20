@@ -1,8 +1,8 @@
 [
   {
     "id": "pbc_2059723834",
-    "listRule": "@collection.globalUserPermissions.status ?= \"approved\"\n",
-    "viewRule": "@collection.globalUserPermissions.status ?= \"approved\"",
+    "listRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n",
+    "viewRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"",
     "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"admin\"",
     "updateRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"admin\"\n",
     "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"admin\"",
@@ -31,7 +31,7 @@
         "maxSelect": 1,
         "maxSize": 0,
         "mimeTypes": ["image/png", "image/jpeg", "image/gif", "image/webp", "image/svg+xml"],
-        "name": "imageUrl",
+        "name": "imageName",
         "presentable": false,
         "protected": false,
         "required": false,
