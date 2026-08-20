@@ -12,3 +12,5 @@ export const delay = async (x: number) => {
     setTimeout(() => resolve(true), x);
   });
 };
+
+export const formatDateForPb = (date: Date) => date.toISOString().replace("T", " ");

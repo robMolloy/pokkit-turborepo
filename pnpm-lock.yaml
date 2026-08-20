@@ -772,6 +772,9 @@ importers:
 
   packages/pokkit-db-blog-ts-helpers:
     dependencies:
+      '@repo/pokkit-utils':
+        specifier: workspace:*
+        version: link:../pokkit-utils
       pocketbase:
         specifier: ^0.26.8
         version: 0.26.8
