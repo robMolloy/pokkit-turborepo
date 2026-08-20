@@ -1,3 +1,9 @@
+import { blogPostPayloadBuilder, blogPostsCollectionName } from "@repo/pokkit-db-blog-ts-helpers";
+import {
+  createUserAndPermissions,
+  userPayloadBuilder,
+  usersCollectionName,
+} from "@repo/pokkit-db-permissions-ts-helpers";
 import {
   getPbFilePath,
   getPbServeUrl,
@@ -54,13 +60,228 @@ describe(`${testSuiteName} tests`, () => {
     expect(isHealthy.code).toBe(200);
   });
 
-  it("PDB-BP-UPDATE-01 — Global Superadmin (approved) can UPDATE", async () => {});
+  it("PDB-BP-UPDATE-01 — Global Superadmin (approved) can UPDATE", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
-  it("PDB-BP-UPDATE-02 — Global Superadmin (pending or blocked) cannot UPDATE", async () => {});
+    const blogPostPayload = blogPostPayloadBuilder.forCreateRandomData();
+    const blogPostRecord = await superadminPb
+      .collection(blogPostsCollectionName)
+      .create(blogPostPayload);
+    const updatedBlogPostPayload = blogPostPayloadBuilder.forCreateData({
+      ...blogPostPayload,
+      title: "Updated Title",
+    });
 
-  it("PDB-BP-UPDATE-03 — Global Admin (approved) can UPDATE", async () => {});
+    await expect(
+      superadminPb
+        .collection(blogPostsCollectionName)
+        .update(blogPostRecord.id, updatedBlogPostPayload),
+    ).resolves.toMatchObject(updatedBlogPostPayload);
+  });
 
-  it("PDB-BP-UPDATE-04 — Global Admin (pending or blocked) cannot UPDATE", async () => {});
+  it("PDB-BP-UPDATE-02 — Global Superadmin (pending or blocked) cannot UPDATE", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
-  it("PDB-BP-UPDATE-05 — Global Standard (approved, pending or blocked) cannot UPDATE", async () => {});
+    const pendingSuperadminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: pendingSuperadminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { role: "superadmin", status: "pending" },
+      },
+    });
+
+    const blockedSuperadminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: blockedSuperadminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { role: "superadmin", status: "blocked" },
+      },
+    });
+
+    const blogPostPayload = blogPostPayloadBuilder.forCreateRandomData();
+    const blogPostRecord = await superadminPb
+      .collection(blogPostsCollectionName)
+      .create(blogPostPayload);
+    const updatedBlogPostPayload = blogPostPayloadBuilder.forCreateData({
+      ...blogPostPayload,
+      title: "Updated Title",
+    });
+
+    const testFn = (p: { pb: PocketBase }) =>
+      p.pb.collection(blogPostsCollectionName).update(blogPostRecord.id, updatedBlogPostPayload);
+    await expect(testFn({ pb: pendingSuperadminPb })).rejects.toThrow();
+    await expect(testFn({ pb: blockedSuperadminPb })).rejects.toThrow();
+    await expect(testFn({ pb: superadminPb })).resolves.toMatchObject(updatedBlogPostPayload);
+  });
+
+  it("PDB-BP-UPDATE-03 — Global Admin (approved) can UPDATE", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const approvedAdminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: approvedAdminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { role: "admin", status: "approved" },
+      },
+    });
+
+    const blogPostPayload = blogPostPayloadBuilder.forCreateRandomData();
+    const blogPostRecord = await superadminPb
+      .collection(blogPostsCollectionName)
+      .create(blogPostPayload);
+    const updatedBlogPostPayload = blogPostPayloadBuilder.forCreateData({
+      ...blogPostPayload,
+      title: "Updated Title",
+    });
+
+    await expect(
+      approvedAdminPb
+        .collection(blogPostsCollectionName)
+        .update(blogPostRecord.id, updatedBlogPostPayload),
+    ).resolves.toMatchObject(updatedBlogPostPayload);
+  });
+
+  it("PDB-BP-UPDATE-04 — Global Admin (pending or blocked) cannot UPDATE", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const pendingAdminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: pendingAdminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { role: "admin", status: "pending" },
+      },
+    });
+
+    const blockedadminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: blockedadminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { role: "admin", status: "blocked" },
+      },
+    });
+
+    const blogPostPayload = blogPostPayloadBuilder.forCreateRandomData();
+    const blogPostRecord = await superadminPb
+      .collection(blogPostsCollectionName)
+      .create(blogPostPayload);
+    const updatedBlogPostPayload = blogPostPayloadBuilder.forCreateData({
+      ...blogPostPayload,
+      title: "Updated Title",
+    });
+
+    const testFn = (p: { pb: PocketBase }) =>
+      p.pb.collection(blogPostsCollectionName).update(blogPostRecord.id, updatedBlogPostPayload);
+    await expect(testFn({ pb: pendingAdminPb })).rejects.toThrow();
+    await expect(testFn({ pb: blockedadminPb })).rejects.toThrow();
+    await expect(testFn({ pb: superadminPb })).resolves.toMatchObject(updatedBlogPostPayload);
+  });
+
+  it("PDB-BP-UPDATE-05 — Global Standard (approved, pending or blocked) cannot UPDATE", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const approvedStandardPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: approvedStandardPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { role: "standard", status: "approved" },
+      },
+    });
+
+    const pendingStandardPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: pendingStandardPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { role: "standard", status: "pending" },
+      },
+    });
+
+    const blockedStandardPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: blockedStandardPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { role: "standard", status: "blocked" },
+      },
+    });
+
+    const blogPostPayload = blogPostPayloadBuilder.forCreateRandomData();
+    const blogPostRecord = await superadminPb
+      .collection(blogPostsCollectionName)
+      .create(blogPostPayload);
+    const updatedBlogPostPayload = blogPostPayloadBuilder.forCreateData({
+      ...blogPostPayload,
+      title: "Updated Title",
+    });
+
+    const testFn = (p: { pb: PocketBase }) =>
+      p.pb.collection(blogPostsCollectionName).update(blogPostRecord.id, updatedBlogPostPayload);
+    await expect(testFn({ pb: approvedStandardPb })).rejects.toThrow();
+    await expect(testFn({ pb: pendingStandardPb })).rejects.toThrow();
+    await expect(testFn({ pb: blockedStandardPb })).rejects.toThrow();
+    await expect(testFn({ pb: superadminPb })).resolves.toMatchObject(updatedBlogPostPayload);
+  });
 });

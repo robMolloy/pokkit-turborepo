@@ -101,7 +101,7 @@ export const createUserAndPermissions = async (p: {
   user: {
     toBeActionedByPb: PocketBase;
     payload: TUserPayloadCreateData;
-    shouldAuthenticate: boolean;
+    shouldAuthenticate?: boolean;
   };
   globalUserPermissions?: {
     toBeActionedByPb: PocketBase;
@@ -115,7 +115,9 @@ export const createUserAndPermissions = async (p: {
   const userRecord = await p.user.toBeActionedByPb
     .collection(usersCollectionName)
     .create(p.user.payload);
-  if (p.user.shouldAuthenticate) {
+
+  const shouldAuthenticate = p.user.shouldAuthenticate ?? true;
+  if (shouldAuthenticate) {
     await p.user.toBeActionedByPb
       .collection(usersCollectionName)
       .authWithPassword(p.user.payload.email, p.user.payload.password);
