@@ -54,6 +54,17 @@ describe(`${testSuiteName} tests`, () => {
     expect(isHealthy.code).toBe(200);
   });
 
+  // const blogPostImageRecord = await superadminPb
+  //   .collection(blogPostImagesCollectionName)
+  //   .create(blogPostImagePayload);
+
+  // const imageUrl = superadminPb.files.getURL(blogPostImageRecord, blogPostImageRecord.imageUrl);
+  // const fetchedImageBuffer = await fetchFileBuffer(imageUrl);
+  // expect(fetchedImageBuffer).toEqual(mockImageBuffer);
+
+  // const blogPostImageRecordWithImageUrl = { ...blogPostImageRecord, imageUrl };
+  // expect(blogPostImageRecordWithImageUrl).toMatchObject({ ...blogPostImagePayload, imageUrl });
+
   it("PDB-BPI-VIEW-01 — Global Superadmin (approved) can VIEW", async () => {});
 
   it("PDB-BPI-VIEW-02 — Global Superadmin (pending or blocked) cannot VIEW", async () => {});

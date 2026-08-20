@@ -35,7 +35,10 @@ export const blogPostPayloadBuilder = {
 };
 
 export type TBlogPostImagePayloadCreateData = {
-  imageUrl: File;
+  imageFile: File;
+};
+export type TBlogPostImageRecord = {
+  imageName: string;
 };
 const blogPostImagePayloadBuilderInit = {
   forCreateData: <T extends TBlogPostImagePayloadCreateData>(p: T) => p as T,

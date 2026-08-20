@@ -41,3 +41,9 @@ export async function areFileImagesEqual(file1: File, file2: File): Promise<bool
 
   return data1.every((value, index) => value === data2[index]);
 }
+
+export const fetchFileBuffer = async (url: string): Promise<Buffer> => {
+  const response = await fetch(url);
+  const arrayBuffer = await response.arrayBuffer();
+  return Buffer.from(arrayBuffer);
+};

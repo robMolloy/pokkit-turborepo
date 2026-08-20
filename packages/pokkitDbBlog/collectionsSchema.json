@@ -30,7 +30,7 @@
         "id": "file1542800728",
         "maxSelect": 1,
         "maxSize": 0,
-        "mimeTypes": ["image/png", "image/jpeg", "image/gif", "image/webp"],
+        "mimeTypes": ["image/png", "image/jpeg", "image/gif", "image/webp", "image/svg+xml"],
         "name": "imageUrl",
         "presentable": false,
         "protected": false,
