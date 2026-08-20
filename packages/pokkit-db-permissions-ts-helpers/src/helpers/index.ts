@@ -98,7 +98,11 @@ export const organisationUserPermissionsPayloadBuilder = {
 };
 
 export const createUserAndPermissions = async (p: {
-  user: { toBeActionedByPb: PocketBase; payload: TUserPayloadCreateData };
+  user: {
+    toBeActionedByPb: PocketBase;
+    payload: TUserPayloadCreateData;
+    shouldAuthenticate: boolean;
+  };
   globalUserPermissions?: {
     toBeActionedByPb: PocketBase;
     payload: Omit<TGlobalUserPermissionsCreatePayload, "userId">;
@@ -111,9 +115,11 @@ export const createUserAndPermissions = async (p: {
   const userRecord = await p.user.toBeActionedByPb
     .collection(usersCollectionName)
     .create(p.user.payload);
-  await p.user.toBeActionedByPb
-    .collection(usersCollectionName)
-    .authWithPassword(p.user.payload.email, p.user.payload.password);
+  if (p.user.shouldAuthenticate) {
+    await p.user.toBeActionedByPb
+      .collection(usersCollectionName)
+      .authWithPassword(p.user.payload.email, p.user.payload.password);
+  }
 
   const globalUserPermissionsRecord = await (() => {
     if (!p.globalUserPermissions) return undefined;
