@@ -224,10 +224,12 @@ describe(`${testSuiteName} tests`, () => {
       },
     });
 
-    const blogPostPayload = blogPostPayloadBuilder.forCreateRandomData({});
-    const blogPostRecord = await superadminPb
+    const blogPostPublishNowPayload = blogPostPayloadBuilder.forCreateRandomData({
+      publishAt: formatDateForPb(new Date()),
+    });
+    const blogPostPublishNowRecord = await superadminPb
       .collection(blogPostsCollectionName)
-      .create(blogPostPayload);
+      .create(blogPostPublishNowPayload);
 
     const blogPostPublishedTomorrowPayload = blogPostPayloadBuilder.forCreateRandomData({
       publishAt: formatDateForPb(new Date(Date.now() + 24 * 60 * 60 * 1000)),
@@ -236,23 +238,22 @@ describe(`${testSuiteName} tests`, () => {
       .collection(blogPostsCollectionName)
       .create(blogPostPublishedTomorrowPayload);
 
-    const blogPostNoPublishDatePayload = blogPostPayloadBuilder.forCreateRandomData({
-      publishAt: null,
-    });
-    const blogPostNoPublishDateRecord = await superadminPb
+    const blogPostPublishBlankPayload = blogPostPayloadBuilder.forCreateRandomData();
+    const blogPostPublishBlankRecord = await superadminPb
       .collection(blogPostsCollectionName)
-      .create(blogPostNoPublishDatePayload);
-    console.log({ blogPostNoPublishDateRecord });
+      .create(blogPostPublishBlankPayload);
 
     const testFn = async (p: { pb: PocketBase }) => {
       const records = await p.pb.collection(blogPostsCollectionName).getFullList();
       return records.sort((a, b) => (a.created > b.created ? 1 : -1));
     };
-    await expect(testFn({ pb: approvedStandardPb })).resolves.toMatchObject([blogPostRecord]);
+    await expect(testFn({ pb: approvedStandardPb })).resolves.toMatchObject([
+      blogPostPublishNowRecord,
+    ]);
     await expect(testFn({ pb: superadminPb })).resolves.toMatchObject([
-      blogPostRecord,
+      blogPostPublishNowRecord,
       blogPostPublishedTomorrowRecord,
-      blogPostNoPublishDateRecord,
+      blogPostPublishBlankRecord,
     ]);
   });
 

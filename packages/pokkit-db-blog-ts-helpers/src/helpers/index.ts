@@ -1,5 +1,3 @@
-import { formatDateForPb } from "@repo/pokkit-utils";
-
 export const blogPostsCollectionName = "blogPosts";
 export const blogPostImagesCollectionName = "blogPostImages";
 
@@ -9,7 +7,7 @@ export type TBlogPostPayloadCreateData = {
   content: string;
   blogPostImageId?: string;
   blogPostImageCaption?: string;
-  publishAt?: string | null;
+  publishAt: string;
 };
 
 const createRandomString = () => `test${Math.floor(Math.random() * 10000000)}`;
@@ -31,7 +29,7 @@ export const blogPostPayloadBuilder = {
       title: p?.title ?? randomString,
       subtitle: p?.subtitle ?? randomString,
       content: p?.content ?? randomString,
-      publishAt: p?.publishAt === undefined ? formatDateForPb(new Date()) : p.publishAt,
+      publishAt: p?.publishAt === undefined ? "" : p.publishAt,
     });
   },
 };
