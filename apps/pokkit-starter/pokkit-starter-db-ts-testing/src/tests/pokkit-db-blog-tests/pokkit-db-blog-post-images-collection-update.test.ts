@@ -12,6 +12,14 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../../config/pocketbaseConfig";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_constants";
 import { pokkitDbBlogTestsMetadata } from "./_pokkitDbBlogTestsMetadata";
+import {
+  createUserAndPermissions,
+  userPayloadBuilder,
+} from "@repo/pokkit-db-permissions-ts-helpers";
+import {
+  blogPostImagePayloadBuilder,
+  blogPostImagesCollectionName,
+} from "@repo/pokkit-db-blog-ts-helpers";
 
 const testMetadata = pokkitDbBlogTestsMetadata.pokkitDbBlogPostImagesCollectionUpdate;
 const testSuiteName = testMetadata.name;
@@ -21,6 +29,11 @@ const pbDirPath = `_sandboxes/${testSuiteName}`;
 const pbFilePath = getPbFilePath({ pbDirPath });
 const pbServeUrl = getPbServeUrl({ pbPortNumber });
 const logFilePath = `_logs/${testSuiteName}`;
+
+const mockImageBuffer = fse.readFileSync("src/tests/mocks/logo.svg");
+const mockImageFile = new File([mockImageBuffer], "logo.svg", { type: "image/svg+xml" });
+const mockImage2Buffer = fse.readFileSync("src/tests/mocks/logo2.svg");
+const mockImage2File = new File([mockImage2Buffer], "logo2.svg", { type: "image/svg+xml" });
 
 const createPbConnection = () => new PocketBase(pbServeUrl);
 
@@ -54,13 +67,235 @@ describe(`${testSuiteName} tests`, () => {
     expect(isHealthy.code).toBe(200);
   });
 
-  it("PDB-BPI-UPDATE-01 — Global Superadmin (approved) can UPDATE", async () => {});
+  it("PDB-BPI-UPDATE-01 — Global Superadmin (approved) can UPDATE", async () => {
+    const superadminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: superadminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+    });
 
-  it("PDB-BPI-UPDATE-02 — Global Superadmin (pending or blocked) cannot UPDATE", async () => {});
+    const blogPostImagePayload = blogPostImagePayloadBuilder.forCreateData({
+      imageFile: mockImageFile,
+    });
+    const blogPostImageRecord = await superadminPb
+      .collection(blogPostImagesCollectionName)
+      .create(blogPostImagePayload);
 
-  it("PDB-BPI-UPDATE-03 — Global Admin (approved) can UPDATE", async () => {});
+    const testFn = (p: { pb: PocketBase }) =>
+      p.pb.collection(blogPostImagesCollectionName).update(blogPostImageRecord.id, {
+        imageFile: mockImage2File,
+      });
+    await expect(testFn({ pb: superadminPb })).resolves.not.toMatchObject(blogPostImageRecord);
+  });
 
-  it("PDB-BPI-UPDATE-04 — Global Admin (pending or blocked) cannot UPDATE", async () => {});
+  it("PDB-BPI-UPDATE-02 — Global Superadmin (pending or blocked) cannot UPDATE", async () => {
+    const superadminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: superadminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+    });
 
-  it("PDB-BPI-UPDATE-05 — Global Standard (approved, pending or blocked) cannot UPDATE", async () => {});
+    const pendingSuperadminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: pendingSuperadminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { status: "pending", role: "superadmin" },
+      },
+    });
+
+    const blockedSuperadminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: blockedSuperadminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { status: "blocked", role: "superadmin" },
+      },
+    });
+
+    const blogPostImagePayload = blogPostImagePayloadBuilder.forCreateData({
+      imageFile: mockImageFile,
+    });
+    const blogPostImageRecord = await superadminPb
+      .collection(blogPostImagesCollectionName)
+      .create(blogPostImagePayload);
+
+    const testFn = (p: { pb: PocketBase }) =>
+      p.pb.collection(blogPostImagesCollectionName).update(blogPostImageRecord.id, {
+        imageFile: mockImage2File,
+      });
+    await expect(testFn({ pb: pendingSuperadminPb })).rejects.toThrow();
+    await expect(testFn({ pb: blockedSuperadminPb })).rejects.toThrow();
+    await expect(testFn({ pb: superadminPb })).resolves.not.toMatchObject(blogPostImageRecord);
+  });
+
+  it("PDB-BPI-UPDATE-03 — Global Admin (approved) can UPDATE", async () => {
+    const superadminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: superadminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+    });
+
+    const approvedAdminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: approvedAdminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { status: "approved", role: "admin" },
+      },
+    });
+
+    const blogPostImagePayload = blogPostImagePayloadBuilder.forCreateData({
+      imageFile: mockImageFile,
+    });
+    const blogPostImageRecord = await superadminPb
+      .collection(blogPostImagesCollectionName)
+      .create(blogPostImagePayload);
+
+    const testFn = (p: { pb: PocketBase }) =>
+      p.pb.collection(blogPostImagesCollectionName).update(blogPostImageRecord.id, {
+        imageFile: mockImage2File,
+      });
+    await expect(testFn({ pb: approvedAdminPb })).resolves.not.toMatchObject(blogPostImageRecord);
+    await expect(testFn({ pb: superadminPb })).resolves.not.toMatchObject(blogPostImageRecord);
+  });
+
+  it("PDB-BPI-UPDATE-04 — Global Admin (pending or blocked) cannot UPDATE", async () => {
+    const superadminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: superadminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+    });
+
+    const pendingAdminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: pendingAdminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { status: "pending", role: "admin" },
+      },
+    });
+
+    const blockedAdminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: blockedAdminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { status: "blocked", role: "admin" },
+      },
+    });
+
+    const blogPostImagePayload = blogPostImagePayloadBuilder.forCreateData({
+      imageFile: mockImageFile,
+    });
+    const blogPostImageRecord = await superadminPb
+      .collection(blogPostImagesCollectionName)
+      .create(blogPostImagePayload);
+
+    const testFn = (p: { pb: PocketBase }) =>
+      p.pb.collection(blogPostImagesCollectionName).update(blogPostImageRecord.id, {
+        imageFile: mockImage2File,
+      });
+    await expect(testFn({ pb: pendingAdminPb })).rejects.toThrow();
+    await expect(testFn({ pb: blockedAdminPb })).rejects.toThrow();
+    await expect(testFn({ pb: superadminPb })).resolves.not.toMatchObject(blogPostImageRecord);
+  });
+
+  it("PDB-BPI-UPDATE-05 — Global Standard (approved, pending or blocked) cannot UPDATE", async () => {
+    const superadminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: superadminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+    });
+
+    const approvedStandardPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: approvedStandardPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { status: "approved", role: "standard" },
+      },
+    });
+
+    const pendingStandardPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: pendingStandardPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { status: "pending", role: "standard" },
+      },
+    });
+
+    const blockedStandardPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: blockedStandardPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { status: "blocked", role: "standard" },
+      },
+    });
+
+    const blogPostImagePayload = blogPostImagePayloadBuilder.forCreateData({
+      imageFile: mockImageFile,
+    });
+    const blogPostImageRecord = await superadminPb
+      .collection(blogPostImagesCollectionName)
+      .create(blogPostImagePayload);
+
+    const testFn = (p: { pb: PocketBase }) =>
+      p.pb.collection(blogPostImagesCollectionName).update(blogPostImageRecord.id, {
+        imageFile: mockImage2File,
+      });
+    await expect(testFn({ pb: approvedStandardPb })).rejects.toThrow();
+    await expect(testFn({ pb: pendingStandardPb })).rejects.toThrow();
+    await expect(testFn({ pb: blockedStandardPb })).rejects.toThrow();
+    await expect(testFn({ pb: superadminPb })).resolves.not.toMatchObject(blogPostImageRecord);
+  });
 });
