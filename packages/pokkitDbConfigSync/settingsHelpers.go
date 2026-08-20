@@ -6,7 +6,7 @@ import (
 	"os"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
-	pokkitDbUtils "github.com/robMolloy/pokkit-turborepo/packages/pokkit-db-utils"
+	pokkitDbUtils "github.com/robMolloy/pokkit-turborepo/packages/pokkitDbUtils"
 )
 
 // importCollectionsFromCollectionsFile imports collections from pb_data/collections.json.

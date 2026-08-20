@@ -9,7 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
-	pokkitDbUtils "github.com/robMolloy/pokkit-turborepo/packages/pokkit-db-utils"
+	pokkitDbUtils "github.com/robMolloy/pokkit-turborepo/packages/pokkitDbUtils"
 )
 
 func getCollectionsFromFile[T any](app pbCore.App) (collections *T, err error) {

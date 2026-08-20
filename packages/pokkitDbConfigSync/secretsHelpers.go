@@ -6,8 +6,7 @@ import (
 	"os"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
-	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
-	pokkitDbUtils "github.com/robMolloy/pokkit-turborepo/packages/pokkit-db-utils"
+	pokkitDbUtils "github.com/robMolloy/pokkit-turborepo/packages/pokkitDbUtils"
 )
 
 const secretsCollectionName = "_pb_config_secrets"
@@ -114,7 +113,7 @@ func writeSecretsCollectionToSecretsFile(app pbCore.App) error {
 		secretsMap[record.GetString("key")] = record.GetString("value")
 	}
 
-	err = utils.WriteDataToFileAsJson(secretsFilePath, secretsMap)
+	err = pokkitDbUtils.WriteDataToFileAsJson(secretsFilePath, secretsMap)
 	if err != nil {
 		return fmt.Errorf("error writing json to %s: %w", secretsFilePath, err)
 	}
