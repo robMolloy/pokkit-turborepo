@@ -12,6 +12,13 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../../config/pocketbaseConfig";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_constants";
 import { pokkitDbBlogTestsMetadata } from "./_pokkitDbBlogTestsMetadata";
+import { blogPostPayloadBuilder, blogPostsCollectionName } from "@repo/pokkit-db-blog-ts-helpers";
+import {
+  createUserAndPermissions,
+  userPayloadBuilder,
+  usersCollectionName,
+} from "@repo/pokkit-db-permissions-ts-helpers";
+import { formatDateForPb } from "@repo/pokkit-utils";
 
 const testMetadata = pokkitDbBlogTestsMetadata.pokkitDbBlogPostsCollectionList;
 const testSuiteName = testMetadata.name;
@@ -53,18 +60,298 @@ describe(`${testSuiteName} tests`, () => {
     const isHealthy = await pb.health.check();
     expect(isHealthy.code).toBe(200);
   });
+  it("PDB-BP-LIST-01 — Global Superadmin (approved) can LIST", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
-  it("PDB-BP-LIST-01 — Global Superadmin (approved) can LIST", async () => {});
+    const blogPostPayload = blogPostPayloadBuilder.forCreateRandomData();
+    const blogPostRecord = await superadminPb
+      .collection(blogPostsCollectionName)
+      .create(blogPostPayload);
 
-  it("PDB-BP-LIST-02 — Global Superadmin (pending or blocked) cannot LIST", async () => {});
+    const testFn = (p: { pb: PocketBase }) =>
+      p.pb.collection(blogPostsCollectionName).getFullList();
+    await expect(testFn({ pb: superadminPb })).resolves.toMatchObject([blogPostRecord]);
+  });
 
-  it("PDB-BP-LIST-03 — Global Admin (approved) can LIST", async () => {});
+  it("PDB-BP-LIST-02 — Global Superadmin (pending or blocked) cannot LIST", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
 
-  it("PDB-BP-LIST-04 — Global Admin (pending or blocked) cannot LIST", async () => {});
+    const pendingSuperadminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: pendingSuperadminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { role: "superadmin", status: "pending" },
+      },
+    });
 
-  it("PDB-BP-LIST-05 — Global Standard (approved) can LIST", async () => {});
+    const blockedSuperadminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: blockedSuperadminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { role: "superadmin", status: "blocked" },
+      },
+    });
 
-  it("PDB-BP-LIST-06 — Global Standard (pending or blocked) cannot LIST", async () => {});
+    const blogPostPayload = blogPostPayloadBuilder.forCreateRandomData();
+    const blogPostRecord = await superadminPb
+      .collection(blogPostsCollectionName)
+      .create(blogPostPayload);
 
-  it("PDB-BP-LIST-07 — Global Standard (approved) cannot LIST if publishAt datetime is in future", async () => {});
+    const testFn = (p: { pb: PocketBase }) =>
+      p.pb.collection(blogPostsCollectionName).getFullList();
+    await expect(testFn({ pb: pendingSuperadminPb })).resolves.toMatchObject([]);
+    await expect(testFn({ pb: blockedSuperadminPb })).resolves.toMatchObject([]);
+    await expect(testFn({ pb: superadminPb })).resolves.toMatchObject([blogPostRecord]);
+  });
+
+  it("PDB-BP-LIST-03 — Global Admin (approved) can LIST", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const approvedAdminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: approvedAdminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { role: "admin", status: "approved" },
+      },
+    });
+
+    const blogPostPayload = blogPostPayloadBuilder.forCreateRandomData();
+    const blogPostRecord = await superadminPb
+      .collection(blogPostsCollectionName)
+      .create(blogPostPayload);
+
+    const testFn = (p: { pb: PocketBase }) =>
+      p.pb.collection(blogPostsCollectionName).getFullList();
+    await expect(testFn({ pb: approvedAdminPb })).resolves.toMatchObject([blogPostRecord]);
+    await expect(testFn({ pb: superadminPb })).resolves.toMatchObject([blogPostRecord]);
+  });
+
+  it("PDB-BP-LIST-04 — Global Admin (pending or blocked) cannot LIST", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const pendingAdminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: pendingAdminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { role: "admin", status: "pending" },
+      },
+    });
+
+    const blockedAdminPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: blockedAdminPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { role: "admin", status: "blocked" },
+      },
+    });
+
+    const blogPostPayload = blogPostPayloadBuilder.forCreateRandomData();
+    const blogPostRecord = await superadminPb
+      .collection(blogPostsCollectionName)
+      .create(blogPostPayload);
+
+    const testFn = (p: { pb: PocketBase }) =>
+      p.pb.collection(blogPostsCollectionName).getFullList();
+    await expect(testFn({ pb: pendingAdminPb })).resolves.toMatchObject([]);
+    await expect(testFn({ pb: blockedAdminPb })).resolves.toMatchObject([]);
+    await expect(testFn({ pb: superadminPb })).resolves.toMatchObject([blogPostRecord]);
+  });
+
+  it("PDB-BP-LIST-05 — Global Standard (approved) can LIST", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const approvedStandardPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: approvedStandardPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { role: "standard", status: "approved" },
+      },
+    });
+
+    const blogPostPublishNowPayload = blogPostPayloadBuilder.forCreateRandomData({
+      publishAt: formatDateForPb(new Date()),
+    });
+    const blogPostPublishNowRecord = await superadminPb
+      .collection(blogPostsCollectionName)
+      .create(blogPostPublishNowPayload);
+
+    const blogPostPublishedTomorrowPayload = blogPostPayloadBuilder.forCreateRandomData({
+      publishAt: formatDateForPb(new Date(Date.now() + 24 * 60 * 60 * 1000)),
+    });
+    const blogPostPublishedTomorrowRecord = await superadminPb
+      .collection(blogPostsCollectionName)
+      .create(blogPostPublishedTomorrowPayload);
+
+    const blogPostPublishBlankPayload = blogPostPayloadBuilder.forCreateRandomData();
+    const blogPostPublishBlankRecord = await superadminPb
+      .collection(blogPostsCollectionName)
+      .create(blogPostPublishBlankPayload);
+
+    const testFn = async (p: { pb: PocketBase }) => {
+      const records = await p.pb.collection(blogPostsCollectionName).getFullList();
+      return records.sort((a, b) => (a.created > b.created ? 1 : -1));
+    };
+    await expect(testFn({ pb: approvedStandardPb })).resolves.toMatchObject([
+      blogPostPublishNowRecord,
+    ]);
+    await expect(testFn({ pb: superadminPb })).resolves.toMatchObject([
+      blogPostPublishNowRecord,
+      blogPostPublishedTomorrowRecord,
+      blogPostPublishBlankRecord,
+    ]);
+  });
+
+  it("PDB-BP-LIST-06 — Global Standard (pending or blocked) cannot LIST", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const pendingStandardPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: pendingStandardPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { role: "standard", status: "pending" },
+      },
+    });
+
+    const blockedStandardPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: blockedStandardPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { role: "standard", status: "blocked" },
+      },
+    });
+
+    const blogPostPayload = blogPostPayloadBuilder.forCreateRandomData();
+    const blogPostRecord = await superadminPb
+      .collection(blogPostsCollectionName)
+      .create(blogPostPayload);
+
+    const testFn = async (p: { pb: PocketBase }) =>
+      p.pb.collection(blogPostsCollectionName).getFullList();
+    await expect(testFn({ pb: pendingStandardPb })).resolves.toMatchObject([]);
+    await expect(testFn({ pb: blockedStandardPb })).resolves.toMatchObject([]);
+    await expect(testFn({ pb: superadminPb })).resolves.toMatchObject([blogPostRecord]);
+  });
+  it("PDB-BP-LIST-07 — Global Standard (approved) cannot LIST if publishAt datetime is in future", async () => {
+    const superadminPb = createPbConnection();
+    const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
+    await superadminPb.collection(usersCollectionName).create(superadminUserPayload);
+    await superadminPb
+      .collection(usersCollectionName)
+      .authWithPassword(superadminUserPayload.email, superadminUserPayload.password);
+
+    const approvedStandardPb = createPbConnection();
+    await createUserAndPermissions({
+      user: {
+        toBeActionedByPb: approvedStandardPb,
+        payload: userPayloadBuilder.forCreateRandomData(),
+        shouldAuthenticate: true,
+      },
+      globalUserPermissions: {
+        toBeActionedByPb: superadminPb,
+        payload: { role: "standard", status: "approved" },
+      },
+    });
+
+    const blogPostPublishAtNowPayload = blogPostPayloadBuilder.forCreateRandomData({
+      publishAt: formatDateForPb(new Date()),
+    });
+    const blogPostPublishAtNowRecord = await superadminPb
+      .collection(blogPostsCollectionName)
+      .create(blogPostPublishAtNowPayload);
+
+    const blogPostPublishAtTomorrowPayload = blogPostPayloadBuilder.forCreateRandomData({
+      publishAt: formatDateForPb(new Date(Date.now() + 24 * 60 * 60 * 1000)),
+    });
+    const blogPostPublishAtTomorrowRecord = await superadminPb
+      .collection(blogPostsCollectionName)
+      .create(blogPostPublishAtTomorrowPayload);
+
+    const blogPostPublishAtBlankPayload = blogPostPayloadBuilder.forCreateRandomData();
+    const blogPostPublishAtBlankRecord = await superadminPb
+      .collection(blogPostsCollectionName)
+      .create(blogPostPublishAtBlankPayload);
+
+    const testFn = async (p: { pb: PocketBase }) => {
+      const records = await p.pb.collection(blogPostsCollectionName).getFullList();
+      return records.sort((a, b) => (a.created > b.created ? 1 : -1));
+    };
+    await expect(testFn({ pb: approvedStandardPb })).resolves.toMatchObject([
+      blogPostPublishAtNowRecord,
+    ]);
+    await expect(testFn({ pb: superadminPb })).resolves.toMatchObject([
+      blogPostPublishAtNowRecord,
+      blogPostPublishAtTomorrowRecord,
+      blogPostPublishAtBlankRecord,
+    ]);
+  });
 });
