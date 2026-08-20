@@ -230,30 +230,12 @@ describe(`${testSuiteName} tests`, () => {
       .collection(blogPostsCollectionName)
       .create(blogPostPublishNowPayload);
 
-    const blogPostPublishedTomorrowPayload = blogPostPayloadBuilder.forCreateRandomData({
-      publishAt: formatDateForPb(new Date(Date.now() + 24 * 60 * 60 * 1000)),
-    });
-    const blogPostPublishedTomorrowRecord = await superadminPb
-      .collection(blogPostsCollectionName)
-      .create(blogPostPublishedTomorrowPayload);
-
-    const blogPostPublishBlankPayload = blogPostPayloadBuilder.forCreateRandomData();
-    const blogPostPublishBlankRecord = await superadminPb
-      .collection(blogPostsCollectionName)
-      .create(blogPostPublishBlankPayload);
-
-    const testFn = async (p: { pb: PocketBase }) => {
-      const records = await p.pb.collection(blogPostsCollectionName).getFullList();
-      return records.sort((a, b) => (a.created > b.created ? 1 : -1));
-    };
+    const testFn = async (p: { pb: PocketBase }) =>
+      p.pb.collection(blogPostsCollectionName).getFullList();
     await expect(testFn({ pb: approvedStandardPb })).resolves.toMatchObject([
       blogPostPublishNowRecord,
     ]);
-    await expect(testFn({ pb: superadminPb })).resolves.toMatchObject([
-      blogPostPublishNowRecord,
-      blogPostPublishedTomorrowRecord,
-      blogPostPublishBlankRecord,
-    ]);
+    await expect(testFn({ pb: superadminPb })).resolves.toMatchObject([blogPostPublishNowRecord]);
   });
 
   it("PDB-BP-LIST-06 — Global Standard (pending or blocked) cannot LIST", async () => {
@@ -301,6 +283,7 @@ describe(`${testSuiteName} tests`, () => {
     await expect(testFn({ pb: blockedStandardPb })).resolves.toMatchObject([]);
     await expect(testFn({ pb: superadminPb })).resolves.toMatchObject([blogPostRecord]);
   });
+
   it("PDB-BP-LIST-07 — Global Standard (approved) cannot LIST if publishAt datetime is in future", async () => {
     const superadminPb = createPbConnection();
     const superadminUserPayload = userPayloadBuilder.forCreateRandomData();
