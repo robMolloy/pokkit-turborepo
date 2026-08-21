@@ -1,29 +1,29 @@
 import { useGlobalUserPermissionStore, useUserRecordsStore, useUserStore } from "@repo/pokkit-auth";
 import { DisplayAnything } from "@repo/pokkit-components";
 
-const IndexPage = () => {
-  const userStore = useUserStore();
-  const userRecordsStore = useUserRecordsStore();
-  const globalUserPermissionStore = useGlobalUserPermissionStore();
+const useStores = (indexedUseStores: Record<string, () => any>) => {
+  const rtn: { [key: string]: any } = {};
+  Object.entries(indexedUseStores).forEach(([key, useStore]) => {
+    const store = useStore();
+    const storeName = key.replace("use", "");
+
+    return (rtn[storeName] = store);
+  });
+  return rtn;
+};
+
+const Page = () => {
+  const stores = useStores({ useUserStore, useUserRecordsStore, useGlobalUserPermissionStore });
 
   return (
     <div>
       <h1>Stores</h1>
 
       <pre>
-        <DisplayAnything
-          title=""
-          data={{
-            userStore,
-            userRecordsStore,
-            globalUserPermissionStore,
-          }}
-          hideFunctions={true}
-          expandLevel={1}
-        />
+        <DisplayAnything title="" data={stores} hideFunctions={true} expandLevel={1} />
       </pre>
     </div>
   );
 };
 
-export default IndexPage;
+export default Page;
