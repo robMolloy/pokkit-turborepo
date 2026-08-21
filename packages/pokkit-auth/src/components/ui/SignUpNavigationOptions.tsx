@@ -1,0 +1,40 @@
+import { Button } from "@repo/pokkit-shadcn";
+import { AuthMethodsList } from "pocketbase";
+
+export const SignUpNavigationOptions = (p: {
+  authMethodsList: AuthMethodsList;
+  onSignUpWithOtpButtonClick: () => void;
+  onSignUpWithOauth2ButtonClick: () => void;
+  onSignUpWithPasswordButtonClick: () => void;
+  onNavigateToSignInLinkClick: () => void;
+}) => {
+  return (
+    <div className="flex flex-col gap-4">
+      {p.authMethodsList.otp.enabled && (
+        <Button className="w-full" onClick={p.onSignUpWithOtpButtonClick}>
+          Sign up with one-time passcode
+        </Button>
+      )}
+      {p.authMethodsList.oauth2.enabled && (
+        <Button className="w-full" onClick={p.onSignUpWithOauth2ButtonClick}>
+          Sign up with oAuth2
+        </Button>
+      )}
+      {p.authMethodsList.password.enabled && (
+        <Button className="w-full" onClick={p.onSignUpWithPasswordButtonClick}>
+          Sign up with password
+        </Button>
+      )}
+      <span className="flex justify-center items-center gap-2">
+        Already have an account?{" "}
+        <Button
+          variant="link"
+          className="text-muted-foreground text-md p-0 h-0"
+          onClick={p.onNavigateToSignInLinkClick}
+        >
+          Sign in
+        </Button>
+      </span>
+    </div>
+  );
+};

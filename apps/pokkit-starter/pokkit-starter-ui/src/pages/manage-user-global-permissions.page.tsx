@@ -20,7 +20,7 @@ import {
 } from "@repo/pokkit-shadcn";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useGlobalUserPermissionsStore } from "../../../../../packages/pokkit-auth/src/hooks/globalUserPermissionsStore";
+import { useGlobalUserPermissionsStore } from "@repo/pokkit-auth";
 
 const statusColorClassMap: { [k in TGlobalUserPermission["status"]]: string } = {
   pending: "bg-muted",

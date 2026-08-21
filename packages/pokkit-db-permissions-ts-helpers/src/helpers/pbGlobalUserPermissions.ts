@@ -1,4 +1,3 @@
-import { extractMessageFromPbError } from "@repo/pokkit-auth";
 import PocketBase from "pocketbase";
 import {
   globalUserPermissionSchema,
@@ -6,6 +5,7 @@ import {
   type TGlobalUserPermission,
   type TGlobalUserPermissionsCreatePayload,
 } from "../..";
+import { extractMessageFromPbError } from "@repo/pokkit-auth/lib";
 
 export const updateGlobalUserPermissionRecord = async (p: {
   pb: PocketBase;

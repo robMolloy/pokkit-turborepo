@@ -1,3 +1,2 @@
-export * from "./src/components";
-export * from "./src/hooks";
-export * from "./src/utils";
+export * from "./src/components/ui";
+export * from "./src/lib";
