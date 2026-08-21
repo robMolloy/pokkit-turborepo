@@ -1,8 +1,11 @@
 import z from "zod";
 
 const envSchema = z.object({
-  VITE_APP_BASE_URL: z.string(),
   VITE_POCKETBASE_URL: z.string(),
+  VITE_APP_BASE_URL: z
+    .string()
+    .optional()
+    .transform((val) => val || ""),
   VITE_APP_NAME: z
     .string()
     .optional()
