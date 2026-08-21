@@ -19,9 +19,7 @@ const Page = () => {
     <div>
       <h1>Stores</h1>
 
-      <pre>
-        <DisplayAnything title="" data={stores} hideFunctions={true} expandLevel={1} />
-      </pre>
+      <DisplayAnything title="" data={stores} hideFunctions={true} expandLevel={1} />
     </div>
   );
 };

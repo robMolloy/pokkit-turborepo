@@ -69,7 +69,7 @@ func main() {
 	app.OnRecordAfterUpdateSuccess(db.InstancesCollectionName).BindFunc(nginxTemplatesSdk.RebuildAndReloadNginxConfigOnChangeEventHandler)
 	app.OnRecordAfterDeleteSuccess(db.InstancesCollectionName).BindFunc(nginxTemplatesSdk.RebuildAndReloadNginxConfigOnChangeEventHandler)
 
-	app.OnRecordCreateRequest(db.AuthOrganisationsCollectionName).BindFunc(events.PromoteOrganisationCreatorToOrgAdminAfterUserCreateEventHandler)
+	app.OnRecordCreateRequest(db.OrganisationsCollectionName).BindFunc(events.PromoteOrganisationCreatorToOrgAdminAfterUserCreateEventHandler)
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)

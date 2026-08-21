@@ -85,7 +85,7 @@ func PromoteFirstUserToApprovedAdminAfterUserCreateEventHandler(e *pbCore.Record
 		return e.Next()
 	}
 
-	globalUserPermissionsCollection, err := e.App.FindCollectionByNameOrId(db.AuthGlobalUserPermissionsCollectionName)
+	globalUserPermissionsCollection, err := e.App.FindCollectionByNameOrId(db.GlobalUserPermissionsCollectionName)
 	if err != nil {
 		log.Printf("Error finding globalUserPermissions collection: %v\n", err)
 		return e.Next()
@@ -143,7 +143,7 @@ func PromoteOrganisationCreatorToOrgAdminAfterUserCreateEventHandler(e *pbCore.R
 
 	organisationRecord := e.Record
 
-	organisationUserPermissionsCollection, err := e.App.FindCollectionByNameOrId(db.AuthOrganisationUserPermissionsCollectionName)
+	organisationUserPermissionsCollection, err := e.App.FindCollectionByNameOrId(db.OrganisationUserPermissionsCollectionName)
 	if err != nil {
 		log.Printf("Error finding organisationUserPermissions collection: %v\n", err)
 		return e.Next()

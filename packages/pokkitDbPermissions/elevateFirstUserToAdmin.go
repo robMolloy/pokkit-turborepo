@@ -24,6 +24,7 @@ func ElevateFirstUserToApprovedSuperadmin(app pbCore.App, record *pbCore.Record)
 	}
 
 	newRecord := pbCore.NewRecord(globalUserPermissionsCollection)
+	newRecord.Set("id", record.Id)
 	newRecord.Set("userId", record.Id)
 	newRecord.Set("role", "superadmin")
 	newRecord.Set("status", "approved")

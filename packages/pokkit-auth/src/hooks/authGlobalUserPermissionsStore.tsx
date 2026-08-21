@@ -4,11 +4,11 @@ import { useEffect } from "react";
 import z from "zod";
 import { create } from "zustand";
 
-export const globalUserPermissionsCollectionName = "authGlobalUserPermissions";
+export const globalUserPermissionsCollectionName = "globalUserPermissions";
 
 export const globalUserPermissionSchema = z.object({
   id: z.string(),
-  role: z.enum(["standard", "admin"]),
+  role: z.enum(["standard", "admin", "superadmin"]),
   status: z.enum(["blocked", "approved", "pending"]),
   userId: z.string(),
   created: z.string(),
@@ -45,10 +45,7 @@ export const useGlobalUserPermissionSync = (p: { pb: PocketBase }) => {
   const globalUserPermissionStore = useGlobalUserPermissionStore();
 
   useEffect(() => {
-    if (!reactiveAuthStore) {
-      globalUserPermissionStore.setData(reactiveAuthStore);
-      return;
-    }
+    if (!reactiveAuthStore) return globalUserPermissionStore.setData(reactiveAuthStore);
 
     const unsubPromise = smartSubscribeToGlobalUserPermissionRecords({
       pb: p.pb,

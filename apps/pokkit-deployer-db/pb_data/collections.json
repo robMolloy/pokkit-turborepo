@@ -11,6 +11,7 @@
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -25,6 +26,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text455797646",
         "max": 0,
@@ -39,6 +41,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text127846527",
         "max": 0,
@@ -53,6 +56,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text1582905952",
         "max": 0,
@@ -90,7 +94,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-05-07 22:06:24.687Z",
-    "updated": "2026-06-15 02:20:03.343Z",
+    "updated": "2026-08-21 11:05:56.462Z",
     "system": true
   },
   {
@@ -105,6 +109,7 @@
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -119,6 +124,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text455797646",
         "max": 0,
@@ -133,6 +139,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text127846527",
         "max": 0,
@@ -147,6 +154,7 @@
       },
       {
         "cost": 8,
+        "help": "",
         "hidden": true,
         "id": "password901924565",
         "max": 0,
@@ -160,6 +168,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": true,
         "id": "text3866985172",
         "max": 0,
@@ -197,7 +206,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-05-07 22:06:24.689Z",
-    "updated": "2026-06-15 02:20:03.347Z",
+    "updated": "2026-08-21 11:05:56.463Z",
     "system": true
   },
   {
@@ -212,6 +221,7 @@
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -226,6 +236,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text455797646",
         "max": 0,
@@ -240,6 +251,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text127846527",
         "max": 0,
@@ -254,6 +266,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text2462348188",
         "max": 0,
@@ -268,6 +281,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text1044722854",
         "max": 0,
@@ -306,7 +320,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-05-07 22:06:24.690Z",
-    "updated": "2026-06-15 02:20:03.350Z",
+    "updated": "2026-08-21 11:05:56.464Z",
     "system": true
   },
   {
@@ -321,6 +335,7 @@
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -335,6 +350,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text455797646",
         "max": 0,
@@ -349,6 +365,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text127846527",
         "max": 0,
@@ -363,6 +380,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text4228609354",
         "max": 0,
@@ -400,7 +418,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-05-07 22:06:24.691Z",
-    "updated": "2026-06-15 02:20:03.353Z",
+    "updated": "2026-08-21 11:05:56.465Z",
     "system": true
   },
   {
@@ -415,6 +433,7 @@
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -429,6 +448,7 @@
       },
       {
         "cost": 0,
+        "help": "",
         "hidden": true,
         "id": "password901924565",
         "max": 0,
@@ -442,6 +462,7 @@
       },
       {
         "autogeneratePattern": "[a-zA-Z0-9]{50}",
+        "help": "",
         "hidden": true,
         "id": "text2504183744",
         "max": 60,
@@ -456,6 +477,7 @@
       },
       {
         "exceptDomains": null,
+        "help": "",
         "hidden": false,
         "id": "email3885137012",
         "name": "email",
@@ -466,6 +488,7 @@
         "type": "email"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "bool1547992806",
         "name": "emailVisibility",
@@ -475,6 +498,7 @@
         "type": "bool"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "bool256245529",
         "name": "verified",
@@ -509,7 +533,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-05-07 22:06:24.693Z",
-    "updated": "2026-06-15 02:20:03.356Z",
+    "updated": "2026-08-21 11:05:56.466Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -580,8 +604,8 @@
   },
   {
     "id": "_pb_users_auth_",
-    "listRule": "@request.auth.id = id ||\n@collection.authGlobalUserPermissions.userId ?= @request.auth.id \u0026\u0026\n@collection.authGlobalUserPermissions.role = \"admin\"",
-    "viewRule": "@request.auth.id = id ||\n@collection.authGlobalUserPermissions.userId ?= @request.auth.id \u0026\u0026\n@collection.authGlobalUserPermissions.role = \"admin\"",
+    "listRule": "@request.auth.id = id ||\n@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026\n@collection.globalUserPermissions.role = \"admin\"",
+    "viewRule": "@request.auth.id = id ||\n@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026\n@collection.globalUserPermissions.role = \"admin\"",
     "createRule": "",
     "updateRule": "id = @request.auth.id",
     "deleteRule": "id = @request.auth.id",
@@ -590,6 +614,7 @@
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -604,6 +629,7 @@
       },
       {
         "cost": 0,
+        "help": "",
         "hidden": true,
         "id": "password901924565",
         "max": 0,
@@ -617,6 +643,7 @@
       },
       {
         "autogeneratePattern": "[a-zA-Z0-9]{50}",
+        "help": "",
         "hidden": true,
         "id": "text2504183744",
         "max": 60,
@@ -631,6 +658,7 @@
       },
       {
         "exceptDomains": null,
+        "help": "",
         "hidden": false,
         "id": "email3885137012",
         "name": "email",
@@ -641,6 +669,7 @@
         "type": "email"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "bool1547992806",
         "name": "emailVisibility",
@@ -650,6 +679,7 @@
         "type": "bool"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "bool256245529",
         "name": "verified",
@@ -660,6 +690,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text1579384326",
         "max": 255,
@@ -673,6 +704,7 @@
         "type": "text"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "file376926767",
         "maxSelect": 1,
@@ -718,7 +750,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-05-07 22:06:24.696Z",
-    "updated": "2026-06-15 02:20:03.360Z",
+    "updated": "2026-08-21 11:09:46.372Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -789,16 +821,17 @@
   },
   {
     "id": "pbc_2680520508",
-    "listRule": "@request.auth.id != \"\" \u0026\u0026 (\n  @request.auth.id = id || \n  @collection.authGlobalUserPermissions.id ?= @request.auth.id \u0026\u0026 @collection.authGlobalUserPermissions.role ?= \"admin\"\n)",
-    "viewRule": "@request.auth.id != \"\" \u0026\u0026 (\n  @request.auth.id = id || \n  @collection.authGlobalUserPermissions.id ?= @request.auth.id \u0026\u0026 @collection.authGlobalUserPermissions.role ?= \"admin\"\n)",
-    "createRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.authGlobalUserPermissions.id ?= @request.auth.id \u0026\u0026 \n@collection.authGlobalUserPermissions.role ?= \"admin\"",
-    "updateRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.authGlobalUserPermissions.id ?= @request.auth.id \u0026\u0026 \n@collection.authGlobalUserPermissions.role ?= \"admin\"",
-    "deleteRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.authGlobalUserPermissions.id ?= @request.auth.id \u0026\u0026 \n@collection.authGlobalUserPermissions.role ?= \"admin\"",
-    "name": "authGlobalUserPermissions",
+    "listRule": "@request.auth.id != \"\" \u0026\u0026 (\n  @request.auth.id = id || \n  @collection.globalUserPermissions.id ?= @request.auth.id \u0026\u0026 @collection.globalUserPermissions.role ?= \"admin\"\n)",
+    "viewRule": "@request.auth.id != \"\" \u0026\u0026 (\n  @request.auth.id = id || \n  @collection.globalUserPermissions.id ?= @request.auth.id \u0026\u0026 @collection.globalUserPermissions.role ?= \"admin\"\n)",
+    "createRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.globalUserPermissions.id ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"admin\"",
+    "updateRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.globalUserPermissions.id ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"admin\"",
+    "deleteRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.globalUserPermissions.id ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"admin\"",
+    "name": "globalUserPermissions",
     "type": "base",
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -812,6 +845,7 @@
         "type": "text"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "select1466534506",
         "maxSelect": 1,
@@ -826,6 +860,7 @@
         ]
       },
       {
+        "help": "",
         "hidden": false,
         "id": "select2063623452",
         "maxSelect": 1,
@@ -843,6 +878,7 @@
       {
         "cascadeDelete": true,
         "collectionId": "_pb_users_auth_",
+        "help": "",
         "hidden": false,
         "id": "relation1689669068",
         "maxSelect": 1,
@@ -875,22 +911,23 @@
       }
     ],
     "indexes": [],
-    "created": "2026-05-07 22:11:26.834Z",
-    "updated": "2026-06-15 02:20:03.365Z",
+    "created": "2026-08-21 11:05:56.470Z",
+    "updated": "2026-08-21 11:07:28.066Z",
     "system": false
   },
   {
     "id": "pbc_230240349",
-    "listRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.authOrganisationUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.authOrganisationUserPermissions.organisationId ?= organisationId \u0026\u0026 \n@collection.authOrganisationUserPermissions.role = \"admin\"",
-    "viewRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.authOrganisationUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.authOrganisationUserPermissions.organisationId ?= organisationId \u0026\u0026 \n@collection.authOrganisationUserPermissions.role = \"admin\"",
-    "createRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.authOrganisationUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.authOrganisationUserPermissions.organisationId ?= organisationId \u0026\u0026 \n@collection.authOrganisationUserPermissions.role ?= \"admin\"",
-    "updateRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.authOrganisationUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.authOrganisationUserPermissions.organisationId ?= organisationId \u0026\u0026 \n@collection.authOrganisationUserPermissions.role ?= \"admin\"",
-    "deleteRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.authOrganisationUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.authOrganisationUserPermissions.organisationId ?= organisationId \u0026\u0026 \n@collection.authOrganisationUserPermissions.role ?= \"admin\"",
-    "name": "authOrganisationUserPermissions",
+    "listRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.organisationUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.organisationUserPermissions.organisationId ?= organisationId \u0026\u0026 \n@collection.organisationUserPermissions.role = \"admin\"",
+    "viewRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.organisationUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.organisationUserPermissions.organisationId ?= organisationId \u0026\u0026 \n@collection.organisationUserPermissions.role = \"admin\"",
+    "createRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.organisationUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.organisationUserPermissions.organisationId ?= organisationId \u0026\u0026 \n@collection.organisationUserPermissions.role ?= \"admin\"",
+    "updateRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.organisationUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.organisationUserPermissions.organisationId ?= organisationId \u0026\u0026 \n@collection.organisationUserPermissions.role ?= \"admin\"",
+    "deleteRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.organisationUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.organisationUserPermissions.organisationId ?= organisationId \u0026\u0026 \n@collection.organisationUserPermissions.role ?= \"admin\"",
+    "name": "organisationUserPermissions",
     "type": "base",
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -906,6 +943,7 @@
       {
         "cascadeDelete": true,
         "collectionId": "pbc_1053844701",
+        "help": "",
         "hidden": false,
         "id": "relation982184766",
         "maxSelect": 1,
@@ -917,6 +955,7 @@
         "type": "relation"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "select1466534506",
         "maxSelect": 1,
@@ -931,6 +970,7 @@
         ]
       },
       {
+        "help": "",
         "hidden": false,
         "id": "select2063623452",
         "maxSelect": 1,
@@ -948,6 +988,7 @@
       {
         "cascadeDelete": true,
         "collectionId": "_pb_users_auth_",
+        "help": "",
         "hidden": false,
         "id": "relation1689669068",
         "maxSelect": 1,
@@ -960,6 +1001,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text1330202256",
         "max": 0,
@@ -994,24 +1036,25 @@
       }
     ],
     "indexes": [
-      "CREATE UNIQUE INDEX `idx_0UWlVOdDqD` ON `authOrganisationUserPermissions` (`userOrgKey`)"
+      "CREATE UNIQUE INDEX `idx_0UWlVOdDqD` ON `organisationUserPermissions` (`userOrgKey`)"
     ],
-    "created": "2026-05-07 22:11:26.836Z",
-    "updated": "2026-06-15 02:20:03.368Z",
+    "created": "2026-08-21 11:05:56.471Z",
+    "updated": "2026-08-21 11:12:43.295Z",
     "system": false
   },
   {
     "id": "pbc_1053844701",
     "listRule": "@request.auth.id != \"\"",
     "viewRule": "@request.auth.id != \"\"",
-    "createRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.authGlobalUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.authGlobalUserPermissions.role = \"admin\"",
-    "updateRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.authOrganisationUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.authOrganisationUserPermissions.organisationId ?= id \u0026\u0026 \n@collection.authOrganisationUserPermissions.role = \"admin\"",
-    "deleteRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.authOrganisationUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.authOrganisationUserPermissions.organisationId ?= id \u0026\u0026 \n@collection.authOrganisationUserPermissions.role = \"admin\"",
-    "name": "authOrganisations",
+    "createRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role = \"admin\"",
+    "updateRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.organisationUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.organisationUserPermissions.organisationId ?= id \u0026\u0026 \n@collection.organisationUserPermissions.role = \"admin\"",
+    "deleteRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.organisationUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.organisationUserPermissions.organisationId ?= id \u0026\u0026 \n@collection.organisationUserPermissions.role = \"admin\"",
+    "name": "organisations",
     "type": "base",
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -1026,6 +1069,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text1579384326",
         "max": 0,
@@ -1040,6 +1084,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text1843675174",
         "max": 0,
@@ -1074,8 +1119,8 @@
       }
     ],
     "indexes": [],
-    "created": "2026-05-07 22:11:26.838Z",
-    "updated": "2026-06-15 02:20:03.371Z",
+    "created": "2026-08-21 11:05:56.472Z",
+    "updated": "2026-08-21 11:10:48.792Z",
     "system": false
   },
   {
@@ -1090,6 +1135,7 @@
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -1103,6 +1149,7 @@
         "type": "text"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "number1085635215",
         "max": null,
@@ -1117,6 +1164,7 @@
       {
         "cascadeDelete": true,
         "collectionId": "pbc_792733244",
+        "help": "",
         "hidden": false,
         "id": "relation267956229",
         "maxSelect": 1,
@@ -1128,6 +1176,7 @@
         "type": "relation"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "select2063623452",
         "maxSelect": 1,
@@ -1167,14 +1216,14 @@
       "CREATE UNIQUE INDEX `idx_MGuOIBNgXv` ON `instances` (`portNumber`)",
       "CREATE UNIQUE INDEX `idx_JbxVy7FfOr` ON `instances` (`instanceRequestId`)"
     ],
-    "created": "2026-05-07 22:11:26.840Z",
-    "updated": "2026-06-15 02:20:03.374Z",
+    "created": "2026-08-21 11:05:56.473Z",
+    "updated": "2026-08-21 11:05:56.473Z",
     "system": false
   },
   {
     "id": "pbc_3272359208",
-    "listRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = id || @collection.authGlobalUserPermissions.id ?= @request.auth.id \u0026\u0026 @collection.authGlobalUserPermissions.role ?= \"admin\")",
-    "viewRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = id || @collection.authGlobalUserPermissions.id ?= @request.auth.id \u0026\u0026 @collection.authGlobalUserPermissions.role ?= \"admin\")",
+    "listRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = id || @collection.globalUserPermissions.id ?= @request.auth.id \u0026\u0026 @collection.globalUserPermissions.role ?= \"admin\")",
+    "viewRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = id || @collection.globalUserPermissions.id ?= @request.auth.id \u0026\u0026 @collection.globalUserPermissions.role ?= \"admin\")",
     "createRule": null,
     "updateRule": null,
     "deleteRule": null,
@@ -1183,6 +1232,7 @@
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -1196,6 +1246,7 @@
         "type": "text"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "number3115862390",
         "max": null,
@@ -1210,6 +1261,7 @@
       {
         "cascadeDelete": false,
         "collectionId": "_pb_users_auth_",
+        "help": "",
         "hidden": false,
         "id": "relation1689669068",
         "maxSelect": 1,
@@ -1244,14 +1296,14 @@
     "indexes": [
       "CREATE UNIQUE INDEX `idx_tKzMrurend` ON `userBalances` (`userId`)"
     ],
-    "created": "2026-05-07 22:11:26.846Z",
-    "updated": "2026-06-15 02:20:03.378Z",
+    "created": "2026-08-21 11:05:56.474Z",
+    "updated": "2026-08-21 11:09:22.709Z",
     "system": false
   },
   {
     "id": "pbc_2852184993",
     "listRule": "@request.auth.id != \"\" \u0026\u0026 @request.auth.id = userId ",
-    "viewRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = userId ||\n@collection.authGlobalUserPermissions.userId ?= @request.auth.id \u0026\u0026\n@collection.authGlobalUserPermissions.role = \"admin\")",
+    "viewRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = userId ||\n@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026\n@collection.globalUserPermissions.role = \"admin\")",
     "createRule": null,
     "updateRule": null,
     "deleteRule": null,
@@ -1260,6 +1312,7 @@
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -1275,6 +1328,7 @@
       {
         "cascadeDelete": false,
         "collectionId": "_pb_users_auth_",
+        "help": "",
         "hidden": false,
         "id": "relation1689669068",
         "maxSelect": 1,
@@ -1287,6 +1341,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text3396850601",
         "max": 0,
@@ -1300,6 +1355,7 @@
         "type": "text"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "number3517527325",
         "max": null,
@@ -1312,6 +1368,7 @@
         "type": "number"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "date2557496732",
         "max": "",
@@ -1324,6 +1381,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text432467915",
         "max": 0,
@@ -1337,6 +1395,7 @@
         "type": "text"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "number1524867112",
         "max": null,
@@ -1350,6 +1409,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text1767278655",
         "max": 0,
@@ -1363,6 +1423,7 @@
         "type": "text"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "number2392944706",
         "max": null,
@@ -1375,6 +1436,7 @@
         "type": "number"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "json3174873989",
         "maxSize": 0,
@@ -1385,6 +1447,7 @@
         "type": "json"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "number3327837906",
         "max": null,
@@ -1418,14 +1481,14 @@
       }
     ],
     "indexes": [],
-    "created": "2026-05-07 22:11:26.847Z",
-    "updated": "2026-06-15 02:20:03.380Z",
+    "created": "2026-08-21 11:05:56.475Z",
+    "updated": "2026-08-21 11:07:58.526Z",
     "system": false
   },
   {
     "id": "pbc_3068566530",
-    "listRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = userId ||\n@collection.authGlobalUserPermissions.userId ?= @request.auth.id \u0026\u0026\n@collection.authGlobalUserPermissions.role = \"admin\")",
-    "viewRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = userId ||\n@collection.authGlobalUserPermissions.userId ?= @request.auth.id \u0026\u0026\n@collection.authGlobalUserPermissions.role = \"admin\")",
+    "listRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = userId ||\n@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026\n@collection.globalUserPermissions.role = \"admin\")",
+    "viewRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = userId ||\n@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026\n@collection.globalUserPermissions.role = \"admin\")",
     "createRule": null,
     "updateRule": null,
     "deleteRule": null,
@@ -1434,6 +1497,7 @@
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -1449,6 +1513,7 @@
       {
         "cascadeDelete": false,
         "collectionId": "_pb_users_auth_",
+        "help": "",
         "hidden": false,
         "id": "relation1689669068",
         "maxSelect": 1,
@@ -1461,6 +1526,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text1883776062",
         "max": 0,
@@ -1474,6 +1540,7 @@
         "type": "text"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "json1111784733",
         "maxSize": 0,
@@ -1485,6 +1552,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text1031527505",
         "max": 0,
@@ -1499,6 +1567,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text3346823387",
         "max": 0,
@@ -1513,6 +1582,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text3396850601",
         "max": 0,
@@ -1527,6 +1597,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text1767278655",
         "max": 0,
@@ -1540,6 +1611,7 @@
         "type": "text"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "number2683508278",
         "max": null,
@@ -1553,6 +1625,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text837031339",
         "max": 0,
@@ -1566,6 +1639,7 @@
         "type": "text"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "number3327837906",
         "max": null,
@@ -1578,6 +1652,7 @@
         "type": "number"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "number928573309",
         "max": null,
@@ -1591,6 +1666,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text1398119645",
         "max": 0,
@@ -1605,6 +1681,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text913937925",
         "max": 0,
@@ -1619,6 +1696,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text1278432162",
         "max": 0,
@@ -1633,6 +1711,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text3287476027",
         "max": 0,
@@ -1646,6 +1725,7 @@
         "type": "text"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "number2413213763",
         "max": null,
@@ -1658,6 +1738,7 @@
         "type": "number"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "date3512434289",
         "max": "",
@@ -1669,6 +1750,7 @@
         "type": "date"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "date1902542209",
         "max": "",
@@ -1703,8 +1785,8 @@
     "indexes": [
       "CREATE INDEX `idx_Bzj0h4o9vr` ON `stripeLedger` (`stripePayloadId`)"
     ],
-    "created": "2026-05-07 22:11:26.850Z",
-    "updated": "2026-06-15 02:20:03.383Z",
+    "created": "2026-08-21 11:05:56.477Z",
+    "updated": "2026-08-21 11:08:32.473Z",
     "system": false
   },
   {
@@ -1719,6 +1801,7 @@
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -1734,6 +1817,7 @@
       {
         "cascadeDelete": false,
         "collectionId": "pbc_2852184993",
+        "help": "",
         "hidden": false,
         "id": "relation1438442264",
         "maxSelect": 1,
@@ -1745,6 +1829,7 @@
         "type": "relation"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "number396027798",
         "max": null,
@@ -1757,6 +1842,7 @@
         "type": "number"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "select298994659",
         "maxSelect": 1,
@@ -1794,8 +1880,8 @@
     "indexes": [
       "CREATE UNIQUE INDEX `idx_iads1c81Gz` ON `instanceRequests` (\n  `instancesSubscriptionId`,\n  `instanceNumber`\n)"
     ],
-    "created": "2026-05-08 22:53:33.592Z",
-    "updated": "2026-06-15 02:20:03.388Z",
+    "created": "2026-08-21 11:05:56.479Z",
+    "updated": "2026-08-21 11:05:56.479Z",
     "system": false
   },
   {
@@ -1810,6 +1896,7 @@
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -1824,6 +1911,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text2560242772",
         "max": 0,
@@ -1838,6 +1926,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text3377378130",
         "max": 0,
@@ -1872,8 +1961,8 @@
       }
     ],
     "indexes": [],
-    "created": "2026-06-10 22:07:19.233Z",
-    "updated": "2026-06-15 02:20:03.391Z",
+    "created": "2026-08-21 11:05:56.480Z",
+    "updated": "2026-08-21 11:05:56.480Z",
     "system": false
   },
   {
@@ -1888,6 +1977,7 @@
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -1901,6 +1991,7 @@
         "type": "text"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "bool1002600656",
         "name": "logAllStripeEvents",
@@ -1931,14 +2022,14 @@
       }
     ],
     "indexes": [],
-    "created": "2026-06-11 15:41:22.859Z",
-    "updated": "2026-06-15 02:20:03.393Z",
+    "created": "2026-08-21 11:05:56.482Z",
+    "updated": "2026-08-21 11:05:56.482Z",
     "system": false
   },
   {
     "id": "pbc_2499967934",
     "listRule": "@request.auth.id != \"\" \u0026\u0026 @request.auth.id = userId ",
-    "viewRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = userId ||\n@collection.authGlobalUserPermissions.userId ?= @request.auth.id \u0026\u0026\n@collection.authGlobalUserPermissions.role = \"admin\")",
+    "viewRule": "@request.auth.id != \"\" \u0026\u0026 (@request.auth.id = userId ||\n@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026\n@collection.globalUserPermissions.role = \"admin\")",
     "createRule": null,
     "updateRule": null,
     "deleteRule": null,
@@ -1947,6 +2038,7 @@
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -1962,6 +2054,7 @@
       {
         "cascadeDelete": false,
         "collectionId": "_pb_users_auth_",
+        "help": "",
         "hidden": false,
         "id": "relation1689669068",
         "maxSelect": 1,
@@ -1974,6 +2067,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text3396850601",
         "max": 0,
@@ -1987,6 +2081,7 @@
         "type": "text"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "number2683508278",
         "max": null,
@@ -1999,6 +2094,7 @@
         "type": "number"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "date943907490",
         "max": "",
@@ -2011,6 +2107,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text432467915",
         "max": 0,
@@ -2024,6 +2121,7 @@
         "type": "text"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "number1524867112",
         "max": null,
@@ -2037,6 +2135,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text1767278655",
         "max": 0,
@@ -2050,6 +2149,7 @@
         "type": "text"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "number405181692",
         "max": null,
@@ -2062,6 +2162,7 @@
         "type": "number"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "number3327837906",
         "max": null,
@@ -2095,8 +2196,8 @@
       }
     ],
     "indexes": [],
-    "created": "2026-06-11 15:48:13.714Z",
-    "updated": "2026-06-15 02:20:03.396Z",
+    "created": "2026-08-21 11:05:56.483Z",
+    "updated": "2026-08-21 11:09:00.572Z",
     "system": false
   },
   {
@@ -2111,6 +2212,7 @@
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -2125,6 +2227,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text3339685365",
         "max": 0,
@@ -2139,6 +2242,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text3448522234",
         "max": 0,
@@ -2175,8 +2279,8 @@
     "indexes": [
       "CREATE UNIQUE INDEX `idx_LtrWiLzD9H` ON `stripeProducts` (`stripeProductId`)"
     ],
-    "created": "2026-06-13 22:39:21.277Z",
-    "updated": "2026-06-15 02:33:01.029Z",
+    "created": "2026-08-21 11:05:56.485Z",
+    "updated": "2026-08-21 11:05:56.485Z",
     "system": false
   },
   {
@@ -2191,6 +2295,7 @@
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
         "hidden": false,
         "id": "text3208210256",
         "max": 15,
@@ -2205,6 +2310,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text3339685365",
         "max": 0,
@@ -2219,6 +2325,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text837031339",
         "max": 0,
@@ -2233,6 +2340,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text3287476027",
         "max": 0,
@@ -2246,6 +2354,7 @@
         "type": "text"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "number2413213763",
         "max": null,
@@ -2259,6 +2368,7 @@
       },
       {
         "autogeneratePattern": "",
+        "help": "",
         "hidden": false,
         "id": "text1767278655",
         "max": 0,
@@ -2272,6 +2382,7 @@
         "type": "text"
       },
       {
+        "help": "",
         "hidden": false,
         "id": "number3327837906",
         "max": null,
@@ -2307,8 +2418,8 @@
     "indexes": [
       "CREATE UNIQUE INDEX `idx_pTVVK0Ex6B` ON `stripeProductPrices` (`stripePriceId`)"
     ],
-    "created": "2026-06-15 01:38:32.862Z",
-    "updated": "2026-06-15 02:32:45.083Z",
+    "created": "2026-08-21 11:05:56.486Z",
+    "updated": "2026-08-21 11:05:56.486Z",
     "system": false
   }
 ]

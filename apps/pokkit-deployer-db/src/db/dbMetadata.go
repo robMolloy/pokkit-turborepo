@@ -1,9 +1,9 @@
 package db
 
 var UsersCollectionName = "users"
-var AuthOrganisationsCollectionName = "authOrganisations"
-var AuthOrganisationUserPermissionsCollectionName = "authOrganisationUserPermissions"
-var AuthGlobalUserPermissionsCollectionName = "authGlobalUserPermissions"
+var OrganisationsCollectionName = "organisations"
+var OrganisationUserPermissionsCollectionName = "organisationUserPermissions"
+var GlobalUserPermissionsCollectionName = "globalUserPermissions"
 var InstancesCollectionName = "instances"
 var InstanceRequestsCollectionName = "instanceRequests"
 var InstancesSubscriptionsCollectionName = "instancesSubscriptions"
