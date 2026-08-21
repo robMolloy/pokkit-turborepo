@@ -1,4 +1,5 @@
 export * from "./reactiveAuthStore";
 export * from "./useUsersStore";
 export * from "./useAuthSync";
-export * from "./authGlobalUserPermissionsStore";
+export * from "./globalUserPermissionStore";
+export * from "./globalUserPermissionsMetadata";

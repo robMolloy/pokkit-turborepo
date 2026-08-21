@@ -94,7 +94,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-08-12 07:22:44.810Z",
-    "updated": "2026-08-20 14:52:09.189Z",
+    "updated": "2026-08-21 20:18:33.894Z",
     "system": true
   },
   {
@@ -206,7 +206,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-08-12 07:22:44.812Z",
-    "updated": "2026-08-20 14:52:09.192Z",
+    "updated": "2026-08-21 20:18:33.899Z",
     "system": true
   },
   {
@@ -320,7 +320,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-08-12 07:22:44.814Z",
-    "updated": "2026-08-20 14:52:09.194Z",
+    "updated": "2026-08-21 20:18:33.901Z",
     "system": true
   },
   {
@@ -418,7 +418,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-08-12 07:22:44.817Z",
-    "updated": "2026-08-20 14:52:09.195Z",
+    "updated": "2026-08-21 20:18:33.903Z",
     "system": true
   },
   {
@@ -533,7 +533,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-08-12 07:22:44.819Z",
-    "updated": "2026-08-20 14:52:09.196Z",
+    "updated": "2026-08-21 20:18:33.904Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -604,8 +604,8 @@
   },
   {
     "id": "_pb_users_auth_",
-    "listRule": "id = @request.auth.id",
-    "viewRule": "id = @request.auth.id",
+    "listRule": "id = @request.auth.id\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n",
+    "viewRule": "id = @request.auth.id\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"",
     "createRule": "",
     "updateRule": "id = @request.auth.id",
     "deleteRule": "id = @request.auth.id",
@@ -750,7 +750,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-08-12 07:22:44.822Z",
-    "updated": "2026-08-20 14:52:09.238Z",
+    "updated": "2026-08-21 20:18:33.954Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -824,7 +824,7 @@
     "listRule": "@request.auth.id = userId\n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\" \n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"",
     "viewRule": "@request.auth.id = userId\n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\" \n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"",
     "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"superadmin\"",
-    "updateRule": "@request.auth.id != \"\" \u0026\u0026 \n@collection.globalUserPermissions.userId ?= @request.auth.id \u0026\u0026 \n@collection.globalUserPermissions.role ?= \"superadmin\"",
+    "updateRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\u0026\u0026 userId ?!= @request.auth.id \n",
     "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\t\u0026\u0026 @collection.globalUserPermissions.role ?= \"superadmin\"\n\t\u0026\u0026 userId ?!= @request.auth.id \n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t\u0026\u0026 @collection.globalUserPermissions.role ?!= \"superadmin\"\n\t\u0026\u0026 @collection.globalUserPermissions.status ?= \"approved\"\n\t\u0026\u0026 userId ?= @request.auth.id \t\n",
     "name": "globalUserPermissions",
     "type": "base",
@@ -915,7 +915,7 @@
       "CREATE UNIQUE INDEX `idx_djyvvpjhe1` ON `globalUserPermissions` (`userId`)"
     ],
     "created": "2026-08-12 11:07:59.725Z",
-    "updated": "2026-08-20 14:52:09.240Z",
+    "updated": "2026-08-21 20:23:23.053Z",
     "system": false
   },
   {
@@ -1027,7 +1027,7 @@
       "CREATE UNIQUE INDEX `idx_2ag063yzee` ON `organisationUserPermissions` (\n  `orgId`,\n  `userId`\n)"
     ],
     "created": "2026-08-12 11:07:59.729Z",
-    "updated": "2026-08-20 14:52:09.241Z",
+    "updated": "2026-08-21 20:18:33.958Z",
     "system": false
   },
   {
@@ -1110,7 +1110,7 @@
       "CREATE UNIQUE INDEX `idx_l5jn9kiytc` ON `organisations` (`name`)"
     ],
     "created": "2026-08-12 11:07:59.731Z",
-    "updated": "2026-08-20 14:52:09.242Z",
+    "updated": "2026-08-21 20:18:33.960Z",
     "system": false
   },
   {
@@ -1182,7 +1182,7 @@
     ],
     "indexes": [],
     "created": "2026-08-19 21:03:23.836Z",
-    "updated": "2026-08-20 22:44:23.531Z",
+    "updated": "2026-08-21 20:18:33.973Z",
     "system": false
   },
   {
@@ -1319,7 +1319,7 @@
     ],
     "indexes": [],
     "created": "2026-08-19 21:03:23.839Z",
-    "updated": "2026-08-20 14:52:09.256Z",
+    "updated": "2026-08-21 20:18:33.975Z",
     "system": false
   },
   {
@@ -1401,8 +1401,8 @@
     "indexes": [
       "CREATE UNIQUE INDEX `idx_secrets_key` ON `_pb_config_secrets` (key)"
     ],
-    "created": "2026-08-20 14:52:09.230Z",
-    "updated": "2026-08-20 14:52:09.230Z",
+    "created": "2026-08-21 20:18:33.943Z",
+    "updated": "2026-08-21 20:18:33.943Z",
     "system": false
   }
 ]

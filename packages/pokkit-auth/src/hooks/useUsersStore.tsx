@@ -24,6 +24,9 @@ export const useUserRecordsSync = (p: { pb: PocketBase }) => {
       collectionName: usersCollectionName,
       itemSchema: userSchema,
       onChange: (x) => usersStore.setData(x),
+      onParsedItemFailedFn: (x) => {
+        console.log(`useUsersStore.tsx:${/*LL*/ 28}`, { x });
+      },
     });
 
     return () => {

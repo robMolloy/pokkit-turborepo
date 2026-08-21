@@ -1,4 +1,5 @@
 import PocketBase from "pocketbase";
+import z from "zod";
 
 export const usersCollectionName = "users";
 export const globalUserPermissionsCollectionName = "globalUserPermissions";
@@ -42,6 +43,13 @@ export const userPayloadBuilder = {
 export type TGlobalUserPermissionsRole = "superadmin" | "admin" | "standard";
 export type TGlobalUserPermissionsStatus = "approved" | "pending" | "blocked";
 
+export const globalUserPermissionSchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  role: z.enum(["superadmin", "admin", "standard"]),
+  status: z.enum(["approved", "pending", "blocked"]),
+});
+export type TGlobalUserPermission = z.infer<typeof globalUserPermissionSchema>;
 export type TGlobalUserPermissionsCreatePayload = {
   userId: string;
   role: TGlobalUserPermissionsRole;

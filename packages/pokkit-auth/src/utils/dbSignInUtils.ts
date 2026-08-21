@@ -1,7 +1,7 @@
 import PocketBase from "pocketbase";
 import { z } from "zod";
 import { extractMessageFromPbError } from "./dbErrorUtils";
-import { TUserSignInWithPasswordSeed, usersCollectionName } from "./dbUserUtils";
+import { type TUserSignInWithPasswordSeed, usersCollectionName } from "./dbUserUtils";
 import { authStoreSchema } from "./dbAuthStoreUtils";
 
 export const requestOtpForSignInWithOtp = async (p: { pb: PocketBase; email: string }) => {

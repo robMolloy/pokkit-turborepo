@@ -46,6 +46,13 @@ export const LeftSidebar = (p: { pb: PocketBase }) => {
           >
             View Stores
           </SidebarButton>
+          <SidebarButton
+            href="/manage-user-global-permissions"
+            isHighlighted={location.pathname === "/manage-user-global-permissions"}
+            iconName="Home"
+          >
+            Manage User Global Permissions
+          </SidebarButton>
         </>
       }
       bottom={

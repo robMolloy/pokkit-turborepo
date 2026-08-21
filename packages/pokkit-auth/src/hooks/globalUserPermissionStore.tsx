@@ -1,23 +1,14 @@
 import { smartSubscribeToRecordById, useReactiveAuthStore } from "@repo/pokkit-auth";
 import PocketBase from "pocketbase";
 import { useEffect } from "react";
-import z from "zod";
 import { create } from "zustand";
+import {
+  globalUserPermissionSchema,
+  globalUserPermissionsCollectionName,
+  TGlobalUserPermission,
+} from "./globalUserPermissionsMetadata";
 
-export const globalUserPermissionsCollectionName = "globalUserPermissions";
-
-export const globalUserPermissionSchema = z.object({
-  id: z.string(),
-  role: z.enum(["standard", "admin", "superadmin"]),
-  status: z.enum(["blocked", "approved", "pending"]),
-  userId: z.string(),
-  created: z.string(),
-  updated: z.string(),
-});
-
-type TGlobalUserPermissionRecord = z.infer<typeof globalUserPermissionSchema>;
-
-type TGlobalUserPermissionStoreState = TGlobalUserPermissionRecord | null | undefined;
+type TGlobalUserPermissionStoreState = TGlobalUserPermission | null | undefined;
 export const useGlobalUserPermissionStore = create<{
   data: TGlobalUserPermissionStoreState;
   setData: (x: TGlobalUserPermissionStoreState) => void;
@@ -26,10 +17,10 @@ export const useGlobalUserPermissionStore = create<{
   setData: (data) => set(() => ({ data })),
 }));
 
-export const smartSubscribeToGlobalUserPermissionRecords = async (p: {
+export const smartSubscribeToGlobalUserPermissionRecord = async (p: {
   pb: PocketBase;
   userId: string;
-  onChange: (x: TGlobalUserPermissionRecord | null) => void;
+  onChange: (x: TGlobalUserPermission | null) => void;
 }) => {
   return smartSubscribeToRecordById({
     pb: p.pb,
@@ -47,7 +38,7 @@ export const useGlobalUserPermissionSync = (p: { pb: PocketBase }) => {
   useEffect(() => {
     if (!reactiveAuthStore) return globalUserPermissionStore.setData(reactiveAuthStore);
 
-    const unsubPromise = smartSubscribeToGlobalUserPermissionRecords({
+    const unsubPromise = smartSubscribeToGlobalUserPermissionRecord({
       pb: p.pb,
       userId: reactiveAuthStore.record.id,
       onChange: (x) => globalUserPermissionStore.setData(x),

@@ -309,9 +309,15 @@ importers:
 
   apps/pokkit-starter/pokkit-starter-ui:
     dependencies:
+      '@repo/pokkit-auth':
+        specifier: workspace:*
+        version: link:../../../packages/pokkit-auth
       '@repo/pokkit-components':
         specifier: workspace:^
         version: link:../../../packages/pokkit-components
+      '@repo/pokkit-db-permissions-ts-helpers':
+        specifier: workspace:^
+        version: link:../../../packages/pokkit-db-permissions-ts-helpers
       '@repo/pokkit-shadcn':
         specifier: workspace:^
         version: link:../../../packages/pokkit-shadcn
@@ -364,9 +370,6 @@ importers:
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../../packages/eslint-config
-      '@repo/pokkit-auth':
-        specifier: workspace:*
-        version: link:../../../packages/pokkit-auth
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../../packages/typescript-config
@@ -839,6 +842,9 @@ importers:
 
   packages/pokkit-db-permissions-ts-helpers:
     dependencies:
+      '@repo/pokkit-auth':
+        specifier: workspace:*
+        version: link:../pokkit-auth
       pocketbase:
         specifier: ^0.26.8
         version: 0.26.8

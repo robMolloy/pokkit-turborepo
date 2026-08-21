@@ -1,6 +1,6 @@
 import PocketBase from "pocketbase";
 import { extractMessageFromPbError } from "./dbErrorUtils";
-import { TUserSignUpWithPasswordSeed, userSchema, usersCollectionName } from "./dbUserUtils";
+import { type TUserSignUpWithPasswordSeed, userSchema, usersCollectionName } from "./dbUserUtils";
 import { signUpOrSignInWithOAuth2 } from "./dbSignInUtils";
 
 export const signUpWithOAuth2 = signUpOrSignInWithOAuth2;

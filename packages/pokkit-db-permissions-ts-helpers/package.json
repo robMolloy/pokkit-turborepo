@@ -11,6 +11,7 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@repo/pokkit-auth": "workspace:*",
     "pocketbase": "^0.26.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

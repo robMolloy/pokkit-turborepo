@@ -1,8 +1,8 @@
 [
   {
     "id": "_pb_users_auth_",
-    "listRule": "id = @request.auth.id",
-    "viewRule": "id = @request.auth.id",
+    "listRule": "id = @request.auth.id\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.role ?= \"superadmin\"\n&& @collection.globalUserPermissions.status ?= \"approved\"\n",
+    "viewRule": "id = @request.auth.id\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.role ?= \"superadmin\"\n&& @collection.globalUserPermissions.status ?= \"approved\"",
     "createRule": "",
     "updateRule": "id = @request.auth.id",
     "deleteRule": "id = @request.auth.id",
@@ -210,7 +210,7 @@
     "listRule": "@request.auth.id = userId\n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t&& @collection.globalUserPermissions.status ?= \"approved\" \n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t&& @collection.globalUserPermissions.role ?= \"superadmin\"",
     "viewRule": "@request.auth.id = userId\n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t&& @collection.globalUserPermissions.status ?= \"approved\" \n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t&& @collection.globalUserPermissions.role ?= \"superadmin\"",
     "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id && \n@collection.globalUserPermissions.role ?= \"superadmin\"",
-    "updateRule": "@request.auth.id != \"\" && \n@collection.globalUserPermissions.userId ?= @request.auth.id && \n@collection.globalUserPermissions.role ?= \"superadmin\"",
+    "updateRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n&& @collection.globalUserPermissions.role ?= \"superadmin\"\n&& userId ?!= @request.auth.id \n",
     "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id \n\t&& @collection.globalUserPermissions.role ?= \"superadmin\"\n\t&& userId ?!= @request.auth.id \n|| @collection.globalUserPermissions.userId ?= @request.auth.id \n\t&& @collection.globalUserPermissions.role ?!= \"superadmin\"\n\t&& @collection.globalUserPermissions.status ?= \"approved\"\n\t&& userId ?= @request.auth.id \t\n",
     "name": "globalUserPermissions",
     "type": "base",

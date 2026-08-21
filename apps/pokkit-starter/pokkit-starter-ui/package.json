@@ -11,8 +11,10 @@
     "tsc": "cd ../../.. && apps/pokkit-starter/pokkit-starter-ui/node_modules/.bin/tsc --project apps/pokkit-starter/pokkit-starter-ui/tsconfig.json --noemit --watch"
   },
   "dependencies": {
+    "@repo/pokkit-auth": "workspace:*",
     "@repo/pokkit-components": "workspace:^",
     "@repo/pokkit-shadcn": "workspace:^",
+    "@repo/pokkit-db-permissions-ts-helpers": "workspace:^",
     "@repo/ui": "workspace:*",
     "@tailwindcss/vite": "^4.2.1",
     "class-variance-authority": "^0.7.1",
@@ -31,7 +33,6 @@
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
-    "@repo/pokkit-auth": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
