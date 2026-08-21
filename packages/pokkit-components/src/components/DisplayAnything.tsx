@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 export const DisplayAnyObject = (p: {
   data: unknown[] | Record<string, unknown>;
@@ -34,11 +34,13 @@ export const DisplayAnyObject = (p: {
           className="border-l border-white border-opacity-25"
         >
           {Object.entries(p.data).map(([k, v]) => {
-            if (typeof v === "function" && p.hideFunctions) return <></>;
+            const key = `level-${p.level}-key-${k}`;
+
+            if (typeof v === "function" && p.hideFunctions) return <Fragment key={key} />;
 
             return (
               <DisplayAnything
-                key={`level-${p.level}-key-${k}`}
+                key={key}
                 data={v}
                 level={p.level + 1}
                 title={k}
