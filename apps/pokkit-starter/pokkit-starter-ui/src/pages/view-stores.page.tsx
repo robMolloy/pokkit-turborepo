@@ -1,4 +1,9 @@
-import { useGlobalUserPermissionStore, useUserRecordsStore, useUserStore } from "@repo/pokkit-auth";
+import {
+  useAuthMethodsListStore,
+  useGlobalUserPermissionStore,
+  useUserRecordsStore,
+  useUserStore,
+} from "@repo/pokkit-auth";
 import { DisplayAnything } from "@repo/pokkit-components";
 
 const useStores = (indexedUseStores: Record<string, () => any>) => {
@@ -13,7 +18,12 @@ const useStores = (indexedUseStores: Record<string, () => any>) => {
 };
 
 const Page = () => {
-  const stores = useStores({ useUserStore, useUserRecordsStore, useGlobalUserPermissionStore });
+  const stores = useStores({
+    useUserStore,
+    useUserRecordsStore,
+    useGlobalUserPermissionStore,
+    useAuthMethodsListStore,
+  });
 
   return (
     <div>
