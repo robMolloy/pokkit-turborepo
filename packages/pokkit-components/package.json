@@ -9,6 +9,7 @@
   "scripts": {
     "lint": "eslint \"**/*.ts\"",
     "test": "vitest",
+    "test-once": "vitest run",
     "tsc": "cd ../.. && packages/pokkit-components/node_modules/.bin/tsc --project packages/pokkit-components/tsconfig.json --noemit --watch",
     "build": "tailwindcss -i ./styles.css -o ./dist/styles.css",
     "css-build": "tailwindcss -i ./styles.css -o ./dist/styles.css --watch",
@@ -49,7 +50,7 @@
     "tailwindcss": "^4.2.1",
     "tw-animate-css": "^1.4.0",
     "typescript": "5.9.2",
-    "vite": "^5.1.4",
+    "vite": "^6.4.3",
     "vitest": "^4.0.18"
   }
 }
