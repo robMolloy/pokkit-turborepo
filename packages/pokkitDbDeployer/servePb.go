@@ -15,12 +15,12 @@ func ServePb(pbFilePath string, pbPortNumber int, logFilePath string) (*exec.Cmd
 	}
 
 	if err := os.MkdirAll(filepath.Dir(logFilePath), 0755); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to os.MkdirAll(filepath.Dir(logFilePath), 0755) in ServePb: %w", err)
 	}
 
 	logFile, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to os.OpenFile(logFilePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644) in ServePb: %w", err)
 	}
 
 	cmd := exec.Command(pbFilePath, "serve", fmt.Sprintf("--http=0.0.0.0:%d", pbPortNumber), "--dev")
@@ -29,7 +29,7 @@ func ServePb(pbFilePath string, pbPortNumber int, logFilePath string) (*exec.Cmd
 
 	if err := cmd.Start(); err != nil {
 		logFile.Close()
-		return nil, err
+		return nil, fmt.Errorf("failed to cmd.Start() in ServePb: %w", err)
 	}
 
 	deadline := time.Now().Add(30 * time.Second)
@@ -37,7 +37,7 @@ func ServePb(pbFilePath string, pbPortNumber int, logFilePath string) (*exec.Cmd
 		b, err := os.ReadFile(logFilePath)
 		if err != nil {
 			cmd.Process.Kill()
-			return nil, err
+			return nil, fmt.Errorf("failed to os.ReadFile(logFilePath) in ServePb: %w", err)
 		}
 		if strings.Contains(string(b), "Server started at") {
 			return cmd, nil
@@ -46,5 +46,5 @@ func ServePb(pbFilePath string, pbPortNumber int, logFilePath string) (*exec.Cmd
 	}
 
 	cmd.Process.Kill()
-	return nil, fmt.Errorf("servePb: timed out waiting for pocketbase to start")
+	return nil, fmt.Errorf("timed out waiting for pocketbase to start in ServePb")
 }
