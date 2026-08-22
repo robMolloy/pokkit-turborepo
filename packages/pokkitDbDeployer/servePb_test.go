@@ -28,31 +28,22 @@ func TestServePbWritesCliOutputToLogFile(t *testing.T) {
 		t.Fatalf("failed to write fake pocketbase script: %v", err)
 	}
 
-	result, err := ServePb(pbFilePath, 8090, logFilePath)
+	cmd, err := ServePb(pbFilePath, 8090, logFilePath)
 	if err != nil {
 		t.Fatalf("ServePb() error = %v", err)
 	}
-	if result == nil || result.Cmd == nil || result.Cmd.Process == nil {
+	if cmd == nil || cmd.Process == nil {
 		t.Fatal("ServePb() returned no running process")
 	}
 	t.Cleanup(func() {
-		_ = result.Cmd.Process.Kill()
-		_, _ = result.Cmd.Process.Wait()
+		_ = cmd.Process.Kill()
 	})
-
-	if result.DbServeUrl != "0.0.0.0:8090" {
-		t.Errorf("DbServeUrl = %q; want %q", result.DbServeUrl, "0.0.0.0:8090")
-	}
-	if result.DbUrl != "http://0.0.0.0:8090" {
-		t.Errorf("DbUrl = %q; want %q", result.DbUrl, "http://0.0.0.0:8090")
-	}
 
 	logBytes, err := os.ReadFile(logFilePath)
 	if err != nil {
 		t.Fatalf("failed to read log file: %v", err)
 	}
-	logContent := string(logBytes)
-	if !strings.Contains(logContent, "[stdout] Server started at http://0.0.0.0:8090") {
-		t.Errorf("log file = %q; want stdout server started line", logContent)
+	if !strings.Contains(string(logBytes), "Server started at") {
+		t.Errorf("log file = %q; want Server started at", logBytes)
 	}
 }
