@@ -89,6 +89,14 @@ func onRecordAfterCreateSuccessDeploymentsCollectionHandler(e *pbCore.RecordEven
 		return fmt.Errorf("servePbResp == nil returned from ServePb in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc")
 	}
 
+	superuserEmail := e.Record.GetString("superuserEmail")
+	superuserPassword := e.Record.GetString("superuserPassword")
+
+	err = UpsertPbAdminCredentialsFromCli(pbFilePath, superuserEmail, superuserPassword)
+	if err != nil {
+		return fmt.Errorf("error returned from UpsertPbAdminCredentialsFromCli in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+	}
+
 	return nil
 }
 

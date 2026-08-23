@@ -98,6 +98,36 @@
         "type": "number"
       },
       {
+        "autogeneratePattern": "",
+        "help": "",
+        "hidden": false,
+        "id": "text4041586153",
+        "max": 0,
+        "min": 0,
+        "name": "superuserEmail",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
+        "autogeneratePattern": "",
+        "help": "",
+        "hidden": false,
+        "id": "text340846073",
+        "max": 0,
+        "min": 0,
+        "name": "superuserPassword",
+        "pattern": "",
+        "presentable": false,
+        "primaryKey": false,
+        "required": false,
+        "system": false,
+        "type": "text"
+      },
+      {
         "hidden": false,
         "id": "autodate2990389176",
         "name": "created",
@@ -118,7 +148,7 @@
         "type": "autodate"
       }
     ],
-    "indexes": [],
+    "indexes": ["CREATE UNIQUE INDEX `idx_hsgdf346yi` ON `deployments` (`portNumber`)"],
     "system": false
   }
 ]
