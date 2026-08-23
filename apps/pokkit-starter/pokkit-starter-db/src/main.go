@@ -7,6 +7,7 @@ import (
 	pbCore "github.com/pocketbase/pocketbase/core"
 	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbBlog"
 	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbConfigSync"
+	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbDeployer"
 	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbPermissions"
 )
 
@@ -16,6 +17,7 @@ func main() {
 	pokkitDbConfigSync.BindFunctions(app)
 	pokkitDbPermissions.BindFunctions(app)
 	pokkitDbBlog.BindFunctions(app)
+	pokkitDbDeployer.BindFunctions(app)
 
 	app.OnServe().BindFunc(func(se *pbCore.ServeEvent) error {
 		return se.Next()

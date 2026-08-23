@@ -1,11 +1,11 @@
 [
   {
     "id": "pbc_1968374250",
-    "listRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"admin\"",
-    "viewRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"admin\"",
-    "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"admin\"",
-    "updateRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"admin\"",
-    "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"admin\"",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
     "name": "deployments",
     "type": "base",
     "fields": [
@@ -25,7 +25,7 @@
         "type": "text"
       },
       {
-        "help": "",
+        "help": "lasdjlaskhj",
         "hidden": false,
         "id": "file1019283746",
         "maxSelect": 1,
@@ -83,6 +83,19 @@
         "system": false,
         "thumbs": [],
         "type": "file"
+      },
+      {
+        "help": "",
+        "hidden": false,
+        "id": "number1085635215",
+        "max": null,
+        "min": null,
+        "name": "portNumber",
+        "onlyInt": false,
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "number"
       },
       {
         "hidden": false,
