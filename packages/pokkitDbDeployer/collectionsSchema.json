@@ -1,0 +1,111 @@
+[
+  {
+    "id": "pbc_1968374250",
+    "listRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"admin\"",
+    "viewRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"admin\"",
+    "createRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"admin\"",
+    "updateRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"admin\"",
+    "deleteRule": "@collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"superadmin\"\n\t|| @collection.globalUserPermissions.userId ?= @request.auth.id\n&& @collection.globalUserPermissions.status ?= \"approved\"\n&& @collection.globalUserPermissions.role ?= \"admin\"",
+    "name": "deployments",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "help": "",
+        "hidden": false,
+        "id": "file1019283746",
+        "maxSelect": 1,
+        "maxSize": 0,
+        "mimeTypes": [],
+        "name": "buildFile",
+        "presentable": false,
+        "protected": true,
+        "required": false,
+        "system": false,
+        "thumbs": [],
+        "type": "file"
+      },
+      {
+        "help": "",
+        "hidden": false,
+        "id": "file1129384756",
+        "maxSelect": 1,
+        "maxSize": 0,
+        "mimeTypes": [],
+        "name": "settingsFile",
+        "presentable": false,
+        "protected": true,
+        "required": false,
+        "system": false,
+        "thumbs": [],
+        "type": "file"
+      },
+      {
+        "help": "",
+        "hidden": false,
+        "id": "file1238495767",
+        "maxSelect": 1,
+        "maxSize": 0,
+        "mimeTypes": [],
+        "name": "secretsFile",
+        "presentable": false,
+        "protected": true,
+        "required": false,
+        "system": false,
+        "thumbs": [],
+        "type": "file"
+      },
+      {
+        "help": "",
+        "hidden": false,
+        "id": "file1349506878",
+        "maxSelect": 1,
+        "maxSize": 0,
+        "mimeTypes": [],
+        "name": "collectionsFile",
+        "presentable": false,
+        "protected": true,
+        "required": false,
+        "system": false,
+        "thumbs": [],
+        "type": "file"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [],
+    "system": false
+  }
+]
