@@ -28,6 +28,39 @@ func BindFunctions(app pbCore.App) {
 		return e.Next()
 	})
 
+	app.OnRecordCreate(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+		nextPortNumber, err := getNextPortNumber(e.App)
+		if err != nil {
+			log.Fatal("error returned from getNextPortNumber in app.OnRecordCreate(deploymentsCollectionName).BindFunc: %w", err)
+		}
+		e.Record.Set("portNumber", nextPortNumber)
+
+		return e.Next()
+	})
+}
+
+func getNextPortNumber(app pbCore.App) (int, error) {
+	records, err := app.FindRecordsByFilter(
+		deploymentsCollectionName,
+		"",
+		"-portNumber",
+		1,
+		0,
+	)
+	if err != nil {
+		return 0, fmt.Errorf("error returned from app.FindRecordsByFilter in getNextPortNumber: %w", err)
+	}
+
+	highestPortNumber := 0
+	if len(records) > 0 {
+		highestPortNumber = records[0].GetInt("portNumber")
+	}
+
+	nextPortNumber := highestPortNumber + 1
+	if nextPortNumber < 9000 {
+		return 9000, nil
+	}
+	return nextPortNumber, nil
 }
 
 func onRecordAfterCreateSuccessDeploymentsCollectionHandler(e *pbCore.RecordEvent) error {
