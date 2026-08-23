@@ -31,9 +31,11 @@ func BindFunctions(app pbCore.App) {
 }
 
 func onRecordAfterCreateSuccessDeploymentsCollectionHandler(e *pbCore.RecordEvent) error {
-	deploymentsDir := filepath.Join(e.App.DataDir(), "..", "_deployments", e.Record.Id)
-	if err := os.MkdirAll(deploymentsDir, 0755); err != nil {
-		return err
+	deploymentsDir := filepath.Join(e.App.DataDir(), "..", "_deployments")
+	deploymentDir := filepath.Join(deploymentsDir, e.Record.Id)
+	err := os.MkdirAll(deploymentDir, 0755)
+	if err != nil {
+		return fmt.Errorf("failed to os.MkdirAll(deploymentDir, 0755) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 	}
 
 	settingsFileKey := e.Record.GetString("settingsFile")
@@ -41,7 +43,6 @@ func onRecordAfterCreateSuccessDeploymentsCollectionHandler(e *pbCore.RecordEven
 	collectionsFileKey := e.Record.GetString("collectionsFile")
 	buildFileKey := e.Record.GetString("buildFile")
 
-	// initialize the filesystem
 	fsys, err := e.App.NewFilesystem()
 	if err != nil {
 		return fmt.Errorf("error returned from e.App.NewFilesystem() in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
@@ -49,22 +50,22 @@ func onRecordAfterCreateSuccessDeploymentsCollectionHandler(e *pbCore.RecordEven
 	defer fsys.Close()
 
 	buildFileKeyPath := e.Record.BaseFilesPath() + "/" + buildFileKey
-	pbFilePath := filepath.Join(deploymentsDir, "app-db")
-	err = writeFileToFileSystemFromKey(fsys, buildFileKeyPath, filepath.Join(deploymentsDir, "app-db"))
+	pbFilePath := deploymentDir + "/" + "app-db"
+	err = writeFileToFileSystemFromKey(fsys, buildFileKeyPath, filepath.Join(deploymentDir, "app-db"))
 	if err != nil {
 		return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, buildFileKeyPath, filepath.Join(deploymentsDir, 'app-db')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 	}
 
 	if settingsFileKey != "" {
 		settingsFileKeyPath := e.Record.BaseFilesPath() + "/" + settingsFileKey
-		err = writeFileToFileSystemFromKey(fsys, settingsFileKeyPath, filepath.Join(deploymentsDir, "settings.json"))
+		err = writeFileToFileSystemFromKey(fsys, settingsFileKeyPath, filepath.Join(deploymentDir, "settings.json"))
 		if err != nil {
 			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, settingsFileKey, filepath.Join(deploymentsDir, 'settings.json')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 		}
 	}
 	if secretsFileKey != "" {
 		secretsFileKeyPath := e.Record.BaseFilesPath() + "/" + secretsFileKey
-		err = writeFileToFileSystemFromKey(fsys, secretsFileKeyPath, filepath.Join(deploymentsDir, "secrets.json"))
+		err = writeFileToFileSystemFromKey(fsys, secretsFileKeyPath, filepath.Join(deploymentDir, "secrets.json"))
 		if err != nil {
 			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, secretsFileKeyPath, filepath.Join(deploymentsDir, 'secrets.json')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 		}
@@ -72,7 +73,7 @@ func onRecordAfterCreateSuccessDeploymentsCollectionHandler(e *pbCore.RecordEven
 
 	if collectionsFileKey != "" {
 		collectionsFileKeyPath := e.Record.BaseFilesPath() + "/" + collectionsFileKey
-		err = writeFileToFileSystemFromKey(fsys, collectionsFileKeyPath, filepath.Join(deploymentsDir, "collections.json"))
+		err = writeFileToFileSystemFromKey(fsys, collectionsFileKeyPath, filepath.Join(deploymentDir, "collections.json"))
 		if err != nil {
 			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, collectionsFileKeyPath, filepath.Join(deploymentsDir, 'collections.json')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 		}
@@ -80,7 +81,7 @@ func onRecordAfterCreateSuccessDeploymentsCollectionHandler(e *pbCore.RecordEven
 
 	portNumber := e.Record.GetInt("portNumber")
 
-	servePbResp, err := ServePb(pbFilePath, portNumber, filepath.Join(deploymentsDir, "log.txt"))
+	servePbResp, err := ServePb(pbFilePath, portNumber, filepath.Join(deploymentDir, "log.txt"))
 	if err != nil {
 		return fmt.Errorf("error returned from ServePb in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 	}
