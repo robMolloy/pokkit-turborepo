@@ -1,3 +1,4 @@
+src/_deployments
 src/pb_data/*.db
 src/pb_data/*.db*
 src/pb_data/storage

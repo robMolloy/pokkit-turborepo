@@ -25,11 +25,11 @@
         "type": "text"
       },
       {
-        "help": "lasdjlaskhj",
+        "help": "",
         "hidden": false,
         "id": "file1019283746",
         "maxSelect": 1,
-        "maxSize": 0,
+        "maxSize": 500000000,
         "mimeTypes": [],
         "name": "buildFile",
         "presentable": false,
