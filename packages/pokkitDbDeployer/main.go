@@ -90,14 +90,14 @@ func onRecordAfterCreateSuccessDeploymentsCollectionHandler(e *pbCore.RecordEven
 	}
 
 	if settingsFileKey != "" {
-		settingsFileKeyPath := e.Record.BaseFilesPath() + "/" + settingsFileKey
+		settingsFileKeyPath := e.Record.BaseFilesPath() + "/pb_config/" + settingsFileKey
 		err = writeFileToFileSystemFromKey(fsys, settingsFileKeyPath, filepath.Join(deploymentDir, "settings.json"))
 		if err != nil {
 			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, settingsFileKey, filepath.Join(deploymentsDir, 'settings.json')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 		}
 	}
 	if secretsFileKey != "" {
-		secretsFileKeyPath := e.Record.BaseFilesPath() + "/" + secretsFileKey
+		secretsFileKeyPath := e.Record.BaseFilesPath() + "/pb_config/" + secretsFileKey
 		err = writeFileToFileSystemFromKey(fsys, secretsFileKeyPath, filepath.Join(deploymentDir, "secrets.json"))
 		if err != nil {
 			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, secretsFileKeyPath, filepath.Join(deploymentsDir, 'secrets.json')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
@@ -105,7 +105,7 @@ func onRecordAfterCreateSuccessDeploymentsCollectionHandler(e *pbCore.RecordEven
 	}
 
 	if collectionsFileKey != "" {
-		collectionsFileKeyPath := e.Record.BaseFilesPath() + "/" + collectionsFileKey
+		collectionsFileKeyPath := e.Record.BaseFilesPath() + "/pb_config/" + collectionsFileKey
 		err = writeFileToFileSystemFromKey(fsys, collectionsFileKeyPath, filepath.Join(deploymentDir, "collections.json"))
 		if err != nil {
 			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, collectionsFileKeyPath, filepath.Join(deploymentsDir, 'collections.json')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
