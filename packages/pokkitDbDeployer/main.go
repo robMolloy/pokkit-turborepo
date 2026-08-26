@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
-	"github.com/pocketbase/pocketbase/tools/filesystem"
+	pbFilesystem "github.com/pocketbase/pocketbase/tools/filesystem"
 )
 
 func BindFunctions(app pbCore.App) {
@@ -21,9 +21,9 @@ func BindFunctions(app pbCore.App) {
 	})
 
 	app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		err := onRecordAfterCreateSuccessDeploymentsCollectionHandler(e)
+		err := onRecordEventWriteAndDeployPokkitDb(e)
 		if err != nil {
-			e.App.Logger().Error("error returned from onRecordAfterCreateSuccessDeploymentsCollectionHandler in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+			log.Fatal("error returned from onRecordEventWriteAndDeployPokkitDb in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 		}
 		return e.Next()
 	})
@@ -37,6 +37,29 @@ func BindFunctions(app pbCore.App) {
 
 		return e.Next()
 	})
+
+	app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+		err := RebuildAndReloadNginxConfig(e.App)
+		if err != nil {
+			log.Fatal("error returned from RebuildAndReloadNginxConfig in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+		}
+		return e.Next()
+	})
+	app.OnRecordAfterUpdateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+		err := RebuildAndReloadNginxConfig(e.App)
+		if err != nil {
+			log.Fatal("error returned from RebuildAndReloadNginxConfig in app.OnRecordAfterUpdateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+		}
+		return e.Next()
+	})
+	app.OnRecordAfterDeleteSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+		err := RebuildAndReloadNginxConfig(e.App)
+		if err != nil {
+			log.Fatal("error returned from RebuildAndReloadNginxConfig in app.OnRecordAfterDeleteSuccess(deploymentsCollectionName).BindFunc: %w", err)
+		}
+		return e.Next()
+	})
+
 }
 
 func getNextPortNumber(app pbCore.App) (int, error) {
@@ -63,7 +86,7 @@ func getNextPortNumber(app pbCore.App) (int, error) {
 	return nextPortNumber, nil
 }
 
-func onRecordAfterCreateSuccessDeploymentsCollectionHandler(e *pbCore.RecordEvent) error {
+func onRecordEventWriteAndDeployPokkitDb(e *pbCore.RecordEvent) error {
 	deploymentsDir := filepath.Join(e.App.DataDir(), "..", "_deployments")
 	deploymentDir := filepath.Join(deploymentsDir, e.Record.Id)
 	err := os.MkdirAll(deploymentDir, 0755)
@@ -133,7 +156,7 @@ func onRecordAfterCreateSuccessDeploymentsCollectionHandler(e *pbCore.RecordEven
 	return nil
 }
 
-func writeFileToFileSystemFromKey(fsys *filesystem.System, fileKey string, filePath string) error {
+func writeFileToFileSystemFromKey(fsys *pbFilesystem.System, fileKey string, filePath string) error {
 	buildFileReader, err := fsys.GetReader(fileKey)
 	if err != nil {
 		return err
