@@ -52,4 +52,9 @@ describe(`${testSuiteName} tests`, () => {
     const isHealthy = await pb.health.check();
     expect(isHealthy.code).toBe(200);
   });
+  it("is connection healthy: AFTER", async () => {
+    const pb = createPbConnection();
+    const isHealthy = await pb.health.check();
+    expect(isHealthy.code).toBe(200);
+  });
 });
