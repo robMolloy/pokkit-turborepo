@@ -45,7 +45,7 @@ func BindFunctions(app pbCore.App) {
 		err := RebuildAndReloadNginxConfig(e.App)
 		if err != nil {
 			// log.Fatal("error returned from RebuildAndReloadNginxConfig in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
-			e.App.Logger().Error("error returned from RebuildAndReloadNginxConfig in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+			e.App.Logger().Error("error returned from RebuildAndReloadNginxConfig in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc", "err", err)
 		}
 		return e.Next()
 	})
@@ -58,7 +58,7 @@ func writeFilesAndDeployPokkitDb(app pbCore.App, deploymentRecord *deploymentRec
 	pbConfigDir := filepath.Join(deploymentDir, "pb_config")
 	err := os.MkdirAll(pbConfigDir, 0755)
 	if err != nil {
-		return fmt.Errorf("failed to os.MkdirAll(deploymentDir, 0755) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+		return fmt.Errorf("failed to os.MkdirAll(pbConfigDir, 0755) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 	}
 
 	settingsFileKey := deploymentRecord.getSettingsFileKey()
@@ -72,33 +72,33 @@ func writeFilesAndDeployPokkitDb(app pbCore.App, deploymentRecord *deploymentRec
 	}
 	defer fsys.Close()
 
-	buildFileKeyPath := deploymentRecord.BaseFilesPath() + "/" + buildFileKey
-	pbFilePath := deploymentDir + "/app-db"
-	err = writeFileToFileSystemFromKey(fsys, buildFileKeyPath, filepath.Join(deploymentDir, "app-db"))
+	buildFileKeyPath := deploymentRecord.storageFileKey(buildFileKey)
+	pbFilePath := filepath.Join(deploymentDir, "app-db")
+	err = writeFileToFileSystemFromKey(fsys, buildFileKeyPath, pbFilePath)
 	if err != nil {
 		return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, buildFileKeyPath, filepath.Join(deploymentDir, 'app-db')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 	}
 
 	if settingsFileKey != "" {
-		settingsFileKeyPath := deploymentRecord.BaseFilesPath() + "/pb_config/" + settingsFileKey
-		err = writeFileToFileSystemFromKey(fsys, settingsFileKeyPath, filepath.Join(deploymentDir, "settings.json"))
+		settingsFileKeyPath := deploymentRecord.storageFileKey(settingsFileKey)
+		err = writeFileToFileSystemFromKey(fsys, settingsFileKeyPath, filepath.Join(pbConfigDir, "settings.json"))
 		if err != nil {
-			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, settingsFileKey, filepath.Join(deploymentsDir, 'settings.json')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, settingsFileKeyPath, filepath.Join(pbConfigDir, 'settings.json')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 		}
 	}
 	if secretsFileKey != "" {
-		secretsFileKeyPath := deploymentRecord.BaseFilesPath() + "/pb_config/" + secretsFileKey
-		err = writeFileToFileSystemFromKey(fsys, secretsFileKeyPath, filepath.Join(deploymentDir, "secrets.json"))
+		secretsFileKeyPath := deploymentRecord.storageFileKey(secretsFileKey)
+		err = writeFileToFileSystemFromKey(fsys, secretsFileKeyPath, filepath.Join(pbConfigDir, "secrets.json"))
 		if err != nil {
-			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, secretsFileKeyPath, filepath.Join(deploymentsDir, 'secrets.json')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, secretsFileKeyPath, filepath.Join(pbConfigDir, 'secrets.json')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 		}
 	}
 
 	if collectionsFileKey != "" {
-		collectionsFileKeyPath := deploymentRecord.BaseFilesPath() + "/pb_config/" + collectionsFileKey
-		err = writeFileToFileSystemFromKey(fsys, collectionsFileKeyPath, filepath.Join(deploymentDir, "collections.json"))
+		collectionsFileKeyPath := deploymentRecord.storageFileKey(collectionsFileKey)
+		err = writeFileToFileSystemFromKey(fsys, collectionsFileKeyPath, filepath.Join(pbConfigDir, "collections.json"))
 		if err != nil {
-			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, collectionsFileKeyPath, filepath.Join(deploymentsDir, 'collections.json')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, collectionsFileKeyPath, filepath.Join(pbConfigDir, 'collections.json')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 		}
 	}
 

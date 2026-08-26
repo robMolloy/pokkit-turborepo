@@ -31,6 +31,12 @@ func (a *deploymentRecord) getCollectionsFileKey() string {
 func (a *deploymentRecord) getBuildFileKey() string {
 	return a.GetString("buildFile")
 }
+
+// storageFileKey is the PocketBase blob store key for a file field value.
+// Files live at {collectionId}/{recordId}/{filename} — not under pb_config.
+func (a *deploymentRecord) storageFileKey(fileName string) string {
+	return a.BaseFilesPath() + "/" + fileName
+}
 func (a *deploymentRecord) getSuperuserEmail() string {
 	return a.GetString("superuserEmail")
 }

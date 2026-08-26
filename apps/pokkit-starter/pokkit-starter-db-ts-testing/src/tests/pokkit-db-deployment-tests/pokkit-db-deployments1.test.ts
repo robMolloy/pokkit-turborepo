@@ -84,9 +84,9 @@ describe(`${testSuiteName} tests`, () => {
     await superuserPb.collection(deploymentsCollectionName).create(
       deploymentsPayloadBuilder.forCreateData({
         buildFile: mockBuildFile,
-        // settingsFile: mockSettingsFile,
-        // secretsFile: mockSecretsFile,
-        // collectionsFile: mockCollectionsFile,
+        settingsFile: mockSettingsFile,
+        secretsFile: mockSecretsFile,
+        collectionsFile: mockCollectionsFile,
         superuserEmail,
         superuserPassword,
       }),

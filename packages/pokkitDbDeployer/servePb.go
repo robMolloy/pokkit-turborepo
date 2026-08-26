@@ -36,6 +36,7 @@ func ServePb(pbFilePath string, pbPortNumber int, logFilePath string) (*ServePbR
 	dbUrl := fmt.Sprintf("http://0.0.0.0:%d", pbPortNumber)
 
 	cmd := exec.Command(pbFilePath, "serve", "--http="+dbServeUrl, "--dev")
+	cmd.Dir = filepath.Dir(pbFilePath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		logFile.Close()
