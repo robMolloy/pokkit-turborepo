@@ -34,6 +34,7 @@
   "dependencies": {
     "@repo/pokkit-testing": "workspace:^",
     "@repo/pokkit-db-permissions-ts-helpers": "workspace:^",
+    "@repo/pokkit-db-deployments-ts-helpers": "workspace:^",
     "@repo/pokkit-db-blog-ts-helpers": "workspace:^",
     "@repo/pokkit-utils": "workspace:^",
     "pocketbase": "^0.26.6",

@@ -13,8 +13,29 @@ type deploymentRecord struct {
 func (a *deploymentRecord) getId() string {
 	return a.GetString("id")
 }
-func (a *deploymentRecord) getPortNumber() string {
-	return a.GetString("portNumber")
+func (a *deploymentRecord) getPortNumber() int {
+	return a.GetInt("portNumber")
+}
+func (a *deploymentRecord) setPortNumber(portNumber int) {
+	a.Set("portNumber", portNumber)
+}
+func (a *deploymentRecord) getSettingsFileKey() string {
+	return a.GetString("settingsFile")
+}
+func (a *deploymentRecord) getSecretsFileKey() string {
+	return a.GetString("secretsFile")
+}
+func (a *deploymentRecord) getCollectionsFileKey() string {
+	return a.GetString("collectionsFile")
+}
+func (a *deploymentRecord) getBuildFileKey() string {
+	return a.GetString("buildFile")
+}
+func (a *deploymentRecord) getSuperuserEmail() string {
+	return a.GetString("superuserEmail")
+}
+func (a *deploymentRecord) getSuperuserPassword() string {
+	return a.GetString("superuserPassword")
 }
 
 func convertUnproxiedRecordToDeploymentRecord(unproxiedRecord *pbCore.Record) *deploymentRecord {

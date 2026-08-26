@@ -12,15 +12,16 @@ type nginxTemplateRecord struct {
 	pbCore.BaseRecordProxy
 }
 
-func (a *nginxTemplateRecord) getId() string {
-	return a.GetString("id")
-}
+//	func (a *nginxTemplateRecord) getId() string {
+//		return a.GetString("id")
+//	}
 func (a *nginxTemplateRecord) getTemplateBody() string {
 	return a.GetString("templateBody")
 }
-func (a *nginxTemplateRecord) setTemplateBody(templateBody string) {
-	a.Set("templateBody", templateBody)
-}
+
+//	func (a *nginxTemplateRecord) setTemplateBody(templateBody string) {
+//		a.Set("templateBody", templateBody)
+//	}
 func (a *nginxTemplateRecord) getFilePath() string {
 	return a.GetString("filePath")
 }

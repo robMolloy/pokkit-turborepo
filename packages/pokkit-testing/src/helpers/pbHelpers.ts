@@ -187,3 +187,39 @@ export const pollPbLogsUntilNumberOfItemsChange = async (p: {
   }
   return { success: false, error: "No logs found" } as const;
 };
+
+export const createPbTestFunctions = (p: {
+  pbPortNumber: number;
+  pbFilePath: string;
+  sourcePbDirPath: string;
+  sandboxPbDirPath: string;
+  logFilePath: string;
+  superuserEmail: string;
+  superuserPassword: string;
+}) => {
+  const cleanup = async () => {
+    await killPbInstance({ pbPortNumber: p.pbPortNumber });
+    fse.removeSync(p.sandboxPbDirPath);
+  };
+
+  const copySourcePbDirToSandbox = async () => {
+    fse.copySync(p.sourcePbDirPath, p.sandboxPbDirPath);
+  };
+
+  const serveSandboxPb = async () => {
+    await servePb({
+      pbFilePath: getPbFilePath({ pbDirPath: p.sandboxPbDirPath }),
+      pbPortNumber: p.pbPortNumber,
+      logFilePath: p.logFilePath,
+    });
+  };
+
+  const upsertPbAdminCredentials = async () => {
+    await upsertPbAdminCredentialsFromCli({
+      pbFilePath: p.pbFilePath,
+      superuserEmail: p.superuserEmail,
+      superuserPassword: p.superuserPassword,
+    });
+  };
+  return { cleanup, copySourcePbDirToSandbox, serveSandboxPb, upsertPbAdminCredentials };
+};

@@ -21,7 +21,9 @@ func BindFunctions(app pbCore.App) {
 	})
 
 	app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		err := onRecordEventWriteAndDeployPokkitDb(e)
+		deploymentRecord := convertUnproxiedRecordToDeploymentRecord(e.Record)
+
+		err := writeFilesAndDeployPokkitDb(e.App, deploymentRecord)
 		if err != nil {
 			log.Fatal("error returned from onRecordEventWriteAndDeployPokkitDb in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 		}
@@ -29,11 +31,12 @@ func BindFunctions(app pbCore.App) {
 	})
 
 	app.OnRecordCreate(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		nextPortNumber, err := getNextPortNumber(e.App)
+		nextPortNumber, err := getNextDeploymentPortNumber(e.App)
 		if err != nil {
 			log.Fatal("error returned from getNextPortNumber in app.OnRecordCreate(deploymentsCollectionName).BindFunc: %w", err)
 		}
-		e.Record.Set("portNumber", nextPortNumber)
+		deploymentRecord := convertUnproxiedRecordToDeploymentRecord(e.Record)
+		deploymentRecord.setPortNumber(nextPortNumber)
 
 		return e.Next()
 	})
@@ -41,86 +44,50 @@ func BindFunctions(app pbCore.App) {
 	app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		err := RebuildAndReloadNginxConfig(e.App)
 		if err != nil {
-			log.Fatal("error returned from RebuildAndReloadNginxConfig in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
-		}
-		return e.Next()
-	})
-	app.OnRecordAfterUpdateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		err := RebuildAndReloadNginxConfig(e.App)
-		if err != nil {
-			log.Fatal("error returned from RebuildAndReloadNginxConfig in app.OnRecordAfterUpdateSuccess(deploymentsCollectionName).BindFunc: %w", err)
-		}
-		return e.Next()
-	})
-	app.OnRecordAfterDeleteSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		err := RebuildAndReloadNginxConfig(e.App)
-		if err != nil {
-			log.Fatal("error returned from RebuildAndReloadNginxConfig in app.OnRecordAfterDeleteSuccess(deploymentsCollectionName).BindFunc: %w", err)
+			// log.Fatal("error returned from RebuildAndReloadNginxConfig in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+			e.App.Logger().Error("error returned from RebuildAndReloadNginxConfig in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 		}
 		return e.Next()
 	})
 
 }
 
-func getNextPortNumber(app pbCore.App) (int, error) {
-	records, err := app.FindRecordsByFilter(
-		deploymentsCollectionName,
-		"",
-		"-portNumber",
-		1,
-		0,
-	)
-	if err != nil {
-		return 0, fmt.Errorf("error returned from app.FindRecordsByFilter in getNextPortNumber: %w", err)
-	}
-
-	highestPortNumber := 0
-	if len(records) > 0 {
-		highestPortNumber = records[0].GetInt("portNumber")
-	}
-
-	nextPortNumber := highestPortNumber + 1
-	if nextPortNumber < 9000 {
-		return 9000, nil
-	}
-	return nextPortNumber, nil
-}
-
-func onRecordEventWriteAndDeployPokkitDb(e *pbCore.RecordEvent) error {
-	deploymentsDir := filepath.Join(e.App.DataDir(), "..", "_deployments")
-	deploymentDir := filepath.Join(deploymentsDir, e.Record.Id)
-	err := os.MkdirAll(deploymentDir, 0755)
+func writeFilesAndDeployPokkitDb(app pbCore.App, deploymentRecord *deploymentRecord) error {
+	deploymentsDir := filepath.Join(app.DataDir(), "..", "_deployments")
+	deploymentDir := filepath.Join(deploymentsDir, deploymentRecord.getId())
+	pbConfigDir := filepath.Join(deploymentDir, "pb_config")
+	err := os.MkdirAll(pbConfigDir, 0755)
 	if err != nil {
 		return fmt.Errorf("failed to os.MkdirAll(deploymentDir, 0755) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 	}
 
-	settingsFileKey := e.Record.GetString("settingsFile")
-	secretsFileKey := e.Record.GetString("secretsFile")
-	collectionsFileKey := e.Record.GetString("collectionsFile")
-	buildFileKey := e.Record.GetString("buildFile")
+	settingsFileKey := deploymentRecord.getSettingsFileKey()
+	secretsFileKey := deploymentRecord.getSecretsFileKey()
+	collectionsFileKey := deploymentRecord.getCollectionsFileKey()
+	buildFileKey := deploymentRecord.getBuildFileKey()
 
-	fsys, err := e.App.NewFilesystem()
+	fsys, err := app.NewFilesystem()
 	if err != nil {
 		return fmt.Errorf("error returned from e.App.NewFilesystem() in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 	}
 	defer fsys.Close()
 
-	buildFileKeyPath := e.Record.BaseFilesPath() + "/" + buildFileKey
-	pbFilePath := deploymentDir + "/" + "app-db"
+	buildFileKeyPath := deploymentRecord.BaseFilesPath() + "/" + buildFileKey
+	pbFilePath := deploymentDir + "/app-db"
 	err = writeFileToFileSystemFromKey(fsys, buildFileKeyPath, filepath.Join(deploymentDir, "app-db"))
 	if err != nil {
-		return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, buildFileKeyPath, filepath.Join(deploymentsDir, 'app-db')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+		return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, buildFileKeyPath, filepath.Join(deploymentDir, 'app-db')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 	}
 
 	if settingsFileKey != "" {
-		settingsFileKeyPath := e.Record.BaseFilesPath() + "/pb_config/" + settingsFileKey
+		settingsFileKeyPath := deploymentRecord.BaseFilesPath() + "/pb_config/" + settingsFileKey
 		err = writeFileToFileSystemFromKey(fsys, settingsFileKeyPath, filepath.Join(deploymentDir, "settings.json"))
 		if err != nil {
 			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, settingsFileKey, filepath.Join(deploymentsDir, 'settings.json')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 		}
 	}
 	if secretsFileKey != "" {
-		secretsFileKeyPath := e.Record.BaseFilesPath() + "/pb_config/" + secretsFileKey
+		secretsFileKeyPath := deploymentRecord.BaseFilesPath() + "/pb_config/" + secretsFileKey
 		err = writeFileToFileSystemFromKey(fsys, secretsFileKeyPath, filepath.Join(deploymentDir, "secrets.json"))
 		if err != nil {
 			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, secretsFileKeyPath, filepath.Join(deploymentsDir, 'secrets.json')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
@@ -128,14 +95,14 @@ func onRecordEventWriteAndDeployPokkitDb(e *pbCore.RecordEvent) error {
 	}
 
 	if collectionsFileKey != "" {
-		collectionsFileKeyPath := e.Record.BaseFilesPath() + "/pb_config/" + collectionsFileKey
+		collectionsFileKeyPath := deploymentRecord.BaseFilesPath() + "/pb_config/" + collectionsFileKey
 		err = writeFileToFileSystemFromKey(fsys, collectionsFileKeyPath, filepath.Join(deploymentDir, "collections.json"))
 		if err != nil {
 			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, collectionsFileKeyPath, filepath.Join(deploymentsDir, 'collections.json')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 		}
 	}
 
-	portNumber := e.Record.GetInt("portNumber")
+	portNumber := deploymentRecord.getPortNumber()
 
 	servePbResp, err := ServePb(pbFilePath, portNumber, filepath.Join(deploymentDir, "log.txt"))
 	if err != nil {
@@ -145,10 +112,7 @@ func onRecordEventWriteAndDeployPokkitDb(e *pbCore.RecordEvent) error {
 		return fmt.Errorf("servePbResp == nil returned from ServePb in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc")
 	}
 
-	superuserEmail := e.Record.GetString("superuserEmail")
-	superuserPassword := e.Record.GetString("superuserPassword")
-
-	err = UpsertPbAdminCredentialsFromCli(pbFilePath, superuserEmail, superuserPassword)
+	err = UpsertPbAdminCredentialsFromCli(pbFilePath, deploymentRecord.getSuperuserEmail(), deploymentRecord.getSuperuserPassword())
 	if err != nil {
 		return fmt.Errorf("error returned from UpsertPbAdminCredentialsFromCli in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 	}
