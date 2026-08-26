@@ -3,11 +3,17 @@ package pokkitDbDeployer
 import (
 	"fmt"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
 func UpsertPbAdminCredentialsFromCli(pbFilePath string, superuserEmail string, superuserPassword string) error {
-	cmd := exec.Command(pbFilePath, "superuser", "upsert", superuserEmail, superuserPassword)
+	absPbFilePath, err := filepath.Abs(pbFilePath)
+	if err != nil {
+		return fmt.Errorf("failed to filepath.Abs(pbFilePath) in UpsertPbAdminCredentialsFromCli: %w", err)
+	}
+	cmd := exec.Command(absPbFilePath, "superuser", "upsert", superuserEmail, superuserPassword)
+	cmd.Dir = filepath.Dir(absPbFilePath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return fmt.Errorf("failed to cmd.StdoutPipe in UpsertPbAdminCredentialsFromCli: %w", err)

@@ -19,8 +19,12 @@ type ServePbResult struct {
 }
 
 func ServePb(pbFilePath string, pbPortNumber int, logFilePath string) (*ServePbResult, error) {
-	if _, err := os.Stat(pbFilePath); err != nil {
-		return nil, fmt.Errorf("servePb: pbFile does not exist: %s", pbFilePath)
+	absPbFilePath, err := filepath.Abs(pbFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to filepath.Abs(pbFilePath) in ServePb: %w", err)
+	}
+	if _, err := os.Stat(absPbFilePath); err != nil {
+		return nil, fmt.Errorf("servePb: pbFile does not exist: %s", absPbFilePath)
 	}
 
 	if err := os.MkdirAll(filepath.Dir(logFilePath), 0755); err != nil {
@@ -35,7 +39,8 @@ func ServePb(pbFilePath string, pbPortNumber int, logFilePath string) (*ServePbR
 	dbServeUrl := fmt.Sprintf("0.0.0.0:%d", pbPortNumber)
 	dbUrl := fmt.Sprintf("http://0.0.0.0:%d", pbPortNumber)
 
-	cmd := exec.Command(pbFilePath, "serve", "--http="+dbServeUrl, "--dev")
+	cmd := exec.Command(absPbFilePath, "serve", "--http="+dbServeUrl, "--dev")
+	cmd.Dir = filepath.Dir(absPbFilePath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		logFile.Close()
