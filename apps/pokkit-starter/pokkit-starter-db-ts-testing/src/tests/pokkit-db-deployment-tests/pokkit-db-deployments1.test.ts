@@ -1,4 +1,5 @@
 import {
+  fetchPbHealthStatus,
   getPbFilePath,
   getPbServeUrl,
   killPbInstance,
@@ -55,7 +56,9 @@ describe(`${testSuiteName} tests`, () => {
   });
 
   afterAll(async () => {
-    killPbInstance({ pbPortNumber });
+    await killPbInstance({ pbPortNumber: 9001 });
+    await killPbInstance({ pbPortNumber: 9002 });
+    await killPbInstance({ pbPortNumber });
     fse.removeSync(pbDirPath);
   }, 30000);
 
@@ -92,8 +95,8 @@ describe(`${testSuiteName} tests`, () => {
       }),
     );
 
-    const healthResponse = await fetch(`http://0.0.0.0:${deployedPortNumber}/api/health`);
-    expect(healthResponse.status).toBe(200);
+    const healthStatus = await fetchPbHealthStatus({ pbPortNumber: deployedPortNumber });
+    expect(healthStatus).toBe(200);
   });
 
   it("adding a deployment record without a port number should serve the deployment on port 9002 (with pbconfigFiles)", async () => {
@@ -117,8 +120,8 @@ describe(`${testSuiteName} tests`, () => {
       }),
     );
 
-    const healthResponse = await fetch(`http://0.0.0.0:${deployedPortNumber}/api/health`);
-    expect(healthResponse.status).toBe(200);
+    const healthStatus = await fetchPbHealthStatus({ pbPortNumber: deployedPortNumber });
+    expect(healthStatus).toBe(200);
 
     const statResp = await fse.statSync(`${pbDirPath}/_deployments/${deploymentRecord.id}`);
     expect(statResp.isDirectory()).toBe(true);

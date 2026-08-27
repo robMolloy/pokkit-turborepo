@@ -55,15 +55,27 @@ func BindFunctions(app pbCore.App) {
 		return e.Next()
 	})
 
+	app.OnRecordAfterDeleteSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+		deploymentRecord := convertUnproxiedRecordToDeploymentRecord(e.Record)
+		portNumber := deploymentRecord.getPortNumber()
+		_ = pokkitDbUtils.KillProcessByPortNumber(portNumber)
+		return e.Next()
+	})
+
 	app.OnTerminate().BindFunc(func(e *pbCore.TerminateEvent) error {
 		records, err := e.App.FindAllRecords(deploymentsCollectionName)
 		if err != nil {
-			log.Fatal("error returned from e.App.FindAllRecords in app.OnTerminate(): %w", err)
+			e.App.Logger().Error(
+				"error returned from e.App.FindAllRecords in app.OnTerminate()",
+				"error",
+				err,
+			)
+			return e.Next()
 		}
 		for _, record := range records {
 			deploymentRecord := convertUnproxiedRecordToDeploymentRecord(record)
 			portNumber := deploymentRecord.getPortNumber()
-			pokkitDbUtils.KillProcessByPortNumber(portNumber)
+			_ = pokkitDbUtils.KillProcessByPortNumber(portNumber)
 		}
 
 		return e.Next()

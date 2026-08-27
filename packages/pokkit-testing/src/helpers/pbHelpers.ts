@@ -1,4 +1,5 @@
 import { exec, spawn, type ChildProcessWithoutNullStreams } from "child_process";
+import http from "node:http";
 import fse from "fs-extra";
 import { promisify } from "util";
 import PocketBase from "pocketbase";
@@ -8,28 +9,61 @@ import { delay } from "@repo/pokkit-utils";
 
 const execAsync = promisify(exec);
 
+const ignoreStdioError = () => {};
+
+const getListenPidsOnPort = async (portNumber: number) => {
+  const { stdout } = await execAsync(
+    `lsof -t -iTCP:${portNumber} -sTCP:LISTEN 2>/dev/null || true`,
+  );
+  return stdout.trim().split(/\s+/).filter(Boolean);
+};
+
+const killPids = async (pids: string[], signal: "TERM" | "KILL") => {
+  if (pids.length === 0) return;
+  const flag = signal === "KILL" ? "-9" : "-TERM";
+  await execAsync(`kill ${flag} ${pids.join(" ")} 2>/dev/null || true`);
+};
+
+const waitForPortToBeFree = async (portNumber: number, timeoutMs: number) => {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    const pids = await getListenPidsOnPort(portNumber);
+    if (pids.length === 0) return true;
+    await delay(50);
+  }
+  return (await getListenPidsOnPort(portNumber)).length === 0;
+};
+
+const preventUncaughtChildStdioErrors = (spawnProcess: ChildProcessWithoutNullStreams) => {
+  spawnProcess.stdout?.on("error", ignoreStdioError);
+  spawnProcess.stderr?.on("error", ignoreStdioError);
+  spawnProcess.stdin?.on("error", ignoreStdioError);
+};
+
 export const getPortNumberFromDbUrl = (dbUrl: string): string | undefined => {
   return dbUrl.split(":").slice(-1)[0]?.match(/^\d+/)?.[0];
 };
 
 export const killPocketbaseInstanceByDbUrl = async (dbUrl: string) => {
-  const portNumber = getPortNumberFromDbUrl(dbUrl);
-  try {
-    const result = await execAsync(
-      `kill -9 $(lsof -ti :"${portNumber}" 2>/dev/null | head -n 1) 2>/dev/null || true`,
-    );
-
-    return { success: true, data: result } as const;
-  } catch (error) {
-    return { success: false, error } as const;
+  const portNumber = Number(getPortNumberFromDbUrl(dbUrl));
+  if (!Number.isFinite(portNumber)) {
+    return { success: false, error: new Error(`invalid port in dbUrl: ${dbUrl}`) } as const;
   }
+  return killPocketbaseInstanceByDbPortNumber(portNumber);
 };
+
 export const killPocketbaseInstanceByDbPortNumber = async (portNumber: number) => {
   try {
-    const result = await execAsync(
-      `kill -9 $(lsof -ti :"${portNumber}" 2>/dev/null | head -n 1) 2>/dev/null || true`,
-    );
-    return { success: true, data: result } as const;
+    // SIGKILL (kill -9) skips PocketBase OnTerminate hooks and can flush broken
+    // stdout/stderr pipes, which Node then surfaces as uncaught exceptions after
+    // a test has already passed. SIGTERM first lets the process shut down cleanly.
+    const pids = await getListenPidsOnPort(portNumber);
+    await killPids(pids, "TERM");
+    await waitForPortToBeFree(portNumber, 3000);
+    const remainingPids = await getListenPidsOnPort(portNumber);
+    await killPids(remainingPids, "KILL");
+    await waitForPortToBeFree(portNumber, 1000);
+    return { success: true, data: { pids } } as const;
   } catch (error) {
     return { success: false, error } as const;
   }
@@ -39,6 +73,7 @@ export const killPocketbaseInstanceBySpawnProcess = (
   spawnProcess: ChildProcessWithoutNullStreams,
 ) => {
   try {
+    preventUncaughtChildStdioErrors(spawnProcess);
     const result = spawnProcess.kill("SIGTERM");
     return { success: true, data: result } as const;
   } catch (error) {
@@ -56,6 +91,24 @@ export const killPbInstance = (
 export const getPbServeAddress = (p: { portNumber: number }) => `0.0.0.0:${p.portNumber}`;
 export const getPbServeUrl = (p: { pbPortNumber: number }) => `http://0.0.0.0:${p.pbPortNumber}`;
 export const getPbFilePath = (p: { pbDirPath: string }) => p.pbDirPath + "/app-db";
+
+/**
+ * Checks PocketBase /api/health without keeping the TCP connection alive.
+ *
+ * `fetch()` (undici) pools sockets. When killPbInstance later stops the server,
+ * those idle sockets emit uncaught "other side closed" errors after the test
+ * has already passed.
+ */
+export const fetchPbHealthStatus = (p: { pbPortNumber: number }) => {
+  const url = `${getPbServeUrl({ pbPortNumber: p.pbPortNumber })}/api/health`;
+  return new Promise<number>((resolve, reject) => {
+    const req = http.get(url, { agent: false }, (res) => {
+      res.resume();
+      res.on("end", () => resolve(res.statusCode ?? 0));
+    });
+    req.on("error", reject);
+  });
+};
 
 /**
  * Serves the PocketBase build and writes logs to a file.
@@ -77,30 +130,60 @@ export const servePb = async (p: {
   if (!buildFileExists) throw new Error(`servePb: pbFile does not exist: ${p.pbFilePath}`);
 
   const pbProcess = spawn(p.pbFilePath, ["serve", `--http=${dbServeUrl}`, "--dev"]);
+  preventUncaughtChildStdioErrors(pbProcess);
 
   if (p.logFilePath) fse.ensureFileSync(p.logFilePath);
   const logStream = p.logFilePath
     ? fse.createWriteStream(p.logFilePath, { flags: "a" })
     : undefined;
+  logStream?.on("error", ignoreStdioError);
+
+  const writeLog = (prefix: string, data: Buffer | string) => {
+    if (!logStream || logStream.destroyed || logStream.writableEnded) return;
+    logStream.write(`${prefix} ${data.toString()}\n`);
+  };
+
   try {
     await new Promise((resolve, reject) => {
-      pbProcess.stdout.on("data", (data) => {
+      let settled = false;
+      const settleResolve = (value: unknown) => {
+        if (settled) return;
+        settled = true;
+        resolve(value);
+      };
+      const settleReject = (error: unknown) => {
+        if (settled) return;
+        settled = true;
+        reject(error);
+      };
+
+      const onOutput = (source: "stdout" | "stderr", data: Buffer) => {
         const strData = data.toString();
-        logStream?.write(`[stdout] ${strData}\n`);
+        writeLog(`[${source}]`, strData);
+        if (strData.includes("Server started at")) settleResolve(pbProcess);
+      };
 
-        if (strData.includes("Server started at")) resolve(pbProcess);
-      });
-
-      pbProcess.stderr.on("data", (data) => {
-        logStream?.write(`[stderr] ${data.toString()}\n`);
-        logStream?.end();
-        reject(data.toString());
-      });
+      pbProcess.stdout.on("data", (data: Buffer) => onOutput("stdout", data));
+      // PocketBase/Go write routine logs to stderr. Treating that as fatal used
+      // to end the log stream, so a later killPbInstance flush threw
+      // "write after end" after the test had already passed.
+      pbProcess.stderr.on("data", (data: Buffer) => onOutput("stderr", data));
 
       pbProcess.on("error", (error) => {
-        logStream?.write(`[error] ${error.message}\n`);
-        logStream?.end();
-        reject(error);
+        writeLog("[error]", error.message);
+        settleReject(error);
+      });
+
+      pbProcess.on("exit", (code, signal) => {
+        if (!settled) {
+          settleReject(
+            new Error(`pocketbase exited before server started (code=${code}, signal=${signal})`),
+          );
+        }
+      });
+
+      pbProcess.on("close", () => {
+        if (logStream && !logStream.destroyed && !logStream.writableEnded) logStream.end();
       });
     });
     return { success: true, data: { pbProcess, dbUrl, dbServeUrl } } as const;
@@ -123,6 +206,7 @@ export const upsertPbAdminCredentialsFromCli = async (p: {
     p.superuserEmail,
     p.superuserPassword,
   ]);
+  preventUncaughtChildStdioErrors(upsertProcess);
 
   upsertProcess.on("error", (err) => console.error("spawn error:", err));
 

@@ -11,10 +11,15 @@ func ExecuteBashCommand(bashCommand string) error {
 }
 
 func KillProcessByPortNumber(portNumber int) error {
-	err := ExecuteBashCommand(
-		fmt.Sprintf(`kill -9 $(lsof -ti :"%d" 2>/dev/null | head -n 1) 2>/dev/null || true`, portNumber),
+	cmd := exec.Command(
+		"bash",
+		"-c",
+		fmt.Sprintf(
+			`pids=$(lsof -t -iTCP:%d -sTCP:LISTEN 2>/dev/null || true); if [ -n "$pids" ]; then kill -TERM $pids 2>/dev/null || true; fi`,
+			portNumber,
+		),
 	)
-
+	err := cmd.Run()
 	if err != nil {
 		return fmt.Errorf("error returned from ExecuteBashCommand in KillPocketbaseInstanceByDbPortNumber: %w", err)
 	}
