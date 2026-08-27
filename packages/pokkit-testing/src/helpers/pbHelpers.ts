@@ -23,7 +23,7 @@ export const killPocketbaseInstanceByDbUrl = async (dbUrl: string) => {
 export const killPocketbaseInstanceByDbPortNumber = async (portNumber: number) => {
   try {
     const result = await execAsync(
-      `kill -9 $(lsof -tiTCP:"${portNumber}" -sTCP:LISTEN 2>/dev/null | head -n 1) 2>/dev/null || true`,
+      `kill -15 $(lsof -tiTCP:"${portNumber}" -sTCP:LISTEN 2>/dev/null | head -n 1) 2>/dev/null || true`,
     );
     return { success: true, data: result } as const;
   } catch (error) {
@@ -31,11 +31,16 @@ export const killPocketbaseInstanceByDbPortNumber = async (portNumber: number) =
   }
 };
 
-export const killPocketbaseInstanceBySpawnProcess = (
+export const killPocketbaseInstanceBySpawnProcess = async (
   spawnProcess: ChildProcessWithoutNullStreams,
 ) => {
   try {
-    const result = spawnProcess.kill("SIGTERM");
+    const result = await new Promise<void>((resolve, reject) => {
+      spawnProcess.once("exit", () => resolve());
+      // spawnProcess.once("close", () => resolve());
+      spawnProcess.once("error", reject);
+      spawnProcess.kill("SIGTERM");
+    });
     return { success: true, data: result } as const;
   } catch (error) {
     return { success: false, error } as const;

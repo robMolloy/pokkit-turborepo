@@ -12,7 +12,7 @@ func ExecuteBashCommand(bashCommand string) error {
 
 func KillProcessByPortNumber(portNumber int) error {
 	err := ExecuteBashCommand(
-		fmt.Sprintf(`kill -9 $(lsof -tiTCP:"%d" -sTCP:LISTEN 2>/dev/null | head -n 1) 2>/dev/null || true`, portNumber),
+		fmt.Sprintf(`kill -15 $(lsof -tiTCP:"%d" -sTCP:LISTEN 2>/dev/null | head -n 1) 2>/dev/null || true`, portNumber),
 	)
 
 	if err != nil {
