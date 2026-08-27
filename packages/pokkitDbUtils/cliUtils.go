@@ -2,6 +2,7 @@ package pokkitDbUtils
 
 import (
 	"fmt"
+	"io"
 	"os/exec"
 )
 
@@ -11,11 +12,14 @@ func ExecuteBashCommand(bashCommand string) error {
 }
 
 func KillProcessByPortNumber(portNumber int) error {
-	err := ExecuteBashCommand(
+	cmd := exec.Command(
+		"bash",
+		"-c",
 		fmt.Sprintf(`kill -9 $(lsof -ti :"%d" 2>/dev/null | head -n 1) 2>/dev/null || true`, portNumber),
 	)
-
-	if err != nil {
+	cmd.Stdout = io.Discard
+	cmd.Stderr = io.Discard
+	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("error returned from ExecuteBashCommand in KillPocketbaseInstanceByDbPortNumber: %w", err)
 	}
 	return nil
