@@ -6,6 +6,7 @@ export type TDeploymentsCreatePayload = {
   settingsFile?: File;
   secretsFile?: File;
   collectionsFile?: File;
+  portNumber?: number;
   superuserEmail: string;
   superuserPassword: string;
 };

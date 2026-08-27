@@ -12,22 +12,38 @@ export const getPortNumberFromDbUrl = (dbUrl: string): string | undefined => {
   return dbUrl.split(":").slice(-1)[0]?.match(/^\d+/)?.[0];
 };
 
-export const killPocketbaseInstanceByDbUrl = (dbUrl: string) => {
+export const killPocketbaseInstanceByDbUrl = async (dbUrl: string) => {
   const portNumber = getPortNumberFromDbUrl(dbUrl);
-  return execAsync(
-    `kill -9 $(lsof -ti :"${portNumber}" 2>/dev/null | head -n 1) 2>/dev/null || true`,
-  );
+  try {
+    const result = await execAsync(
+      `kill -9 $(lsof -ti :"${portNumber}" 2>/dev/null | head -n 1) 2>/dev/null || true`,
+    );
+
+    return { success: true, data: result } as const;
+  } catch (error) {
+    return { success: false, error } as const;
+  }
 };
-export const killPocketbaseInstanceByDbPortNumber = (portNumber: number) => {
-  return execAsync(
-    `kill -9 $(lsof -ti :"${portNumber}" 2>/dev/null | head -n 1) 2>/dev/null || true`,
-  );
+export const killPocketbaseInstanceByDbPortNumber = async (portNumber: number) => {
+  try {
+    const result = await execAsync(
+      `kill -9 $(lsof -ti :"${portNumber}" 2>/dev/null | head -n 1) 2>/dev/null || true`,
+    );
+    return { success: true, data: result } as const;
+  } catch (error) {
+    return { success: false, error } as const;
+  }
 };
 
 export const killPocketbaseInstanceBySpawnProcess = (
   spawnProcess: ChildProcessWithoutNullStreams,
 ) => {
-  return spawnProcess.kill("SIGTERM");
+  try {
+    const result = spawnProcess.kill("SIGTERM");
+    return { success: true, data: result } as const;
+  } catch (error) {
+    return { success: false, error } as const;
+  }
 };
 
 export const killPbInstance = (

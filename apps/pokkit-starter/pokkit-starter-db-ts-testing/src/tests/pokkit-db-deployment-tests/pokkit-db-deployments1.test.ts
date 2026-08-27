@@ -39,7 +39,6 @@ const mockSecretsFile = new File([mockSecretsFileBuffer], "secrets.json", {
   type: "application/json",
 });
 const mockBuildFileBuffer = fse.readFileSync(`${sourceTestBuildDirPath}/app-db`);
-// type unix executable file
 const mockBuildFile = new File([mockBuildFileBuffer], "app-db", {
   type: "application/x-executable",
 });
@@ -74,7 +73,10 @@ describe(`${testSuiteName} tests`, () => {
     const isHealthy = await pb.health.check();
     expect(isHealthy.code).toBe(200);
   });
-  it("", async () => {
+
+  it("adding a deployment record without a port number should serve the deployment on port 9001 (without pbconfigFiles)", async () => {
+    const deployedPortNumber = 9001;
+    await killPbInstance({ pbPortNumber: deployedPortNumber });
     const superuserPb = createPbConnection();
 
     await superuserPb
@@ -84,14 +86,44 @@ describe(`${testSuiteName} tests`, () => {
     await superuserPb.collection(deploymentsCollectionName).create(
       deploymentsPayloadBuilder.forCreateData({
         buildFile: mockBuildFile,
-        // settingsFile: mockSettingsFile,
-        // secretsFile: mockSecretsFile,
-        // collectionsFile: mockCollectionsFile,
+        portNumber: deployedPortNumber,
         superuserEmail,
         superuserPassword,
       }),
     );
+
+    const healthResponse = await fetch(`http://0.0.0.0:${deployedPortNumber}/api/health`);
+    expect(healthResponse.status).toBe(200);
   });
+
+  it("adding a deployment record without a port number should serve the deployment on port 9002 (with pbconfigFiles)", async () => {
+    const deployedPortNumber = 9002;
+    await killPbInstance({ pbPortNumber: deployedPortNumber });
+    const superuserPb = createPbConnection();
+
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+
+    const deploymentRecord = await superuserPb.collection(deploymentsCollectionName).create(
+      deploymentsPayloadBuilder.forCreateData({
+        buildFile: mockBuildFile,
+        settingsFile: mockSettingsFile,
+        secretsFile: mockSecretsFile,
+        collectionsFile: mockCollectionsFile,
+        portNumber: deployedPortNumber,
+        superuserEmail,
+        superuserPassword,
+      }),
+    );
+
+    const healthResponse = await fetch(`http://0.0.0.0:${deployedPortNumber}/api/health`);
+    expect(healthResponse.status).toBe(200);
+
+    const statResp = await fse.statSync(`${pbDirPath}/_deployments/${deploymentRecord.id}`);
+    expect(statResp.isDirectory()).toBe(true);
+  });
+
   it("is connection healthy: AFTER", async () => {
     const pb = createPbConnection();
     const isHealthy = await pb.health.check();

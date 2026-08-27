@@ -78,7 +78,7 @@
     "maxBodySize": 0
   },
   "logs": {
-    "maxDataSize": 0,
+    "maxDataSize": 16000000,
     "maxDays": 5,
     "minLevel": 0,
     "logIP": true,

@@ -1,11 +1,11 @@
 export const validSettingsFileData = {
   superuserIPs: [],
   smtp: {
-    enabled: false,
+    enabled: true,
     port: 587,
-    host: "smtp.example.com",
-    username: "",
-    authMethod: "",
+    host: "smtp.gmail.com",
+    username: "romolocodes@gmail.com",
+    authMethod: "PLAIN",
     tls: false,
     localName: "",
   },
@@ -31,10 +31,10 @@ export const validSettingsFileData = {
   },
   meta: {
     accentColor: "#1055c9",
-    appName: "Acme123",
+    appName: "Pokkit Blog",
     appURL: "http://localhost:8090",
     senderName: "Support",
-    senderAddress: "support@example.com",
+    senderAddress: "romolocodes@gmail.com",
     hideControls: false,
   },
   rateLimits: {
@@ -78,6 +78,7 @@ export const validSettingsFileData = {
     maxBodySize: 0,
   },
   logs: {
+    maxDataSize: 16000000,
     maxDays: 5,
     minLevel: 0,
     logIP: true,

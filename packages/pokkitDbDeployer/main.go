@@ -9,6 +9,7 @@ import (
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 	pbFilesystem "github.com/pocketbase/pocketbase/tools/filesystem"
+	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbUtils"
 )
 
 func BindFunctions(app pbCore.App) {
@@ -31,12 +32,16 @@ func BindFunctions(app pbCore.App) {
 	})
 
 	app.OnRecordCreate(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		nextPortNumber, err := getNextDeploymentPortNumber(e.App)
-		if err != nil {
-			log.Fatal("error returned from getNextPortNumber in app.OnRecordCreate(deploymentsCollectionName).BindFunc: %w", err)
-		}
 		deploymentRecord := convertUnproxiedRecordToDeploymentRecord(e.Record)
-		deploymentRecord.setPortNumber(nextPortNumber)
+		portNumber := deploymentRecord.getPortNumber()
+
+		if portNumber <= lowestPortNumber {
+			nextPortNumber, err := getNextDeploymentPortNumber(e.App)
+			if err != nil {
+				log.Fatal("error returned from getNextPortNumber in app.OnRecordCreate(deploymentsCollectionName).BindFunc: %w", err)
+			}
+			deploymentRecord.setPortNumber(nextPortNumber)
+		}
 
 		return e.Next()
 	})
@@ -47,6 +52,20 @@ func BindFunctions(app pbCore.App) {
 			// log.Fatal("error returned from RebuildAndReloadNginxConfig in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 			e.App.Logger().Error("error returned from RebuildAndReloadNginxConfig in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 		}
+		return e.Next()
+	})
+
+	app.OnTerminate().BindFunc(func(e *pbCore.TerminateEvent) error {
+		records, err := e.App.FindAllRecords(deploymentsCollectionName)
+		if err != nil {
+			log.Fatal("error returned from e.App.FindAllRecords in app.OnTerminate(): %w", err)
+		}
+		for _, record := range records {
+			deploymentRecord := convertUnproxiedRecordToDeploymentRecord(record)
+			portNumber := deploymentRecord.getPortNumber()
+			pokkitDbUtils.KillProcessByPortNumber(portNumber)
+		}
+
 		return e.Next()
 	})
 

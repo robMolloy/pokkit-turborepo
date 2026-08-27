@@ -6,6 +6,8 @@ import (
 	pbCore "github.com/pocketbase/pocketbase/core"
 )
 
+const lowestPortNumber = 9000
+
 func getNextDeploymentPortNumber(app pbCore.App) (int, error) {
 	records, err := app.FindRecordsByFilter(
 		deploymentsCollectionName,
@@ -24,8 +26,8 @@ func getNextDeploymentPortNumber(app pbCore.App) (int, error) {
 	}
 
 	nextPortNumber := highestPortNumber + 1
-	if nextPortNumber < 9000 {
-		return 9000, nil
+	if nextPortNumber < lowestPortNumber {
+		return lowestPortNumber, nil
 	}
 	return nextPortNumber, nil
 }
