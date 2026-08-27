@@ -20,16 +20,33 @@ func (a *deploymentRecord) setPortNumber(portNumber int) {
 	a.Set("portNumber", portNumber)
 }
 func (a *deploymentRecord) getSettingsFileKey() string {
-	return a.GetString("settingsFile")
+	settingsFileString := a.GetString("settingsFile")
+	if settingsFileString == "" {
+		return ""
+	}
+	return a.BaseFilesPath() + "/" + a.GetString("settingsFile")
 }
 func (a *deploymentRecord) getSecretsFileKey() string {
-	return a.GetString("secretsFile")
+
+	secretsFileString := a.GetString("secretsFile")
+	if secretsFileString == "" {
+		return ""
+	}
+	return a.BaseFilesPath() + "/" + secretsFileString
 }
 func (a *deploymentRecord) getCollectionsFileKey() string {
-	return a.GetString("collectionsFile")
+	collectionsFileString := a.GetString("collectionsFile")
+	if collectionsFileString == "" {
+		return ""
+	}
+	return a.BaseFilesPath() + "/" + a.GetString("collectionsFile")
 }
 func (a *deploymentRecord) getBuildFileKey() string {
-	return a.GetString("buildFile")
+	buildFileString := a.GetString("buildFile")
+	if buildFileString == "" {
+		return ""
+	}
+	return a.BaseFilesPath() + "/" + buildFileString
 }
 func (a *deploymentRecord) getSuperuserEmail() string {
 	return a.GetString("superuserEmail")

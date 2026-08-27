@@ -87,37 +87,33 @@ func writeFilesAndDeployPokkitDb(app pbCore.App, deploymentRecord *deploymentRec
 
 	fsys, err := app.NewFilesystem()
 	if err != nil {
-		return fmt.Errorf("error returned from e.App.NewFilesystem() in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+		return fmt.Errorf("error returned from e.App.NewFilesystem() in writeFilesAndDeployPokkitDb: %w", err)
 	}
 	defer fsys.Close()
 
-	buildFileKeyPath := deploymentRecord.BaseFilesPath() + "/" + buildFileKey
 	pbFilePath := deploymentDir + "/app-db"
-	err = writeFileToFileSystemFromKey(fsys, buildFileKeyPath, filepath.Join(deploymentDir, "app-db"))
+	err = writeFileToFileSystemFromKey(fsys, buildFileKey, deploymentDir+"/app-db")
 	if err != nil {
-		return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, buildFileKeyPath, filepath.Join(deploymentDir, 'app-db')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+		return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, buildFileKey, deploymentDir+\"/app-db\") in writeFilesAndDeployPokkitDb: %w", err)
 	}
 
 	if settingsFileKey != "" {
-		settingsFileKeyPath := deploymentRecord.BaseFilesPath() + "/pb_config/" + settingsFileKey
-		err = writeFileToFileSystemFromKey(fsys, settingsFileKeyPath, filepath.Join(deploymentDir, "settings.json"))
+		err = writeFileToFileSystemFromKey(fsys, settingsFileKey, deploymentDir+"/pb_config/settings.json")
 		if err != nil {
-			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, settingsFileKey, filepath.Join(deploymentsDir, 'settings.json')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, settingsFileKey, deploymentDir+\"/pb_config/settings.json\") in writeFilesAndDeployPokkitDb: %w", err)
 		}
 	}
 	if secretsFileKey != "" {
-		secretsFileKeyPath := deploymentRecord.BaseFilesPath() + "/pb_config/" + secretsFileKey
-		err = writeFileToFileSystemFromKey(fsys, secretsFileKeyPath, filepath.Join(deploymentDir, "secrets.json"))
+		err = writeFileToFileSystemFromKey(fsys, secretsFileKey, deploymentDir+"/pb_config/secrets.json")
 		if err != nil {
-			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, secretsFileKeyPath, filepath.Join(deploymentsDir, 'secrets.json')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, secretsFileKey, deploymentDir+\"/pb_config/secrets.json\") in writeFilesAndDeployPokkitDb: %w", err)
 		}
 	}
 
 	if collectionsFileKey != "" {
-		collectionsFileKeyPath := deploymentRecord.BaseFilesPath() + "/pb_config/" + collectionsFileKey
-		err = writeFileToFileSystemFromKey(fsys, collectionsFileKeyPath, filepath.Join(deploymentDir, "collections.json"))
+		err = writeFileToFileSystemFromKey(fsys, collectionsFileKey, deploymentDir+"/pb_config/collections.json")
 		if err != nil {
-			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, collectionsFileKeyPath, filepath.Join(deploymentsDir, 'collections.json')) in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, collectionsFileKey, deploymentDir+\"/pb_config/collections.json\") in writeFilesAndDeployPokkitDb: %w", err)
 		}
 	}
 
@@ -125,15 +121,15 @@ func writeFilesAndDeployPokkitDb(app pbCore.App, deploymentRecord *deploymentRec
 
 	servePbResp, err := ServePb(pbFilePath, portNumber, filepath.Join(deploymentDir, "log.txt"))
 	if err != nil {
-		return fmt.Errorf("error returned from ServePb in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+		return fmt.Errorf("error returned from ServePb in writeFilesAndDeployPokkitDb: %w", err)
 	}
 	if servePbResp == nil {
-		return fmt.Errorf("servePbResp == nil returned from ServePb in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc")
+		return fmt.Errorf("servePbResp == nil returned from ServePb in writeFilesAndDeployPokkitDb")
 	}
 
 	err = UpsertPbAdminCredentialsFromCli(pbFilePath, deploymentRecord.getSuperuserEmail(), deploymentRecord.getSuperuserPassword())
 	if err != nil {
-		return fmt.Errorf("error returned from UpsertPbAdminCredentialsFromCli in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+		return fmt.Errorf("error returned from UpsertPbAdminCredentialsFromCli in writeFilesAndDeployPokkitDb: %w", err)
 	}
 
 	return nil
