@@ -8,21 +8,17 @@ import { delay } from "@repo/pokkit-utils";
 
 const execAsync = promisify(exec);
 
-export const getPortNumberFromDbUrl = (dbUrl: string): string | undefined => {
-  return dbUrl.split(":").slice(-1)[0]?.match(/^\d+/)?.[0];
+export const getPortNumberFromDbUrl = (dbUrl: string): number | undefined => {
+  const rtn = dbUrl.split(":").slice(-1)[0]?.match(/^\d+/)?.[0];
+  if (!rtn) return undefined;
+  return parseInt(rtn);
 };
 
 export const killPocketbaseInstanceByDbUrl = async (dbUrl: string) => {
   const portNumber = getPortNumberFromDbUrl(dbUrl);
-  try {
-    const result = await execAsync(
-      `kill -9 $(lsof -tiTCP:"${portNumber}" -sTCP:LISTEN 2>/dev/null | head -n 1) 2>/dev/null || true`,
-    );
+  if (!portNumber) return { success: false, error: "Port number not found in dbUrl" } as const;
 
-    return { success: true, data: result } as const;
-  } catch (error) {
-    return { success: false, error } as const;
-  }
+  return killPocketbaseInstanceByDbPortNumber(portNumber);
 };
 export const killPocketbaseInstanceByDbPortNumber = async (portNumber: number) => {
   try {
