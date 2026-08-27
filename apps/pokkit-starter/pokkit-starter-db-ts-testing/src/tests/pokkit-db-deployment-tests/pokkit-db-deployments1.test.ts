@@ -100,7 +100,7 @@ describe(`${testSuiteName} tests`, () => {
     expect(healthResponse.status).toBe(200);
   });
 
-  it.skip("adding a deployment record without a port number should serve the deployment on port 9002 (with pbconfigFiles)", async () => {
+  it("adding a deployment record without a port number should serve the deployment on port 9002 (with pbconfigFiles)", async () => {
     const deployedPortNumber = 9002;
     await killPbInstance({ pbPortNumber: deployedPortNumber });
     const superuserPb = createPbConnection();
@@ -128,7 +128,7 @@ describe(`${testSuiteName} tests`, () => {
     expect(statResp.isDirectory()).toBe(true);
   });
 
-  it.skip("creates a nginx config file for the deployment if there is a record in the nginxTemplates collection", async () => {
+  it("creates a nginx config file for the deployment if there is a record in the nginxTemplates collection", async () => {
     const deployedPortNumber = 9003;
     const nginxConfigFilePath = `${pbDirPath}/config-${deployedPortNumber}.conf`;
 
@@ -169,7 +169,7 @@ describe(`${testSuiteName} tests`, () => {
     expect(nginxConfigStatResp.isFile()).toBe(true);
   });
 
-  it.skip("checks the templating of the nginx config file for the deployment if there is a record in the nginxTemplates collection", async () => {
+  it("checks the templating of the nginx config file for the deployment if there is a record in the nginxTemplates collection", async () => {
     const deployedPortNumber = 9004;
     const nginxConfigFilePath = `${pbDirPath}/config-${deployedPortNumber}.conf`;
 
@@ -212,7 +212,7 @@ describe(`${testSuiteName} tests`, () => {
     expect(nginxConfigContent).toBe(`${deployedPortNumber}`);
   });
 
-  it.skip("checks the templating of the nginx config file for the deployment if there is a record in the nginxTemplates collection", async () => {
+  it("checks the templating of the nginx config file for the deployment if there is a record in the nginxTemplates collection", async () => {
     const deployedPortNumber1 = 9005;
     const deployedPortNumber2 = 9006;
     const nginxConfigFilePath = `${pbDirPath}/config-${deployedPortNumber1}-${deployedPortNumber2}.conf`;

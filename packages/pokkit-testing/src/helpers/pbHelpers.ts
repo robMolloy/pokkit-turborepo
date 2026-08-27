@@ -16,7 +16,7 @@ export const killPocketbaseInstanceByDbUrl = async (dbUrl: string) => {
   const portNumber = getPortNumberFromDbUrl(dbUrl);
   try {
     const result = await execAsync(
-      `kill -9 $(lsof -ti :"${portNumber}" 2>/dev/null | head -n 1) 2>/dev/null || true`,
+      `kill -9 $(lsof -tiTCP:"${portNumber}" -sTCP:LISTEN 2>/dev/null | head -n 1) 2>/dev/null || true`,
     );
 
     return { success: true, data: result } as const;
@@ -27,7 +27,7 @@ export const killPocketbaseInstanceByDbUrl = async (dbUrl: string) => {
 export const killPocketbaseInstanceByDbPortNumber = async (portNumber: number) => {
   try {
     const result = await execAsync(
-      `kill -9 $(lsof -ti :"${portNumber}" 2>/dev/null | head -n 1) 2>/dev/null || true`,
+      `kill -9 $(lsof -tiTCP:"${portNumber}" -sTCP:LISTEN 2>/dev/null | head -n 1) 2>/dev/null || true`,
     );
     return { success: true, data: result } as const;
   } catch (error) {
