@@ -14,3 +14,12 @@ export type TDeploymentsCreatePayload = {
 export const deploymentsPayloadBuilder = {
   forCreateData: <T extends TDeploymentsCreatePayload>(p: T) => p as T,
 };
+
+export type TNginxTemplatesCreatePayload = {
+  templateBody: string;
+  filePath: string;
+};
+
+export const nginxTemplatesPayloadBuilder = {
+  forCreateData: <T extends TNginxTemplatesCreatePayload>(p: T) => p as T,
+};

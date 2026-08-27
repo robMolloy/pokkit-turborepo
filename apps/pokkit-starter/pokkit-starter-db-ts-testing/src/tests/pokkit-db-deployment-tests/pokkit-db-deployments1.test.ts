@@ -15,6 +15,8 @@ import { pokkitDbDeploymentsTestsMetadata } from "./_pokkitDbDeploymentsTestsMet
 import {
   deploymentsCollectionName,
   deploymentsPayloadBuilder,
+  nginxTemplatesCollectionName,
+  nginxTemplatesPayloadBuilder,
 } from "@repo/pokkit-db-deployments-ts-helpers";
 
 const testMetadata = pokkitDbDeploymentsTestsMetadata.pokkitDbDeployments1;
@@ -122,6 +124,47 @@ describe(`${testSuiteName} tests`, () => {
 
     const statResp = await fse.statSync(`${pbDirPath}/_deployments/${deploymentRecord.id}`);
     expect(statResp.isDirectory()).toBe(true);
+  });
+
+  it("creates a nginx config file for the deployment if there is a record in the nginxTemplates collection", async () => {
+    const deployedPortNumber = 9003;
+    const nginxConfigFilePath = `${pbDirPath}/config-${deployedPortNumber}.conf`;
+
+    await killPbInstance({ pbPortNumber: deployedPortNumber });
+    const superuserPb = createPbConnection();
+
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+
+    await superuserPb.collection(nginxTemplatesCollectionName).create(
+      nginxTemplatesPayloadBuilder.forCreateData({
+        templateBody: "test",
+        filePath: nginxConfigFilePath,
+      }),
+    );
+
+    const deploymentRecord = await superuserPb.collection(deploymentsCollectionName).create(
+      deploymentsPayloadBuilder.forCreateData({
+        buildFile: mockBuildFile,
+        settingsFile: mockSettingsFile,
+        secretsFile: mockSecretsFile,
+        collectionsFile: mockCollectionsFile,
+        portNumber: deployedPortNumber,
+        superuserEmail,
+        superuserPassword,
+      }),
+    );
+
+    const healthResponse = await fetch(`http://0.0.0.0:${deployedPortNumber}/api/health`);
+    expect(healthResponse.status).toBe(200);
+
+    const deploymentStatResp = await fse.statSync(
+      `${pbDirPath}/_deployments/${deploymentRecord.id}`,
+    );
+    expect(deploymentStatResp.isDirectory()).toBe(true);
+    const nginxConfigStatResp = await fse.statSync(nginxConfigFilePath);
+    expect(nginxConfigStatResp.isFile()).toBe(true);
   });
 
   it("is connection healthy: AFTER", async () => {
