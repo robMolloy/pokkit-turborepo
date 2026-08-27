@@ -15,7 +15,7 @@ func KillProcessByPortNumber(portNumber int) error {
 	cmd := exec.Command(
 		"bash",
 		"-c",
-		fmt.Sprintf(`kill -9 $(lsof -ti :"%d" 2>/dev/null | head -n 1) 2>/dev/null || true`, portNumber),
+		fmt.Sprintf(`kill -9 $(lsof -tiTCP:"%d" -sTCP:LISTEN 2>/dev/null | head -n 1) 2>/dev/null || true`, portNumber),
 	)
 	cmd.Stdout = io.Discard
 	cmd.Stderr = io.Discard
