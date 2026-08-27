@@ -276,8 +276,8 @@ describe(`${testSuiteName} tests`, () => {
   });
 
   it("renders a sudo-real nginx template", async () => {
-    const deployedPortNumber1 = 9005;
-    const deployedPortNumber2 = 9006;
+    const deployedPortNumber1 = 9007;
+    const deployedPortNumber2 = 9008;
     const sandboxedNginxConfigFilePath = `${pbDirPath}/config-${deployedPortNumber1}-${deployedPortNumber2}.conf`;
 
     await killPbInstance({ pbPortNumber: deployedPortNumber1 });
@@ -380,8 +380,8 @@ server {
     ssl_certificate /etc/letsencrypt/live/pokkit.cloud/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/pokkit.cloud/privkey.pem;
 
-    location /9005/ {
-        proxy_pass http://127.0.0.1:9005/;
+    location /9007/ {
+        proxy_pass http://127.0.0.1:9007/;
         proxy_http_version 1.1;
 
         proxy_set_header Host $host;
@@ -393,8 +393,8 @@ server {
         proxy_set_header Connection "upgrade";
     }
 
-    location /9006/ {
-        proxy_pass http://127.0.0.1:9006/;
+    location /9008/ {
+        proxy_pass http://127.0.0.1:9008/;
         proxy_http_version 1.1;
 
         proxy_set_header Host $host;
