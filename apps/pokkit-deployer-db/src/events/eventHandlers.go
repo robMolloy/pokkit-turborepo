@@ -14,7 +14,7 @@ import (
 	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/modules/stripeProductsSdk"
 	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/modules/userBalanceRecordsSdk"
 	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/pokkitSetup"
-	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
+	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbUtils"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 )
@@ -27,7 +27,7 @@ func WriteSettingsToSettingsFileOnSettingsReloadEventHandler(e *pbCore.SettingsR
 
 	isSetupComplete := e.App.Store().Get("isSetupComplete").(bool)
 	if isSetupComplete {
-		writeErr := utils.WriteDataToFileAsJson(e.App.DataDir()+"/settings.json", e.App.Settings())
+		writeErr := pokkitDbUtils.WriteDataToFileAsJson(e.App.DataDir()+"/settings.json", e.App.Settings())
 		if writeErr != nil {
 			e.App.Logger().Error("Error when writing to settings.json")
 		}

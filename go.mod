@@ -1,4 +1,4 @@
-module app-db
+module github.com/robMolloy/pokkit-turborepo
 
 go 1.27.0
 
@@ -6,7 +6,6 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/pocketbase/dbx v1.12.0
 	github.com/pocketbase/pocketbase v0.40.1
-	github.com/robMolloy/pokkit-turborepo v0.0.0-20260827224639-c4be8b73de0c
 	github.com/stripe/stripe-go/v85 v85.2.0
 )
 

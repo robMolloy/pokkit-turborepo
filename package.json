@@ -2,7 +2,7 @@
   "name": "pokkit-turborepo",
   "private": true,
   "scripts": {
-    "go:init": "go mod init app-db && go mod tidy",
+    "go:init": "go mod init github.com/robMolloy/pokkit-turborepo && go mod tidy",
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",

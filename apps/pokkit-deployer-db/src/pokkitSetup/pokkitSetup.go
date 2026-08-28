@@ -6,7 +6,7 @@ import (
 	"os"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
-	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
+	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbUtils"
 )
 
 // WriteCollectionsToCollectionsFile writes collections to pb_data/collections.json.
@@ -21,7 +21,7 @@ func WriteCollectionsToCollectionsFile(app pbCore.App) (bool, error) {
 		return false, err
 	}
 
-	err = utils.WriteDataToFileAsJson(collectionsFilePath, collectionsData)
+	err = pokkitDbUtils.WriteDataToFileAsJson(collectionsFilePath, collectionsData)
 
 	return err == nil, err
 }
@@ -29,7 +29,7 @@ func WriteCollectionsToCollectionsFile(app pbCore.App) (bool, error) {
 func SaveSecretsJsonAsEnvVars(app pbCore.App) error {
 	fileName := "secrets.json"
 	filePath := fmt.Sprintf("%s/%s", app.DataDir(), fileName)
-	obj, err := utils.ReadJsonFromFile(filePath)
+	obj, err := pokkitDbUtils.ReadJsonFromFile(filePath)
 	if err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func ImportSettingsFromSettingsFile(app pbCore.App) (bool, error) {
 	fileName := "settings.json"
 	filePath := fmt.Sprintf("%s/%s", app.DataDir(), fileName)
 
-	isExist := utils.FileExists(filePath)
+	isExist := pokkitDbUtils.FileExists(filePath)
 	if !isExist {
 		return false, nil
 	}
@@ -74,7 +74,7 @@ func ImportCollectionsFromCollectionsFile(app pbCore.App) (bool, error) {
 	collectionsFileName := "collections.json"
 	collectionsFilePath := fmt.Sprintf("%s/%s", app.DataDir(), collectionsFileName)
 
-	isExist := utils.FileExists(collectionsFilePath)
+	isExist := pokkitDbUtils.FileExists(collectionsFilePath)
 	if !isExist {
 		return false, nil
 	}
@@ -101,7 +101,7 @@ func WriteSettingsToSettingsFileOnSettingsReloadEventHandler(e *pbCore.SettingsR
 
 	isSetupComplete := e.App.Store().Get("isSetupComplete").(bool)
 	if isSetupComplete {
-		writeErr := utils.WriteDataToFileAsJson(e.App.DataDir()+"/settings.json", e.App.Settings())
+		writeErr := pokkitDbUtils.WriteDataToFileAsJson(e.App.DataDir()+"/settings.json", e.App.Settings())
 		if writeErr != nil {
 			e.App.Logger().Error("Error when writing to settings.json")
 		}
