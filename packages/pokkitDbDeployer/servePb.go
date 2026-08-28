@@ -100,4 +100,7 @@ func copyPbOutput(r io.Reader, writeLog func(string), onLine func(string)) {
 		writeLog(line)
 		onLine(line)
 	}
+	if err := scanner.Err(); err != nil {
+		writeLog(fmt.Sprintf("error reading pocketbase output: %v", err))
+	}
 }
