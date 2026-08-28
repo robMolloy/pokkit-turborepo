@@ -47,10 +47,13 @@ func BindFunctions(app pbCore.App) {
 	})
 
 	app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		err := RebuildAndReloadNginxConfig(e.App)
+		err := WriteNginxConfigToFile(e.App)
 		if err != nil {
-			// log.Fatal("error returned from RebuildAndReloadNginxConfig in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
-			e.App.Logger().Error("error returned from RebuildAndReloadNginxConfig in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", "err", err)
+			log.Fatal("error returned from WriteNginxConfigToFile in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+		}
+		err = ReloadNginxConfig(e.App)
+		if err != nil {
+			log.Fatal("error returned from ReloadNginxConfig in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 		}
 		return e.Next()
 	})

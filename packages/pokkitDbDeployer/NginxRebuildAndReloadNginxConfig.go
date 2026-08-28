@@ -7,16 +7,16 @@ import (
 	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbUtils"
 )
 
-func RebuildAndReloadNginxConfig(app pbCore.App) error {
+func WriteNginxConfigToFile(app pbCore.App) error {
 	unproxiedNginxTemplateRecords, err := app.FindAllRecords(nginxTemplatesCollectionName)
 	if err != nil {
-		return fmt.Errorf("Error finding nginx template records in RebuildAndReloadNginxConfig: %w", err)
+		return fmt.Errorf("Error finding nginx template records in WriteNginxConfigToFile: %w", err)
 	}
 	nginxTemplateRecords := convertUnproxiedRecordsToNginxTemplateRecords(unproxiedNginxTemplateRecords)
 
 	unproxiedDeploymentRecords, err := app.FindAllRecords(deploymentsCollectionName)
 	if err != nil {
-		return fmt.Errorf("Error finding deployment records in RebuildAndReloadNginxConfig: %w", err)
+		return fmt.Errorf("Error finding deployment records in WriteNginxConfigToFile: %w", err)
 	}
 	deploymentRecords := convertUnproxiedRecordsToDeploymentRecords(unproxiedDeploymentRecords)
 	deploymentRecordsFieldData := convertDeploymentRecordsToFieldsData(deploymentRecords)
@@ -26,19 +26,22 @@ func RebuildAndReloadNginxConfig(app pbCore.App) error {
 
 		populatedTemplate, err := pokkitDbUtils.PopulateTemplate(templateBody, deploymentRecordsFieldData)
 		if err != nil {
-			return fmt.Errorf("Error populating template in RebuildAndReloadNginxConfig: %w", err)
+			return fmt.Errorf("Error populating template in WriteNginxConfigToFile: %w", err)
 		}
 
 		err = pokkitDbUtils.WriteStringToFile(populatedTemplate, nginxTemplateRecord.getFilePath())
 		if err != nil {
-			return fmt.Errorf("Error writing populated template to file in RebuildAndReloadNginxConfig: %w", err)
+			return fmt.Errorf("Error writing populated template to file in WriteNginxConfigToFile: %w", err)
 		}
 	}
 
-	err = pokkitDbUtils.ExecuteBashCommand("systemctl reload nginx")
-	if err != nil {
-		return fmt.Errorf("Error reloading nginx with new config in RebuildAndReloadNginxConfig: %w", err)
-	}
+	return nil
+}
 
+func ReloadNginxConfig(app pbCore.App) error {
+	err := pokkitDbUtils.ExecuteBashCommand("systemctl reload nginx")
+	if err != nil {
+		return fmt.Errorf("Error reloading nginx with new config in reloadNginxConfig: %w", err)
+	}
 	return nil
 }
