@@ -446,39 +446,14 @@ server {
     await expect(fetch(`http://0.0.0.0:${pbPortNumber}/api/health`)).resolves.toMatchObject({
       status: 200,
     });
-    // await expect(`http://0.0.0.0:${deployedPortNumber}/api/health`).toMatchObject({ status: 200 });
+    await expect(fetch(`http://0.0.0.0:${deployedPortNumber}/api/health`)).resolves.toMatchObject({
+      status: 200,
+    });
 
-    // const deployedHealthResponseDead = await fetch(
-    //   `http://0.0.0.0:${deployedPortNumber}/api/health`,
-    // );
-    // expect(deployedHealthResponseDead.status).toBe(200);
+    await killPbInstance({ pbPortNumber: deployedPortNumber });
+    await expect(fetch(`http://0.0.0.0:${deployedPortNumber}/api/health`)).rejects.toThrow();
   });
 
-  // it.skip("deploys all the existing deployment records onServe", async () => {
-  //   const deployedPortNumber = 9010;
-  //   await killPbInstance({ pbPortNumber: deployedPortNumber });
-  //   const superuserPb = createPbConnection();
-
-  //   await superuserPb
-  //     .collection(superusersCollectionName)
-  //     .authWithPassword(superuserEmail, superuserPassword);
-
-  //   await superuserPb.collection(deploymentsCollectionName).create(
-  //     deploymentsPayloadBuilder.forCreateData({
-  //       buildFile: mockBuildFile,
-  //       portNumber: deployedPortNumber,
-  //       superuserEmail,
-  //       superuserPassword,
-  //     }),
-  //   );
-
-  //   const healthResponse = await fetch(`http://0.0.0.0:${deployedPortNumber}/api/health`);
-  //   expect(healthResponse.status).toBe(200);
-
-  //   await killPbInstance({ pbPortNumber });
-  //   const healthResponseDead = await fetch(`http://0.0.0.0:${deployedPortNumber}/api/health`);
-  //   expect(healthResponseDead.status).toBe(200);
-  // });
   it("reports a healthy PocketBase connection after deployments", async () => {
     const pb = createPbConnection();
     const isHealthy = await pb.health.check();

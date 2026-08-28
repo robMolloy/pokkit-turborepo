@@ -18,7 +18,21 @@ func BindFunctions(app pbCore.App) {
 		if err != nil {
 			log.Fatal("failed to mergePokkitDbDeployerCollectionsFromSchema(e.App) in app.OnServe().BindFunc: %w", err)
 		}
-		return e.Next()
+		e.Next()
+
+		unproxiedRecords, err := app.FindAllRecords(deploymentsCollectionName)
+		if err != nil {
+			log.Fatal("error returned from app.FindAllRecords(deploymentsCollectionName) in app.OnServe().BindFunc: %w", err)
+		}
+		deploymentRecords := convertUnproxiedRecordsToDeploymentRecords(unproxiedRecords)
+
+		for _, deploymentRecord := range deploymentRecords {
+			err := writeFilesAndDeployPokkitDb(e.App, deploymentRecord)
+			if err != nil {
+				// log.Fatal("error returned from onRecordEventWriteAndDeployPokkitDb in app.OnServe().BindFunc: %w", err)
+			}
+		}
+		return nil
 	})
 
 	app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
@@ -77,6 +91,9 @@ func BindFunctions(app pbCore.App) {
 func writeFilesAndDeployPokkitDb(app pbCore.App, deploymentRecord *deploymentRecord) error {
 	deploymentsDir := filepath.Join(app.DataDir(), "..", "_deployments")
 	deploymentDir := filepath.Join(deploymentsDir, deploymentRecord.getId())
+
+	os.Remove(deploymentDir)
+
 	pbConfigDir := filepath.Join(deploymentDir, "pb_config")
 	err := os.MkdirAll(pbConfigDir, 0755)
 	if err != nil {
