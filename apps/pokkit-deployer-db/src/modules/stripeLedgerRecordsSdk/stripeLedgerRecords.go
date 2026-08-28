@@ -1,7 +1,7 @@
 package stripeLedgerRecordsSdk
 
 import (
-	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
+	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbUtils"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 	pbTypes "github.com/pocketbase/pocketbase/tools/types"
@@ -58,5 +58,5 @@ func ConvertStripeLedgerRecordToStruct(record *pbCore.Record) TStripeLedgerStruc
 }
 
 func PopulateStripeLedgerRecord(record *pbCore.Record, data TStripeLedgerStruct) (*pbCore.Record, error) {
-	return utils.PopulateRecord(record, data)
+	return pokkitDbUtils.PopulateRecord(record, data)
 }

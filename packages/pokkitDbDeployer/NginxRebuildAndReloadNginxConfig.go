@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
-	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
+	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbUtils"
 )
 
 func RebuildAndReloadNginxConfig(app pbCore.App) error {
@@ -24,18 +24,18 @@ func RebuildAndReloadNginxConfig(app pbCore.App) error {
 	for _, nginxTemplateRecord := range nginxTemplateRecords {
 		templateBody := nginxTemplateRecord.getTemplateBody()
 
-		populatedTemplate, err := utils.PopulateTemplate(templateBody, deploymentRecordsFieldData)
+		populatedTemplate, err := pokkitDbUtils.PopulateTemplate(templateBody, deploymentRecordsFieldData)
 		if err != nil {
 			return fmt.Errorf("Error populating template in RebuildAndReloadNginxConfig: %w", err)
 		}
 
-		err = utils.WriteStringToFile(populatedTemplate, nginxTemplateRecord.getFilePath())
+		err = pokkitDbUtils.WriteStringToFile(populatedTemplate, nginxTemplateRecord.getFilePath())
 		if err != nil {
 			return fmt.Errorf("Error writing populated template to file in RebuildAndReloadNginxConfig: %w", err)
 		}
 	}
 
-	err = utils.ExecuteBashCommand("systemctl reload nginx")
+	err = pokkitDbUtils.ExecuteBashCommand("systemctl reload nginx")
 	if err != nil {
 		return fmt.Errorf("Error reloading nginx with new config in RebuildAndReloadNginxConfig: %w", err)
 	}

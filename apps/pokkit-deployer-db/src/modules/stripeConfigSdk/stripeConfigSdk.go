@@ -2,7 +2,7 @@ package stripeConfigSdk
 
 import (
 	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/db"
-	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
+	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbUtils"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 	pbTypes "github.com/pocketbase/pocketbase/tools/types"
@@ -35,7 +35,7 @@ func NewStripeConfigRecord(app pbCore.App) (*pbCore.Record, error) {
 }
 
 func PopulateStripeConfigRecordWithStruct(record *pbCore.Record, data TStripeConfigStruct) (*pbCore.Record, error) {
-	return utils.PopulateRecord(record, data)
+	return pokkitDbUtils.PopulateRecord(record, data)
 }
 
 func GetStripeConfig(app pbCore.App) (*TStripeConfigStruct, error) {

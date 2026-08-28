@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/db"
-	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
+	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbUtils"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 	pbTypes "github.com/pocketbase/pocketbase/tools/types"
@@ -39,7 +39,7 @@ func NewStripeProductRecord(app pbCore.App) (*pbCore.Record, error) {
 }
 
 func PopulateStripeProductRecordWithStruct(record *pbCore.Record, data TStripeProductStruct) (*pbCore.Record, error) {
-	return utils.PopulateRecord(record, data)
+	return pokkitDbUtils.PopulateRecord(record, data)
 }
 
 func DbGetStripeProductRecordStructs(app pbCore.App) ([]TStripeProductStruct, error) {
@@ -73,7 +73,7 @@ func DbCreateStripeProductRecord(app pbCore.App, recordStruct TStripeProductStru
 		return fmt.Errorf("DbGetStripeProductCollection(app): %w", err)
 	}
 	record := pbCore.NewRecord(collection)
-	record, err = utils.PopulateRecord(record, recordStruct)
+	record, err = pokkitDbUtils.PopulateRecord(record, recordStruct)
 	if err != nil {
 		return fmt.Errorf("utils.PopulateRecord(record, recordStruct): %w", err)
 	}

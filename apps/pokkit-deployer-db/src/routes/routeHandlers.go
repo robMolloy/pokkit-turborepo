@@ -12,7 +12,7 @@ import (
 	stripeConfigSdk "github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/modules/stripeConfigSdk"
 	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/modules/stripeLedgerRecordsSdk"
 	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/modules/stripeSdk"
-	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
+	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbUtils"
 
 	"github.com/pocketbase/dbx"
 	pbCore "github.com/pocketbase/pocketbase/core"
@@ -174,7 +174,7 @@ func StripeCreateCheckoutSessionRouteHandler(e *pbCore.RequestEvent) error {
 		return e.InternalServerError(fmt.Sprintf("failed to create stripe customer from: %v", userEmail), err)
 	}
 
-	req, err := utils.ReadRequestBodyJsonIntoResult[struct {
+	req, err := pokkitDbUtils.ReadRequestBodyJsonIntoResult[struct {
 		ProductName string `json:"productName"`
 		Quantity    int64  `json:"quantity"`
 	}](e.Request.Body)
@@ -246,7 +246,7 @@ func UpdateStripeSubscriptionRouteHandler(e *pbCore.RequestEvent) error {
 		return e.BadRequestError("not_logged_id", nil)
 	}
 
-	req, err := utils.ReadRequestBodyJsonIntoResult[struct {
+	req, err := pokkitDbUtils.ReadRequestBodyJsonIntoResult[struct {
 		SubscriptionId string `json:"subscriptionId"`
 		Quantity       int64  `json:"quantity"`
 	}](e.Request.Body)
@@ -316,11 +316,11 @@ func getStripeLedgerRecordStructFromCheckoutSessionCompletedWebhookEvent(stripeE
 
 	recurrenceIntervalStartDateInt := item.CurrentPeriodStart
 	recurrenceIntervalEndDateInt := item.CurrentPeriodEnd
-	recurrenceIntervalStart, err := utils.ConvertStripeDateIntToPbDateTime(recurrenceIntervalStartDateInt)
+	recurrenceIntervalStart, err := pokkitDbUtils.ConvertStripeDateIntToPbDateTime(recurrenceIntervalStartDateInt)
 	if err != nil {
 		return nil, fmt.Errorf("recurrence data invalid: %w", err)
 	}
-	recurrenceIntervalEnd, err := utils.ConvertStripeDateIntToPbDateTime(recurrenceIntervalEndDateInt)
+	recurrenceIntervalEnd, err := pokkitDbUtils.ConvertStripeDateIntToPbDateTime(recurrenceIntervalEndDateInt)
 	if err != nil {
 		return nil, fmt.Errorf("recurrence data invalid: %w", err)
 	}
@@ -369,11 +369,11 @@ func getStripeLedgerRecordStructFromCustomerSubscriptionUpdatedWebhookEvent(app 
 
 	recurrenceIntervalStartDateInt := item.CurrentPeriodStart
 	recurrenceIntervalEndDateInt := item.CurrentPeriodEnd
-	recurrenceIntervalStart, err := utils.ConvertStripeDateIntToPbDateTime(recurrenceIntervalStartDateInt)
+	recurrenceIntervalStart, err := pokkitDbUtils.ConvertStripeDateIntToPbDateTime(recurrenceIntervalStartDateInt)
 	if err != nil {
 		return nil, fmt.Errorf("recurrence data invalid: %w", err)
 	}
-	recurrenceIntervalEnd, err := utils.ConvertStripeDateIntToPbDateTime(recurrenceIntervalEndDateInt)
+	recurrenceIntervalEnd, err := pokkitDbUtils.ConvertStripeDateIntToPbDateTime(recurrenceIntervalEndDateInt)
 	if err != nil {
 		return nil, fmt.Errorf("recurrence data invalid: %w", err)
 	}

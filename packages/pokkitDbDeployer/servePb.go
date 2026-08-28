@@ -93,11 +93,16 @@ func ServePb(pbFilePath string, pbPortNumber int, logFilePath string) (*ServePbR
 	}
 }
 
-func copyPbOutput(r io.Reader, writeLog func(string), onLine func(string)) {
+func copyPbOutput(r io.Reader, writeLog func(string), onLine func(string)) error {
 	scanner := bufio.NewScanner(r)
+	err := scanner.Err()
+	if err != nil {
+		return fmt.Errorf("failed to scanner.Err() in copyPbOutput: %w", err)
+	}
 	for scanner.Scan() {
 		line := scanner.Text()
 		writeLog(line)
 		onLine(line)
 	}
+	return nil
 }

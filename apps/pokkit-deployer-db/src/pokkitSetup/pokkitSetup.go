@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
-
 	pbCore "github.com/pocketbase/pocketbase/core"
+	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
 )
 
 // WriteCollectionsToCollectionsFile writes collections to pb_data/collections.json.

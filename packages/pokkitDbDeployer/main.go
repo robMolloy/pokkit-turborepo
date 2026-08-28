@@ -50,7 +50,7 @@ func BindFunctions(app pbCore.App) {
 		err := RebuildAndReloadNginxConfig(e.App)
 		if err != nil {
 			// log.Fatal("error returned from RebuildAndReloadNginxConfig in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
-			e.App.Logger().Error("error returned from RebuildAndReloadNginxConfig in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+			e.App.Logger().Error("error returned from RebuildAndReloadNginxConfig in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", "err", err)
 		}
 		return e.Next()
 	})

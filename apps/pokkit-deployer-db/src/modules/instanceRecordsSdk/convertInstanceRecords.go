@@ -1,7 +1,7 @@
 package instanceRecordsSdk
 
 import (
-	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
+	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbUtils"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
 	pbTypes "github.com/pocketbase/pocketbase/tools/types"
@@ -53,5 +53,5 @@ func ConvertInstanceRecordsToData(instanceRecords []*pbCore.Record) []map[string
 
 // tested as part of TestConvertStructToInstanceRecordAndBackAgain
 func PopulateInstanceRecordWithStruct(record *pbCore.Record, data TInstanceRecordStruct) (*pbCore.Record, error) {
-	return utils.PopulateRecord(record, data)
+	return pokkitDbUtils.PopulateRecord(record, data)
 }

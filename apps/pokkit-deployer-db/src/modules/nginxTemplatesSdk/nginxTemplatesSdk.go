@@ -3,7 +3,7 @@ package nginxTemplatesSdk
 import (
 	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/db"
 	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/modules/instanceRecordsSdk"
-	"github.com/robMolloy/pokkit-turborepo/apps/pokkit-deployer-db/src/utils"
+	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbUtils"
 
 	"github.com/pocketbase/dbx"
 	pbCore "github.com/pocketbase/pocketbase/core"
@@ -60,27 +60,27 @@ func RebuildAndReloadNginxConfigOnChangeEventHandler(e *pbCore.RecordEvent) erro
 
 	for _, nginxTemplateRecordStruct := range nginxTemplateRecordStructs {
 		templateBody := nginxTemplateRecordStruct.TemplateBody
-		templateData, err := utils.StructSliceToMapSlice(allInstanceRecordStructs)
+		templateData, err := pokkitDbUtils.StructSliceToMapSlice(allInstanceRecordStructs)
 
 		if err != nil {
 			e.App.Logger().Error("Error converting instance Record Struct(s) to map/map-slice", "err", err)
 			continue
 		}
 
-		populatedTemplate, err := utils.PopulateTemplate(templateBody, templateData)
+		populatedTemplate, err := pokkitDbUtils.PopulateTemplate(templateBody, templateData)
 		if err != nil {
 			e.App.Logger().Error("Error populating template", "err", err)
 			continue
 		}
 
-		err = utils.WriteStringToFile(populatedTemplate, nginxTemplateRecordStruct.FilePath)
+		err = pokkitDbUtils.WriteStringToFile(populatedTemplate, nginxTemplateRecordStruct.FilePath)
 		if err != nil {
 			e.App.Logger().Error("Error writing populated template to file", "err", err)
 			continue
 		}
 	}
 
-	err = utils.ExecuteBashCommand("systemctl reload nginx")
+	err = pokkitDbUtils.ExecuteBashCommand("systemctl reload nginx")
 	if err != nil {
 		e.App.Logger().Error("Error reloading nginx with new config", "err", err)
 	}
