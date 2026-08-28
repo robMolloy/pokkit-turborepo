@@ -410,7 +410,7 @@ server {
 }`);
   });
 
-  it.only("deploys all the existing deployment records onServe", async () => {
+  it("deploys all the existing deployment records onServe", async () => {
     const deployedPortNumber = 9009;
     await killPbInstance({ pbPortNumber: deployedPortNumber });
     const superuserPb = createPbConnection();

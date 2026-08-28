@@ -3,17 +3,33 @@ package pokkitDbUtils
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os/exec"
+	"sync"
 )
+
+type handlers struct {
+	doneWaiting func()
+	killProcess func()
+}
 
 func ExecuteBashCommand(bashCommand string) error {
 	cmd := exec.Command("bash", "-c", bashCommand)
 	return cmd.Start()
 }
 
+func closeOnce(c chan<- struct{}) func() {
+	var once sync.Once
+	return func() {
+		once.Do(func() {
+			close(c)
+		})
+	}
+}
+
 func ExecuteAndWaitBashCommand(
 	bashCommand string,
-	handleOutputLine func(string, func()),
+	handleOutputLine func(line string, handlers handlers),
 ) error {
 	cmd := exec.Command("bash", "-c", bashCommand)
 
@@ -26,21 +42,33 @@ func ExecuteAndWaitBashCommand(
 		return err
 	}
 
+	done := make(chan struct{})
+	doneWaiting := closeOnce(done)
 	killProcess := func() {
-		cmd.Process.Kill()
+		_ = cmd.Process.Kill()
+		doneWaiting()
+	}
+	handlers := handlers{
+		doneWaiting: doneWaiting,
+		killProcess: killProcess,
 	}
 
-	scanner := bufio.NewScanner(stdout)
+	go func() {
+		scanner := bufio.NewScanner(stdout)
 
-	for scanner.Scan() {
-		handleOutputLine(scanner.Text(), killProcess)
-	}
+		err := scanner.Err()
+		if err != nil {
+			log.Printf("error returned from bufio.NewScanner in ExecuteAndWaitBashCommand: %v", err)
+		}
+		for scanner.Scan() {
+			handleOutputLine(scanner.Text(), handlers)
+		}
+		handlers.doneWaiting()
+		_ = cmd.Wait()
+	}()
 
-	if err := scanner.Err(); err != nil {
-		return err
-	}
-
-	return cmd.Wait()
+	<-done
+	return nil
 }
 
 func KillProcessByPortNumber(portNumber int) error {
