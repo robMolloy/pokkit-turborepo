@@ -1,6 +1,7 @@
 package pokkitDbDeployer
 
 import (
+	"bufio"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -13,16 +14,31 @@ func UpsertPbAdminCredentialsFromCli(pbFilePath string, superuserEmail string, s
 		return fmt.Errorf("failed to cmd.StdoutPipe in UpsertPbAdminCredentialsFromCli: %w", err)
 	}
 
-	err = cmd.Start()
-	if err != nil {
+	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("failed to cmd.Start in UpsertPbAdminCredentialsFromCli: %w", err)
 	}
 
-	buf := make([]byte, 4096)
-	for {
-		n, _ := stdout.Read(buf)
-		if n > 0 && strings.Contains(string(buf[:n]), "Successfully saved") {
-			return nil
+	scanner := bufio.NewScanner(stdout)
+	saved := false
+	for scanner.Scan() {
+		line := scanner.Text()
+		fmt.Println(line)
+		if strings.Contains(line, "Successfully saved") {
+			saved = true
 		}
 	}
+
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("failed to scan stdout in UpsertPbAdminCredentialsFromCli: %w", err)
+	}
+
+	if err := cmd.Wait(); err != nil {
+		return fmt.Errorf("failed to cmd.Wait in UpsertPbAdminCredentialsFromCli: %w", err)
+	}
+
+	if !saved {
+		return fmt.Errorf("did not see Successfully saved in UpsertPbAdminCredentialsFromCli")
+	}
+
+	return nil
 }
