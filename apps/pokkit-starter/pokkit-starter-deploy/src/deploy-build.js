@@ -1,6 +1,6 @@
 import PocketBase from "pocketbase";
 import fs from "fs-extra";
-
+// test push to deploy pokkit-starter-db
 await (async () => {
   const pb = new PocketBase("https://pokkit.cloud:9999");
   pb.autoCancellation(false);
