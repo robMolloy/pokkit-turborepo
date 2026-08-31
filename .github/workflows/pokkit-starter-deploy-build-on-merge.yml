@@ -22,6 +22,8 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - run: pnpm i
+
       - name: Build app-db for linux/amd64
         working-directory: apps/pokkit-starter/pokkit-starter-db
         run: GOOS=linux GOARCH=amd64 go build -o build/app-db ./src/...
