@@ -4,9 +4,11 @@ import fs from "fs-extra";
 const pb = new PocketBase("https://pokkit.cloud:9999/");
 
 await (async () => {
-  const collectionsBuffer = fs.readFileSync("build/pb_config/collections.json");
-  const secretsBuffer = fs.readFileSync("build/pb_config/secrets.json");
-  const settingsBuffer = fs.readFileSync("build/pb_config/settings.json");
+  const collectionsBuffer = fs.readFileSync(
+    "../pokkit-starter-db/build/pb_config/collections.json",
+  );
+  const secretsBuffer = fs.readFileSync("../pokkit-starter-db/build/pb_config/secrets.json");
+  const settingsBuffer = fs.readFileSync("../pokkit-starter-db/build/pb_config/settings.json");
   const collectionsFile = collectionsBuffer
     ? new File([collectionsBuffer], "collections.json")
     : undefined;
@@ -14,7 +16,7 @@ await (async () => {
   const settingsFile = settingsBuffer ? new File([settingsBuffer], "settings.json") : undefined;
 
   const deployment = await pb.collection("deployments").create({
-    buildFile: fs.readFileSync("build/app-db"),
+    buildFile: fs.readFileSync("../pokkit-starter-db/build/app-db"),
     collectionsFile,
     secretsFile,
     settingsFile,
