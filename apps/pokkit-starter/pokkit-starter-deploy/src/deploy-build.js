@@ -29,5 +29,5 @@ await (async () => {
     superuserPassword: "admin@admin.com",
   });
 
-  console.log(deployment);
+  console.log(deployment.portNumber);
 })();
