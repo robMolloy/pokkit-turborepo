@@ -72,27 +72,27 @@ export const pokkitDbPermissionsTestsMetadata = {
     name: "pokkitDbPermissionsOrganisationsCollectionView",
   },
   pokkitDbPermissionsOrganisationUserPermissionsCollectionSetup: {
-    portNumber: 8500,
+    portNumber: 8407,
     name: "pokkitDbPermissionsOrganisationUserPermissionsCollectionSetup",
   },
   pokkitDbPermissionsOrganisationUserPermissionsCollectionCreate: {
-    portNumber: 8501,
+    portNumber: 8408,
     name: "pokkitDbPermissionsOrganisationUserPermissionsCollectionCreate",
   },
   pokkitDbPermissionsOrganisationUserPermissionsCollectionDelete: {
-    portNumber: 8502,
+    portNumber: 8409,
     name: "pokkitDbPermissionsOrganisationUserPermissionsCollectionDelete",
   },
   pokkitDbPermissionsOrganisationUserPermissionsCollectionList: {
-    portNumber: 8503,
+    portNumber: 8410,
     name: "pokkitDbPermissionsOrganisationUserPermissionsCollectionList",
   },
   pokkitDbPermissionsOrganisationUserPermissionsCollectionUpdate: {
-    portNumber: 8504,
+    portNumber: 8411,
     name: "pokkitDbPermissionsOrganisationUserPermissionsCollectionUpdate",
   },
   pokkitDbPermissionsOrganisationUserPermissionsCollectionView: {
-    portNumber: 8505,
+    portNumber: 8412,
     name: "pokkitDbPermissionsOrganisationUserPermissionsCollectionView",
   },
 } as const satisfies { [k: string]: { portNumber: number; name: string } };
