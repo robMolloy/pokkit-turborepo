@@ -1,9 +1,10 @@
 import PocketBase from "pocketbase";
 import fs from "fs-extra";
 
-const pb = new PocketBase("https://pokkit.cloud:9999/");
-
 await (async () => {
+  const pb = new PocketBase("https://pokkit.cloud:9999/");
+  await pb.collection("superusers").authWithPassword("admin@admin.com", "admin@admin.com");
+
   const collectionsBuffer = fs.readFileSync(
     "../pokkit-starter-db/build/pb_config/collections.json",
   );
