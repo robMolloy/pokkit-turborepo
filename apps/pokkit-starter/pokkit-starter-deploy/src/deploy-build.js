@@ -1,6 +1,5 @@
 import PocketBase from "pocketbase";
 import fs from "fs-extra";
-// test push
 
 await (async () => {
   const pb = new PocketBase("https://pokkit.cloud:9999");
