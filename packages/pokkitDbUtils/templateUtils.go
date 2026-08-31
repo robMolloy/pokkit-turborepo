@@ -6,7 +6,11 @@ import (
 )
 
 func PopulateTemplate(inputTemplate string, data any) (string, error) {
-	tmpl, err := template.New("test").Parse(inputTemplate)
+	funcMap := template.FuncMap{
+		"add": func(a, b int) int { return a + b },
+	}
+
+	tmpl, err := template.New("test").Funcs(funcMap).Parse(inputTemplate)
 	if err != nil {
 		return "", err
 	}
