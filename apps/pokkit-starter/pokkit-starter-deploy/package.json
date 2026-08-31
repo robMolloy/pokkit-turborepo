@@ -1,0 +1,28 @@
+{
+  "name": "pokkit-starter-db-ts-testing",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "deploy-build": "node deploy-build.js"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^25.0.10",
+    "@vitest/ui": "4.0.18",
+    "dotenv": "^17.2.3",
+    "fs-extra": "^11.3.3",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4",
+    "vitest": "^4.0.18"
+  },
+  "dependencies": {
+    "@repo/pokkit-testing": "workspace:^",
+    "@repo/pokkit-db-permissions-ts-helpers": "workspace:^",
+    "@repo/pokkit-db-deployments-ts-helpers": "workspace:^",
+    "@repo/pokkit-db-blog-ts-helpers": "workspace:^",
+    "@repo/pokkit-utils": "workspace:^",
+    "pocketbase": "^0.26.6",
+    "zod": "^4.3.6"
+  }
+}

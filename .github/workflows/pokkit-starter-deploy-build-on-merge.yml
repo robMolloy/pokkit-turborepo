@@ -1,0 +1,22 @@
+name: pokkit-starter-deploy-build-on-merge
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy_pokkit_starter_build_on_merge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Build app-db for linux/amd64
+        working-directory: apps/pokkit-starter/pokkit-starter-db
+        run: GOOS=linux GOARCH=amd64 go build -o build/app-db ./src/...
+
+      - name: Deploy build to PocketBase
+        working-directory: apps/pokkit-starter/pokkit-starter-deploy
+        run: pnpm run deploy-build
