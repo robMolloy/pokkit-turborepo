@@ -21,6 +21,15 @@ func WriteNginxConfigToFile(app pbCore.App) error {
 	deploymentRecords := convertUnproxiedRecordsToDeploymentRecords(unproxiedDeploymentRecords)
 	deploymentRecordsFieldData := convertDeploymentRecordsToFieldsData(deploymentRecords)
 
+	app.Logger().Info(
+		"deploymentRecordsFieldData",
+		"deploymentRecordsFieldData",
+		deploymentRecordsFieldData,
+		"deploymentRecords",
+		deploymentRecords,
+		"nginxTemplateRecords",
+		nginxTemplateRecords,
+	)
 	for _, nginxTemplateRecord := range nginxTemplateRecords {
 		templateBody := nginxTemplateRecord.getTemplateBody()
 
