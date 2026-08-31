@@ -6,7 +6,7 @@ import (
 )
 
 var funcMap = template.FuncMap{
-	"add": func(a, b int) int { return a + b },
+	"add": func(a, b float64) int { return int(a + b) },
 }
 
 func PopulateTemplate(inputTemplate string, data any) (string, error) {
