@@ -5,7 +5,7 @@ await (async () => {
   const pb = new PocketBase("https://pokkit.cloud:9999");
   pb.autoCancellation(false);
 
-  await pb.collection("superusers").authWithPassword("admin@admin.com", "admin@admin.com");
+  await pb.collection("_superusers").authWithPassword("admin@admin.com", "admin@admin.com");
 
   const buildBuffer = fs.readFileSync("../pokkit-starter-db/build/app-db");
   const buildFile = new File([buildBuffer], "app-db");
