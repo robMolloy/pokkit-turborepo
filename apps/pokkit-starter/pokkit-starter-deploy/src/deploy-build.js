@@ -7,6 +7,8 @@ await (async () => {
 
   await pb.collection("superusers").authWithPassword("admin@admin.com", "admin@admin.com");
 
+  const buildBuffer = fs.readFileSync("../pokkit-starter-db/build/app-db");
+  const buildFile = new File([buildBuffer], "app-db");
   const collectionsBuffer = fs.readFileSync(
     "../pokkit-starter-db/build/pb_config/collections.json",
   );
@@ -19,7 +21,7 @@ await (async () => {
   const settingsFile = settingsBuffer ? new File([settingsBuffer], "settings.json") : undefined;
 
   const deployment = await pb.collection("deployments").create({
-    buildFile: fs.readFileSync("../pokkit-starter-db/build/app-db"),
+    buildFile,
     collectionsFile,
     secretsFile,
     settingsFile,
