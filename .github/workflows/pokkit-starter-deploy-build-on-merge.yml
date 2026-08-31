@@ -28,6 +28,10 @@ jobs:
         working-directory: apps/pokkit-starter/pokkit-starter-db
         run: GOOS=linux GOARCH=amd64 go build -o build/app-db ./src/...
 
+      - name: add pb_config
+        working-directory: apps/pokkit-starter/pokkit-starter-db
+        run: pnpm run copy-pbconfig-to-build
+
       - name: Deploy build to PocketBase
         working-directory: apps/pokkit-starter/pokkit-starter-deploy
         run: pnpm run deploy-build
