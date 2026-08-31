@@ -5,10 +5,11 @@ import (
 	"text/template"
 )
 
+var funcMap = template.FuncMap{
+	"add": func(a, b int) int { return a + b },
+}
+
 func PopulateTemplate(inputTemplate string, data any) (string, error) {
-	funcMap := template.FuncMap{
-		"add": func(a, b int) int { return a + b },
-	}
 
 	tmpl, err := template.New("test").Funcs(funcMap).Parse(inputTemplate)
 	if err != nil {
