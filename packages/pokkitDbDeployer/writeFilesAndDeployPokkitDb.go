@@ -8,7 +8,7 @@ import (
 	pbCore "github.com/pocketbase/pocketbase/core"
 )
 
-func writeFilesAndDeployPokkitDb(app pbCore.App, deploymentRecord *deploymentRecord) error {
+func writeFilesAndDeployPokkitDb(app pbCore.App, deploymentRecord *deployPokkitDbFilesRecord) error {
 	deploymentsDir := filepath.Join(app.DataDir(), "..", "_deployments")
 	deploymentDir := filepath.Join(deploymentsDir, deploymentRecord.getId())
 
@@ -75,7 +75,7 @@ func writeFilesAndDeployPokkitDb(app pbCore.App, deploymentRecord *deploymentRec
 	return nil
 }
 
-func writeFilesAndDeployPokkitDbs(app pbCore.App, deploymentRecords []*deploymentRecord) *[]error {
+func writeFilesAndDeployPokkitDbs(app pbCore.App, deploymentRecords []*deployPokkitDbFilesRecord) *[]error {
 	errors := []error{}
 
 	for _, deploymentRecord := range deploymentRecords {

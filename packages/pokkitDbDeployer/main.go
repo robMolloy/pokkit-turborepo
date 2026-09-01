@@ -22,7 +22,7 @@ func BindFunctions(app pbCore.App) {
 		if err != nil {
 			log.Fatal("error returned from app.FindAllRecords(deploymentsCollectionName) in app.OnServe().BindFunc: %w", err)
 		}
-		deploymentRecords := convertUnproxiedRecordsToDeploymentRecords(unproxiedRecords)
+		deploymentRecords := convertUnproxiedRecordsToDeployPokkitDbFilesRecords(unproxiedRecords)
 
 		errors := writeFilesAndDeployPokkitDbs(e.App, deploymentRecords)
 		if errors != nil {
@@ -32,7 +32,7 @@ func BindFunctions(app pbCore.App) {
 	})
 
 	app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		deploymentRecord := convertUnproxiedRecordToDeploymentRecord(e.Record)
+		deploymentRecord := convertUnproxiedRecordToDeployPokkitDbFilesRecord(e.Record)
 
 		err := writeFilesAndDeployPokkitDb(e.App, deploymentRecord)
 		if err != nil {
@@ -42,7 +42,7 @@ func BindFunctions(app pbCore.App) {
 	})
 
 	app.OnRecordCreate(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		deploymentRecord := convertUnproxiedRecordToDeploymentRecord(e.Record)
+		deploymentRecord := convertUnproxiedRecordToDeployPokkitDbFilesRecord(e.Record)
 		portNumber := deploymentRecord.getPortNumber()
 
 		if portNumber <= lowestPortNumber {
@@ -57,7 +57,7 @@ func BindFunctions(app pbCore.App) {
 	})
 
 	app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		err := WriteNginxConfigToFile(e.App)
+		err := WriteDeploymentTemplatesToFile(e.App)
 		if err != nil {
 			log.Fatal("error returned from WriteNginxConfigToFile in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
 		}
@@ -75,7 +75,7 @@ func BindFunctions(app pbCore.App) {
 		}
 		e.App.Logger().Info("records", "records", records)
 		for _, record := range records {
-			deploymentRecord := convertUnproxiedRecordToDeploymentRecord(record)
+			deploymentRecord := convertUnproxiedRecordToDeployPokkitDbFilesRecord(record)
 			pokkitDbUtils.KillProcessByPortNumber(deploymentRecord.getPortNumber())
 		}
 

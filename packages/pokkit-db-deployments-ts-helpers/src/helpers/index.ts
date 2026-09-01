@@ -1,7 +1,7 @@
-export const deploymentsCollectionName = "deployments";
-export const nginxTemplatesCollectionName = "nginxTemplates";
+export const deployPokkitDbFilesCollectionName = "deployPokkitDbFiles";
+export const deploymentTemplatesCollectionName = "deploymentTemplates";
 
-export type TDeploymentsCreatePayload = {
+export type TDeployPokkitDbFilesCreatePayload = {
   buildFile: File;
   settingsFile?: File;
   secretsFile?: File;
@@ -11,15 +11,15 @@ export type TDeploymentsCreatePayload = {
   superuserPassword: string;
 };
 
-export const deploymentsPayloadBuilder = {
-  forCreateData: <T extends TDeploymentsCreatePayload>(p: T) => p as T,
+export const deployPokkitDbFilesPayloadBuilder = {
+  forCreateData: <T extends TDeployPokkitDbFilesCreatePayload>(p: T) => p as T,
 };
 
-export type TNginxTemplatesCreatePayload = {
+export type TDeploymentTemplatesCreatePayload = {
   templateBody: string;
   filePath: string;
 };
 
-export const nginxTemplatesPayloadBuilder = {
-  forCreateData: <T extends TNginxTemplatesCreatePayload>(p: T) => p as T,
+export const deploymentTemplatesPayloadBuilder = {
+  forCreateData: <T extends TDeploymentTemplatesCreatePayload>(p: T) => p as T,
 };

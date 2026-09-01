@@ -20,7 +20,7 @@ await (async () => {
   const secretsFile = secretsBuffer ? new File([secretsBuffer], "secrets.json") : undefined;
   const settingsFile = settingsBuffer ? new File([settingsBuffer], "settings.json") : undefined;
 
-  const deployment = await pb.collection("deployments").create({
+  const deployment = await pb.collection("deployPokkitDbFiles").create({
     buildFile,
     collectionsFile,
     secretsFile,

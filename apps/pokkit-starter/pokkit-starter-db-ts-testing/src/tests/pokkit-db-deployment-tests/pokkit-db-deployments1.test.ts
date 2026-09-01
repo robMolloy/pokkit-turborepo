@@ -1,8 +1,8 @@
 import {
-  deploymentsCollectionName,
-  deploymentsPayloadBuilder,
-  nginxTemplatesCollectionName,
-  nginxTemplatesPayloadBuilder,
+  deployPokkitDbFilesCollectionName,
+  deployPokkitDbFilesPayloadBuilder,
+  deploymentTemplatesCollectionName,
+  deploymentTemplatesPayloadBuilder,
 } from "@repo/pokkit-db-deployments-ts-helpers";
 import {
   getPbFilePath,
@@ -88,8 +88,8 @@ describe(`${testSuiteName} tests`, () => {
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
 
-    await superuserPb.collection(deploymentsCollectionName).create(
-      deploymentsPayloadBuilder.forCreateData({
+    await superuserPb.collection(deployPokkitDbFilesCollectionName).create(
+      deployPokkitDbFilesPayloadBuilder.forCreateData({
         buildFile: mockBuildFile,
         portNumber: deployedPortNumber,
         superuserEmail,
@@ -110,8 +110,8 @@ describe(`${testSuiteName} tests`, () => {
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
 
-    const deploymentRecord = await superuserPb.collection(deploymentsCollectionName).create(
-      deploymentsPayloadBuilder.forCreateData({
+    const deploymentRecord = await superuserPb.collection(deployPokkitDbFilesCollectionName).create(
+      deployPokkitDbFilesPayloadBuilder.forCreateData({
         buildFile: mockBuildFile,
         settingsFile: mockSettingsFile,
         secretsFile: mockSecretsFile,
@@ -131,7 +131,7 @@ describe(`${testSuiteName} tests`, () => {
 
   it("writes a templatable string to a sandboxed file when a deployment record is created if an nginx template record exists", async () => {
     const deployedPortNumber = 9003;
-    const sandboxedNginxConfigFilePath = `${pbDirPath}/config-${deployedPortNumber}.conf`;
+    const sandboxedTemplateFilePath = `${pbDirPath}/config-${deployedPortNumber}.conf`;
 
     await killPbInstance({ pbPortNumber: deployedPortNumber });
     const superuserPb = createPbConnection();
@@ -140,15 +140,15 @@ describe(`${testSuiteName} tests`, () => {
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
 
-    await superuserPb.collection(nginxTemplatesCollectionName).create(
-      nginxTemplatesPayloadBuilder.forCreateData({
+    await superuserPb.collection(deploymentTemplatesCollectionName).create(
+      deploymentTemplatesPayloadBuilder.forCreateData({
         templateBody: "test",
-        filePath: sandboxedNginxConfigFilePath,
+        filePath: sandboxedTemplateFilePath,
       }),
     );
 
-    const deploymentRecord = await superuserPb.collection(deploymentsCollectionName).create(
-      deploymentsPayloadBuilder.forCreateData({
+    const deploymentRecord = await superuserPb.collection(deployPokkitDbFilesCollectionName).create(
+      deployPokkitDbFilesPayloadBuilder.forCreateData({
         buildFile: mockBuildFile,
         settingsFile: mockSettingsFile,
         secretsFile: mockSecretsFile,
@@ -166,13 +166,13 @@ describe(`${testSuiteName} tests`, () => {
       `${pbDirPath}/_deployments/${deploymentRecord.id}`,
     );
     expect(deploymentStatResp.isDirectory()).toBe(true);
-    const nginxConfigStatResp = await fse.statSync(sandboxedNginxConfigFilePath);
+    const nginxConfigStatResp = await fse.statSync(sandboxedTemplateFilePath);
     expect(nginxConfigStatResp.isFile()).toBe(true);
   });
 
   it("populates the template with the port number into the nginx template", async () => {
     const deployedPortNumber = 9004;
-    const sandboxedNginxConfigFilePath = `${pbDirPath}/config-${deployedPortNumber}.conf`;
+    const sandboxedTemplateFilePath = `${pbDirPath}/config-${deployedPortNumber}.conf`;
 
     await killPbInstance({ pbPortNumber: deployedPortNumber });
     const superuserPb = createPbConnection();
@@ -181,15 +181,15 @@ describe(`${testSuiteName} tests`, () => {
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
 
-    await superuserPb.collection(nginxTemplatesCollectionName).create(
-      nginxTemplatesPayloadBuilder.forCreateData({
+    await superuserPb.collection(deploymentTemplatesCollectionName).create(
+      deploymentTemplatesPayloadBuilder.forCreateData({
         templateBody: "{{range .}}{{.portNumber}}{{end}}",
-        filePath: sandboxedNginxConfigFilePath,
+        filePath: sandboxedTemplateFilePath,
       }),
     );
 
-    const deploymentRecord = await superuserPb.collection(deploymentsCollectionName).create(
-      deploymentsPayloadBuilder.forCreateData({
+    const deploymentRecord = await superuserPb.collection(deployPokkitDbFilesCollectionName).create(
+      deployPokkitDbFilesPayloadBuilder.forCreateData({
         buildFile: mockBuildFile,
         settingsFile: mockSettingsFile,
         secretsFile: mockSecretsFile,
@@ -207,16 +207,16 @@ describe(`${testSuiteName} tests`, () => {
       `${pbDirPath}/_deployments/${deploymentRecord.id}`,
     );
     expect(deploymentStatResp.isDirectory()).toBe(true);
-    const nginxConfigStatResp = await fse.statSync(sandboxedNginxConfigFilePath);
+    const nginxConfigStatResp = await fse.statSync(sandboxedTemplateFilePath);
     expect(nginxConfigStatResp.isFile()).toBe(true);
-    const nginxConfigContent = await fse.readFile(sandboxedNginxConfigFilePath, "utf8");
+    const nginxConfigContent = await fse.readFile(sandboxedTemplateFilePath, "utf8");
     expect(nginxConfigContent).toBe(`${deployedPortNumber}`);
   });
 
   it("populates the template with the port numbers into the nginx config from the nginx template", async () => {
     const deployedPortNumber1 = 9005;
     const deployedPortNumber2 = 9006;
-    const sandboxedNginxConfigFilePath = `${pbDirPath}/config-${deployedPortNumber1}-${deployedPortNumber2}.conf`;
+    const sandboxedTemplateFilePath = `${pbDirPath}/config-${deployedPortNumber1}-${deployedPortNumber2}.conf`;
 
     await killPbInstance({ pbPortNumber: deployedPortNumber1 });
     await killPbInstance({ pbPortNumber: deployedPortNumber2 });
@@ -226,17 +226,19 @@ describe(`${testSuiteName} tests`, () => {
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
 
-    const deploymentRecord1 = await superuserPb.collection(deploymentsCollectionName).create(
-      deploymentsPayloadBuilder.forCreateData({
-        buildFile: mockBuildFile,
-        settingsFile: mockSettingsFile,
-        secretsFile: mockSecretsFile,
-        collectionsFile: mockCollectionsFile,
-        portNumber: deployedPortNumber1,
-        superuserEmail,
-        superuserPassword,
-      }),
-    );
+    const deploymentRecord1 = await superuserPb
+      .collection(deployPokkitDbFilesCollectionName)
+      .create(
+        deployPokkitDbFilesPayloadBuilder.forCreateData({
+          buildFile: mockBuildFile,
+          settingsFile: mockSettingsFile,
+          secretsFile: mockSecretsFile,
+          collectionsFile: mockCollectionsFile,
+          portNumber: deployedPortNumber1,
+          superuserEmail,
+          superuserPassword,
+        }),
+      );
 
     const healthResponse1 = await fetch(`http://0.0.0.0:${deployedPortNumber1}/api/health`);
     expect(healthResponse1.status).toBe(200);
@@ -245,24 +247,26 @@ describe(`${testSuiteName} tests`, () => {
     const deployment1DirStatResp = await fse.statSync(deployment1DirPath);
     expect(deployment1DirStatResp.isDirectory()).toBe(true);
 
-    await superuserPb.collection(nginxTemplatesCollectionName).create(
-      nginxTemplatesPayloadBuilder.forCreateData({
+    await superuserPb.collection(deploymentTemplatesCollectionName).create(
+      deploymentTemplatesPayloadBuilder.forCreateData({
         templateBody: "{{range .}}-{{.portNumber}}{{end}}",
-        filePath: sandboxedNginxConfigFilePath,
+        filePath: sandboxedTemplateFilePath,
       }),
     );
 
-    const deploymentRecord2 = await superuserPb.collection(deploymentsCollectionName).create(
-      deploymentsPayloadBuilder.forCreateData({
-        buildFile: mockBuildFile,
-        settingsFile: mockSettingsFile,
-        secretsFile: mockSecretsFile,
-        collectionsFile: mockCollectionsFile,
-        portNumber: deployedPortNumber2,
-        superuserEmail,
-        superuserPassword,
-      }),
-    );
+    const deploymentRecord2 = await superuserPb
+      .collection(deployPokkitDbFilesCollectionName)
+      .create(
+        deployPokkitDbFilesPayloadBuilder.forCreateData({
+          buildFile: mockBuildFile,
+          settingsFile: mockSettingsFile,
+          secretsFile: mockSecretsFile,
+          collectionsFile: mockCollectionsFile,
+          portNumber: deployedPortNumber2,
+          superuserEmail,
+          superuserPassword,
+        }),
+      );
 
     const healthResponse2 = await fetch(`http://0.0.0.0:${deployedPortNumber2}/api/health`);
     expect(healthResponse2.status).toBe(200);
@@ -271,17 +275,17 @@ describe(`${testSuiteName} tests`, () => {
     const deployment2DirStatResp = await fse.statSync(deployment2DirPath);
 
     expect(deployment2DirStatResp.isDirectory()).toBe(true);
-    const nginxConfigStatResp = await fse.statSync(sandboxedNginxConfigFilePath);
+    const nginxConfigStatResp = await fse.statSync(sandboxedTemplateFilePath);
 
     expect(nginxConfigStatResp.isFile()).toBe(true);
-    const nginxConfigContent = await fse.readFile(sandboxedNginxConfigFilePath, "utf8");
+    const nginxConfigContent = await fse.readFile(sandboxedTemplateFilePath, "utf8");
     expect(nginxConfigContent).toBe(`-${deployedPortNumber1}-${deployedPortNumber2}`);
   });
 
   it("renders a sudo-real nginx template", async () => {
     const deployedPortNumber1 = 9007;
     const deployedPortNumber2 = 9008;
-    const sandboxedNginxConfigFilePath = `${pbDirPath}/config-${deployedPortNumber1}-${deployedPortNumber2}.conf`;
+    const sandboxedTemplateFilePath = `${pbDirPath}/config-${deployedPortNumber1}-${deployedPortNumber2}.conf`;
 
     await killPbInstance({ pbPortNumber: deployedPortNumber1 });
     await killPbInstance({ pbPortNumber: deployedPortNumber2 });
@@ -291,17 +295,19 @@ describe(`${testSuiteName} tests`, () => {
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
 
-    const deploymentRecord1 = await superuserPb.collection(deploymentsCollectionName).create(
-      deploymentsPayloadBuilder.forCreateData({
-        buildFile: mockBuildFile,
-        settingsFile: mockSettingsFile,
-        secretsFile: mockSecretsFile,
-        collectionsFile: mockCollectionsFile,
-        portNumber: deployedPortNumber1,
-        superuserEmail,
-        superuserPassword,
-      }),
-    );
+    const deploymentRecord1 = await superuserPb
+      .collection(deployPokkitDbFilesCollectionName)
+      .create(
+        deployPokkitDbFilesPayloadBuilder.forCreateData({
+          buildFile: mockBuildFile,
+          settingsFile: mockSettingsFile,
+          secretsFile: mockSecretsFile,
+          collectionsFile: mockCollectionsFile,
+          portNumber: deployedPortNumber1,
+          superuserEmail,
+          superuserPassword,
+        }),
+      );
 
     const healthResponse1 = await fetch(`http://0.0.0.0:${deployedPortNumber1}/api/health`);
     expect(healthResponse1.status).toBe(200);
@@ -310,8 +316,8 @@ describe(`${testSuiteName} tests`, () => {
     const deployment1DirStatResp = await fse.statSync(deployment1DirPath);
     expect(deployment1DirStatResp.isDirectory()).toBe(true);
 
-    await superuserPb.collection(nginxTemplatesCollectionName).create(
-      nginxTemplatesPayloadBuilder.forCreateData({
+    await superuserPb.collection(deploymentTemplatesCollectionName).create(
+      deploymentTemplatesPayloadBuilder.forCreateData({
         templateBody: `server {
     listen 80;
     server_name pokkit.cloud;
@@ -343,21 +349,23 @@ server {
 {{- end }}
 
 }`,
-        filePath: sandboxedNginxConfigFilePath,
+        filePath: sandboxedTemplateFilePath,
       }),
     );
 
-    const deploymentRecord2 = await superuserPb.collection(deploymentsCollectionName).create(
-      deploymentsPayloadBuilder.forCreateData({
-        buildFile: mockBuildFile,
-        settingsFile: mockSettingsFile,
-        secretsFile: mockSecretsFile,
-        collectionsFile: mockCollectionsFile,
-        portNumber: deployedPortNumber2,
-        superuserEmail,
-        superuserPassword,
-      }),
-    );
+    const deploymentRecord2 = await superuserPb
+      .collection(deployPokkitDbFilesCollectionName)
+      .create(
+        deployPokkitDbFilesPayloadBuilder.forCreateData({
+          buildFile: mockBuildFile,
+          settingsFile: mockSettingsFile,
+          secretsFile: mockSecretsFile,
+          collectionsFile: mockCollectionsFile,
+          portNumber: deployedPortNumber2,
+          superuserEmail,
+          superuserPassword,
+        }),
+      );
 
     const healthResponse2 = await fetch(`http://0.0.0.0:${deployedPortNumber2}/api/health`);
     expect(healthResponse2.status).toBe(200);
@@ -366,10 +374,10 @@ server {
     const deployment2DirStatResp = await fse.statSync(deployment2DirPath);
 
     expect(deployment2DirStatResp.isDirectory()).toBe(true);
-    const nginxConfigStatResp = await fse.statSync(sandboxedNginxConfigFilePath);
+    const nginxConfigStatResp = await fse.statSync(sandboxedTemplateFilePath);
 
     expect(nginxConfigStatResp.isFile()).toBe(true);
-    const nginxConfigContent = await fse.readFile(sandboxedNginxConfigFilePath, "utf8");
+    const nginxConfigContent = await fse.readFile(sandboxedTemplateFilePath, "utf8");
     expect(nginxConfigContent).toBe(`server {
     listen 80;
     server_name pokkit.cloud;
@@ -421,8 +429,8 @@ server {
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
 
-    await superuserPb.collection(deploymentsCollectionName).create(
-      deploymentsPayloadBuilder.forCreateData({
+    await superuserPb.collection(deployPokkitDbFilesCollectionName).create(
+      deployPokkitDbFilesPayloadBuilder.forCreateData({
         buildFile: mockBuildFile,
         portNumber: deployedPortNumber,
         superuserEmail,
