@@ -21,15 +21,6 @@ func WriteNginxConfigToFile(app pbCore.App) error {
 	deploymentRecords := convertUnproxiedRecordsToDeploymentRecords(unproxiedDeploymentRecords)
 	deploymentRecordsFieldData := convertDeploymentRecordsToFieldsData(deploymentRecords)
 
-	app.Logger().Info(
-		"deploymentRecordsFieldData",
-		"deploymentRecordsFieldData",
-		deploymentRecordsFieldData,
-		"deploymentRecords",
-		deploymentRecords,
-		"nginxTemplateRecords",
-		nginxTemplateRecords,
-	)
 	for _, nginxTemplateRecord := range nginxTemplateRecords {
 		templateBody := nginxTemplateRecord.getTemplateBody()
 
@@ -38,8 +29,6 @@ func WriteNginxConfigToFile(app pbCore.App) error {
 			return fmt.Errorf("Error populating template in WriteNginxConfigToFile: %w", err)
 		}
 
-		nginxTemplateRecordFilePath := nginxTemplateRecord.getFilePath()
-		app.Logger().Info("nginxTemplateRecordFilePath", "nginxTemplateRecordFilePath", nginxTemplateRecordFilePath, "populatedTemplate", populatedTemplate)
 		err = pokkitDbUtils.WriteStringToFile(populatedTemplate, nginxTemplateRecord.getFilePath())
 		if err != nil {
 			return fmt.Errorf("Error writing populated template to file in WriteNginxConfigToFile: %w", err)
