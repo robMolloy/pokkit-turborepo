@@ -34,10 +34,10 @@ jobs:
         working-directory: apps/pokkit-starter/pokkit-starter-db
         run: pnpm run copy-pbconfig-to-build
 
-      - name: Deploy build to PocketBase
+      - name: Deploy db build
         id: deploy
         working-directory: apps/pokkit-starter/pokkit-starter-deploy
-        run: pnpm run deploy-build
+        run: pnpm run deploy-db-build
 
       - name: Echo port number
         run: 'echo "Port number: ${{ steps.deploy.outputs.portNumber }}"'
