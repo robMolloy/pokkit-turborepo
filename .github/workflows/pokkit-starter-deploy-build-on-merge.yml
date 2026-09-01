@@ -40,4 +40,4 @@ jobs:
         run: pnpm run deploy-build
 
       - name: Echo port number
-        run: echo "Port number: ${{ jobs.deploy_pokkit_starter_build_on_merge.outputs.portNumber }}"
+        run: echo "Port number: ${{ steps.deploy.outputs.portNumber }}"
