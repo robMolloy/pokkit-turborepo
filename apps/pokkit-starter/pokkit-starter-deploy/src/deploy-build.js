@@ -29,5 +29,10 @@ await (async () => {
     superuserPassword: "admin@admin.com",
   });
 
-  console.log(deployment);
+  const portNumber = deployment.portNumber;
+  if (process.env.GITHUB_OUTPUT) {
+    fs.appendFileSync(process.env.GITHUB_OUTPUT, `portNumber=${portNumber}\n`);
+  } else {
+    console.log(portNumber);
+  }
 })();

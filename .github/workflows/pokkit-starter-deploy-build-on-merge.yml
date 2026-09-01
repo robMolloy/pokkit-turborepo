@@ -6,6 +6,8 @@ on:
 jobs:
   deploy_pokkit_starter_build_on_merge:
     runs-on: ubuntu-latest
+    outputs:
+      portNumber: ${{ steps.deploy.outputs.portNumber }}
     steps:
       - uses: actions/checkout@v4
 
@@ -33,5 +35,9 @@ jobs:
         run: pnpm run copy-pbconfig-to-build
 
       - name: Deploy build to PocketBase
+        id: deploy
         working-directory: apps/pokkit-starter/pokkit-starter-deploy
         run: pnpm run deploy-build
+
+      - name: Echo port number
+        run: echo "Port number: ${{ jobs.deploy_pokkit_starter_build_on_merge.outputs.portNumber }}"
