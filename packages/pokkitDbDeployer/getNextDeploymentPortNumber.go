@@ -9,20 +9,14 @@ import (
 const lowestPortNumber = 9000
 
 func getNextDeploymentPortNumber(app pbCore.App) (int, error) {
-	records, err := app.FindRecordsByFilter(
-		deploymentsCollectionName,
-		"",
-		"-portNumber",
-		1,
-		0,
-	)
+	highestPortNumber := 0
+	deployPokkitDbFilesRecords, err := FindDeployPokkitDbFilesRecordsByFilter(app, "", "-portNumber", 1, 0)
 	if err != nil {
-		return 0, fmt.Errorf("error returned from app.FindRecordsByFilter in getNextPortNumber: %w", err)
+		return 0, fmt.Errorf("error returned from FindDeployPokkitDbFilesRecordsByFilter in getNextPortNumber: %w", err)
 	}
 
-	highestPortNumber := 0
-	if len(records) > 0 {
-		highestPortNumber = records[0].GetInt("portNumber")
+	if len(deployPokkitDbFilesRecords) > 0 {
+		highestPortNumber = deployPokkitDbFilesRecords[0].getPortNumber()
 	}
 
 	nextPortNumber := highestPortNumber + 1

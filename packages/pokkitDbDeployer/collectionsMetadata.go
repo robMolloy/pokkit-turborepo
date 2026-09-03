@@ -1,3 +1,3 @@
 package pokkitDbDeployer
 
-const deploymentsCollectionName = "deployPokkitDbFiles"
+const deployPokkitDbFilesCollectionName = "deployPokkitDbFiles"

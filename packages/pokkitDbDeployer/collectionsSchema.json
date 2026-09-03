@@ -98,6 +98,19 @@
         "type": "number"
       },
       {
+        "help": "",
+        "hidden": false,
+        "id": "number3979481114",
+        "max": null,
+        "min": null,
+        "name": "sslPortNumber",
+        "onlyInt": false,
+        "presentable": false,
+        "required": true,
+        "system": false,
+        "type": "number"
+      },
+      {
         "autogeneratePattern": "",
         "help": "",
         "hidden": false,

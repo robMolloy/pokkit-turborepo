@@ -18,7 +18,7 @@ func BindFunctions(app pbCore.App) {
 		}
 		e.Next()
 
-		unproxiedRecords, err := app.FindAllRecords(deploymentsCollectionName)
+		unproxiedRecords, err := app.FindAllRecords(deployPokkitDbFilesCollectionName)
 		if err != nil {
 			log.Fatal("error returned from app.FindAllRecords(deploymentsCollectionName) in app.OnServe().BindFunc: %w", err)
 		}
@@ -31,7 +31,7 @@ func BindFunctions(app pbCore.App) {
 		return nil
 	})
 
-	app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+	app.OnRecordAfterCreateSuccess(deployPokkitDbFilesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		deploymentRecord := convertUnproxiedRecordToDeployPokkitDbFilesRecord(e.Record)
 
 		err := writeFilesAndDeployPokkitDb(e.App, deploymentRecord)
@@ -41,7 +41,7 @@ func BindFunctions(app pbCore.App) {
 		return e.Next()
 	})
 
-	app.OnRecordCreate(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+	app.OnRecordCreate(deployPokkitDbFilesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		deploymentRecord := convertUnproxiedRecordToDeployPokkitDbFilesRecord(e.Record)
 		portNumber := deploymentRecord.getPortNumber()
 
@@ -56,7 +56,7 @@ func BindFunctions(app pbCore.App) {
 		return e.Next()
 	})
 
-	app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+	app.OnRecordAfterCreateSuccess(deployPokkitDbFilesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		err := WriteDeploymentTemplatesToFile(e.App)
 		if err != nil {
 			log.Fatal("error returned from WriteNginxConfigToFile in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
@@ -69,7 +69,7 @@ func BindFunctions(app pbCore.App) {
 	})
 
 	app.OnTerminate().BindFunc(func(e *pbCore.TerminateEvent) error {
-		records, err := e.App.FindAllRecords(deploymentsCollectionName)
+		records, err := e.App.FindAllRecords(deployPokkitDbFilesCollectionName)
 		if err != nil {
 			log.Fatal("error returned from e.App.FindAllRecords in app.OnTerminate(): %w", err)
 		}
