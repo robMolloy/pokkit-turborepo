@@ -33,8 +33,8 @@ func (a *deployPokkitDbFilesRecord) getSettingsFileKey() string {
 	}
 	return a.BaseFilesPath() + "/" + a.GetString("settingsFile")
 }
-func (a *deployPokkitDbFilesRecord) getSecretsFileKey() string {
 
+func (a *deployPokkitDbFilesRecord) getSecretsFileKey() string {
 	secretsFileString := a.GetString("secretsFile")
 	if secretsFileString == "" {
 		return ""

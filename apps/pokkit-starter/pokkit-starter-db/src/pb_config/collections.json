@@ -1485,7 +1485,8 @@
       }
     ],
     "indexes": [
-      "CREATE UNIQUE INDEX `idx_hsgdf346yi` ON `deployPokkitDbFiles` (`portNumber`)"
+      "CREATE UNIQUE INDEX `idx_hsgdf346yi` ON `deployPokkitDbFiles` (`portNumber`)",
+      "CREATE UNIQUE INDEX `idx_sslPortNumber` ON `deployPokkitDbFiles` (`sslPortNumber`)"
     ],
     "created": "2026-08-23 07:02:51.011Z",
     "updated": "2026-09-03 13:05:37.876Z",

@@ -16,7 +16,9 @@ func BindFunctions(app pbCore.App) {
 		if err != nil {
 			log.Fatal("failed to mergePokkitDbDeployerCollectionsFromSchema(e.App) in app.OnServe().BindFunc: %w", err)
 		}
-		e.Next()
+		if err := e.Next(); err != nil {
+			return err
+		}
 
 		unproxiedRecords, err := app.FindAllRecords(deployPokkitDbFilesCollectionName)
 		if err != nil {
@@ -42,15 +44,11 @@ func BindFunctions(app pbCore.App) {
 	})
 
 	app.OnRecordCreate(deployPokkitDbFilesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
-		deploymentRecord := convertUnproxiedRecordToDeployPokkitDbFilesRecord(e.Record)
-		portNumber := deploymentRecord.getPortNumber()
+		deployPokkitDbFilesRecord := convertUnproxiedRecordToDeployPokkitDbFilesRecord(e.Record)
 
-		if portNumber <= lowestPortNumber {
-			nextPortNumber, err := getNextDeploymentPortNumber(e.App)
-			if err != nil {
-				log.Fatal("error returned from getNextPortNumber in app.OnRecordCreate(deploymentsCollectionName).BindFunc: %w", err)
-			}
-			deploymentRecord.setPortNumber(nextPortNumber)
+		err := assignMissingDeploymentPortNumbers(e.App, deployPokkitDbFilesRecord)
+		if err != nil {
+			log.Fatal("error returned from assignMissingDeploymentPortNumbers in app.OnRecordCreate(deploymentsCollectionName).BindFunc: %w", err)
 		}
 
 		return e.Next()

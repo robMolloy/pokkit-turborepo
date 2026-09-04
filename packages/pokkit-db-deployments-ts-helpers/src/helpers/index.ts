@@ -7,6 +7,7 @@ export type TDeployPokkitDbFilesCreatePayload = {
   secretsFile?: File;
   collectionsFile?: File;
   portNumber?: number;
+  sslPortNumber?: number;
   superuserEmail: string;
   superuserPassword: string;
 };

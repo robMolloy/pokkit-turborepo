@@ -80,7 +80,8 @@ describe(`${testSuiteName} tests`, () => {
   });
 
   it("serves the deployment without pokkitDb pbConfig files on the specified port", async () => {
-    const deployedPortNumber = 9001;
+    const deployedPortNumber = 11011;
+    const deployedSslPortNumber = 11012;
     await killPbInstance({ pbPortNumber: deployedPortNumber });
     const superuserPb = createPbConnection();
 
@@ -92,6 +93,31 @@ describe(`${testSuiteName} tests`, () => {
       deployPokkitDbFilesPayloadBuilder.forCreateData({
         buildFile: mockBuildFile,
         portNumber: deployedPortNumber,
+        sslPortNumber: deployedSslPortNumber,
+        superuserEmail,
+        superuserPassword,
+      }),
+    );
+
+    const healthResponse = await fetch(`http://0.0.0.0:${deployedPortNumber}/api/health`);
+    expect(healthResponse.status).toBe(200);
+  });
+
+  it("serves the deployment without pokkitDb pbConfig files on the specified port", async () => {
+    const deployedPortNumber = 11001;
+    const sslPortNumber = 11002;
+    await killPbInstance({ pbPortNumber: deployedPortNumber });
+    const superuserPb = createPbConnection();
+
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+
+    await superuserPb.collection(deployPokkitDbFilesCollectionName).create(
+      deployPokkitDbFilesPayloadBuilder.forCreateData({
+        buildFile: mockBuildFile,
+        portNumber: deployedPortNumber,
+        sslPortNumber,
         superuserEmail,
         superuserPassword,
       }),
@@ -102,7 +128,7 @@ describe(`${testSuiteName} tests`, () => {
   });
 
   it("serves a deployment with pokkitDb pbConfig files on the specified port and creates a deployment directory", async () => {
-    const deployedPortNumber = 9002;
+    const deployedPortNumber = 11002;
     await killPbInstance({ pbPortNumber: deployedPortNumber });
     const superuserPb = createPbConnection();
 
@@ -130,7 +156,7 @@ describe(`${testSuiteName} tests`, () => {
   });
 
   it("writes a templatable string to a sandboxed file when a deployment record is created if an nginx template record exists", async () => {
-    const deployedPortNumber = 9003;
+    const deployedPortNumber = 11003;
     const sandboxedTemplateFilePath = `${pbDirPath}/config-${deployedPortNumber}.conf`;
 
     await killPbInstance({ pbPortNumber: deployedPortNumber });
@@ -171,7 +197,7 @@ describe(`${testSuiteName} tests`, () => {
   });
 
   it("populates the template with the port number into the nginx template", async () => {
-    const deployedPortNumber = 9004;
+    const deployedPortNumber = 11004;
     const sandboxedTemplateFilePath = `${pbDirPath}/config-${deployedPortNumber}.conf`;
 
     await killPbInstance({ pbPortNumber: deployedPortNumber });
@@ -214,8 +240,8 @@ describe(`${testSuiteName} tests`, () => {
   });
 
   it("populates the template with the port numbers into the nginx config from the nginx template", async () => {
-    const deployedPortNumber1 = 9005;
-    const deployedPortNumber2 = 9006;
+    const deployedPortNumber1 = 11005;
+    const deployedPortNumber2 = 11006;
     const sandboxedTemplateFilePath = `${pbDirPath}/config-${deployedPortNumber1}-${deployedPortNumber2}.conf`;
 
     await killPbInstance({ pbPortNumber: deployedPortNumber1 });
@@ -283,8 +309,8 @@ describe(`${testSuiteName} tests`, () => {
   });
 
   it("renders a sudo-real nginx template", async () => {
-    const deployedPortNumber1 = 9007;
-    const deployedPortNumber2 = 9008;
+    const deployedPortNumber1 = 11007;
+    const deployedPortNumber2 = 11008;
     const sandboxedTemplateFilePath = `${pbDirPath}/config-${deployedPortNumber1}-${deployedPortNumber2}.conf`;
 
     await killPbInstance({ pbPortNumber: deployedPortNumber1 });
@@ -391,8 +417,8 @@ server {
     ssl_certificate /etc/letsencrypt/live/pokkit.cloud/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/pokkit.cloud/privkey.pem;
 
-    location /9007/ {
-        proxy_pass http://127.0.0.1:9007/;
+    location /11007/ {
+        proxy_pass http://127.0.0.1:11007/;
         proxy_http_version 1.1;
 
         proxy_set_header Host $host;
@@ -404,8 +430,8 @@ server {
         proxy_set_header Connection "upgrade";
     }
 
-    location /9008/ {
-        proxy_pass http://127.0.0.1:9008/;
+    location /11008/ {
+        proxy_pass http://127.0.0.1:11008/;
         proxy_http_version 1.1;
 
         proxy_set_header Host $host;
@@ -421,7 +447,7 @@ server {
   });
 
   it("deploys all the existing deployment records onServe", async () => {
-    const deployedPortNumber = 9009;
+    const deployedPortNumber = 11009;
     await killPbInstance({ pbPortNumber: deployedPortNumber });
     const superuserPb = createPbConnection();
 
