@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
+	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbUtils"
 )
 
 func writeFilesAndDeployPokkitDb(app pbCore.App, deploymentRecord *deployPokkitDbFilesRecord) error {
@@ -32,26 +33,26 @@ func writeFilesAndDeployPokkitDb(app pbCore.App, deploymentRecord *deployPokkitD
 	defer fsys.Close()
 
 	pbFilePath := deploymentDir + "/app-db"
-	err = writeFileToFileSystemFromKey(fsys, buildFileKey, deploymentDir+"/app-db")
+	err = pokkitDbUtils.WriteFileToFileSystemFromKey(fsys, buildFileKey, deploymentDir+"/app-db")
 	if err != nil {
 		return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, buildFileKey, deploymentDir+\"/app-db\") in writeFilesAndDeployPokkitDb: %w", err)
 	}
 
 	if settingsFileKey != "" {
-		err = writeFileToFileSystemFromKey(fsys, settingsFileKey, deploymentDir+"/pb_config/settings.json")
+		err = pokkitDbUtils.WriteFileToFileSystemFromKey(fsys, settingsFileKey, deploymentDir+"/pb_config/settings.json")
 		if err != nil {
 			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, settingsFileKey, deploymentDir+\"/pb_config/settings.json\") in writeFilesAndDeployPokkitDb: %w", err)
 		}
 	}
 	if secretsFileKey != "" {
-		err = writeFileToFileSystemFromKey(fsys, secretsFileKey, deploymentDir+"/pb_config/secrets.json")
+		err = pokkitDbUtils.WriteFileToFileSystemFromKey(fsys, secretsFileKey, deploymentDir+"/pb_config/secrets.json")
 		if err != nil {
 			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, secretsFileKey, deploymentDir+\"/pb_config/secrets.json\") in writeFilesAndDeployPokkitDb: %w", err)
 		}
 	}
 
 	if collectionsFileKey != "" {
-		err = writeFileToFileSystemFromKey(fsys, collectionsFileKey, deploymentDir+"/pb_config/collections.json")
+		err = pokkitDbUtils.WriteFileToFileSystemFromKey(fsys, collectionsFileKey, deploymentDir+"/pb_config/collections.json")
 		if err != nil {
 			return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, collectionsFileKey, deploymentDir+\"/pb_config/collections.json\") in writeFilesAndDeployPokkitDb: %w", err)
 		}

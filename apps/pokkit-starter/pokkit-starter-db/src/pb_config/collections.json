@@ -94,7 +94,7 @@
       "CREATE INDEX `idx_mfas_collectionRef_recordRef` ON `_mfas` (collectionRef,recordRef)"
     ],
     "created": "2026-08-12 07:22:44.810Z",
-    "updated": "2026-09-01 12:20:37.617Z",
+    "updated": "2026-09-04 14:03:23.341Z",
     "system": true
   },
   {
@@ -206,7 +206,7 @@
       "CREATE INDEX `idx_otps_collectionRef_recordRef` ON `_otps` (collectionRef, recordRef)"
     ],
     "created": "2026-08-12 07:22:44.812Z",
-    "updated": "2026-09-01 12:20:37.618Z",
+    "updated": "2026-09-04 14:03:23.343Z",
     "system": true
   },
   {
@@ -320,7 +320,7 @@
       "CREATE UNIQUE INDEX `idx_externalAuths_collection_provider` ON `_externalAuths` (collectionRef, provider, providerId)"
     ],
     "created": "2026-08-12 07:22:44.814Z",
-    "updated": "2026-09-01 12:20:37.619Z",
+    "updated": "2026-09-04 14:03:23.344Z",
     "system": true
   },
   {
@@ -418,7 +418,7 @@
       "CREATE UNIQUE INDEX `idx_authOrigins_unique_pairs` ON `_authOrigins` (collectionRef, recordRef, fingerprint)"
     ],
     "created": "2026-08-12 07:22:44.817Z",
-    "updated": "2026-09-01 12:20:37.621Z",
+    "updated": "2026-09-04 14:03:23.346Z",
     "system": true
   },
   {
@@ -533,7 +533,7 @@
       "CREATE UNIQUE INDEX `idx_email_pbc_3142635823` ON `_superusers` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-08-12 07:22:44.819Z",
-    "updated": "2026-09-01 12:20:37.622Z",
+    "updated": "2026-09-04 14:03:23.346Z",
     "system": true,
     "authRule": "",
     "manageRule": null,
@@ -750,7 +750,7 @@
       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
     ],
     "created": "2026-08-12 07:22:44.822Z",
-    "updated": "2026-09-01 12:20:37.624Z",
+    "updated": "2026-09-04 14:03:23.395Z",
     "system": false,
     "authRule": "",
     "manageRule": null,
@@ -915,7 +915,7 @@
       "CREATE UNIQUE INDEX `idx_djyvvpjhe1` ON `globalUserPermissions` (`userId`)"
     ],
     "created": "2026-08-12 11:07:59.725Z",
-    "updated": "2026-09-01 12:20:37.627Z",
+    "updated": "2026-09-04 14:03:23.397Z",
     "system": false
   },
   {
@@ -1027,7 +1027,7 @@
       "CREATE UNIQUE INDEX `idx_2ag063yzee` ON `organisationUserPermissions` (\n  `orgId`,\n  `userId`\n)"
     ],
     "created": "2026-08-12 11:07:59.729Z",
-    "updated": "2026-09-01 12:20:37.628Z",
+    "updated": "2026-09-04 14:03:23.398Z",
     "system": false
   },
   {
@@ -1110,7 +1110,7 @@
       "CREATE UNIQUE INDEX `idx_l5jn9kiytc` ON `organisations` (`name`)"
     ],
     "created": "2026-08-12 11:07:59.731Z",
-    "updated": "2026-09-01 12:20:37.631Z",
+    "updated": "2026-09-04 14:03:23.399Z",
     "system": false
   },
   {
@@ -1182,7 +1182,7 @@
     ],
     "indexes": [],
     "created": "2026-08-19 21:03:23.836Z",
-    "updated": "2026-09-01 12:20:37.633Z",
+    "updated": "2026-09-04 14:03:23.410Z",
     "system": false
   },
   {
@@ -1319,7 +1319,7 @@
     ],
     "indexes": [],
     "created": "2026-08-19 21:03:23.839Z",
-    "updated": "2026-09-01 12:20:37.635Z",
+    "updated": "2026-09-04 14:03:23.411Z",
     "system": false
   },
   {
@@ -1489,7 +1489,7 @@
       "CREATE UNIQUE INDEX `idx_sslPortNumber` ON `deployPokkitDbFiles` (`sslPortNumber`)"
     ],
     "created": "2026-08-23 07:02:51.011Z",
-    "updated": "2026-09-03 13:05:37.876Z",
+    "updated": "2026-09-04 14:03:23.421Z",
     "system": false
   },
   {
@@ -1570,7 +1570,7 @@
     ],
     "indexes": [],
     "created": "2026-08-21 11:05:56.480Z",
-    "updated": "2026-09-01 12:39:31.579Z",
+    "updated": "2026-09-04 14:03:23.420Z",
     "system": false
   },
   {
@@ -1652,8 +1652,103 @@
     "indexes": [
       "CREATE UNIQUE INDEX `idx_secrets_key` ON `_pb_config_secrets` (key)"
     ],
-    "created": "2026-08-27 10:47:32.257Z",
-    "updated": "2026-09-01 12:20:37.643Z",
+    "created": "2026-09-04 14:03:23.389Z",
+    "updated": "2026-09-04 14:03:23.389Z",
+    "system": false
+  },
+  {
+    "id": "pbc_2824589293",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "name": "deployViteFiles",
+    "type": "base",
+    "fields": [
+      {
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "help": "",
+        "hidden": false,
+        "id": "text3208210256",
+        "max": 15,
+        "min": 15,
+        "name": "id",
+        "pattern": "^[a-z0-9]+$",
+        "presentable": false,
+        "primaryKey": true,
+        "required": true,
+        "system": true,
+        "type": "text"
+      },
+      {
+        "help": "",
+        "hidden": false,
+        "id": "file246720628",
+        "maxSelect": 1,
+        "maxSize": 500000000,
+        "mimeTypes": [],
+        "name": "zipFile",
+        "presentable": false,
+        "protected": true,
+        "required": true,
+        "system": false,
+        "thumbs": [],
+        "type": "file"
+      },
+      {
+        "help": "",
+        "hidden": false,
+        "id": "number1085635215",
+        "max": null,
+        "min": null,
+        "name": "portNumber",
+        "onlyInt": false,
+        "presentable": false,
+        "required": true,
+        "system": false,
+        "type": "number"
+      },
+      {
+        "help": "",
+        "hidden": false,
+        "id": "number3979481114",
+        "max": null,
+        "min": null,
+        "name": "sslPortNumber",
+        "onlyInt": false,
+        "presentable": false,
+        "required": true,
+        "system": false,
+        "type": "number"
+      },
+      {
+        "hidden": false,
+        "id": "autodate2990389176",
+        "name": "created",
+        "onCreate": true,
+        "onUpdate": false,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      },
+      {
+        "hidden": false,
+        "id": "autodate3332085495",
+        "name": "updated",
+        "onCreate": true,
+        "onUpdate": true,
+        "presentable": false,
+        "system": false,
+        "type": "autodate"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX `idx_hsgdf346yicjn` ON `deployViteFiles` (`portNumber`)",
+      "CREATE UNIQUE INDEX `idx_sslPortNumberutf` ON `deployViteFiles` (`sslPortNumber`)"
+    ],
+    "created": "2026-09-04 14:43:28.447Z",
+    "updated": "2026-09-04 14:43:28.447Z",
     "system": false
   }
 ]

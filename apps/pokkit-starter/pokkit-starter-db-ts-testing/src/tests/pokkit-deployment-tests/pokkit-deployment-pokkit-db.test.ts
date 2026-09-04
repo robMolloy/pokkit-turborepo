@@ -17,10 +17,10 @@ import fse from "fs-extra";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../../config/pocketbaseConfig";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_constants";
-import { pokkitDbDeploymentsTestsMetadata } from "./_pokkitDbDeploymentsTestsMetadata";
+import { pokkitDbDeploymentsTestsMetadata } from "./_pokkitDeploymentsTestsMetadata";
 import { delay } from "@repo/pokkit-utils";
 
-const testMetadata = pokkitDbDeploymentsTestsMetadata.pokkitDbDeployments1;
+const testMetadata = pokkitDbDeploymentsTestsMetadata.pokkitDeploymentsPokkitDb;
 const testSuiteName = testMetadata.name;
 
 const pbPortNumber = testMetadata.portNumber;

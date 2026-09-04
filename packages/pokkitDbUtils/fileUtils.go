@@ -3,7 +3,10 @@ package pokkitDbUtils
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"os"
+
+	pbFilesystem "github.com/pocketbase/pocketbase/tools/filesystem"
 )
 
 func FileExists(path string) bool {
@@ -46,4 +49,22 @@ func ReadJsonFromFileGeneric[T any](filePath string) (T, error) {
 
 func WriteStringToFile(contentBodyString string, filePath string) error {
 	return os.WriteFile(filePath, []byte(contentBodyString), 0644)
+}
+
+func WriteFileToFileSystemFromKey(fsys *pbFilesystem.System, fileKey string, filePath string) error {
+	buildFileReader, err := fsys.GetReader(fileKey)
+	if err != nil {
+		return err
+	}
+	defer buildFileReader.Close()
+
+	data, err := io.ReadAll(buildFileReader)
+	if err != nil {
+		return err
+	}
+
+	if err := os.WriteFile(filePath, data, 0755); err != nil {
+		return err
+	}
+	return nil
 }

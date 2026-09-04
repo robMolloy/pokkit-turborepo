@@ -1,12 +1,9 @@
 package pokkitDbDeployer
 
 import (
-	"io"
 	"log"
-	"os"
 
 	pbCore "github.com/pocketbase/pocketbase/core"
-	pbFilesystem "github.com/pocketbase/pocketbase/tools/filesystem"
 	"github.com/robMolloy/pokkit-turborepo/packages/pokkitDbUtils"
 )
 
@@ -80,22 +77,4 @@ func BindFunctions(app pbCore.App) {
 		return e.Next()
 	})
 
-}
-
-func writeFileToFileSystemFromKey(fsys *pbFilesystem.System, fileKey string, filePath string) error {
-	buildFileReader, err := fsys.GetReader(fileKey)
-	if err != nil {
-		return err
-	}
-	defer buildFileReader.Close()
-
-	data, err := io.ReadAll(buildFileReader)
-	if err != nil {
-		return err
-	}
-
-	if err := os.WriteFile(filePath, data, 0755); err != nil {
-		return err
-	}
-	return nil
 }
