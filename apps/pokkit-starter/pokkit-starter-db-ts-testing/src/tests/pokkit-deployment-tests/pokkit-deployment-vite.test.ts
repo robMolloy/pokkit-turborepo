@@ -1,6 +1,8 @@
 import {
   deployViteFilesCollectionName,
   deployViteFilesPayloadBuilder,
+  deploymentTemplatesCollectionName,
+  deploymentTemplatesPayloadBuilder,
 } from "@repo/pokkit-db-deployments-ts-helpers";
 import {
   getPbFilePath,
@@ -156,6 +158,154 @@ describe(`${testSuiteName} tests`, () => {
     await expect(siteResponse.text()).resolves.toContain("<!doctype html>");
 
     await killPbInstance({ pbPortNumber: deployedPortNumber });
+  });
+
+  it("writes a templatable string to a sandboxed file when a vite deployment record is created if an nginx template record exists", async () => {
+    const deployedPortNumber = 11310;
+    const sslPortNumber = 11311;
+    const sandboxedTemplateFilePath = `${pbDirPath}/config-${deployedPortNumber}.conf`;
+
+    await killPbInstance({ pbPortNumber: deployedPortNumber });
+    const superuserPb = createPbConnection();
+
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+
+    await superuserPb.collection(deploymentTemplatesCollectionName).create(
+      deploymentTemplatesPayloadBuilder.forCreateData({
+        templateBody: "test",
+        filePath: sandboxedTemplateFilePath,
+      }),
+    );
+
+    const deploymentRecord = await superuserPb.collection(deployViteFilesCollectionName).create(
+      deployViteFilesPayloadBuilder.forCreateData({
+        zipFile: mockViteDistZip,
+        portNumber: deployedPortNumber,
+        sslPortNumber,
+      }),
+    );
+
+    const siteResponse = await fetch(`http://0.0.0.0:${deployedPortNumber}/`);
+    expect(siteResponse.status).toBe(200);
+    await expect(siteResponse.text()).resolves.toContain("<!doctype html>");
+
+    const deploymentStatResp = await fse.statSync(
+      `${pbDirPath}/_deployments/${deploymentRecord.id}`,
+    );
+    expect(deploymentStatResp.isDirectory()).toBe(true);
+    const nginxConfigStatResp = await fse.statSync(sandboxedTemplateFilePath);
+    expect(nginxConfigStatResp.isFile()).toBe(true);
+
+    await killPbInstance({ pbPortNumber: deployedPortNumber });
+  });
+
+  it("populates the template with the vite deployment port number", async () => {
+    const deployedPortNumber = 11312;
+    const sslPortNumber = 11313;
+    const sandboxedTemplateFilePath = `${pbDirPath}/config-${deployedPortNumber}.conf`;
+
+    await killPbInstance({ pbPortNumber: deployedPortNumber });
+    const superuserPb = createPbConnection();
+
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+
+    await superuserPb.collection(deploymentTemplatesCollectionName).create(
+      deploymentTemplatesPayloadBuilder.forCreateData({
+        templateBody: "{{range .}}{{.portNumber}}{{end}}",
+        filePath: sandboxedTemplateFilePath,
+      }),
+    );
+
+    const deploymentRecord = await superuserPb.collection(deployViteFilesCollectionName).create(
+      deployViteFilesPayloadBuilder.forCreateData({
+        zipFile: mockViteDistZip,
+        portNumber: deployedPortNumber,
+        sslPortNumber,
+      }),
+    );
+
+    const siteResponse = await fetch(`http://0.0.0.0:${deployedPortNumber}/`);
+    expect(siteResponse.status).toBe(200);
+    await expect(siteResponse.text()).resolves.toContain("<!doctype html>");
+
+    const deploymentStatResp = await fse.statSync(
+      `${pbDirPath}/_deployments/${deploymentRecord.id}`,
+    );
+    expect(deploymentStatResp.isDirectory()).toBe(true);
+    const nginxConfigStatResp = await fse.statSync(sandboxedTemplateFilePath);
+    expect(nginxConfigStatResp.isFile()).toBe(true);
+    const nginxConfigContent = await fse.readFile(sandboxedTemplateFilePath, "utf8");
+    expect(nginxConfigContent).toBe(`${deployedPortNumber}`);
+
+    await killPbInstance({ pbPortNumber: deployedPortNumber });
+  });
+
+  it("populates the template with port numbers from multiple vite deployments", async () => {
+    const deployedPortNumber1 = 11314;
+    const sslPortNumber1 = 11315;
+    const deployedPortNumber2 = 11316;
+    const sslPortNumber2 = 11317;
+    const sandboxedTemplateFilePath = `${pbDirPath}/config-${deployedPortNumber1}-${deployedPortNumber2}.conf`;
+
+    await killPbInstance({ pbPortNumber: deployedPortNumber1 });
+    await killPbInstance({ pbPortNumber: deployedPortNumber2 });
+    const superuserPb = createPbConnection();
+
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+
+    const deploymentRecord1 = await superuserPb.collection(deployViteFilesCollectionName).create(
+      deployViteFilesPayloadBuilder.forCreateData({
+        zipFile: mockViteDistZip,
+        portNumber: deployedPortNumber1,
+        sslPortNumber: sslPortNumber1,
+      }),
+    );
+
+    const siteResponse1 = await fetch(`http://0.0.0.0:${deployedPortNumber1}/`);
+    expect(siteResponse1.status).toBe(200);
+    await expect(siteResponse1.text()).resolves.toContain("<!doctype html>");
+
+    const deployment1DirPath = `${pbDirPath}/_deployments/${deploymentRecord1.id}`;
+    const deployment1DirStatResp = await fse.statSync(deployment1DirPath);
+    expect(deployment1DirStatResp.isDirectory()).toBe(true);
+
+    await superuserPb.collection(deploymentTemplatesCollectionName).create(
+      deploymentTemplatesPayloadBuilder.forCreateData({
+        templateBody: "{{range .}}-{{.portNumber}}{{end}}",
+        filePath: sandboxedTemplateFilePath,
+      }),
+    );
+
+    const deploymentRecord2 = await superuserPb.collection(deployViteFilesCollectionName).create(
+      deployViteFilesPayloadBuilder.forCreateData({
+        zipFile: mockViteDistZip,
+        portNumber: deployedPortNumber2,
+        sslPortNumber: sslPortNumber2,
+      }),
+    );
+
+    const siteResponse2 = await fetch(`http://0.0.0.0:${deployedPortNumber2}/`);
+    expect(siteResponse2.status).toBe(200);
+    await expect(siteResponse2.text()).resolves.toContain("<!doctype html>");
+
+    const deployment2DirPath = `${pbDirPath}/_deployments/${deploymentRecord2.id}`;
+    const deployment2DirStatResp = await fse.statSync(deployment2DirPath);
+
+    expect(deployment2DirStatResp.isDirectory()).toBe(true);
+    const nginxConfigStatResp = await fse.statSync(sandboxedTemplateFilePath);
+
+    expect(nginxConfigStatResp.isFile()).toBe(true);
+    const nginxConfigContent = await fse.readFile(sandboxedTemplateFilePath, "utf8");
+    expect(nginxConfigContent).toBe(`-${deployedPortNumber1}-${deployedPortNumber2}`);
+
+    await killPbInstance({ pbPortNumber: deployedPortNumber1 });
+    await killPbInstance({ pbPortNumber: deployedPortNumber2 });
   });
   /*
 
