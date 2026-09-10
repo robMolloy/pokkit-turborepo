@@ -87,6 +87,8 @@ describe(`${testSuiteName} tests`, () => {
       portNumber: deployedPortNumber,
       sslPortNumber: sslPortNumber,
     });
+
+    await killPbInstance({ pbPortNumber: deployedPortNumber });
   });
 
   it("When the vite build zip file is added to the database, the relevant files and directories are created", async () => {
@@ -118,13 +120,13 @@ describe(`${testSuiteName} tests`, () => {
     expect(fse.existsSync(deployedDirPath)).toBe(true);
     const viteBuildZipFilePath = `${deployedDirPath}/zipFile.zip`;
     expect(fse.existsSync(viteBuildZipFilePath)).toBe(true);
-    const vistBuildIndexFilePath = `${deployedDirPath}/index.html`;
-    expect(fse.existsSync(vistBuildIndexFilePath)).toBe(true);
+    const viteBuildIndexFilePath = `${deployedDirPath}/dist/index.html`;
+    expect(fse.existsSync(viteBuildIndexFilePath)).toBe(true);
 
     await killPbInstance({ pbPortNumber: deployedPortNumber });
   });
 
-  it.only("When the vite build zip file is added to the database it is then served on the specified port", async () => {
+  it("When the vite build zip file is added to the database it is then served on the specified port", async () => {
     const deployedPortNumber = 11306;
     const sslPortNumber = 11307;
     await killPbInstance({ pbPortNumber: deployedPortNumber });
@@ -149,8 +151,9 @@ describe(`${testSuiteName} tests`, () => {
       sslPortNumber: sslPortNumber,
     });
 
-    const healthResponse = await fetch(`http://0.0.0.0:${deployedPortNumber}/api/health`);
-    expect(healthResponse.status).toBe(200);
+    const siteResponse = await fetch(`http://0.0.0.0:${deployedPortNumber}/`);
+    expect(siteResponse.status).toBe(200);
+    await expect(siteResponse.text()).resolves.toContain("<!doctype html>");
 
     await killPbInstance({ pbPortNumber: deployedPortNumber });
   });
