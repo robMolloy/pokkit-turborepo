@@ -22,6 +22,7 @@ const testSuiteName = testMetadata.name;
 
 const pbPortNumber = testMetadata.portNumber;
 const pbDirPath = `_sandboxes/${testSuiteName}`;
+const deploymentsDirPath = `${pbDirPath}/_deployments`;
 const pbFilePath = getPbFilePath({ pbDirPath });
 const pbServeUrl = getPbServeUrl({ pbPortNumber });
 const logFilePath = `_logs/${testSuiteName}`;
@@ -44,7 +45,7 @@ describe(`${testSuiteName} tests`, () => {
 
   afterAll(async () => {
     await killPbInstance({ pbPortNumber });
-    fse.removeSync(pbDirPath);
+    // fse.removeSync(pbDirPath);
   }, 30000);
 
   beforeEach(async () => {
@@ -88,9 +89,44 @@ describe(`${testSuiteName} tests`, () => {
     });
   });
 
-  it.only("is able to add the vite build zip file to the database", async () => {
-    const deployedPortNumber = 11300;
-    const sslPortNumber = 11301;
+  it("When the vite build zip file is added to the database, the relevant files and directories are created", async () => {
+    const deployedPortNumber = 11304;
+    const sslPortNumber = 11305;
+    await killPbInstance({ pbPortNumber: deployedPortNumber });
+    const superuserPb = createPbConnection();
+
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+
+    const resp = await superuserPb.collection(deployViteFilesCollectionName).create(
+      deployViteFilesPayloadBuilder.forCreateData({
+        zipFile: mockViteDistZip,
+        portNumber: deployedPortNumber,
+        sslPortNumber,
+      }),
+    );
+    expect(resp).toMatchObject({
+      id: expect.any(String),
+      created: expect.any(String),
+      updated: expect.any(String),
+      portNumber: deployedPortNumber,
+      sslPortNumber: sslPortNumber,
+    });
+
+    const deployedDirPath = `${deploymentsDirPath}/${resp.id}`;
+    expect(fse.existsSync(deployedDirPath)).toBe(true);
+    const viteBuildZipFilePath = `${deployedDirPath}/zipFile.zip`;
+    expect(fse.existsSync(viteBuildZipFilePath)).toBe(true);
+    const vistBuildIndexFilePath = `${deployedDirPath}/index.html`;
+    expect(fse.existsSync(vistBuildIndexFilePath)).toBe(true);
+
+    await killPbInstance({ pbPortNumber: deployedPortNumber });
+  });
+
+  it.only("When the vite build zip file is added to the database it is then served on the specified port", async () => {
+    const deployedPortNumber = 11306;
+    const sslPortNumber = 11307;
     await killPbInstance({ pbPortNumber: deployedPortNumber });
     const superuserPb = createPbConnection();
 
@@ -115,6 +151,8 @@ describe(`${testSuiteName} tests`, () => {
 
     const healthResponse = await fetch(`http://0.0.0.0:${deployedPortNumber}/api/health`);
     expect(healthResponse.status).toBe(200);
+
+    await killPbInstance({ pbPortNumber: deployedPortNumber });
   });
   /*
 

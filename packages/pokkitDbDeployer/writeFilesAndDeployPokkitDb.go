@@ -76,6 +76,50 @@ func writeFilesAndDeployPokkitDb(app pbCore.App, deploymentRecord *deployPokkitD
 	return nil
 }
 
+func writeFilesAndDeployVite(app pbCore.App, deploymentRecord *deployViteFilesRecord) error {
+	deploymentsDir := filepath.Join(app.DataDir(), "..", "_deployments")
+	deploymentDir := filepath.Join(deploymentsDir, deploymentRecord.getId())
+
+	os.Remove(deploymentDir)
+
+	pbConfigDir := filepath.Join(deploymentDir, "pb_config")
+	err := os.MkdirAll(pbConfigDir, 0755)
+	if err != nil {
+		return fmt.Errorf("failed to os.MkdirAll(deploymentDir, 0755) in writeFilesAndDeployVite: %w", err)
+	}
+
+	zipFileKey := deploymentRecord.getZipFileKey()
+
+	fsys, err := app.NewFilesystem()
+	if err != nil {
+		return fmt.Errorf("error returned from e.App.NewFilesystem() in writeFilesAndDeployPokkitDb: %w", err)
+	}
+	defer fsys.Close()
+
+	err = pokkitDbUtils.WriteFileToFileSystemFromKey(fsys, zipFileKey, deploymentDir+"/zipFile.zip")
+	if err != nil {
+		return fmt.Errorf("failed to writeFileToFileSystemFromKey(fsys, zipFileKey, deploymentDir+\"/zipFile.zip\") in writeFilesAndDeployVite: %w", err)
+	}
+
+	deploymentDistDirPath := deploymentDir + "/dist"
+	_, err = Unzip(deploymentDir+"/zipFile.zip", deploymentDistDirPath)
+	if err != nil {
+		return fmt.Errorf("error returned from Unzip in writeFilesAndDeployVite: %w", err)
+	}
+
+	portNumber := deploymentRecord.getPortNumber()
+
+	servePbResp, err := ServeVite(deploymentDistDirPath, portNumber, filepath.Join(deploymentDir, "log.txt"))
+	if err != nil {
+		return fmt.Errorf("error returned from ServePb in writeFilesAndDeployPokkitDb: %w", err)
+	}
+	if servePbResp == nil {
+		return fmt.Errorf("servePbResp == nil returned from ServePb in writeFilesAndDeployPokkitDb")
+	}
+
+	return nil
+}
+
 func writeFilesAndDeployPokkitDbs(app pbCore.App, deploymentRecords []*deployPokkitDbFilesRecord) *[]error {
 	errors := []error{}
 

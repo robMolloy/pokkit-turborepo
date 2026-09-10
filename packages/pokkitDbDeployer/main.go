@@ -43,9 +43,16 @@ func BindFunctions(app pbCore.App) {
 	app.OnRecordCreate(deployPokkitDbFilesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
 		deployPokkitDbFilesRecord := convertUnproxiedRecordToDeployPokkitDbFilesRecord(e.Record)
 
-		err := assignMissingDeploymentPortNumbers(e.App, deployPokkitDbFilesRecord)
+		truncatedHighestPortNumber, err := getTruncatedHighestDeploymentPortNumber(e.App)
 		if err != nil {
 			log.Fatal("error returned from assignMissingDeploymentPortNumbers in app.OnRecordCreate(deploymentsCollectionName).BindFunc: %w", err)
+		}
+
+		if deployPokkitDbFilesRecord.getPortNumber() == 0 {
+			deployPokkitDbFilesRecord.setPortNumber(truncatedHighestPortNumber + 1)
+		}
+		if deployPokkitDbFilesRecord.getSslPortNumber() == 0 {
+			deployPokkitDbFilesRecord.setSslPortNumber(truncatedHighestPortNumber + 2)
 		}
 
 		return e.Next()
@@ -59,6 +66,34 @@ func BindFunctions(app pbCore.App) {
 		err = ReloadNginxConfig(e.App)
 		if err != nil {
 			log.Fatal("error returned from ReloadNginxConfig in app.OnRecordAfterCreateSuccess(deploymentsCollectionName).BindFunc: %w", err)
+		}
+		return e.Next()
+	})
+
+	app.OnRecordCreate(deployViteFilesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+		deployViteFilesRecord := convertUnproxiedRecordToDeployViteFilesRecord(e.Record)
+
+		truncatedHighestPortNumber, err := getTruncatedHighestDeploymentPortNumber(e.App)
+		if err != nil {
+			log.Fatal("error returned from getTruncatedHighestDeploymentPortNumber in app.OnRecordCreate(deployViteFilesCollectionName).BindFunc: %w", err)
+		}
+
+		if deployViteFilesRecord.getPortNumber() == 0 {
+			deployViteFilesRecord.setPortNumber(truncatedHighestPortNumber + 1)
+		}
+		if deployViteFilesRecord.getSslPortNumber() == 0 {
+			deployViteFilesRecord.setSslPortNumber(truncatedHighestPortNumber + 2)
+		}
+
+		return e.Next()
+	})
+
+	app.OnRecordAfterCreateSuccess(deployViteFilesCollectionName).BindFunc(func(e *pbCore.RecordEvent) error {
+		deploymentRecord := convertUnproxiedRecordToDeployViteFilesRecord(e.Record)
+
+		err := writeFilesAndDeployVite(e.App, deploymentRecord)
+		if err != nil {
+			log.Fatal("error returned from writeFilesAndDeployVite in app.OnRecordAfterCreateSuccess(deployViteFilesCollectionName).BindFunc: %w", err)
 		}
 		return e.Next()
 	})

@@ -106,3 +106,17 @@ func copyPbOutput(r io.Reader, writeLog func(string), onLine func(string)) error
 	}
 	return nil
 }
+
+func cmdOutputHandler(r io.Reader, writeLog func(string), onLine func(string)) error {
+	scanner := bufio.NewScanner(r)
+	err := scanner.Err()
+	if err != nil {
+		return fmt.Errorf("failed to scanner.Err() in copyPbOutput: %w", err)
+	}
+	for scanner.Scan() {
+		line := scanner.Text()
+		writeLog(line)
+		onLine(line)
+	}
+	return nil
+}

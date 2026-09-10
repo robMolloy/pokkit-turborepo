@@ -1,12 +1,9 @@
-import { exec, spawn, type ChildProcessWithoutNullStreams } from "child_process";
+import { delay, killProcessByPortNumber } from "@repo/pokkit-utils";
+import { spawn, type ChildProcessWithoutNullStreams } from "child_process";
 import fse from "fs-extra";
-import { promisify } from "util";
-import PocketBase from "pocketbase";
 import type { ListOptions } from "pocketbase";
+import PocketBase from "pocketbase";
 import { superusersCollectionName } from "../helpers/pbMetadata";
-import { delay } from "@repo/pokkit-utils";
-
-const execAsync = promisify(exec);
 
 export const getPortNumberFromDbUrl = (dbUrl: string): number | undefined => {
   const rtn = dbUrl.split(":").slice(-1)[0]?.match(/^\d+/)?.[0];
@@ -21,14 +18,7 @@ export const killPocketbaseInstanceByDbUrl = async (dbUrl: string) => {
   return killPocketbaseInstanceByDbPortNumber(portNumber);
 };
 export const killPocketbaseInstanceByDbPortNumber = async (portNumber: number) => {
-  try {
-    const result = await execAsync(
-      `kill -15 $(lsof -tiTCP:"${portNumber}" -sTCP:LISTEN 2>/dev/null | head -n 1) 2>/dev/null || true`,
-    );
-    return { success: true, data: result } as const;
-  } catch (error) {
-    return { success: false, error } as const;
-  }
+  return killProcessByPortNumber(portNumber);
 };
 
 export const killPocketbaseInstanceBySpawnProcess = async (

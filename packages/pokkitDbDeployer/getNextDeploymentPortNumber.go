@@ -34,39 +34,46 @@ func getHighestDeploymentPortNumber(app pbCore.App) (int, error) {
 		}
 	}
 
+	deployViteFilesRecords, err := FindDeployViteFilesRecordsByFilter(app, "", "-portNumber", 1, 0)
+	if err != nil {
+		return 0, fmt.Errorf("error returned from FindDeployViteFilesRecordsByFilter in getHighestDeploymentPortNumber: %w", err)
+	}
+
+	if len(deployViteFilesRecords) == 1 {
+		portNumber := deployViteFilesRecords[0].getPortNumber()
+		if portNumber > highestPortNumber {
+			highestPortNumber = portNumber
+		}
+	}
+
+	deployViteFilesRecords, err = FindDeployViteFilesRecordsByFilter(app, "", "-sslPortNumber", 1, 0)
+	if err != nil {
+		return 0, fmt.Errorf("error returned from FindDeployViteFilesRecordsByFilter in getHighestDeploymentPortNumber: %w", err)
+	}
+
+	if len(deployViteFilesRecords) == 1 {
+		portNumber := deployViteFilesRecords[0].getSslPortNumber()
+		if portNumber > highestPortNumber {
+			highestPortNumber = portNumber
+		}
+	}
+
 	return highestPortNumber, nil
 }
 
-func assignMissingDeploymentPortNumbers(app pbCore.App, record *deployPokkitDbFilesRecord) error {
-	if record.getPortNumber() != 0 && record.getSslPortNumber() != 0 {
-		return nil
-	}
-
+func getTruncatedHighestDeploymentPortNumber(app pbCore.App) (int, error) {
 	highestPortNumber, err := getHighestDeploymentPortNumber(app)
 	if err != nil {
-		return err
-	}
-	if portNumber := record.getPortNumber(); portNumber > highestPortNumber {
-		highestPortNumber = portNumber
-	}
-	if sslPortNumber := record.getSslPortNumber(); sslPortNumber > highestPortNumber {
-		highestPortNumber = sslPortNumber
+		return 0, fmt.Errorf("error returned from getHighestDeploymentPortNumber in getTruncatedHighestDeploymentPortNumber: %w", err)
 	}
 
-	nextPortNumber := func() int {
+	truncatedHighestPortNumber := (func() int {
 		if highestPortNumber < MIN_PORT_NUMBER {
-			highestPortNumber = MIN_PORT_NUMBER - 1
+			return MIN_PORT_NUMBER
 		}
-		highestPortNumber++
+
 		return highestPortNumber
-	}
+	})()
 
-	if record.getPortNumber() == 0 {
-		record.setPortNumber(nextPortNumber())
-	}
-	if record.getSslPortNumber() == 0 {
-		record.setSslPortNumber(nextPortNumber())
-	}
-
-	return nil
+	return truncatedHighestPortNumber, nil
 }
