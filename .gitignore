@@ -5,6 +5,7 @@ node_modules
 **/vite.config.ts.timestamp-*
 .pnp
 .pnp.js
+.pnpm-store
 
 # Testing
 coverage
@@ -20,6 +21,7 @@ coverage
 out/
 build
 dist
+
 
 
 # Debug

@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "exports": {
     ".": "./index.ts",
-    "./styles.css": "./dist/styles.css"
+    "./styles.css": "./styles.css"
   },
   "license": "MIT",
   "scripts": {

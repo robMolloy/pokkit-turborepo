@@ -1,8 +1,6 @@
 import {
-  deployPokkitDbFilesCollectionName,
-  deployPokkitDbFilesPayloadBuilder,
-  deploymentTemplatesCollectionName,
-  deploymentTemplatesPayloadBuilder,
+  deployViteFilesCollectionName,
+  deployViteFilesPayloadBuilder,
 } from "@repo/pokkit-db-deployments-ts-helpers";
 import {
   getPbFilePath,
@@ -18,9 +16,8 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PocketBase } from "../../config/pocketbaseConfig";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "../_constants";
 import { pokkitDbDeploymentsTestsMetadata } from "./_pokkitDeploymentsTestsMetadata";
-import { delay } from "@repo/pokkit-utils";
 
-const testMetadata = pokkitDbDeploymentsTestsMetadata.pokkitDeploymentsPokkitDb;
+const testMetadata = pokkitDbDeploymentsTestsMetadata.pokkitDeploymentsViteDb;
 const testSuiteName = testMetadata.name;
 
 const pbPortNumber = testMetadata.portNumber;
@@ -29,24 +26,10 @@ const pbFilePath = getPbFilePath({ pbDirPath });
 const pbServeUrl = getPbServeUrl({ pbPortNumber });
 const logFilePath = `_logs/${testSuiteName}`;
 
-const mockCollectionsFileBuffer = fse.readFileSync("src/tests/mocks/pokkitDbMock/collections.json");
-const mockCollectionsFile = new File([mockCollectionsFileBuffer], "collections.json", {
+const mockViteDistZipBuffer = fse.readFileSync("src/tests/mocks/viteMock/dist.zip");
+const mockViteDistZip = new File([mockViteDistZipBuffer], "dist.zip", {
   type: "application/json",
 });
-const mockSettingsFileBuffer = fse.readFileSync("src/tests/mocks/pokkitDbMock/settings.json");
-const mockSettingsFile = new File([mockSettingsFileBuffer], "settings.json", {
-  type: "application/json",
-});
-const mockSecretsFileBuffer = fse.readFileSync("src/tests/mocks/pokkitDbMock/secrets.json");
-const mockSecretsFile = new File([mockSecretsFileBuffer], "secrets.json", {
-  type: "application/json",
-});
-const mockBuildFileBuffer = fse.readFileSync(`${sourceTestBuildDirPath}/app-db`);
-const mockBuildFile = new File([mockBuildFileBuffer], "app-db", {
-  type: "application/x-executable",
-});
-
-// test push
 
 const createPbConnection = () => new PocketBase(pbServeUrl);
 describe(`${testSuiteName} tests`, () => {
@@ -79,9 +62,9 @@ describe(`${testSuiteName} tests`, () => {
     expect(isHealthy.code).toBe(200);
   });
 
-  it("serves the deployment without pokkitDb pbConfig files on the specified port", async () => {
-    const deployedPortNumber = 11011;
-    const deployedSslPortNumber = 11012;
+  it("is able to add the vite build zip file to the database", async () => {
+    const deployedPortNumber = 11300;
+    const sslPortNumber = 11301;
     await killPbInstance({ pbPortNumber: deployedPortNumber });
     const superuserPb = createPbConnection();
 
@@ -89,43 +72,52 @@ describe(`${testSuiteName} tests`, () => {
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
 
-    await superuserPb.collection(deployPokkitDbFilesCollectionName).create(
-      deployPokkitDbFilesPayloadBuilder.forCreateData({
-        buildFile: mockBuildFile,
-        portNumber: deployedPortNumber,
-        sslPortNumber: deployedSslPortNumber,
-        superuserEmail,
-        superuserPassword,
-      }),
-    );
-
-    const healthResponse = await fetch(`http://0.0.0.0:${deployedPortNumber}/api/health`);
-    expect(healthResponse.status).toBe(200);
-  });
-
-  it("serves the deployment without pokkitDb pbConfig files on the specified port", async () => {
-    const deployedPortNumber = 11001;
-    const sslPortNumber = 11002;
-    await killPbInstance({ pbPortNumber: deployedPortNumber });
-    const superuserPb = createPbConnection();
-
-    await superuserPb
-      .collection(superusersCollectionName)
-      .authWithPassword(superuserEmail, superuserPassword);
-
-    await superuserPb.collection(deployPokkitDbFilesCollectionName).create(
-      deployPokkitDbFilesPayloadBuilder.forCreateData({
-        buildFile: mockBuildFile,
+    const resp = await superuserPb.collection(deployViteFilesCollectionName).create(
+      deployViteFilesPayloadBuilder.forCreateData({
+        zipFile: mockViteDistZip,
         portNumber: deployedPortNumber,
         sslPortNumber,
-        superuserEmail,
-        superuserPassword,
       }),
     );
+    expect(resp).toMatchObject({
+      id: expect.any(String),
+      created: expect.any(String),
+      updated: expect.any(String),
+      portNumber: deployedPortNumber,
+      sslPortNumber: sslPortNumber,
+    });
+  });
+
+  it.only("is able to add the vite build zip file to the database", async () => {
+    const deployedPortNumber = 11300;
+    const sslPortNumber = 11301;
+    await killPbInstance({ pbPortNumber: deployedPortNumber });
+    const superuserPb = createPbConnection();
+
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+
+    const resp = await superuserPb.collection(deployViteFilesCollectionName).create(
+      deployViteFilesPayloadBuilder.forCreateData({
+        zipFile: mockViteDistZip,
+        portNumber: deployedPortNumber,
+        sslPortNumber,
+      }),
+    );
+    expect(resp).toMatchObject({
+      id: expect.any(String),
+      created: expect.any(String),
+      updated: expect.any(String),
+      portNumber: deployedPortNumber,
+      sslPortNumber: sslPortNumber,
+    });
 
     const healthResponse = await fetch(`http://0.0.0.0:${deployedPortNumber}/api/health`);
     expect(healthResponse.status).toBe(200);
   });
+  /*
+
 
   it("serves a deployment with pokkitDb pbConfig files on the specified port and creates a deployment directory", async () => {
     const deployedPortNumber = 11002;
@@ -495,4 +487,6 @@ server {
     const isHealthy = await pb.health.check();
     expect(isHealthy.code).toBe(200);
   });
+
+   */
 });

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "compress-build": "../../../node_modules/.bin/zip-a-folder dist dist.zip",
     "preview": "vite preview",
     "lint": "eslint \"src/**/*.ts\"",
     "tsc": "cd ../../.. && apps/pokkit-starter/pokkit-starter-ui/node_modules/.bin/tsc --project apps/pokkit-starter/pokkit-starter-ui/tsconfig.json --noemit --watch"

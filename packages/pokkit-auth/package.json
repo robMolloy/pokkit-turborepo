@@ -4,7 +4,7 @@
   "exports": {
     ".": "./index.ts",
     "./lib": "./src/lib/index.ts",
-    "./styles.css": "./dist/styles.css"
+    "./styles.css": "./styles.css"
   },
   "license": "MIT",
   "scripts": {
