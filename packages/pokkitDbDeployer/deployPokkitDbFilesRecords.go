@@ -12,3 +12,11 @@ func FindDeployPokkitDbFilesRecordsByFilter(app pbCore.App, filter string, sort 
 	}
 	return convertUnproxiedRecordsToDeployPokkitDbFilesRecords(unproxiedRecords), nil
 }
+
+func findAllDeployPokkitDbFilesRecords(app pbCore.App, exprs ...dbx.Expression) ([]*deployPokkitDbFilesRecord, error) {
+	unproxiedRecords, err := app.FindAllRecords(deployPokkitDbFilesCollectionName, exprs...)
+	if err != nil {
+		return nil, err
+	}
+	return convertUnproxiedRecordsToDeployPokkitDbFilesRecords(unproxiedRecords), nil
+}
