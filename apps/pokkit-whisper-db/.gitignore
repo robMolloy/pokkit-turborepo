@@ -2,3 +2,7 @@ pb_data/*.db-*
 pb_data/storage
 
 node_modules
+
+# Cloud Agent dev environment artifacts (see .cursor/install.sh)
+app-db-linux
+pb_data_dev
