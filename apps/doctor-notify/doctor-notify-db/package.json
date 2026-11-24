@@ -8,9 +8,9 @@
   "main": "index.js",
   "scripts": {
     "test-NOT-SETUP-YET": "go test -v ./...",
-    "build:no-cache": "go build -a -o build/app-db ./src",
-    "build:any-changed-deps": "go build -o build/app-db ./src/...",
-    "build-only": "pnpm run build:any-changed-deps",
+    "build:no-cache": "go build -a -o ./build ./src",
+    "build:any-changed-deps": "go build -o ./build/app-db ./src",
+    "build": "pnpm run build:any-changed-deps",
     "serve-build": "./build/app-db serve --http=\"0.0.0.0:8099\"",
     "serve-dev": "cd ./src && go run . serve --http=\"0.0.0.0:8099\"",
     "dev": "pnpm run serve-dev"
