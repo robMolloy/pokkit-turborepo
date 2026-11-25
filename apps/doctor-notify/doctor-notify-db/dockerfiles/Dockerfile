@@ -20,5 +20,5 @@ COPY --from=build /pocketbase /app/pocketbase
 
 EXPOSE 8090
 
-ENTRYPOINT ["/bin/sh", "-c", "/app/pocketbase superuser upsert \"admin@admin.com\" \"admin@admin.com\" && exec /app/pocketbase \"$@\"", "--"]
+ENTRYPOINT ["/bin/sh", "-c", "/app/pocketbase superuser upsert \"admin2@admin.com\" \"admin2@admin.com\" && exec /app/pocketbase \"$@\"", "--"]
 CMD ["serve", "--http=0.0.0.0:8090"]
