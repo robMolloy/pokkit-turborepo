@@ -1,0 +1,21 @@
+{
+  "name": "pokkit-turborepo",
+  "install": "bash .cursor/install.sh",
+  "chromeExecutablePath": "/usr/local/bin/google-chrome",
+  "terminals": [
+    {
+      "name": "pokkit-whisper-db",
+      "command": "cd apps/pokkit-whisper-db && ./app-db-linux serve --http=0.0.0.0:8090 --dir pb_data_dev",
+      "description": "PocketBase backend for pokkit-whisper. REST API + admin dashboard on http://localhost:8090 (dashboard at /_/)."
+    },
+    {
+      "name": "pokkit-whisper-ui",
+      "command": "cd apps/pokkit-whisper && pnpm exec vite --host 0.0.0.0 --port 5173",
+      "description": "Vite dev server for the pokkit-whisper frontend on http://localhost:5173."
+    }
+  ],
+  "ports": [
+    { "name": "pokkit-whisper UI", "port": 5173 },
+    { "name": "pokkit-whisper DB", "port": 8090 }
+  ]
+}
