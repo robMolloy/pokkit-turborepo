@@ -1,0 +1,14 @@
+{
+  "name": "Pokkit Turborepo",
+  "install": "bash .cursor/install.sh",
+  "terminals": [
+    {
+      "name": "pokkit-starter-db",
+      "command": "cd apps/pokkit-starter/pokkit-starter-db/src && go run . serve --http=0.0.0.0:8091"
+    },
+    {
+      "name": "pokkit-starter-ui",
+      "command": "cd apps/pokkit-starter/pokkit-starter-ui && pnpm exec vite --host 0.0.0.0 --port 5173"
+    }
+  ]
+}
