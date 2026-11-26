@@ -15,6 +15,10 @@ export default (p: { mode: ConfigEnv }) => {
       environment: "node",
       fileParallelism: true,
       forceRerunTriggers: ["**/source-test-build/**"],
+      typecheck: {
+        enabled: true,
+        include: ["**/*.{test,spec}.{ts,tsx}"],
+      },
     },
   });
 };
