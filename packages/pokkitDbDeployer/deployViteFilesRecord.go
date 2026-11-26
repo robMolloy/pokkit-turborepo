@@ -47,11 +47,3 @@ func convertUnproxiedRecordsToDeployViteFilesRecords(unproxiedRecords []*pbCore.
 	}
 	return deployViteFilesRecords
 }
-
-func convertDeployViteFilesRecordsToFieldsData(deployViteFilesRecords []*deployViteFilesRecord) []map[string]any {
-	fieldsData := []map[string]any{}
-	for _, deployViteFilesRecord := range deployViteFilesRecords {
-		fieldsData = append(fieldsData, deployViteFilesRecord.FieldsData())
-	}
-	return fieldsData
-}

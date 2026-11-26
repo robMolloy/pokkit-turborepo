@@ -14,12 +14,19 @@ func WriteDeploymentTemplatesToFile(app pbCore.App) error {
 	}
 	deploymentTemplateRecords := convertUnproxiedRecordsToDeploymentTemplateRecords(unproxiedDeploymentTemplateRecords)
 
-	unproxiedDeploymentRecords, err := app.FindAllRecords(deployPokkitDbFilesCollectionName)
+	deployPokkitDbFilesRecords, err := findAllDeployPokkitDbFilesRecords(app)
 	if err != nil {
 		return fmt.Errorf("Error finding deployment records in WriteDeploymentTemplatesToFile: %w", err)
 	}
-	deploymentRecords := convertUnproxiedRecordsToDeployPokkitDbFilesRecords(unproxiedDeploymentRecords)
-	deploymentRecordsFieldData := convertDeployPokkitDbFilesRecordsToFieldsData(deploymentRecords)
+	deployPokkitDbFilesRecordsFieldsData := convertDeployPokkitDbFilesRecordsToFieldsData(deployPokkitDbFilesRecords)
+
+	deployViteFilesRecords, err := findAllDeployViteFilesRecords(app)
+	if err != nil {
+		return fmt.Errorf("Error finding deployment records in WriteDeploymentTemplatesToFile: %w", err)
+	}
+	deployViteFilesRecordsFieldsData := convertDeployViteFilesRecordsToFieldsData(deployViteFilesRecords)
+
+	deploymentRecordsFieldData := append(deployPokkitDbFilesRecordsFieldsData, deployViteFilesRecordsFieldsData...)
 
 	for _, deploymentTemplateRecord := range deploymentTemplateRecords {
 		templateBody := deploymentTemplateRecord.getTemplateBody()

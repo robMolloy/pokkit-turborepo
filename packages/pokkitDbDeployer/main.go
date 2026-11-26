@@ -17,15 +17,24 @@ func BindFunctions(app pbCore.App) {
 			return err
 		}
 
-		unproxiedRecords, err := app.FindAllRecords(deployPokkitDbFilesCollectionName)
+		deployPokkitDbFilesRecords, err := findAllDeployPokkitDbFilesRecords(e.App)
 		if err != nil {
-			log.Fatal("error returned from app.FindAllRecords(deploymentsCollectionName) in app.OnServe().BindFunc: %w", err)
+			log.Fatal("error returned from findAllDeployPokkitDbFilesRecords in app.OnServe().BindFunc: %w", err)
 		}
-		deploymentRecords := convertUnproxiedRecordsToDeployPokkitDbFilesRecords(unproxiedRecords)
 
-		errors := writeFilesAndDeployPokkitDbs(e.App, deploymentRecords)
+		errors := writeFilesAndDeployPokkitDbs(e.App, deployPokkitDbFilesRecords)
 		if errors != nil {
 			e.App.Logger().Error("error returned from writeFilesAndDeployPokkitDbs in app.OnServe().BindFunc: %w", "errors", errors)
+		}
+
+		viteDeploymentRecords, err := findAllDeployViteFilesRecords(e.App)
+		if err != nil {
+			log.Fatal("error returned from findAllDeployViteFilesRecords in app.OnServe().BindFunc: %w", err)
+		}
+
+		viteErrors := writeFilesAndDeployVites(e.App, viteDeploymentRecords)
+		if viteErrors != nil {
+			e.App.Logger().Error("error returned from writeFilesAndDeployVites in app.OnServe().BindFunc: %w", "errors", viteErrors)
 		}
 		return nil
 	})
@@ -106,6 +115,15 @@ func BindFunctions(app pbCore.App) {
 		e.App.Logger().Info("records", "records", records)
 		for _, record := range records {
 			deploymentRecord := convertUnproxiedRecordToDeployPokkitDbFilesRecord(record)
+			pokkitDbUtils.KillProcessByPortNumber(deploymentRecord.getPortNumber())
+		}
+
+		viteRecords, err := e.App.FindAllRecords(deployViteFilesCollectionName)
+		if err != nil {
+			log.Fatal("error returned from e.App.FindAllRecords(deployViteFilesCollectionName) in app.OnTerminate(): %w", err)
+		}
+		for _, record := range viteRecords {
+			deploymentRecord := convertUnproxiedRecordToDeployViteFilesRecord(record)
 			pokkitDbUtils.KillProcessByPortNumber(deploymentRecord.getPortNumber())
 		}
 
