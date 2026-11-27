@@ -2,7 +2,7 @@ import {
   getPbFilePath,
   getPbServeUrl,
   killPbInstance,
-  migrateDown1,
+  migrateDownFromCli,
   servePb,
   superusersCollectionName,
   truncatePbCollections,
@@ -60,10 +60,6 @@ describe("a", () => {
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
     expect(superuserPb.authStore.isValid).toBe(true);
-
-    // await superuserPb
-    //   .collection(superusersCollectionName)
-    //   .create({ email: "newsuperuser@aol.com", password: "password", passwordConfirm: "password" });
   });
 
   it("allows second superuser to login but ", async () => {
@@ -84,7 +80,7 @@ describe("a", () => {
 
     superuserPb.authStore.clear();
 
-    await migrateDown1({ pbFilePath });
+    await migrateDownFromCli({ pbFilePath, qty: 1 });
 
     await expect(
       superuserPb

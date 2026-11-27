@@ -126,10 +126,8 @@ export const upsertPbAdminCredentialsFromCli = async (p: {
   });
 };
 
-export const migrateDown1 = async (p: { pbFilePath: string }) => {
-  const upsertProcess = spawn(`${p.pbFilePath}`, ["migrate", "down", "1"]);
-
-  upsertProcess.on("error", (err) => console.error("spawn error:", err));
+export const migrateDownFromCli = async (p: { pbFilePath: string; qty: number }) => {
+  const upsertProcess = spawn(`${p.pbFilePath}`, ["migrate", "down", p.qty.toString()]);
 
   return new Promise((resolve) => {
     upsertProcess.stdout.on("data", (data) => {
@@ -142,16 +140,12 @@ export const migrateDown1 = async (p: { pbFilePath: string }) => {
 
     upsertProcess.stderr.on("data", (data) => {
       const text = data.toString();
-      console.error("stderr:", JSON.stringify(text));
       if (text.includes("(y/N)")) {
         upsertProcess.stdin.write("y\n");
       }
     });
 
-    upsertProcess.stdin.on("error", (err) => console.error("stdin error:", err));
-
-    upsertProcess.on("close", (code, signal) => {
-      console.log("close:", { code, signal });
+    upsertProcess.on("close", () => {
       resolve(false);
     });
   });
