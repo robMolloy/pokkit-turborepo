@@ -52,4 +52,12 @@ describe("a", () => {
     const isHealthy = await pb.health.check();
     expect(isHealthy.code).toBe(200);
   });
+
+  it("allows superuser to auth", async () => {
+    const superuserPb = createPbConnection();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+    expect(superuserPb.authStore.isValid).toBe(true);
+  });
 });
