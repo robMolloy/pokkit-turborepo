@@ -11,8 +11,8 @@
     "build:no-cache": "go build -a -o ./build ./src",
     "build:any-changed-deps": "go build -o ./build/app-db ./src",
     "build": "pnpm run build:any-changed-deps",
-    "serve-build": "./build/app-db serve --http=\"0.0.0.0:8099\"",
-    "serve-dev": "cd ./src && go run . serve --http=\"0.0.0.0:8099\"",
+    "serve-build": "./build/app-db serve --http=\"0.0.0.0:8100\"",
+    "serve-dev": "cd ./src && go run . serve --http=\"0.0.0.0:8101\"",
     "dev": "pnpm run serve-dev"
   }
 }

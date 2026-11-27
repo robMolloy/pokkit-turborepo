@@ -2,6 +2,7 @@ import {
   getPbFilePath,
   getPbServeUrl,
   killPbInstance,
+  migrateDown1,
   servePb,
   superusersCollectionName,
   truncatePbCollections,
@@ -59,5 +60,43 @@ describe("a", () => {
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
     expect(superuserPb.authStore.isValid).toBe(true);
+
+    // await superuserPb
+    //   .collection(superusersCollectionName)
+    //   .create({ email: "newsuperuser@aol.com", password: "password", passwordConfirm: "password" });
+  });
+
+  it("allows second superuser to login but ", async () => {
+    const superuserPb = createPbConnection();
+    await superuserPb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuserEmail, superuserPassword);
+
+    const superuser2Data = { email: "newsuperuser@aol.com", password: "password" };
+
+    const resp = await superuserPb.collection(superusersCollectionName).create({
+      email: superuser2Data.email,
+      password: superuser2Data.password,
+      passwordConfirm: superuser2Data.password,
+    });
+
+    expect(resp.id).toBeTruthy();
+
+    superuserPb.authStore.clear();
+
+    await migrateDown1({ pbFilePath });
+
+    await expect(
+      superuserPb
+        .collection(superusersCollectionName)
+        .authWithPassword(superuserEmail, superuserPassword),
+    ).rejects.toThrow();
+
+    const superuser2Pb = createPbConnection();
+    await superuser2Pb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuser2Data.email, superuser2Data.password);
+
+    expect(superuser2Pb.authStore.isValid).toBe(true);
   });
 });

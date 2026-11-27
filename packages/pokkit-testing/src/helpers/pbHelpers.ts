@@ -126,6 +126,37 @@ export const upsertPbAdminCredentialsFromCli = async (p: {
   });
 };
 
+export const migrateDown1 = async (p: { pbFilePath: string }) => {
+  const upsertProcess = spawn(`${p.pbFilePath}`, ["migrate", "down", "1"]);
+
+  upsertProcess.on("error", (err) => console.error("spawn error:", err));
+
+  return new Promise((resolve) => {
+    upsertProcess.stdout.on("data", (data) => {
+      const text = data.toString();
+
+      if (text.toLowerCase().includes("reverted")) {
+        resolve(true);
+      }
+    });
+
+    upsertProcess.stderr.on("data", (data) => {
+      const text = data.toString();
+      console.error("stderr:", JSON.stringify(text));
+      if (text.includes("(y/N)")) {
+        upsertProcess.stdin.write("y\n");
+      }
+    });
+
+    upsertProcess.stdin.on("error", (err) => console.error("stdin error:", err));
+
+    upsertProcess.on("close", (code, signal) => {
+      console.log("close:", { code, signal });
+      resolve(false);
+    });
+  });
+};
+
 export const truncatePbCollections = async (p: {
   pbPortNumber: number;
   superuserEmail: string;

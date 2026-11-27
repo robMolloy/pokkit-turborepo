@@ -1,5 +1,5 @@
 // main.go
-package pbPluginAddSuperuserMigrationDb
+package main
 
 import (
 	"log"
