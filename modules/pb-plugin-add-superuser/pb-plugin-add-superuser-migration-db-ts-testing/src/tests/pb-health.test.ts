@@ -24,6 +24,8 @@ const pbServeUrl = getPbServeUrl({ pbPortNumber });
 
 const createPbConnection = () => new PocketBase(pbServeUrl);
 
+const superuser2Data = { email: "newsuperuser@aol.com", password: "password" };
+
 describe("a", () => {
   beforeAll(async () => {
     await killPbInstance({ pbPortNumber });
@@ -62,8 +64,10 @@ describe("a", () => {
     expect(superuserPb.authStore.isValid).toBe(true);
   });
 
-  it("allows second superuser to login but ", async () => {
+  it("allows second superuser to be created and logged in ", async () => {
     const superuserPb = createPbConnection();
+    const superuser2Pb = createPbConnection();
+
     await superuserPb
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
@@ -75,10 +79,18 @@ describe("a", () => {
       password: superuser2Data.password,
       passwordConfirm: superuser2Data.password,
     });
-
     expect(resp.id).toBeTruthy();
 
-    superuserPb.authStore.clear();
+    await superuser2Pb
+      .collection(superusersCollectionName)
+      .authWithPassword(superuser2Data.email, superuser2Data.password);
+
+    expect(superuser2Pb.authStore.isValid).toBe(true);
+  });
+
+  it("rejects superuser from logging in but allows second superuser to login, once migration is reverted", async () => {
+    const superuserPb = createPbConnection();
+    const superuser2Pb = createPbConnection();
 
     await migrateDownFromCli({ pbFilePath, qty: 1 });
 
@@ -88,7 +100,6 @@ describe("a", () => {
         .authWithPassword(superuserEmail, superuserPassword),
     ).rejects.toThrow();
 
-    const superuser2Pb = createPbConnection();
     await superuser2Pb
       .collection(superusersCollectionName)
       .authWithPassword(superuser2Data.email, superuser2Data.password);
