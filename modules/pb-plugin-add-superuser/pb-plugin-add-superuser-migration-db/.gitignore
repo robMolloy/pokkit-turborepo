@@ -1,0 +1,7 @@
+src/_deployments
+src/pb_data/*.db
+src/pb_data/*.db*
+src/pb_data/storage
+src/pb_data/secrets.json
+
+node_modules
