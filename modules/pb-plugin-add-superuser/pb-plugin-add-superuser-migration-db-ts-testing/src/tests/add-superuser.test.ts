@@ -14,7 +14,7 @@ import { PocketBase } from "../config/pocketbaseConfig";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "./_testConstants";
 import { testsContext } from "./_testsContext";
 
-const testContext = testsContext.simpleTest;
+const testContext = testsContext.addSuperuser;
 const testSuiteName = testContext.name;
 
 const pbPortNumber = testContext.portNumber;
@@ -64,15 +64,13 @@ describe("a", () => {
     expect(superuserPb.authStore.isValid).toBe(true);
   });
 
-  it("allows second superuser to be created and logged in ", async () => {
+  it("allows superuser to create superuser2  and then log in ", async () => {
     const superuserPb = createPbConnection();
     const superuser2Pb = createPbConnection();
 
     await superuserPb
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
-
-    const superuser2Data = { email: "newsuperuser@aol.com", password: "password" };
 
     const resp = await superuserPb.collection(superusersCollectionName).create({
       email: superuser2Data.email,

@@ -1,6 +1,6 @@
 export const testsContext = {
-  simpleTest: {
+  addSuperuser: {
     portNumber: 9001,
-    name: "simpleTest",
+    name: "addSuperuser",
   },
 };
