@@ -1,4 +1,4 @@
-package pbPluginAddSuperuserMigration
+package addDefaultSuperuserPbPlugin
 
 import (
 	pbCore "ganigeorgiev.com/pocketbase/pocketbase/core"
@@ -8,7 +8,7 @@ import (
 var email = "admin@admin.com"
 var pass = email
 
-func BindFunctions() {
+func BindMigration() {
 	pbMigrations.Register(func(app pbCore.App) error {
 		col, err := app.FindCollectionByNameOrId(pbCore.CollectionNameSuperusers)
 		if err != nil {

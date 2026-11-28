@@ -1,5 +1,5 @@
 {
-  "name": "pb-plugin-add-superuser-migration-db",
+  "name": "add-default-superuser-pb-sandbox",
   "version": "1.0.0",
   "description": "",
   "license": "ISC",

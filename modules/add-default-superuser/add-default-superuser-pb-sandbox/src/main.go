@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"ganigeorgiev.com/pocketbase/pocketbase"
-	pbPluginAddSuperuserMigration "github.com/robMolloy/pokkit-turborepo/modules/pb-plugin-add-superuser/pb-plugin-add-superuser-migration"
+	addDefaultSuperuserPbPlugin "github.com/robMolloy/pokkit-turborepo/modules/add-default-superuser/add-default-superuser-pb-plugin"
 
 	"ganigeorgiev.com/pocketbase/pocketbase/plugins/migratecmd"
 	"ganigeorgiev.com/pocketbase/pocketbase/tools/osutils"
@@ -14,7 +14,7 @@ import (
 func main() {
 	app := pocketbase.New()
 
-	pbPluginAddSuperuserMigration.BindFunctions()
+	addDefaultSuperuserPbPlugin.BindMigration()
 
 	migratecmd.MustRegister(app, app.RootCmd, migratecmd.Config{
 		Automigrate: osutils.IsProbablyGoRun(),

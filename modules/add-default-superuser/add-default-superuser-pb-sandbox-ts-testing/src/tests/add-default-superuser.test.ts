@@ -14,7 +14,7 @@ import { PocketBase } from "../config/pocketbaseConfig";
 import { sourceTestBuildDirPath, superuserEmail, superuserPassword } from "./_testConstants";
 import { testsContext } from "./_testsContext";
 
-const testContext = testsContext.addSuperuser;
+const testContext = testsContext.addDefaultSuperuser;
 const testSuiteName = testContext.name;
 
 const pbPortNumber = testContext.portNumber;
@@ -56,23 +56,23 @@ describe("a", () => {
     expect(isHealthy.code).toBe(200);
   });
 
-  it("allows superuser to auth", async () => {
-    const superuserPb = createPbConnection();
-    await superuserPb
+  it("allows default superuser to log in", async () => {
+    const defaultSuperuserPb = createPbConnection();
+    await defaultSuperuserPb
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
-    expect(superuserPb.authStore.isValid).toBe(true);
+    expect(defaultSuperuserPb.authStore.isValid).toBe(true);
   });
 
-  it("allows superuser to create superuser2  and then log in ", async () => {
-    const superuserPb = createPbConnection();
+  it("allows default superuser to create superuser2 and then log in", async () => {
+    const defaultSuperuserPb = createPbConnection();
     const superuser2Pb = createPbConnection();
 
-    await superuserPb
+    await defaultSuperuserPb
       .collection(superusersCollectionName)
       .authWithPassword(superuserEmail, superuserPassword);
 
-    const resp = await superuserPb.collection(superusersCollectionName).create({
+    const resp = await defaultSuperuserPb.collection(superusersCollectionName).create({
       email: superuser2Data.email,
       password: superuser2Data.password,
       passwordConfirm: superuser2Data.password,
@@ -87,13 +87,13 @@ describe("a", () => {
   });
 
   it("rejects superuser from logging in but allows second superuser to login, once migration is reverted", async () => {
-    const superuserPb = createPbConnection();
+    const defaultSuperuserPb = createPbConnection();
     const superuser2Pb = createPbConnection();
 
     await migrateDownFromCli({ pbFilePath, qty: 1 });
 
     await expect(
-      superuserPb
+      defaultSuperuserPb
         .collection(superusersCollectionName)
         .authWithPassword(superuserEmail, superuserPassword),
     ).rejects.toThrow();

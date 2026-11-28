@@ -1,5 +1,5 @@
 {
-  "name": "pb-plugin-add-superuser-migration",
+  "name": "add-default-superuser-pb-plugin",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
