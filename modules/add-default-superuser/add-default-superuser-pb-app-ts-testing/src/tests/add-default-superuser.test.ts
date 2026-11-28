@@ -26,7 +26,7 @@ const createPbConnection = () => new PocketBase(pbServeUrl);
 
 const superuser2Data = { email: "newsuperuser@aol.com", password: "password" };
 
-describe("a", () => {
+describe("add-default-superuser", () => {
   beforeAll(async () => {
     await killPbInstance({ pbPortNumber });
 
