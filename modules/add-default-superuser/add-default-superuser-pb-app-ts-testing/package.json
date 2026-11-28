@@ -15,10 +15,7 @@
     "test": "vitest",
     "test-once": "vitest run",
     "test-ui": "vitest --ui",
-    "tsc": "node_modules/.bin/tsc --project ./tsconfig.json --noemit --watch",
-    "attempt-kill-port": "kill -9 $(lsof -ti :\"$PORT\" 2>/dev/null | head -n 1) 2>/dev/null || true",
-    "kill-port": "PORT=$PORT npm run attempt-kill-port",
-    "get-platform-arch": "node -e \"console.log(process.platform + '_' + process.arch + (process.platform === 'win32' ? '.exe' : ''))\""
+    "tsc": "cd ../../.. && node_modules/.bin/tsc -p \"$OLDPWD\" --noEmit --watch"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",

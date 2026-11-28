@@ -1,0 +1,39 @@
+{
+  "name": "add-default-superuser-pb-api-ts-testing",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build-source-in-staging:any-changed-deps": "go build -o ../add-default-superuser-pb-api-ts-testing/staging-test-build/app-db ../add-default-superuser-pb-app/src",
+    "build-source-in-staging": "pnpm run build-source-in-staging:any-changed-deps",
+    "copy-staging-to-source": "rm -rf ./source-test-build && cp -r ./staging-test-build ./source-test-build",
+    "remove-staging": "rm -rf ./staging-test-build",
+    "build-source": "pnpm run build-source-in-staging && pnpm run copy-staging-to-source && pnpm run remove-staging",
+    "build-source:on-change-to-dev": "node ../../../node_modules/nodemon/bin/nodemon.js --watch ../../../packages --watch ../add-default-superuser-pb-app/src --on-change-only --exec \"pnpm run build-source\" --ext \"go,json\"",
+    "pre-test": "pnpm run build-source",
+    "test-companion": "pnpm run build-source:on-change-to-dev",
+    "test": "vitest",
+    "test-once": "vitest run",
+    "test-ui": "vitest --ui",
+    "tsc": "cd ../../.. && node_modules/.bin/tsc -p \"$OLDPWD\" --noEmit --watch"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^25.0.10",
+    "@vitest/ui": "4.0.18",
+    "dotenv": "^17.2.3",
+    "fs-extra": "^11.3.3",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4",
+    "vitest": "^4.0.18"
+  },
+  "dependencies": {
+    "@repo/pokkit-testing": "workspace:^",
+    "@repo/pokkit-db-permissions-ts-helpers": "workspace:^",
+    "@repo/pokkit-db-deployments-ts-helpers": "workspace:^",
+    "@repo/pokkit-db-blog-ts-helpers": "workspace:^",
+    "@repo/pokkit-utils": "workspace:^",
+    "pocketbase": "^0.26.6",
+    "zod": "^4.3.6"
+  }
+}
